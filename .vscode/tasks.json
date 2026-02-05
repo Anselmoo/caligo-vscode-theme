@@ -1,0 +1,28 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "npm: build",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "build"],
+      "group": "build",
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "npm: generate",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "generate"],
+      "problemMatcher": []
+    },
+    {
+      "label": "npm: prepare",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "prepare"],
+      "group": "build",
+      "problemMatcher": ["$tsc"]
+    }
+  ]
+}

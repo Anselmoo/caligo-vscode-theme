@@ -1,0 +1,400 @@
+{
+  "name": "caligo-vscode-theme",
+  "displayName": "Caligo Dark+ Theme",
+  "description": "Perceptual dark themes with OKLCH-based harmony variants — 50 professionally crafted color schemes",
+  "version": "0.1.0",
+  "publisher": "AnselmHahn",
+  "author": {
+    "name": "Anselm Hahn",
+    "email": "Anselm.Hahn@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Anselmoo/caligo-vscode-theme.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Anselmoo/caligo-vscode-theme/issues"
+  },
+  "homepage": "https://anselmoo.github.io/caligo-vscode-theme/",
+  "qna": "https://github.com/Anselmoo/caligo-vscode-theme/discussions",
+  "sponsor": {
+    "url": "https://github.com/sponsors/Anselmoo"
+  },
+  "badges": [
+    {
+      "url": "https://img.shields.io/visual-studio-marketplace/v/AnselmHahn.caligo-vscode-theme",
+      "description": "Marketplace Version",
+      "href": "https://marketplace.visualstudio.com/items?itemName=AnselmHahn.caligo-vscode-theme"
+    }
+  ],
+  "license": "MIT",
+  "type": "module",
+  "main": "./build/extension.js",
+  "engines": {
+    "vscode": "^1.108.0"
+  },
+  "icon": "images/icon.png",
+  "galleryBanner": {
+    "color": "#0b0c10",
+    "theme": "dark"
+  },
+  "scripts": {
+    "lint": "biome check .",
+    "lint:fix": "biome check . --write",
+    "lint:colors": "tsx scripts/lint-hardcoded-colors.ts",
+    "check:underscores": "node ./scripts/check-underscores.cjs",
+    "pretest": "node ./scripts/ensure-themes.js",
+    "test": "vitest run && tsx scripts/test-contrast.ts",
+    "posttest": "node ./scripts/cleanup-themes.js",
+    "test:watch": "vitest",
+    "test:unit": "vitest run --coverage=false",
+    "test:unit:coverage": "vitest run --coverage",
+    "test:integration": "vitest run tests/integration",
+    "test:coverage": "vitest run --coverage && tsx scripts/test-contrast.ts",
+    "test:e2e": "NODE_OPTIONS=\"--require ./scripts/block-vitest-expect.cjs\" playwright test",
+    "test:e2e:all": "ALL_BROWSERS=1 playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "build": "tsc -p .",
+    "generate": "npm run build && node ./build/index.js",
+    "copy:manifests": "npx tsx scripts/copy-manifests.ts",
+    "images:generate": "sips -s format png --resampleWidth 128 images/icon.svg --out images/icon.png && sips -s format png --resampleWidth 512 images/icon.svg --out images/icon-512.png && sips -s format png --resampleWidth 1200 images/banner.svg --out images/banner.png && sips -s format ico --resampleWidth 64 images/icon.svg --out images/favicon.ico",
+    "pages:build": "npm run generate && npx tsx scripts/copy-static-assets.ts && npx tsx scripts/generate-themes-manifest.ts && npx tsx scripts/generate-screenshots-manifest.ts && npx tsx scripts/copy-screenshots.ts && npx tsx scripts/copy-seeds.ts && npm run copy:manifests && vite build",
+    "pages:ci": "npm run generate && npx tsx scripts/copy-static-assets.ts && npx tsx scripts/generate-themes-manifest.ts && npx tsx scripts/generate-screenshots-manifest.ts && npx tsx scripts/copy-screenshots.ts && npx tsx scripts/copy-seeds.ts && npm run copy:manifests && vite build",
+    "pages:ci:build-only": "vite build",
+    "pages:preview": "npm run pages:build && vite preview --host --port 4173 --open",
+    "pages:dev": "npm run generate && npx tsx scripts/generate-themes-manifest.ts && vite dev --host --port 4173",
+    "vue:build": "npm run pages:build",
+    "vue:preview": "npm run pages:preview",
+    "vue:dev": "npm run pages:dev",
+    "screenshots:vscode": "npx tsx scripts/capture-vscode-screenshots.ts --full --lang typescript",
+    "screenshots:vscode:minimal": "npx tsx scripts/capture-vscode-screenshots.ts --aurora-demo",
+    "screenshots:vscode:reused": "npx tsx scripts/capture-vscode-screenshots-reuse.ts --full --lang typescript",
+    "screenshots:vscode:smoke-local": "npx tsx scripts/capture-vscode-screenshots-reuse.ts --aurora-demo --lang typescript --output ./tmp-screenshots-reuse",
+    "docker:test-vscode": "bash scripts/docker/build-and-run-local-image.sh",
+    "screenshots:placeholders": "npx tsx scripts/fill-screenshot-placeholders.ts",
+    "marketplace:package": "vsce package --no-dependencies",
+    "marketplace:publish": "vsce publish --no-dependencies",
+    "vscode:prepublish": "npm run build && npm run generate && npm run test",
+    "ci": "npm run lint && npm run lint:colors && npm run check:underscores && npm run test && npm run generate",
+    "release": "standard-version",
+    "release:ci": "npm run build && npm run generate && npm run marketplace:package",
+    "prepare": "lefthook install"
+  },
+  "dependencies": {
+    "apca-w3": "^0.1.9",
+    "chart.js": "^4.5.1",
+    "culori": "^2.1.1",
+    "d3-scale": "^4.0.2",
+    "pinia": "^2.3.1",
+    "primeicons": "^7.0.0",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.11.0",
+    "@biomejs/biome": "^2.3.13",
+    "@playwright/test": "^1.57.0",
+    "@types/d3-scale": "^3.3.5",
+    "@types/node": "^20.3.1",
+    "@types/vscode": "^1.108.1",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vitest/coverage-v8": "^4.0.18",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2",
+    "@vscode/vsce": "^3.2.1",
+    "@vue/test-utils": "^2.4.6",
+    "axe-core": "^4.11.1",
+    "happy-dom": "^20.3.7",
+    "jsdom": "^25.0.1",
+    "lefthook": "^1.3.6",
+    "playwright": "^1.57.0",
+    "serve": "^14.2.4",
+    "standard-version": "^9.5.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5.1.6",
+    "vite": "^6.0.5",
+    "vitest": "^4.0.18"
+  },
+  "categories": [
+    "Themes"
+  ],
+  "keywords": [
+    "theme",
+    "color-theme",
+    "dark-theme",
+    "oklch",
+    "perceptual",
+    "color-harmony",
+    "caligo",
+    "syntax-highlighting",
+    "semantic-highlighting"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "caligo-test.openFile",
+        "title": "Caligo Test: Open File"
+      },
+      {
+        "command": "caligo-test.applyTheme",
+        "title": "Caligo Test: Apply Theme"
+      }
+    ],
+    "themes": [
+      {
+        "label": "Caligo (Aurora Noir — Balanced)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-AuroraNoir.json"
+      },
+      {
+        "label": "Caligo (Aurora Noir — Analogous)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-AuroraNoirAnalogous.json"
+      },
+      {
+        "label": "Caligo (Aurora Noir — Monochromatic)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-AuroraNoirMonochromatic.json"
+      },
+      {
+        "label": "Caligo (Aurora Noir — Split-Complementary)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-AuroraNoirSplitComplementary.json"
+      },
+      {
+        "label": "Caligo (Aurora Noir — Triadic)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-AuroraNoirTriadic.json"
+      },
+      {
+        "label": "Caligo (Cinder — Balanced)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-Cinder.json"
+      },
+      {
+        "label": "Caligo (Cinder — Analogous)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-CinderAnalogous.json"
+      },
+      {
+        "label": "Caligo (Cinder — Monochromatic)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-CinderMonochromatic.json"
+      },
+      {
+        "label": "Caligo (Cinder — Split-Complementary)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-CinderSplitComplementary.json"
+      },
+      {
+        "label": "Caligo (Cinder — Triadic)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-CinderTriadic.json"
+      },
+      {
+        "label": "Caligo (Deep Sable — Balanced)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-DeepSable.json"
+      },
+      {
+        "label": "Caligo (Deep Sable — Analogous)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-DeepSableAnalogous.json"
+      },
+      {
+        "label": "Caligo (Deep Sable — Monochromatic)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-DeepSableMonochromatic.json"
+      },
+      {
+        "label": "Caligo (Deep Sable — Split-Complementary)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-DeepSableSplitComplementary.json"
+      },
+      {
+        "label": "Caligo (Deep Sable — Triadic)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-DeepSableTriadic.json"
+      },
+      {
+        "label": "Caligo (Eclipse — Balanced)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-Eclipse.json"
+      },
+      {
+        "label": "Caligo (Eclipse — Analogous)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-EclipseAnalogous.json"
+      },
+      {
+        "label": "Caligo (Eclipse — Monochromatic)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-EclipseMonochromatic.json"
+      },
+      {
+        "label": "Caligo (Eclipse — Split-Complementary)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-EclipseSplitComplementary.json"
+      },
+      {
+        "label": "Caligo (Eclipse — Triadic)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-EclipseTriadic.json"
+      },
+      {
+        "label": "Caligo (Graphite Flux — Balanced)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-GraphiteFlux.json"
+      },
+      {
+        "label": "Caligo (Graphite Flux — Analogous)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-GraphiteFluxAnalogous.json"
+      },
+      {
+        "label": "Caligo (Graphite Flux — Monochromatic)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-GraphiteFluxMonochromatic.json"
+      },
+      {
+        "label": "Caligo (Graphite Flux — Split-Complementary)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-GraphiteFluxSplitComplementary.json"
+      },
+      {
+        "label": "Caligo (Graphite Flux — Triadic)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-GraphiteFluxTriadic.json"
+      },
+      {
+        "label": "Caligo (Mandarian — Balanced)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-Mandarian.json"
+      },
+      {
+        "label": "Caligo (Mandarian — Analogous)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-MandarianAnalogous.json"
+      },
+      {
+        "label": "Caligo (Mandarian — Monochromatic)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-MandarianMonochromatic.json"
+      },
+      {
+        "label": "Caligo (Mandarian — Split-Complementary)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-MandarianSplitComplementary.json"
+      },
+      {
+        "label": "Caligo (Mandarian — Triadic)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-MandarianTriadic.json"
+      },
+      {
+        "label": "Caligo (Midnight Atelier — Balanced)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-MidnightAtelier.json"
+      },
+      {
+        "label": "Caligo (Midnight Atelier — Analogous)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-MidnightAtelierAnalogous.json"
+      },
+      {
+        "label": "Caligo (Midnight Atelier — Monochromatic)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-MidnightAtelierMonochromatic.json"
+      },
+      {
+        "label": "Caligo (Midnight Atelier — Split-Complementary)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-MidnightAtelierSplitComplementary.json"
+      },
+      {
+        "label": "Caligo (Midnight Atelier — Triadic)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-MidnightAtelierTriadic.json"
+      },
+      {
+        "label": "Caligo (Nebula Night — Balanced)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-NebulaNight.json"
+      },
+      {
+        "label": "Caligo (Nebula Night — Analogous)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-NebulaNightAnalogous.json"
+      },
+      {
+        "label": "Caligo (Nebula Night — Monochromatic)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-NebulaNightMonochromatic.json"
+      },
+      {
+        "label": "Caligo (Nebula Night — Split-Complementary)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-NebulaNightSplitComplementary.json"
+      },
+      {
+        "label": "Caligo (Nebula Night — Triadic)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-NebulaNightTriadic.json"
+      },
+      {
+        "label": "Caligo (Obsidian Glow — Balanced)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-ObsidianGlow.json"
+      },
+      {
+        "label": "Caligo (Obsidian Glow — Analogous)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-ObsidianGlowAnalogous.json"
+      },
+      {
+        "label": "Caligo (Obsidian Glow — Monochromatic)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-ObsidianGlowMonochromatic.json"
+      },
+      {
+        "label": "Caligo (Obsidian Glow — Split-Complementary)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-ObsidianGlowSplitComplementary.json"
+      },
+      {
+        "label": "Caligo (Obsidian Glow — Triadic)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-ObsidianGlowTriadic.json"
+      },
+      {
+        "label": "Caligo (Void Ember — Balanced)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-VoidEmber.json"
+      },
+      {
+        "label": "Caligo (Void Ember — Analogous)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-VoidEmberAnalogous.json"
+      },
+      {
+        "label": "Caligo (Void Ember — Monochromatic)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-VoidEmberMonochromatic.json"
+      },
+      {
+        "label": "Caligo (Void Ember — Split-Complementary)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-VoidEmberSplitComplementary.json"
+      },
+      {
+        "label": "Caligo (Void Ember — Triadic)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caligo-VoidEmberTriadic.json"
+      }
+    ]
+  }
+}

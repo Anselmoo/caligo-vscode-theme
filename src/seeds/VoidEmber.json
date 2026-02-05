@@ -1,0 +1,18 @@
+{
+  "id": "VoidEmber",
+  "displayName": "Void Ember",
+  "background": { "mode": "oklch", "l": 0.17, "c": 0.05, "h": 25 },
+  "accent": { "mode": "oklch", "l": 0.68, "c": 0.18, "h": 10 },
+  "intentMode": true,
+  "harmony": "none",
+  "variants": [
+    { "id": "Analogous", "displayName": "Analogous", "harmony": "analogous" },
+    {
+      "id": "SplitComplementary",
+      "displayName": "Split-Complementary",
+      "harmony": "split-complementary"
+    },
+    { "id": "Monochromatic", "displayName": "Monochromatic", "harmony": "monochromatic" },
+    { "id": "Triadic", "displayName": "Triadic", "harmony": "triadic" }
+  ]
+}

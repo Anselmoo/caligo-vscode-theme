@@ -1,0 +1,19 @@
+{
+  "id": "Cinder",
+  "displayName": "Cinder",
+  "background": { "mode": "oklch", "l": 0.18, "c": 0.04, "h": 40 },
+  "accent": { "mode": "oklch", "l": 0.7, "c": 0.18, "h": 35 },
+  "harmony": "none",
+  "intentMode": true,
+  "intentEmphasis": "balanced",
+  "variants": [
+    { "id": "Analogous", "displayName": "Analogous", "harmony": "analogous" },
+    {
+      "id": "SplitComplementary",
+      "displayName": "Split-Complementary",
+      "harmony": "split-complementary"
+    },
+    { "id": "Monochromatic", "displayName": "Monochromatic", "harmony": "monochromatic" },
+    { "id": "Triadic", "displayName": "Triadic", "harmony": "triadic" }
+  ]
+}

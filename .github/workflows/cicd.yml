@@ -1,0 +1,395 @@
+name: CI + Publish
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*.*.*']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mark workspace as a safe git directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run lint:colors
+      - name: Lint summary
+        if: always()
+        run: |
+          echo "### Lint" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Lint and color checks completed" >> $GITHUB_STEP_SUMMARY
+
+  unit-tests:
+    name: Unit Tests
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mark workspace as a safe git directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Ensure themes for tests
+        run: node ./scripts/ensure-themes.js
+      - run: npm run test:unit:coverage
+      - name: Coverage summary
+        if: always()
+        run: |
+          echo "### Unit Test Coverage" >> $GITHUB_STEP_SUMMARY
+          if [ -f coverage/coverage-summary.json ]; then
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            node -e "const c=require('./coverage/coverage-summary.json'); console.log('Lines: ' + c.total.lines.pct + '%'); console.log('Statements: ' + c.total.statements.pct + '%'); console.log('Functions: ' + c.total.functions.pct + '%'); console.log('Branches: ' + c.total.branches.pct + '%');" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ coverage-summary.json not found" >> $GITHUB_STEP_SUMMARY
+          fi
+      - name: VSIX local build test
+        run: npm run marketplace:package
+      - name: Cleanup generated themes
+        if: always()
+        run: node ./scripts/cleanup-themes.js
+      - name: Upload coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 7
+
+  screenshots-smoke:
+    name: VS Code Screenshots (smoke)
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mark workspace as a safe git directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Build local VS Code Playwright Docker image
+        run: |
+          docker build -f tools/docker/vscode-playwright.Dockerfile -t caligo-vscode-playwright:ci .
+
+      - name: Quick VS Code launch diagnostic (inside container)
+        timeout-minutes: 3
+        run: |
+          mkdir -p build
+          docker run --init --rm --cap-add SYS_ADMIN --ipc=host -v "$GITHUB_WORKSPACE:/work" -w /work caligo-vscode-playwright:ci /bin/bash -lc 'mkdir -p /tmp/vscode-launch /tmp/vscode-user-data /work/build; chown -R pwuser:pwuser /tmp/vscode-launch /tmp/vscode-user-data /work/build || true; su -s /bin/bash pwuser -c "timeout 2m xvfb-run --auto-servernum --server-args=\" -screen 0 1920x1080x24\" /usr/share/code/code --verbose --no-sandbox --user-data-dir /tmp/vscode-user-data --disable-gpu --disable-dev-shm-usage > /tmp/vscode-launch/log.txt 2>&1 || true"; cp /tmp/vscode-launch/log.txt /work/build/vscode-launch-smoke.log || true'
+      - name: Upload VS Code quick-launch diagnostic (smoke)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vscode-diagnostic-smoke
+          path: build/vscode-launch-smoke.log
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Prepare workspace & install dependencies inside image
+        run: |
+          docker run --rm --cap-add SYS_ADMIN --ipc=host -v "$GITHUB_WORKSPACE:/work" -w /work caligo-vscode-playwright:ci /bin/bash -lc 'mkdir -p /work/node_modules /work/build /work/public /work/tmp-screenshots-reuse; chown -R pwuser:pwuser /work/node_modules /work/build /work/public /work/tmp-screenshots-reuse || true; su -s /bin/bash pwuser -c "npm ci --ignore-scripts"'
+      - name: "Smoke test: Generate theme screenshots (local demo set)"
+        env:
+          DEBUG: pw:browser*
+          ELECTRON_ENABLE_LOGGING: "1"
+          ELECTRON_ENABLE_STACK_DUMPING: "1"
+          CODE_EXECUTABLE: /usr/share/code/code
+          CODE_ARGS: "--disable-workspace-trust --no-sandbox --disable-gpu --disable-dev-shm-usage"
+        run: |
+          docker run --rm --cap-add SYS_ADMIN --ipc=host -v "$GITHUB_WORKSPACE:/work" -w /work -e DEBUG="$DEBUG" -e ELECTRON_ENABLE_LOGGING="$ELECTRON_ENABLE_LOGGING" -e ELECTRON_ENABLE_STACK_DUMPING="$ELECTRON_ENABLE_STACK_DUMPING" -e CODE_EXECUTABLE="$CODE_EXECUTABLE" -e CODE_ARGS="$CODE_ARGS" caligo-vscode-playwright:ci /bin/bash -lc 'mkdir -p /tmp/vscode-user-data /work/build /work/tmp-screenshots-reuse; chown -R pwuser:pwuser /tmp/vscode-user-data /work/build /work/tmp-screenshots-reuse || true; su -s /bin/bash pwuser -c "cd /work && DEBUG=\"$DEBUG\" ELECTRON_ENABLE_LOGGING=\"$ELECTRON_ENABLE_LOGGING\" ELECTRON_ENABLE_STACK_DUMPING=\"$ELECTRON_ENABLE_STACK_DUMPING\" CODE_EXECUTABLE=\"$CODE_EXECUTABLE\" CODE_ARGS=\"$CODE_ARGS\" timeout 9m xvfb-run --auto-servernum --server-args=\" -screen 0 1920x1080x24\" npm run screenshots:vscode:smoke-local 2>&1 | tee /tmp/vscode-screenshots-smoke.log /work/build/vscode-screenshots-smoke.log || true"; cp /tmp/vscode-screenshots-smoke.log /work/build/vscode-screenshots-smoke.log || true; if [ -f /work/build/screenshots-report.json ]; then echo "report already in build"; elif [ -f /tmp/screenshot-report.json ]; then cp /tmp/screenshot-report.json /work/build/screenshots-report.json || true; elif [ -f /tmp/caligo-vscode-playwright/screenshots-report.json ]; then cp /tmp/caligo-vscode-playwright/screenshots-report.json /work/build/screenshots-report.json || true; fi; if [ -d /tmp-screenshots-reuse ] && [ -z "$(ls -A /work/tmp-screenshots-reuse 2>/dev/null)" ]; then cp -R /tmp-screenshots-reuse/* /work/tmp-screenshots-reuse/ || true; fi; if [ -f /work/build/screenshots-report.json ]; then echo "report copied"; fi'
+        timeout-minutes: 10
+
+      - name: Copy smoke screenshots to public directory
+        run: npx tsx scripts/copy-screenshots.ts
+
+      - name: "Debug: List public/screenshots directory (smoke)"
+        if: always()
+        run: |
+          echo "--- public/screenshots listing (smoke) ---"
+          ls -la public/screenshots || true
+
+      - name: Upload smoke instrumentation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-instrumentation-smoke
+          path: build/screenshots-report.json
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Upload smoke screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-smoke
+          path: public/screenshots/
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Debug smoke artifacts
+        if: always()
+        run: |
+          echo "--- build directory ---"
+          ls -la build || true
+          echo "--- tmp-screenshots-reuse ---"
+          ls -la tmp-screenshots-reuse || true
+          echo "--- report search ---"
+          find . -maxdepth 6 -name "screenshots-report.json" -print || true
+
+  screenshots:
+    name: VS Code Screenshots
+    needs: [unit-tests, screenshots-smoke]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mark workspace as a safe git directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Build local VS Code Playwright Docker image
+        run: |
+          docker build -f tools/docker/vscode-playwright.Dockerfile -t caligo-vscode-playwright:ci .
+
+      - name: Quick VS Code launch diagnostic (inside container)
+        timeout-minutes: 3
+        run: |
+          mkdir -p build
+          docker run --init --rm --cap-add SYS_ADMIN --ipc=host -v "$GITHUB_WORKSPACE:/work" -w /work caligo-vscode-playwright:ci /bin/bash -lc 'mkdir -p /tmp/vscode-launch /tmp/vscode-user-data /work/build; chown -R pwuser:pwuser /tmp/vscode-launch /tmp/vscode-user-data /work/build || true; su -s /bin/bash pwuser -c "timeout 2m xvfb-run --auto-servernum --server-args=\" -screen 0 1920x1080x24\" /usr/share/code/code --verbose --no-sandbox --user-data-dir /tmp/vscode-user-data --disable-gpu --disable-dev-shm-usage > /tmp/vscode-launch/log.txt 2>&1 || true"; cp /tmp/vscode-launch/log.txt /work/build/vscode-launch.log || true'
+      - name: Upload VS Code quick-launch diagnostic (screenshots)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vscode-diagnostic
+          path: build/vscode-launch.log
+          if-no-files-found: ignore
+          retention-days: 30
+
+      - name: Prepare workspace & install dependencies inside image
+        run: |
+          docker run --rm --cap-add SYS_ADMIN --ipc=host -v "$GITHUB_WORKSPACE:/work" -w /work caligo-vscode-playwright:ci /bin/bash -lc 'mkdir -p /work/node_modules /work/build /work/public /work/tmp-screenshots-reuse; chown -R pwuser:pwuser /work/node_modules /work/build /work/public /work/tmp-screenshots-reuse || true; su -s /bin/bash pwuser -c "npm ci --ignore-scripts"'
+      - name: Generate themes (inside container)
+        run: |
+          docker run --rm --cap-add SYS_ADMIN --ipc=host -v "$GITHUB_WORKSPACE:/work" -w /work caligo-vscode-playwright:ci /bin/bash -lc 'mkdir -p /work/build /work/public /work/tmp-screenshots-reuse; chown -R pwuser:pwuser /work/build /work/public /work/tmp-screenshots-reuse || true; su -s /bin/bash pwuser -c "npm run generate"'
+      - name: Generate theme screenshots
+        env:
+          DEBUG: pw:browser*
+          ELECTRON_ENABLE_LOGGING: "1"
+          ELECTRON_ENABLE_STACK_DUMPING: "1"
+          CODE_EXECUTABLE: /usr/share/code/code
+          CODE_ARGS: "--disable-workspace-trust --no-sandbox --disable-gpu --disable-dev-shm-usage"
+        run: |
+          docker run --rm --cap-add SYS_ADMIN --ipc=host -v "$GITHUB_WORKSPACE:/work" -w /work -e DEBUG="$DEBUG" -e ELECTRON_ENABLE_LOGGING="$ELECTRON_ENABLE_LOGGING" -e ELECTRON_ENABLE_STACK_DUMPING="$ELECTRON_ENABLE_STACK_DUMPING" -e CODE_EXECUTABLE="$CODE_EXECUTABLE" -e CODE_ARGS="$CODE_ARGS" caligo-vscode-playwright:ci /bin/bash -lc 'mkdir -p /tmp/vscode-user-data /work/build /work/tmp-screenshots-reuse; chown -R pwuser:pwuser /tmp/vscode-user-data /work/build /work/tmp-screenshots-reuse || true; su -s /bin/bash pwuser -c "cd /work && DEBUG=\"$DEBUG\" ELECTRON_ENABLE_LOGGING=\"$ELECTRON_ENABLE_LOGGING\" ELECTRON_ENABLE_STACK_DUMPING=\"$ELECTRON_ENABLE_STACK_DUMPING\" CODE_EXECUTABLE=\"$CODE_EXECUTABLE\" CODE_ARGS=\"$CODE_ARGS\" timeout 50m xvfb-run --auto-servernum --server-args=\" -screen 0 1920x1080x24\" npm run screenshots:vscode:reused 2>&1 | tee /tmp/vscode-screenshots.log /work/build/vscode-screenshots.log || true"; cp /tmp/vscode-screenshots.log /work/build/vscode-screenshots.log || true; if [ -f /work/build/screenshots-report.json ]; then echo "report already in build"; elif [ -f /tmp/screenshot-report.json ]; then cp /tmp/screenshot-report.json /work/build/screenshots-report.json || true; elif [ -f /tmp/caligo-vscode-playwright/screenshots-report.json ]; then cp /tmp/caligo-vscode-playwright/screenshots-report.json /work/build/screenshots-report.json || true; fi; if [ -d /tmp-screenshots-reuse ] && [ -z "$(ls -A /work/tmp-screenshots-reuse 2>/dev/null)" ]; then cp -R /tmp-screenshots-reuse/* /work/tmp-screenshots-reuse/ || true; fi; if [ -f /work/build/screenshots-report.json ]; then echo "report copied"; fi'
+        timeout-minutes: 60
+
+      - name: Validate screenshots instrumentation
+        if: always()
+        run: |
+          if [ -f build/screenshots-report.json ]; then
+            node -e "const j=JSON.parse(require('fs').readFileSync('build/screenshots-report.json','utf-8')); if ((j.electronLaunchCount||0) > 1) { console.error('ERROR: electronLaunchCount > 1'); process.exit(1); } if (j.errors && j.errors.length) { console.error('ERROR: instrumentation reported errors', j.errors); process.exit(1); } console.log('Instrumentation OK:', j.electronLaunchCount, 'launches');"
+          else
+            echo "No instrumentation file found; continuing";
+          fi
+
+      - name: Upload screenshots instrumentation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-instrumentation
+          path: build/screenshots-report.json
+          if-no-files-found: ignore
+          retention-days: 30
+      - name: Debug screenshots artifacts
+        if: always()
+        run: |
+          echo "--- build directory ---"
+          ls -la build || true
+          echo "--- tmp-screenshots-reuse ---"
+          ls -la tmp-screenshots-reuse || true
+          echo "--- report search ---"
+          find . -maxdepth 6 -name "screenshots-report.json" -print || true
+
+      - name: Run screenshot integration tests
+        run: npm run test:integration
+        env:
+          CI: true
+
+      - name: Copy screenshots to public directory
+        run: npx tsx scripts/copy-screenshots.ts
+
+      - name: "Debug: List public/screenshots directory"
+        if: always()
+        run: |
+          echo "--- public/screenshots listing ---"
+          ls -la public/screenshots || true
+
+      - name: Upload Screenshot Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: public/screenshots/
+          if-no-files-found: error
+          retention-days: 90
+
+  e2e-tests:
+    name: E2E Tests
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.58.0-noble
+      options: --user root
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mark workspace as a safe git directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Build app
+        run: npm run pages:build
+        env:
+          VITE_BASE: /caligo-vscode-theme/
+      - name: Run E2E tests
+        run: npm run test:e2e
+        continue-on-error: true
+      - name: Upload E2E Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-results
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  build-pages:
+    name: Build Pages
+    needs: [unit-tests, screenshots]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mark workspace as a safe git directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - uses: actions/configure-pages@v5
+        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+      - run: npm ci
+      - name: Download Screenshots
+        uses: actions/download-artifact@v4
+        with:
+          name: screenshots
+          path: public/screenshots/
+      - name: Build pages
+        run: npm run pages:build
+        env:
+          VITE_BASE: /${{ github.event.repository.name }}/
+      - name: Upload Screenshots Manifest
+        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-manifest
+          path: public/screenshots-manifest.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload Pages artifact
+        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    name: Deploy Pages
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main') }}
+    needs: build-pages
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  release:
+    name: Release
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+    needs: [unit-tests, screenshots, build-pages]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      pages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Mark workspace as a safe git directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Build & package
+        run: npm run release:ci
+      - name: Find VSIX
+        id: find_vsix
+        run: |
+          VSIX=$(ls *.vsix || true)
+          if [ -z "$VSIX" ]; then echo "No VSIX found" && exit 1; fi
+          echo "vsix=$VSIX" >> $GITHUB_OUTPUT
+      - name: Create GitHub Release (gh)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ github.ref_name }}"
+          VERSION="${TAG#v}"
+          gh release create "$TAG" \
+            --repo "${{ github.repository }}" \
+            --title "Caligo $TAG" \
+            --notes "## Caligo ${VERSION}
+
+          ### 📦 Installation
+          \`\`\`bash
+          code --install-extension AnselmHahn.caligo-vscode-theme@${VERSION}
+          \`\`\`
+
+          ### 🔗 Links
+          - [Marketplace](https://marketplace.visualstudio.com/items?itemName=AnselmHahn.caligo-vscode-theme)
+          - [Gallery](https://anselmoo.github.io/caligo-vscode-theme/#/gallery)
+          - [Changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md)"
+      - name: Upload VSIX to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ github.ref_name }}" "${{ steps.find_vsix.outputs.vsix }}" \
+            --repo "${{ github.repository }}" \
+            --clobber
+      - name: Release summary
+        run: |
+          echo "### GitHub Release" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Release ${{ github.ref_name }} created" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+      - name: Publish to Visual Studio Marketplace
+        run: npx vsce publish --no-dependencies --pat "${{ secrets.VSCE_PAT }}"

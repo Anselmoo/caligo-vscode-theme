@@ -1,0 +1,35 @@
+<svg width="1200" height="300" viewBox="0 0 1200 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="bg-gradient" x1="0" y1="0" x2="1200" y2="300" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#0f1118" />
+            <stop offset="1" stop-color="#232834" />
+        </linearGradient>
+        <linearGradient id="text-gradient" x1="0" y1="0" x2="100%" y2="0%">
+            <stop offset="0" stop-color="#00c098"/> <!-- Teal -->
+            <stop offset="0.5" stop-color="#00b4d8"/> <!-- Sky Blue -->
+            <stop offset="1" stop-color="#9b90ff"/> <!-- Purple -->
+        </linearGradient>
+
+        <!-- Inner Glow for the Ring -->
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="12" result="blur"/>
+            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+        </filter>
+    </defs>
+    
+    <!-- Background -->
+    <rect width="1200" height="300" fill="url(#bg-gradient)" />
+    
+    <!-- Subtle Grid -->
+    <path d="M0 75 H1200 M0 150 H1200 M0 225 H1200" stroke="white" stroke-width="1" opacity="0.03"/>
+    
+    <!-- Icon Element -->
+    <g transform="translate(80, 50) scale(0.4)">
+        <circle cx="256" cy="256" r="170" fill="none" stroke="url(#text-gradient)" stroke-width="24" opacity="0.9" filter="url(#glow)" />
+        <path d="M350.5 182 A 120 120 0 1 0 350.5 330" stroke="url(#text-gradient)" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    
+    <!-- Text -->
+    <text x="320" y="160" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-weight="bold" font-size="100" fill="url(#text-gradient)" letter-spacing="-2">Caligo</text>
+    <text x="325" y="210" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-weight="300" font-size="32" fill="url(#text-gradient)" opacity="0.6" letter-spacing="1">Perceptual Dark Themes • OKLCH Harmony</text>
+</svg>

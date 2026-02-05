@@ -1,0 +1,18 @@
+{
+  "id": "GraphiteFlux",
+  "displayName": "Graphite Flux",
+  "background": { "mode": "oklch", "l": 0.18, "c": 0.035, "h": 280 },
+  "accent": { "mode": "oklch", "l": 0.7, "c": 0.18, "h": 175 },
+  "intentMode": true,
+  "harmony": "none",
+  "variants": [
+    { "id": "Analogous", "displayName": "Analogous", "harmony": "analogous" },
+    {
+      "id": "SplitComplementary",
+      "displayName": "Split-Complementary",
+      "harmony": "split-complementary"
+    },
+    { "id": "Monochromatic", "displayName": "Monochromatic", "harmony": "monochromatic" },
+    { "id": "Triadic", "displayName": "Triadic", "harmony": "triadic" }
+  ]
+}

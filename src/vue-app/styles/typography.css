@@ -1,0 +1,255 @@
+/**
+ * Typography Hierarchy
+ *
+ * Consistent typographic styles across all components.
+ * All colors derive from theme tokens - NO hardcoded values.
+ *
+ * Design Principle: Single definition per element type.
+ * Components inherit these styles unless explicitly overridden for semantic reasons.
+ */
+
+/* =========================================================================
+ * HEADING HIERARCHY
+ * ========================================================================= */
+
+h1,
+.h1 {
+  color: var(--text-strong); /* syntax-keywords: brightest, most important */
+  font-size: var(--text-4xl);
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: var(--space-lg);
+}
+
+h2,
+.h2 {
+  color: var(--text-strong); /* syntax-keywords: higher chroma emphasis */
+  font-size: var(--text-3xl);
+  font-weight: 600;
+  line-height: 1.3;
+  margin-bottom: var(--space-md);
+}
+
+h3,
+.h3 {
+  color: var(--text-primary); /* syntax-types: primary chromatic text */
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: var(--space-md);
+}
+
+h4,
+.h4 {
+  color: var(--text-muted); /* de-emphasized headings */
+  font-size: var(--text-xl);
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: var(--space-sm);
+}
+
+h5,
+.h5,
+h6,
+.h6 {
+  color: var(--text-subtle); /* least prominent headings */
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: 1.5;
+  margin-bottom: var(--space-sm);
+}
+
+/* =========================================================================
+ * BODY TEXT
+ * ========================================================================= */
+
+p {
+  color: var(--text-primary);
+  font-size: var(--text-base);
+  line-height: 1.6;
+  margin-bottom: var(--space-md);
+}
+
+/* Lead paragraph */
+.lead {
+  color: var(--text-strong);
+  font-size: var(--text-lg);
+  line-height: 1.6;
+}
+
+/* Small text */
+small,
+.text-small {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+/* =========================================================================
+ * SEMANTIC ELEMENTS
+ * ========================================================================= */
+
+/* Strong emphasis */
+strong,
+b {
+  color: var(--text-strong);
+  font-weight: 600;
+}
+
+/* Emphasis */
+em,
+i {
+  color: var(--text-primary);
+  font-style: italic;
+}
+
+/* Code inline */
+code {
+  color: var(--syntax-strings);
+  background-color: rgba(var(--accent-rgb), 0.1);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+/* Pre-formatted code blocks */
+pre {
+  color: var(--text-primary);
+  background-color: var(--bg2);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+}
+
+/* =========================================================================
+ * LINKS
+ * ========================================================================= */
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--text-strong);
+}
+
+a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* =========================================================================
+ * LISTS
+ * ========================================================================= */
+
+ul,
+ol {
+  color: var(--text-primary);
+  padding-left: var(--space-lg);
+  margin-bottom: var(--space-md);
+}
+
+li {
+  line-height: 1.6;
+  margin-bottom: var(--space-xs);
+}
+
+li::marker {
+  color: var(--accent);
+}
+
+/* =========================================================================
+ * BLOCKQUOTES
+ * ========================================================================= */
+
+blockquote {
+  color: var(--text-muted);
+  border-left: 4px solid var(--accent);
+  padding-left: var(--space-md);
+  margin: var(--space-lg) 0;
+  font-style: italic;
+}
+
+blockquote footer,
+blockquote cite {
+  color: var(--text-subtle);
+  font-size: var(--text-sm);
+  font-style: normal;
+}
+
+/* =========================================================================
+ * ANNOTATIONS & CAPTIONS
+ * ========================================================================= */
+
+figcaption,
+.caption,
+.annotation {
+  color: var(--text-subtle);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  margin-top: var(--space-xs);
+}
+
+/* =========================================================================
+ * COMPONENT-SPECIFIC OVERRIDES
+ * ========================================================================= */
+
+/* Card titles inherit parent context color */
+.card-title {
+  color: inherit;
+  font-size: var(--text-xl);
+  font-weight: 600;
+  margin-bottom: var(--space-sm);
+}
+
+/* Spectrum/Gallery titles can have gradients */
+.spectrum-title,
+.gallery-title {
+  /* Color set by explicit gradient class or inherit */
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  margin-bottom: var(--space-lg);
+}
+
+/* Stats labels */
+.stat-label {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-value {
+  color: var(--text-strong);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+}
+
+/* =========================================================================
+ * FOOTER
+ * ========================================================================= */
+
+:where(footer) {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+:where(footer) a {
+  color: var(--text-primary);
+}
+
+:where(footer) a:hover {
+  color: var(--accent);
+}

@@ -1,0 +1,96 @@
+import { describe, expect, it } from "vitest";
+import type { Seed } from "../constraints.js";
+import { derivePalette } from "../palette.js";
+import { buildVscodeThemeJson } from "../vscode-theme.js";
+
+describe("buildVscodeThemeJson", () => {
+  it("should build a valid VS Code theme JSON", () => {
+    const seed: Seed = {
+      id: "TestSeed",
+      displayName: "Test Seed",
+      background: { mode: "oklch", l: 0.18, c: 0.03, h: 220 },
+      accent: { mode: "oklch", l: 0.7, c: 0.15, h: 215 },
+    };
+
+    const palette = derivePalette(seed, "Balanced");
+    const theme = buildVscodeThemeJson(palette);
+
+    // Check basic structure
+    expect(theme.$schema).toBe("vscode://schemas/color-theme");
+    expect(theme.name.includes("Caligo")).toBe(true);
+    expect(theme.name.includes("Test Seed")).toBe(true);
+    // "Balanced" is the default mode and is intentionally omitted from the name.
+    expect(theme.type).toBe("dark");
+
+    // Check colors object exists and has required keys
+    expect(theme.colors).toBeTruthy();
+    expect(theme.colors["editor.background"]).toBeTruthy();
+    expect(theme.colors["editor.foreground"]).toBeTruthy();
+    expect(theme.colors["sideBar.background"]).toBeTruthy();
+    expect(theme.colors["activityBar.background"]).toBeTruthy();
+    expect(theme.colors["statusBar.background"]).toBeTruthy();
+
+    // Check tokenColors array exists and has entries
+    expect(theme.tokenColors).toBeTruthy();
+    expect(Array.isArray(theme.tokenColors)).toBe(true);
+    expect(theme.tokenColors.length).toBeGreaterThan(0);
+  });
+
+  it("should map palette colors to editor colors", () => {
+    const seed: Seed = {
+      id: "TestSeed",
+      displayName: "Test Seed",
+      background: { mode: "oklch", l: 0.18, c: 0.03, h: 220 },
+      accent: { mode: "oklch", l: 0.7, c: 0.15, h: 215 },
+    };
+
+    const palette = derivePalette(seed, "Balanced");
+    const theme = buildVscodeThemeJson(palette);
+
+    // Verify specific mappings
+    expect(theme.colors["editor.background"]).toBe(palette.bg0);
+    expect(theme.colors["editor.foreground"]).toBe(palette.fg0);
+    expect(theme.colors.focusBorder).toBe(palette.accent);
+  });
+
+  it("should include token color scopes", () => {
+    const seed: Seed = {
+      id: "TestSeed",
+      displayName: "Test Seed",
+      background: { mode: "oklch", l: 0.18, c: 0.03, h: 220 },
+      accent: { mode: "oklch", l: 0.7, c: 0.15, h: 215 },
+    };
+
+    const palette = derivePalette(seed, "Balanced");
+    const theme = buildVscodeThemeJson(palette);
+
+    const scopes = theme.tokenColors.map(tc => tc.name).filter(Boolean);
+
+    expect(scopes.includes("Comments")).toBe(true);
+    expect(scopes.includes("Strings")).toBe(true);
+    expect(scopes.includes("Keywords")).toBe(true);
+    expect(scopes.includes("Functions")).toBe(true);
+    expect(scopes.includes("Types")).toBe(true);
+  });
+
+  it("should use hex color format for all colors", () => {
+    const seed: Seed = {
+      id: "TestSeed",
+      displayName: "Test Seed",
+      background: { mode: "oklch", l: 0.18, c: 0.03, h: 220 },
+      accent: { mode: "oklch", l: 0.7, c: 0.15, h: 215 },
+    };
+
+    const palette = derivePalette(seed, "Balanced");
+    const theme = buildVscodeThemeJson(palette);
+
+    // Check all color values are hex format (with or without alpha)
+    const hexPattern = /^#[0-9a-f]{6}([0-9a-f]{2})?$/i;
+
+    for (const [_key, value] of Object.entries(theme.colors)) {
+      if (typeof value === "string") {
+        assert.match(value, hexPattern);
+      }
+    }
+  });
+});

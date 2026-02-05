@@ -1,0 +1,56 @@
+# VS Code Extension - Files to exclude from package
+
+# Development environment
+.vscode/**
+.vscode-test/**
+.gitignore
+
+# Source files (only include compiled themes)
+src/**
+tsconfig.json
+vsc-extension-quickstart.md
+
+# Build artifacts (not needed in published extension)
+build/**
+!build/extension.js
+!build/extension.js.map
+dist/**
+
+# Tests
+tests/**
+test-results/**
+playwright.config.ts
+playwright-report/**
+
+# Scripts and tooling
+scripts/**
+.github/**
+.serena/**
+
+# Development files
+mockup/**
+*.log
+*.md
+!README.md
+!CHANGELOG.md
+!LICENSE
+!THEME_DESIGN_CONCEPT.md
+
+# Dependencies (bundled separately)
+node_modules/**
+package-lock.json
+
+# IDE and OS files
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Generated artifacts
+build/themes/**
+build/reports/**
+*.vsix
+out/**
+coverage/**
+*.tsbuildinfo
+public/**

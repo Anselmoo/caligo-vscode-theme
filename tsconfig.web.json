@@ -1,0 +1,24 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "jsx": "preserve",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "paths": {
+      "@/*": ["./src/vue-app/*"],
+      "@types/*": ["./src/vue-app/types/*"],
+      "@components/*": ["./src/vue-app/components/*"],
+      "@composables/*": ["./src/vue-app/composables/*"],
+      "@views/*": ["./src/vue-app/views/*"],
+      "@styles/*": ["./src/vue-app/styles/*"],
+      "@themes/*": ["./build/themes/*"],
+      "@palettes/*": ["./build/palettes/*"]
+    }
+  },
+  "include": ["src/vue-app/**/*", "src/vue-app/**/*.d.ts", "index.html"],
+  "exclude": ["node_modules", "build", "dist"]
+}

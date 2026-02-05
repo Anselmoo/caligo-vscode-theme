@@ -1,0 +1,418 @@
+/**
+ * Color Utility Classes
+ *
+ * Theme-aware utility classes for rapid UI development.
+ * All colors derive from CSS custom properties set by useTheme composable.
+ * Zero hardcoded colors - all values reference theme tokens.
+ *
+ * Usage:
+ *   <div class="text-accent bg-primary border-accent-30">...</div>
+ */
+
+/* =========================================================================
+ * TEXT COLORS
+ * ========================================================================= */
+
+/* Primary text colors */
+.text-primary {
+  color: var(--text-primary);
+}
+.text-secondary {
+  color: var(--text-secondary);
+}
+.text-muted {
+  color: var(--text-muted);
+}
+.text-subtle {
+  color: var(--text-subtle);
+}
+.text-disabled {
+  color: var(--text-disabled);
+}
+
+/* Foreground tokens */
+.text-fg0 {
+  color: var(--fg0);
+}
+.text-fg1 {
+  color: var(--fg1);
+}
+.text-fg-muted {
+  color: var(--fg-muted);
+}
+
+/* Semantic colors */
+.text-accent {
+  color: var(--accent);
+}
+.text-error {
+  color: var(--error);
+}
+.text-warning {
+  color: var(--color-warning);
+}
+.text-success {
+  color: var(--color-success);
+}
+.text-info {
+  color: var(--color-info);
+}
+
+/* Syntax highlighting colors */
+.text-keywords {
+  color: var(--syntax-keywords);
+}
+.text-types {
+  color: var(--syntax-types);
+}
+.text-functions {
+  color: var(--syntax-functions);
+}
+.text-strings {
+  color: var(--syntax-strings);
+}
+.text-decorator {
+  color: var(--syntax-decorator);
+}
+
+/* App text colors (chromatic) */
+.text-app-primary {
+  color: var(--app-text-primary);
+}
+.text-app-strong {
+  color: var(--app-text-strong);
+}
+.text-app-muted {
+  color: var(--app-text-muted);
+}
+.text-app-subtle {
+  color: var(--app-text-subtle);
+}
+
+/* =========================================================================
+ * BACKGROUND COLORS
+ * ========================================================================= */
+
+/* Base backgrounds */
+.bg-primary {
+  background-color: var(--bg-primary);
+}
+.bg-secondary {
+  background-color: var(--bg-secondary);
+}
+.bg-tertiary {
+  background-color: var(--bg-tertiary);
+}
+
+.bg-bg0 {
+  background-color: var(--bg0);
+}
+.bg-bg1 {
+  background-color: var(--bg1);
+}
+.bg-bg2 {
+  background-color: var(--bg2);
+}
+
+/* Surface backgrounds */
+.bg-surface-base {
+  background-color: var(--surface-base);
+}
+.bg-surface-elevated {
+  background-color: var(--surface-elevated);
+}
+.bg-surface-overlay {
+  background-color: var(--surface-overlay);
+}
+.bg-surface-overlay-strong {
+  background-color: var(--surface-overlay-strong);
+}
+
+/* Interactive states */
+.bg-interactive-hover {
+  background-color: var(--interactive-hover);
+}
+.bg-interactive-hover-strong {
+  background-color: var(--interactive-hover-strong);
+}
+.bg-interactive-active {
+  background-color: var(--interactive-active);
+}
+.bg-interactive-disabled {
+  background-color: var(--interactive-disabled);
+}
+
+/* Semantic backgrounds (subtle tints) */
+.bg-accent {
+  background-color: rgba(var(--accent-rgb), 0.15);
+}
+.bg-error {
+  background-color: rgba(var(--color-error-rgb), 0.15);
+}
+.bg-warning {
+  background-color: rgba(var(--color-warning-rgb), 0.15);
+}
+.bg-success {
+  background-color: rgba(var(--color-success-rgb), 0.15);
+}
+.bg-info {
+  background-color: rgba(var(--accent-rgb), 0.15);
+}
+
+/* Syntax color backgrounds */
+.bg-keywords {
+  background-color: var(--card-bg-keywords);
+}
+.bg-types {
+  background-color: var(--card-bg-types);
+}
+.bg-functions {
+  background-color: var(--card-bg-functions);
+}
+.bg-strings {
+  background-color: var(--card-bg-strings);
+}
+.bg-decorator {
+  background-color: var(--card-bg-decorator);
+}
+
+/* Background opacity variants */
+.bg-accent-5 {
+  background-color: rgba(var(--accent-rgb), 0.05);
+}
+.bg-accent-10 {
+  background-color: rgba(var(--accent-rgb), 0.1);
+}
+.bg-accent-15 {
+  background-color: rgba(var(--accent-rgb), 0.15);
+}
+.bg-accent-20 {
+  background-color: rgba(var(--accent-rgb), 0.2);
+}
+.bg-accent-30 {
+  background-color: rgba(var(--accent-rgb), 0.3);
+}
+
+/* =========================================================================
+ * BORDER COLORS
+ * ========================================================================= */
+
+/* Base borders */
+.border-primary {
+  border-color: var(--border-primary);
+}
+.border-secondary {
+  border-color: var(--border-secondary);
+}
+.border-color {
+  border-color: var(--border-color);
+}
+.border-base {
+  border-color: var(--border-base);
+}
+.border-strong {
+  border-color: var(--border-strong);
+}
+.border-muted {
+  border-color: var(--border-muted);
+}
+.border-subtle {
+  border-color: var(--border-subtle);
+}
+
+/* Semantic border colors */
+.border-accent {
+  border-color: var(--accent);
+}
+.border-error {
+  border-color: var(--error);
+}
+.border-warning {
+  border-color: var(--color-warning);
+}
+.border-success {
+  border-color: var(--color-success);
+}
+.border-info {
+  border-color: var(--color-info);
+}
+
+/* Border opacity variants */
+.border-accent-10 {
+  border-color: rgba(var(--accent-rgb), 0.1);
+}
+.border-accent-20 {
+  border-color: rgba(var(--accent-rgb), 0.2);
+}
+.border-accent-30 {
+  border-color: rgba(var(--accent-rgb), 0.3);
+}
+.border-accent-40 {
+  border-color: rgba(var(--accent-rgb), 0.4);
+}
+
+.border-fg-5 {
+  border-color: rgba(var(--fg0-rgb), 0.05);
+}
+.border-fg-10 {
+  border-color: rgba(var(--fg0-rgb), 0.1);
+}
+.border-fg-15 {
+  border-color: rgba(var(--fg0-rgb), 0.15);
+}
+.border-fg-20 {
+  border-color: rgba(var(--fg0-rgb), 0.2);
+}
+
+/* =========================================================================
+ * GRADIENT UTILITIES
+ * ========================================================================= */
+
+/* Text gradients */
+.text-gradient-accent {
+  background: linear-gradient(135deg, var(--accent), var(--syntax-types));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-keywords {
+  background: linear-gradient(135deg, var(--syntax-keywords), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-types {
+  background: linear-gradient(135deg, var(--syntax-types), var(--syntax-functions));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-functions {
+  background: linear-gradient(135deg, var(--syntax-functions), var(--syntax-strings));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Background gradients */
+.bg-gradient-accent {
+  background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.2), rgba(var(--accent-rgb), 0.05));
+}
+
+.bg-gradient-keywords {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--syntax-keywords-rgb), 0.2),
+    rgba(var(--syntax-keywords-rgb), 0.05)
+  );
+}
+
+.bg-gradient-types {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--syntax-types-rgb), 0.2),
+    rgba(var(--syntax-types-rgb), 0.05)
+  );
+}
+
+/* =========================================================================
+ * COMPOSITE CLASSES
+ * ========================================================================= */
+
+/* Card variants */
+.card-accent {
+  background-color: rgba(var(--accent-rgb), 0.08);
+  border-color: rgba(var(--accent-rgb), 0.3);
+  color: var(--accent);
+}
+
+.card-keywords {
+  background-color: var(--card-bg-keywords);
+  border-color: var(--syntax-keywords);
+  color: var(--syntax-keywords);
+}
+
+.card-types {
+  background-color: var(--card-bg-types);
+  border-color: var(--syntax-types);
+  color: var(--syntax-types);
+}
+
+.card-functions {
+  background-color: var(--card-bg-functions);
+  border-color: var(--syntax-functions);
+  color: var(--syntax-functions);
+}
+
+.card-strings {
+  background-color: var(--card-bg-strings);
+  border-color: var(--syntax-strings);
+  color: var(--syntax-strings);
+}
+
+.card-decorator {
+  background-color: var(--card-bg-decorator);
+  border-color: var(--syntax-decorator);
+  color: var(--syntax-decorator);
+}
+
+/* Stat card variants */
+.stat-card-keywords {
+  background-color: var(--stat-bg-keywords);
+  border-color: var(--syntax-keywords);
+}
+
+.stat-card-types {
+  background-color: var(--stat-bg-types);
+  border-color: var(--syntax-types);
+}
+
+.stat-card-functions {
+  background-color: var(--stat-bg-functions);
+  border-color: var(--syntax-functions);
+}
+
+/* Button variants */
+.btn-accent {
+  background-color: var(--accent);
+  color: var(--bg0);
+  border-color: var(--accent);
+}
+
+.btn-accent:hover {
+  background-color: rgba(var(--accent-rgb), 0.9);
+}
+
+.btn-outline-accent {
+  background-color: transparent;
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.btn-outline-accent:hover {
+  background-color: rgba(var(--accent-rgb), 0.15);
+}
+
+/* Glow effects */
+.glow-accent {
+  box-shadow: 0 0 16px var(--glow-accent);
+}
+
+.glow-accent-strong {
+  box-shadow: 0 0 24px var(--glow-accent-strong);
+}
+
+.glow-keywords {
+  box-shadow: 0 0 16px var(--glow-keywords);
+}
+
+.glow-types {
+  box-shadow: 0 0 16px var(--glow-types);
+}
+
+.glow-functions {
+  box-shadow: 0 0 16px var(--glow-functions);
+}

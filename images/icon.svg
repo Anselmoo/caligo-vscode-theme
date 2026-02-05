@@ -1,0 +1,41 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <!-- Aurora Noir Background Gradient -->
+        <linearGradient id="bg" x1="256" y1="0" x2="256" y2="512" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#232834"/> <!-- Lighter Aurora Blue -->
+            <stop offset="1" stop-color="#0f1118"/> <!-- Deep Aurora Dark -->
+        </linearGradient>
+        
+        <!-- The "Caligo Spectrum" - Night Gradient (Aurora → Nebula) -->
+        <linearGradient id="spectrum" x1="100" y1="100" x2="400" y2="400" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#00c098"/> <!-- Teal (Aurora/GraphiteFlux) -->
+            <stop offset="0.5" stop-color="#00b4d8"/> <!-- Sky Blue (Eclipse) -->
+            <stop offset="1" stop-color="#9b90ff"/> <!-- Purple (Nebula) -->
+        </linearGradient>
+
+        <!-- Inner Glow for the Ring -->
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="12" result="blur"/>
+            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+        </filter>
+    </defs>
+
+    <!-- Squircle Shape (Apple Style) -->
+    <rect width="512" height="512" rx="110" fill="url(#bg)"/>
+    
+    <!-- Subtle Grid Texture (Code/Science hint) -->
+    <path d="M0 128 H512 M0 256 H512 M0 384 H512 M128 0 V512 M256 0 V512 M384 0 V512" stroke="#7ad7f0" stroke-width="1" opacity="0.03"/>
+
+    <!-- The Prism Ring: Represents the Color Science/Circle -->
+    <circle cx="256" cy="256" r="170" stroke="url(#spectrum)" stroke-width="24" stroke-linecap="round" filter="url(#glow)" opacity="0.9"/>
+    
+    <!-- The "C" Monogram: Now using the Spectrum Gradient instead of White -->
+    <!-- Styled as a wave/frequency to represent "Caligo" (Music/Night) -->
+    <path d="M350.5 182 A 120 120 0 1 0 350.5 330" stroke="url(#spectrum)" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Glossy Reflection (Glassy look) -->
+    <path d="M0 0 H512 V240 Q256 280 0 240 Z" fill="white" opacity="0.03"/>
+    
+    <!-- Border Ring -->
+    <rect x="2" y="2" width="508" height="508" rx="108" stroke="white" stroke-opacity="0.08" stroke-width="4"/>
+</svg>

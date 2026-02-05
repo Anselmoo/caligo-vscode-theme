@@ -1,0 +1,107 @@
+/**
+ * Semantic Design Tokens
+ * Auto-generated from theme manifest - DO NOT EDIT MANUALLY
+ *
+ * These tokens create a consistent design language for the preview site.
+ * All formulas use CSS custom properties set by useTheme composable.
+ */
+
+:root {
+  /* ========================================
+   * SURFACE LAYERS
+   * ======================================== */
+
+  /* Base surfaces inherit from theme */
+  --surface-base: var(--bg1);
+  --surface-elevated: var(--bg2);
+
+  /* Overlays for cards, modals, panels */
+  --surface-overlay: color-mix(in oklab, var(--bg2) 80%, var(--bg0) 20%);
+  --surface-overlay-strong: color-mix(in oklab, var(--bg2) 60%, var(--bg0) 40%);
+
+  /* ========================================
+   * INTERACTIVE STATES
+   * ======================================== */
+
+  /* Hover states for buttons, links, cards */
+  --interactive-hover: color-mix(in oklab, var(--accent) 15%, var(--bg0) 85%);
+  --interactive-hover-strong: color-mix(in oklab, var(--accent) 18%, var(--bg0) 82%);
+
+  /* Active/pressed states */
+  --interactive-active: color-mix(in oklab, var(--accent) 25%, var(--bg0) 75%);
+
+  /* Disabled states */
+  --interactive-disabled: color-mix(in oklab, var(--fg0) 40%, var(--bg0) 60%);
+
+  /* ========================================
+   * TEXT HIERARCHY
+   * ======================================== */
+
+  /* Primary text uses chromatic syntax colors (not neutral fg0) */
+  --text-primary: var(--syntax-types);
+  --text-strong: var(--syntax-keywords);
+
+  /* Muted text (de-emphasized but readable) */
+  --text-muted: color-mix(in oklab, var(--syntax-types) 65%, var(--bg1) 35%);
+  --text-subtle: color-mix(in oklab, var(--syntax-functions) 60%, var(--bg1) 40%);
+
+  /* Disabled text */
+  --text-disabled: color-mix(in oklab, var(--fg0) 40%, var(--bg0) 60%);
+
+  /* ========================================
+   * BORDERS
+   * ======================================== */
+
+  /* Base border uses accent tint */
+  --border-base: color-mix(in oklab, var(--accent) 30%, var(--bg0) 70%);
+  --border-strong: color-mix(in oklab, var(--accent) 45%, var(--bg0) 55%);
+
+  /* Muted borders (subtle dividers) */
+  --border-muted: color-mix(in oklab, var(--fg0) 10%, transparent 90%);
+  --border-subtle: color-mix(in oklab, var(--fg0) 8%, transparent 92%);
+
+  /* ========================================
+   * SHADOWS & GLOWS
+   * ======================================== */
+
+  /* Shadow tokens using RGB variables */
+  --shadow-sm: rgba(var(--bg0-rgb), 0.5);
+  --shadow-md: rgba(var(--bg0-rgb), 0.55);
+  --shadow-lg: rgba(var(--bg0-rgb), 0.6);
+
+  /* Accent glows for highlights */
+  --glow-accent: rgba(var(--accent-rgb), 0.3);
+  --glow-accent-strong: rgba(var(--accent-rgb), 0.4);
+
+  /* Syntax color glows for themed effects */
+  --glow-keywords: rgba(var(--syntax-keywords-rgb), 0.15);
+  --glow-types: rgba(var(--syntax-types-rgb), 0.15);
+  --glow-functions: rgba(var(--syntax-functions-rgb), 0.15);
+  --glow-strings: rgba(var(--syntax-strings-rgb), 0.15);
+
+  /* ========================================
+   * STAT CARD VARIANTS
+   * ======================================== */
+
+  /* Background tints for stat cards */
+  --stat-bg-keywords: rgba(var(--syntax-keywords-rgb), 0.08);
+  --stat-bg-types: rgba(var(--syntax-types-rgb), 0.08);
+  --stat-bg-functions: rgba(var(--syntax-functions-rgb), 0.08);
+
+  /* Text colors for stat labels */
+  --stat-text-keywords: color-mix(in oklab, var(--syntax-keywords) 60%, var(--bg1) 40%);
+  --stat-text-types: color-mix(in oklab, var(--syntax-types) 60%, var(--bg1) 40%);
+  --stat-text-functions: color-mix(in oklab, var(--syntax-functions) 60%, var(--bg1) 40%);
+
+  /* ========================================
+   * PHILOSOPHY CARD VARIANTS
+   * ======================================== */
+
+  /* Card backgrounds using syntax color tints */
+  --card-bg-types: rgba(var(--syntax-types-rgb), 0.08);
+  --card-bg-keywords: rgba(var(--syntax-keywords-rgb), 0.08);
+  --card-bg-functions: rgba(var(--syntax-functions-rgb), 0.08);
+  --card-bg-strings: rgba(var(--syntax-strings-rgb), 0.08);
+  --card-bg-decorator: rgba(var(--syntax-decorator-rgb), 0.08);
+  --card-bg-accent: rgba(var(--accent-rgb), 0.08);
+}

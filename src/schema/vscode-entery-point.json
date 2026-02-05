@@ -1,0 +1,2897 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "VS Code Theme Colors Schema",
+  "description": "JSON Schema for VS Code workbench color customizations, based on the official theme color reference.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "contrastActiveBorder": {
+      "type": "string",
+      "description": "An extra border around active elements to separate them from others for greater contrast."
+    },
+    "contrastBorder": {
+      "type": "string",
+      "description": "An extra border around elements to separate them from others for greater contrast."
+    },
+    "focusBorder": {
+      "type": "string",
+      "description": "Overall border color for focused elements. This color is only used if not overridden by a component."
+    },
+    "foreground": {
+      "type": "string",
+      "description": "Overall foreground color. This color is only used if not overridden by a component."
+    },
+    "disabledForeground": {
+      "type": "string",
+      "description": "Overall foreground for disabled elements. This color is only used if not overridden by a component."
+    },
+    "widget.border": {
+      "type": "string",
+      "description": "Border color of widgets such as Find/Replace inside the editor."
+    },
+    "widget.shadow": {
+      "type": "string",
+      "description": "Shadow color of widgets such as Find/Replace inside the editor."
+    },
+    "selection.background": {
+      "type": "string",
+      "description": "Background color of text selections in the workbench (for input fields or text areas, does not apply to selections within the editor and the terminal)."
+    },
+    "descriptionForeground": {
+      "type": "string",
+      "description": "Foreground color for description text providing additional information, for example for a label."
+    },
+    "errorForeground": {
+      "type": "string",
+      "description": "Overall foreground color for error messages (this color is only used if not overridden by a component)."
+    },
+    "icon.foreground": {
+      "type": "string",
+      "description": "The default color for icons in the workbench."
+    },
+    "sash.hoverBorder": {
+      "type": "string",
+      "description": "The hover border color for draggable sashes."
+    },
+    "window.activeBorder": {
+      "type": "string",
+      "description": "Border color for the active (focused) window."
+    },
+    "window.inactiveBorder": {
+      "type": "string",
+      "description": "Border color for the inactive (unfocused) windows."
+    },
+    "textBlockQuote.background": {
+      "type": "string",
+      "description": "Background color for block quotes in text."
+    },
+    "textBlockQuote.border": {
+      "type": "string",
+      "description": "Border color for block quotes in text."
+    },
+    "textCodeBlock.background": {
+      "type": "string",
+      "description": "Background color for code blocks in text."
+    },
+    "textLink.activeForeground": {
+      "type": "string",
+      "description": "Foreground color for links in text when clicked on and on mouse hover."
+    },
+    "textLink.foreground": {
+      "type": "string",
+      "description": "Foreground color for links in text."
+    },
+    "textPreformat.foreground": {
+      "type": "string",
+      "description": "Foreground color for preformatted text segments."
+    },
+    "textPreformat.background": {
+      "type": "string",
+      "description": "Background color for preformatted text segments."
+    },
+    "textSeparator.foreground": {
+      "type": "string",
+      "description": "Color for text separators."
+    },
+    "toolbar.hoverBackground": {
+      "type": "string",
+      "description": "Toolbar background when hovering over actions using the mouse"
+    },
+    "toolbar.hoverOutline": {
+      "type": "string",
+      "description": "Toolbar outline when hovering over actions using the mouse"
+    },
+    "toolbar.activeBackground": {
+      "type": "string",
+      "description": "Toolbar background when holding the mouse over actions"
+    },
+    "editorActionList.background": {
+      "type": "string",
+      "description": "Action List background color."
+    },
+    "editorActionList.foreground": {
+      "type": "string",
+      "description": "Action List foreground color."
+    },
+    "editorActionList.focusForeground": {
+      "type": "string",
+      "description": "Action List foreground color for the focused item."
+    },
+    "editorActionList.focusBackground": {
+      "type": "string",
+      "description": "Action List background color for the focused item."
+    },
+    "button.background": {
+      "type": "string",
+      "description": "Button background color."
+    },
+    "button.foreground": {
+      "type": "string",
+      "description": "Button foreground color."
+    },
+    "button.border": {
+      "type": "string",
+      "description": "Button border color."
+    },
+    "button.separator": {
+      "type": "string",
+      "description": "Button separator color."
+    },
+    "button.hoverBackground": {
+      "type": "string",
+      "description": "Button background color when hovering."
+    },
+    "button.secondaryForeground": {
+      "type": "string",
+      "description": "Secondary button foreground color."
+    },
+    "button.secondaryBackground": {
+      "type": "string",
+      "description": "Secondary button background color."
+    },
+    "button.secondaryHoverBackground": {
+      "type": "string",
+      "description": "Secondary button background color when hovering."
+    },
+    "checkbox.background": {
+      "type": "string",
+      "description": "Background color of checkbox widget."
+    },
+    "checkbox.foreground": {
+      "type": "string",
+      "description": "Foreground color of checkbox widget."
+    },
+    "checkbox.disabled.background": {
+      "type": "string",
+      "description": "Background of a disabled checkbox."
+    },
+    "checkbox.disabled.foreground": {
+      "type": "string",
+      "description": "Foreground of a disabled checkbox."
+    },
+    "checkbox.border": {
+      "type": "string",
+      "description": "Border color of checkbox widget."
+    },
+    "checkbox.selectBackground": {
+      "type": "string",
+      "description": "Background color of checkbox widget when the element it's in is selected."
+    },
+    "checkbox.selectBorder": {
+      "type": "string",
+      "description": "Border color of checkbox widget when the element it's in is selected."
+    },
+    "radio.activeForeground": {
+      "type": "string",
+      "description": "Foreground color of active radio option."
+    },
+    "radio.activeBackground": {
+      "type": "string",
+      "description": "Background color of active radio option."
+    },
+    "radio.activeBorder": {
+      "type": "string",
+      "description": "Border color of the active radio option."
+    },
+    "radio.inactiveForeground": {
+      "type": "string",
+      "description": "Foreground color of inactive radio option."
+    },
+    "radio.inactiveBackground": {
+      "type": "string",
+      "description": "Background color of inactive radio option."
+    },
+    "radio.inactiveBorder": {
+      "type": "string",
+      "description": "Border color of the inactive radio option."
+    },
+    "radio.inactiveHoverBackground": {
+      "type": "string",
+      "description": "Background color of inactive active radio option when hovering."
+    },
+    "dropdown.background": {
+      "type": "string",
+      "description": "Dropdown background."
+    },
+    "dropdown.listBackground": {
+      "type": "string",
+      "description": "Dropdown list background."
+    },
+    "dropdown.border": {
+      "type": "string",
+      "description": "Dropdown border."
+    },
+    "dropdown.foreground": {
+      "type": "string",
+      "description": "Dropdown foreground."
+    },
+    "input.background": {
+      "type": "string",
+      "description": "Input box background."
+    },
+    "input.border": {
+      "type": "string",
+      "description": "Input box border."
+    },
+    "input.foreground": {
+      "type": "string",
+      "description": "Input box foreground."
+    },
+    "input.placeholderForeground": {
+      "type": "string",
+      "description": "Input box foreground color for placeholder text."
+    },
+    "inputOption.activeBackground": {
+      "type": "string",
+      "description": "Background color of activated options in input fields."
+    },
+    "inputOption.activeBorder": {
+      "type": "string",
+      "description": "Border color of activated options in input fields."
+    },
+    "inputOption.activeForeground": {
+      "type": "string",
+      "description": "Foreground color of activated options in input fields."
+    },
+    "inputOption.hoverBackground": {
+      "type": "string",
+      "description": "Background color of activated options in input fields."
+    },
+    "inputValidation.errorBackground": {
+      "type": "string",
+      "description": "Input validation background color for error severity."
+    },
+    "inputValidation.errorForeground": {
+      "type": "string",
+      "description": "Input validation foreground color for error severity."
+    },
+    "inputValidation.errorBorder": {
+      "type": "string",
+      "description": "Input validation border color for error severity."
+    },
+    "inputValidation.infoBackground": {
+      "type": "string",
+      "description": "Input validation background color for information severity."
+    },
+    "inputValidation.infoForeground": {
+      "type": "string",
+      "description": "Input validation foreground color for information severity."
+    },
+    "inputValidation.infoBorder": {
+      "type": "string",
+      "description": "Input validation border color for information severity."
+    },
+    "inputValidation.warningBackground": {
+      "type": "string",
+      "description": "Input validation background color for information warning."
+    },
+    "inputValidation.warningForeground": {
+      "type": "string",
+      "description": "Input validation foreground color for warning severity."
+    },
+    "inputValidation.warningBorder": {
+      "type": "string",
+      "description": "Input validation border color for warning severity."
+    },
+    "scrollbar.background": {
+      "type": "string",
+      "description": "Scrollbar track background color."
+    },
+    "scrollbar.shadow": {
+      "type": "string",
+      "description": "Scrollbar slider shadow to indicate that the view is scrolled."
+    },
+    "scrollbarSlider.activeBackground": {
+      "type": "string",
+      "description": "Scrollbar slider background color when clicked on."
+    },
+    "scrollbarSlider.background": {
+      "type": "string",
+      "description": "Scrollbar slider background color."
+    },
+    "scrollbarSlider.hoverBackground": {
+      "type": "string",
+      "description": "Scrollbar slider background color when hovering."
+    },
+    "badge.foreground": {
+      "type": "string",
+      "description": "Badge foreground color."
+    },
+    "badge.background": {
+      "type": "string",
+      "description": "Badge background color."
+    },
+    "progressBar.background": {
+      "type": "string",
+      "description": "Background color of the progress bar shown for long running operations."
+    },
+    "list.activeSelectionBackground": {
+      "type": "string",
+      "description": "List/Tree background color for the selected item when the list/tree is active."
+    },
+    "list.activeSelectionForeground": {
+      "type": "string",
+      "description": "List/Tree foreground color for the selected item when the list/tree is active."
+    },
+    "list.activeSelectionIconForeground": {
+      "type": "string",
+      "description": "List/Tree icon foreground color for the selected item when the list/tree is active. An active list/tree has keyboard focus, an inactive does not."
+    },
+    "list.dropBackground": {
+      "type": "string",
+      "description": "List/Tree drag and drop background when moving items around using the mouse."
+    },
+    "list.focusBackground": {
+      "type": "string",
+      "description": "List/Tree background color for the focused item when the list/tree is active."
+    },
+    "list.focusForeground": {
+      "type": "string",
+      "description": "List/Tree foreground color for the focused item when the list/tree is active. An active list/tree has keyboard focus, an inactive does not."
+    },
+    "list.focusHighlightForeground": {
+      "type": "string",
+      "description": "List/Tree foreground color of the match highlights on actively focused items when searching inside the list/tree."
+    },
+    "list.focusOutline": {
+      "type": "string",
+      "description": "List/Tree outline color for the focused item when the list/tree is active. An active list/tree has keyboard focus, an inactive does not."
+    },
+    "list.focusAndSelectionOutline": {
+      "type": "string",
+      "description": "List/Tree outline color for the focused item when the list/tree is active and selected. An active list/tree has keyboard focus, an inactive does not."
+    },
+    "list.highlightForeground": {
+      "type": "string",
+      "description": "List/Tree foreground color of the match highlights when searching inside the list/tree."
+    },
+    "list.hoverBackground": {
+      "type": "string",
+      "description": "List/Tree background when hovering over items using the mouse."
+    },
+    "list.hoverForeground": {
+      "type": "string",
+      "description": "List/Tree foreground when hovering over items using the mouse."
+    },
+    "list.inactiveSelectionBackground": {
+      "type": "string",
+      "description": "List/Tree background color for the selected item when the list/tree is inactive."
+    },
+    "list.inactiveSelectionForeground": {
+      "type": "string",
+      "description": "List/Tree foreground color for the selected item when the list/tree is inactive. An active list/tree has keyboard focus, an inactive does not."
+    },
+    "list.inactiveSelectionIconForeground": {
+      "type": "string",
+      "description": "List/Tree icon foreground color for the selected item when the list/tree is inactive. An active list/tree has keyboard focus, an inactive does not."
+    },
+    "list.inactiveFocusBackground": {
+      "type": "string",
+      "description": "List background color for the focused item when the list is inactive. An active list has keyboard focus, an inactive does not. Currently only supported in lists."
+    },
+    "list.inactiveFocusOutline": {
+      "type": "string",
+      "description": "List/Tree outline color for the focused item when the list/tree is inactive. An active list/tree has keyboard focus, an inactive does not."
+    },
+    "list.invalidItemForeground": {
+      "type": "string",
+      "description": "List/Tree foreground color for invalid items, for example an unresolved root in explorer."
+    },
+    "list.errorForeground": {
+      "type": "string",
+      "description": "Foreground color of list items containing errors."
+    },
+    "list.warningForeground": {
+      "type": "string",
+      "description": "Foreground color of list items containing warnings."
+    },
+    "listFilterWidget.background": {
+      "type": "string",
+      "description": "List/Tree Filter background color of typed text when searching inside the list/tree."
+    },
+    "listFilterWidget.outline": {
+      "type": "string",
+      "description": "List/Tree Filter Widget's outline color of typed text when searching inside the list/tree."
+    },
+    "listFilterWidget.noMatchesOutline": {
+      "type": "string",
+      "description": "List/Tree Filter Widget's outline color when no match is found of typed text when searching inside the list/tree."
+    },
+    "listFilterWidget.shadow": {
+      "type": "string",
+      "description": "Shadow color of the type filter widget in lists and tree."
+    },
+    "list.filterMatchBackground": {
+      "type": "string",
+      "description": "Background color of the filtered matches in lists and trees."
+    },
+    "list.filterMatchBorder": {
+      "type": "string",
+      "description": "Border color of the filtered matches in lists and trees."
+    },
+    "list.deemphasizedForeground": {
+      "type": "string",
+      "description": "List/Tree foreground color for items that are deemphasized."
+    },
+    "list.dropBetweenBackground": {
+      "type": "string",
+      "description": "List/Tree drag and drop border color when moving items between items when using the mouse."
+    },
+    "tree.indentGuidesStroke": {
+      "type": "string",
+      "description": "Tree Widget's stroke color for indent guides."
+    },
+    "tree.inactiveIndentGuidesStroke": {
+      "type": "string",
+      "description": "Tree stroke color for the indentation guides that are not active."
+    },
+    "tree.tableColumnsBorder": {
+      "type": "string",
+      "description": "Tree stroke color for the indentation guides."
+    },
+    "tree.tableOddRowsBackground": {
+      "type": "string",
+      "description": "Background color for odd table rows."
+    },
+    "activityBar.background": {
+      "type": "string",
+      "description": "Activity Bar background color."
+    },
+    "activityBar.dropBorder": {
+      "type": "string",
+      "description": "Drag and drop feedback color for the activity bar items. The activity bar is showing on the far left or right and allows to switch between views of the side bar."
+    },
+    "activityBar.foreground": {
+      "type": "string",
+      "description": "Activity Bar foreground color (for example used for the icons)."
+    },
+    "activityBar.inactiveForeground": {
+      "type": "string",
+      "description": "Activity Bar item foreground color when it is inactive."
+    },
+    "activityBar.border": {
+      "type": "string",
+      "description": "Activity Bar border color with the Side Bar."
+    },
+    "activityBarBadge.background": {
+      "type": "string",
+      "description": "Activity notification badge background color."
+    },
+    "activityBarBadge.foreground": {
+      "type": "string",
+      "description": "Activity notification badge foreground color."
+    },
+    "activityBar.activeBorder": {
+      "type": "string",
+      "description": "Activity Bar active indicator border color."
+    },
+    "activityBar.activeBackground": {
+      "type": "string",
+      "description": "Activity Bar optional background color for the active element."
+    },
+    "activityBar.activeFocusBorder": {
+      "type": "string",
+      "description": "Activity bar focus border color for the active item."
+    },
+    "activityBarTop.foreground": {
+      "type": "string",
+      "description": "Active foreground color of the item in the Activity bar when it is on top. The activity allows to switch between views of the side bar."
+    },
+    "activityBarTop.activeBorder": {
+      "type": "string",
+      "description": "Focus border color for the active item in the Activity bar when it is on top. The activity allows to switch between views of the side bar."
+    },
+    "activityBarTop.inactiveForeground": {
+      "type": "string",
+      "description": "Inactive foreground color of the item in the Activity bar when it is on top. The activity allows to switch between views of the side bar."
+    },
+    "activityBarTop.dropBorder": {
+      "type": "string",
+      "description": "Drag and drop feedback color for the items in the Activity bar when it is on top. The activity allows to switch between views of the side bar."
+    },
+    "activityBarTop.background": {
+      "type": "string",
+      "description": "Background color of the activity bar when set to top / bottom."
+    },
+    "activityBarTop.activeBackground": {
+      "type": "string",
+      "description": "Background color for the active item in the Activity bar when it is on top / bottom. The activity allows to switch between views of the side bar."
+    },
+    "activityWarningBadge.foreground": {
+      "type": "string",
+      "description": "Foreground color of the warning activity badge"
+    },
+    "activityWarningBadge.background": {
+      "type": "string",
+      "description": "Background color of the warning activity badge"
+    },
+    "activityErrorBadge.foreground": {
+      "type": "string",
+      "description": "Foreground color of the error activity badge"
+    },
+    "activityErrorBadge.background": {
+      "type": "string",
+      "description": "Background color of the error activity badge"
+    },
+    "profileBadge.background": {
+      "type": "string",
+      "description": "Profile badge background color. The profile badge shows on top of the settings gear icon in the activity bar."
+    },
+    "profileBadge.foreground": {
+      "type": "string",
+      "description": "Profile badge foreground color. The profile badge shows on top of the settings gear icon in the activity bar."
+    },
+    "profiles.sashBorder": {
+      "type": "string",
+      "description": "The color of the Profiles editor splitview sash border."
+    },
+    "sideBar.background": {
+      "type": "string",
+      "description": "Side Bar background color."
+    },
+    "sideBar.foreground": {
+      "type": "string",
+      "description": "Side Bar foreground color. The Side Bar is the container for views like Explorer and Search."
+    },
+    "sideBar.border": {
+      "type": "string",
+      "description": "Side Bar border color on the side separating the editor."
+    },
+    "sideBar.dropBackground": {
+      "type": "string",
+      "description": "Drag and drop feedback color for the side bar sections. The color should have transparency so that the side bar sections can still shine through."
+    },
+    "sideBarTitle.foreground": {
+      "type": "string",
+      "description": "Side Bar title foreground color."
+    },
+    "sideBarSectionHeader.background": {
+      "type": "string",
+      "description": "Side Bar section header background color."
+    },
+    "sideBarSectionHeader.foreground": {
+      "type": "string",
+      "description": "Side Bar section header foreground color."
+    },
+    "sideBarSectionHeader.border": {
+      "type": "string",
+      "description": "Side bar section header border color."
+    },
+    "sideBarActivityBarTop.border": {
+      "type": "string",
+      "description": "Border color between the activity bar at the top/bottom and the views."
+    },
+    "sideBarTitle.background": {
+      "type": "string",
+      "description": "Side bar title background color. The side bar is the container for views like explorer and search."
+    },
+    "sideBarTitle.border": {
+      "type": "string",
+      "description": "Side bar title border color on the bottom, separating the title from the views. The side bar is the container for views like explorer and search."
+    },
+    "sideBarStickyScroll.background": {
+      "type": "string",
+      "description": "Background color of sticky scroll in the side bar."
+    },
+    "sideBarStickyScroll.border": {
+      "type": "string",
+      "description": "Border color of sticky scroll in the side bar."
+    },
+    "sideBarStickyScroll.shadow": {
+      "type": "string",
+      "description": "Shadow color of sticky scroll in the side bar."
+    },
+    "minimap.findMatchHighlight": {
+      "type": "string",
+      "description": "Highlight color for matches from search within files."
+    },
+    "minimap.selectionHighlight": {
+      "type": "string",
+      "description": "Highlight color for the editor selection."
+    },
+    "minimap.errorHighlight": {
+      "type": "string",
+      "description": "Highlight color for errors within the editor."
+    },
+    "minimap.warningHighlight": {
+      "type": "string",
+      "description": "Highlight color for warnings within the editor."
+    },
+    "minimap.background": {
+      "type": "string",
+      "description": "Minimap background color."
+    },
+    "minimap.selectionOccurrenceHighlight": {
+      "type": "string",
+      "description": "Minimap marker color for repeating editor selections."
+    },
+    "minimap.foregroundOpacity": {
+      "type": "string",
+      "description": "Opacity of foreground elements rendered in the minimap. For example, \"#000000c0\" will render the elements with 75% opacity."
+    },
+    "minimap.infoHighlight": {
+      "type": "string",
+      "description": "Minimap marker color for infos."
+    },
+    "minimap.chatEditHighlight": {
+      "type": "string",
+      "description": "Color of pending edit regions in the minimap."
+    },
+    "minimapSlider.background": {
+      "type": "string",
+      "description": "Minimap slider background color."
+    },
+    "minimapSlider.hoverBackground": {
+      "type": "string",
+      "description": "Minimap slider background color when hovering."
+    },
+    "minimapSlider.activeBackground": {
+      "type": "string",
+      "description": "Minimap slider background color when clicked on."
+    },
+    "minimapGutter.addedBackground": {
+      "type": "string",
+      "description": "Minimap gutter color for added content."
+    },
+    "minimapGutter.modifiedBackground": {
+      "type": "string",
+      "description": "Minimap gutter color for modified content."
+    },
+    "minimapGutter.deletedBackground": {
+      "type": "string",
+      "description": "Minimap gutter color for deleted content."
+    },
+    "editorMinimap.inlineChatInserted": {
+      "type": "string",
+      "description": "Minimap marker color for inline chat inserted content."
+    },
+    "editorGroup.border": {
+      "type": "string",
+      "description": "Color to separate multiple editor groups from each other."
+    },
+    "editorGroup.dropBackground": {
+      "type": "string",
+      "description": "Background color when dragging editors around."
+    },
+    "editorGroupHeader.noTabsBackground": {
+      "type": "string",
+      "description": "Background color of the editor group title header when using single Tab (set \"workbench.editor.showTabs\": \"single\")."
+    },
+    "editorGroupHeader.tabsBackground": {
+      "type": "string",
+      "description": "Background color of the Tabs container."
+    },
+    "editorGroupHeader.tabsBorder": {
+      "type": "string",
+      "description": "Border color below the editor tabs control when tabs are enabled."
+    },
+    "editorGroupHeader.border": {
+      "type": "string",
+      "description": "Border color between editor group header and editor (below breadcrumbs if enabled)."
+    },
+    "editorGroup.emptyBackground": {
+      "type": "string",
+      "description": "Background color of an empty editor group."
+    },
+    "editorGroup.focusedEmptyBorder": {
+      "type": "string",
+      "description": "Border color of an empty editor group that is focused."
+    },
+    "editorGroup.dropIntoPromptForeground": {
+      "type": "string",
+      "description": "Foreground color of text shown over editors when dragging files. This text informs the user that they can hold shift to drop into the editor."
+    },
+    "editorGroup.dropIntoPromptBackground": {
+      "type": "string",
+      "description": "Background color of text shown over editors when dragging files. This text informs the user that they can hold shift to drop into the editor."
+    },
+    "editorGroup.dropIntoPromptBorder": {
+      "type": "string",
+      "description": "Border color of text shown over editors when dragging files. This text informs the user that they can hold shift to drop into the editor."
+    },
+    "tab.activeBackground": {
+      "type": "string",
+      "description": "Active Tab background color in an active group."
+    },
+    "tab.unfocusedActiveBackground": {
+      "type": "string",
+      "description": "Active Tab background color in an inactive editor group."
+    },
+    "tab.activeForeground": {
+      "type": "string",
+      "description": "Active Tab foreground color in an active group."
+    },
+    "tab.border": {
+      "type": "string",
+      "description": "Border to separate Tabs from each other."
+    },
+    "tab.activeBorder": {
+      "type": "string",
+      "description": "Bottom border for the active tab."
+    },
+    "tab.selectedBorderTop": {
+      "type": "string",
+      "description": "Border to the top of a selected tab. Tabs are the containers for editors in the editor area. Multiple tabs can be opened in one editor group. There can be multiple editor groups."
+    },
+    "tab.selectedBackground": {
+      "type": "string",
+      "description": "Background of a selected tab. Tabs are the containers for editors in the editor area. Multiple tabs can be opened in one editor group. There can be multiple editor groups."
+    },
+    "tab.selectedForeground": {
+      "type": "string",
+      "description": "Foreground of a selected tab. Tabs are the containers for editors in the editor area. Multiple tabs can be opened in one editor group. There can be multiple editor groups."
+    },
+    "tab.dragAndDropBorder": {
+      "type": "string",
+      "description": "Border between tabs to indicate that a tab can be inserted between two tabs. Tabs are the containers for editors in the editor area. Multiple tabs can be opened in one editor group."
+    },
+    "tab.unfocusedActiveBorder": {
+      "type": "string",
+      "description": "Bottom border for the active tab in an inactive editor group."
+    },
+    "tab.activeBorderTop": {
+      "type": "string",
+      "description": "Top border for the active tab."
+    },
+    "tab.unfocusedActiveBorderTop": {
+      "type": "string",
+      "description": "Top border for the active tab in an inactive editor group"
+    },
+    "tab.lastPinnedBorder": {
+      "type": "string",
+      "description": "Border on the right of the last pinned editor to separate from unpinned editors."
+    },
+    "tab.inactiveBackground": {
+      "type": "string",
+      "description": "Inactive Tab background color."
+    },
+    "tab.unfocusedInactiveBackground": {
+      "type": "string",
+      "description": "Inactive Tab background color in an unfocused group"
+    },
+    "tab.inactiveForeground": {
+      "type": "string",
+      "description": "Inactive Tab foreground color in an active group."
+    },
+    "tab.unfocusedActiveForeground": {
+      "type": "string",
+      "description": "Active tab foreground color in an inactive editor group."
+    },
+    "tab.unfocusedInactiveForeground": {
+      "type": "string",
+      "description": "Inactive tab foreground color in an inactive editor group."
+    },
+    "tab.hoverBackground": {
+      "type": "string",
+      "description": "Tab background color when hovering"
+    },
+    "tab.unfocusedHoverBackground": {
+      "type": "string",
+      "description": "Tab background color in an unfocused group when hovering"
+    },
+    "tab.hoverForeground": {
+      "type": "string",
+      "description": "Tab foreground color when hovering"
+    },
+    "tab.unfocusedHoverForeground": {
+      "type": "string",
+      "description": "Tab foreground color in an unfocused group when hovering"
+    },
+    "tab.hoverBorder": {
+      "type": "string",
+      "description": "Border to highlight tabs when hovering"
+    },
+    "tab.unfocusedHoverBorder": {
+      "type": "string",
+      "description": "Border to highlight tabs in an unfocused group when hovering"
+    },
+    "tab.activeModifiedBorder": {
+      "type": "string",
+      "description": "Border on the top of modified (dirty) active tabs in an active group."
+    },
+    "tab.inactiveModifiedBorder": {
+      "type": "string",
+      "description": "Border on the top of modified (dirty) inactive tabs in an active group."
+    },
+    "tab.unfocusedActiveModifiedBorder": {
+      "type": "string",
+      "description": "Border on the top of modified (dirty) active tabs in an unfocused group."
+    },
+    "tab.unfocusedInactiveModifiedBorder": {
+      "type": "string",
+      "description": "Border on the top of modified (dirty) inactive tabs in an unfocused group."
+    },
+    "editorPane.background": {
+      "type": "string",
+      "description": "Background color of the editor pane visible on the left and right side of the centered editor layout."
+    },
+    "sideBySideEditor.horizontalBorder": {
+      "type": "string",
+      "description": "Color to separate two editors from each other when shown side by side in an editor group from top to bottom."
+    },
+    "sideBySideEditor.verticalBorder": {
+      "type": "string",
+      "description": "Color to separate two editors from each other when shown side by side in an editor group from left to right."
+    },
+    "editor.background": {
+      "type": "string",
+      "description": "Editor background color."
+    },
+    "editor.foreground": {
+      "type": "string",
+      "description": "Editor default foreground color."
+    },
+    "editorLineNumber.foreground": {
+      "type": "string",
+      "description": "Color of editor line numbers."
+    },
+    "editorLineNumber.activeForeground": {
+      "type": "string",
+      "description": "Color of the active editor line number."
+    },
+    "editorLineNumber.dimmedForeground": {
+      "type": "string",
+      "description": "Color of the final editor line when editor.renderFinalNewline is set to dimmed."
+    },
+    "editorCursor.background": {
+      "type": "string",
+      "description": "The background color of the editor cursor. Allows customizing the color of a character overlapped by a block cursor."
+    },
+    "editorCursor.foreground": {
+      "type": "string",
+      "description": "Color of the editor cursor."
+    },
+    "editorMultiCursor.primary.foreground": {
+      "type": "string",
+      "description": "Color of the primary editor cursor when multiple cursors are present."
+    },
+    "editorMultiCursor.primary.background": {
+      "type": "string",
+      "description": "The background color of the primary editor cursor when multiple cursors are present. Allows customizing the color of a character overlapped by a block cursor."
+    },
+    "editorMultiCursor.secondary.foreground": {
+      "type": "string",
+      "description": "Color of secondary editor cursors when multiple cursors are present."
+    },
+    "editorMultiCursor.secondary.background": {
+      "type": "string",
+      "description": "The background color of secondary editor cursors when multiple cursors are present. Allows customizing the color of a character overlapped by a block cursor."
+    },
+    "editor.placeholder.foreground": {
+      "type": "string",
+      "description": "Foreground color of the placeholder text in the editor."
+    },
+    "editor.compositionBorder": {
+      "type": "string",
+      "description": "The border color for an IME composition."
+    },
+    "editor.selectionBackground": {
+      "type": "string",
+      "description": "Color of the editor selection."
+    },
+    "editor.selectionForeground": {
+      "type": "string",
+      "description": "Color of the selected text for high contrast."
+    },
+    "editor.inactiveSelectionBackground": {
+      "type": "string",
+      "description": "Color of the selection in an inactive editor. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "editor.selectionHighlightBackground": {
+      "type": "string",
+      "description": "Color for regions with the same content as the selection. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "editor.selectionHighlightBorder": {
+      "type": "string",
+      "description": "Border color for regions with the same content as the selection."
+    },
+    "editor.wordHighlightBackground": {
+      "type": "string",
+      "description": "Background color of a symbol during read-access, for example when reading a variable. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "editor.wordHighlightBorder": {
+      "type": "string",
+      "description": "Border color of a symbol during read-access, for example when reading a variable."
+    },
+    "editor.wordHighlightStrongBackground": {
+      "type": "string",
+      "description": "Background color of a symbol during write-access, for example when writing to a variable. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "editor.wordHighlightStrongBorder": {
+      "type": "string",
+      "description": "Border color of a symbol during write-access, for example when writing to a variable."
+    },
+    "editor.wordHighlightTextBackground": {
+      "type": "string",
+      "description": "Background color of a textual occurrence for a symbol. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "editor.wordHighlightTextBorder": {
+      "type": "string",
+      "description": "Border color of a textual occurrence for a symbol."
+    },
+    "editor.findMatchBackground": {
+      "type": "string",
+      "description": "Color of the current search match."
+    },
+    "editor.findMatchForeground": {
+      "type": "string",
+      "description": "Text color of the current search match."
+    },
+    "editor.findMatchHighlightForeground": {
+      "type": "string",
+      "description": "Foreground color of the other search matches."
+    },
+    "editor.findMatchHighlightBackground": {
+      "type": "string",
+      "description": "Color of the other search matches. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "editor.findRangeHighlightBackground": {
+      "type": "string",
+      "description": "Color the range limiting the search (Enable 'Find in Selection' in the find widget). The color must not be opaque so as not to hide underlying decorations."
+    },
+    "editor.findMatchBorder": {
+      "type": "string",
+      "description": "Border color of the current search match."
+    },
+    "editor.findMatchHighlightBorder": {
+      "type": "string",
+      "description": "Border color of the other search matches."
+    },
+    "editor.findRangeHighlightBorder": {
+      "type": "string",
+      "description": "Border color the range limiting the search (Enable 'Find in Selection' in the find widget)."
+    },
+    "search.resultsInfoForeground": {
+      "type": "string",
+      "description": "Color of the text in the search viewlet's completion message. For example, this color is used in the text that says \"{x} results in {y} files\"."
+    },
+    "searchEditor.findMatchBackground": {
+      "type": "string",
+      "description": "Color of the editor's results."
+    },
+    "searchEditor.findMatchBorder": {
+      "type": "string",
+      "description": "Border color of the editor's results."
+    },
+    "searchEditor.textInputBorder": {
+      "type": "string",
+      "description": "Search editor text input box border."
+    },
+    "editor.hoverHighlightBackground": {
+      "type": "string",
+      "description": "Highlight below the word for which a hover is shown. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "editor.lineHighlightBackground": {
+      "type": "string",
+      "description": "Background color for the highlight of line at the cursor position."
+    },
+    "editor.inactiveLineHighlightBackground": {
+      "type": "string",
+      "description": "Background color for the highlight of line at the cursor position when the editor is not focused."
+    },
+    "editor.lineHighlightBorder": {
+      "type": "string",
+      "description": "Background color for the border around the line at the cursor position."
+    },
+    "editorUnicodeHighlight.border": {
+      "type": "string",
+      "description": "Border color used to highlight unicode characters."
+    },
+    "editorUnicodeHighlight.background": {
+      "type": "string",
+      "description": "Background color used to highlight unicode characters."
+    },
+    "editorLink.activeForeground": {
+      "type": "string",
+      "description": "Color of active links."
+    },
+    "editor.rangeHighlightBackground": {
+      "type": "string",
+      "description": "Background color of highlighted ranges, used by Quick Open, Symbol in File and Find features. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "editor.rangeHighlightBorder": {
+      "type": "string",
+      "description": "Background color of the border around highlighted ranges."
+    },
+    "editor.symbolHighlightBackground": {
+      "type": "string",
+      "description": "Background color of highlighted symbol. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "editor.symbolHighlightBorder": {
+      "type": "string",
+      "description": "Background color of the border around highlighted symbols."
+    },
+    "editorWhitespace.foreground": {
+      "type": "string",
+      "description": "Color of whitespace characters in the editor."
+    },
+    "editorIndentGuide.background": {
+      "type": "string",
+      "description": "Color of the editor indentation guides."
+    },
+    "editorIndentGuide.background1": {
+      "type": "string",
+      "description": "Color of the editor indentation guides (1)."
+    },
+    "editorIndentGuide.background2": {
+      "type": "string",
+      "description": "Color of the editor indentation guides (2)."
+    },
+    "editorIndentGuide.background3": {
+      "type": "string",
+      "description": "Color of the editor indentation guides (3)."
+    },
+    "editorIndentGuide.background4": {
+      "type": "string",
+      "description": "Color of the editor indentation guides (4)."
+    },
+    "editorIndentGuide.background5": {
+      "type": "string",
+      "description": "Color of the editor indentation guides (5)."
+    },
+    "editorIndentGuide.background6": {
+      "type": "string",
+      "description": "Color of the editor indentation guides (6)."
+    },
+    "editorIndentGuide.activeBackground": {
+      "type": "string",
+      "description": "Color of the active editor indentation guide."
+    },
+    "editorIndentGuide.activeBackground1": {
+      "type": "string",
+      "description": "Color of the active editor indentation guides (1)."
+    },
+    "editorIndentGuide.activeBackground2": {
+      "type": "string",
+      "description": "Color of the active editor indentation guides (2)."
+    },
+    "editorIndentGuide.activeBackground3": {
+      "type": "string",
+      "description": "Color of the active editor indentation guides (3)."
+    },
+    "editorIndentGuide.activeBackground4": {
+      "type": "string",
+      "description": "Color of the active editor indentation guides (4)."
+    },
+    "editorIndentGuide.activeBackground5": {
+      "type": "string",
+      "description": "Color of the active editor indentation guides (5)."
+    },
+    "editorIndentGuide.activeBackground6": {
+      "type": "string",
+      "description": "Color of the active editor indentation guides (6)."
+    },
+    "editorInlayHint.background": {
+      "type": "string",
+      "description": "Background color of inline hints."
+    },
+    "editorInlayHint.foreground": {
+      "type": "string",
+      "description": "Foreground color of inline hints."
+    },
+    "editorInlayHint.typeForeground": {
+      "type": "string",
+      "description": "Foreground color of inline hints for types"
+    },
+    "editorInlayHint.typeBackground": {
+      "type": "string",
+      "description": "Background color of inline hints for types"
+    },
+    "editorInlayHint.parameterForeground": {
+      "type": "string",
+      "description": "Foreground color of inline hints for parameters"
+    },
+    "editorInlayHint.parameterBackground": {
+      "type": "string",
+      "description": "Background color of inline hints for parameters"
+    },
+    "editorRuler.foreground": {
+      "type": "string",
+      "description": "Color of the editor rulers."
+    },
+    "editor.linkedEditingBackground": {
+      "type": "string",
+      "description": "Background color when the editor is in linked editing mode."
+    },
+    "editorCodeLens.foreground": {
+      "type": "string",
+      "description": "Foreground color of an editor CodeLens."
+    },
+    "editorLightBulb.foreground": {
+      "type": "string",
+      "description": "The color used for the lightbulb actions icon."
+    },
+    "editorLightBulbAutoFix.foreground": {
+      "type": "string",
+      "description": "The color used for the lightbulb auto fix actions icon."
+    },
+    "editorLightBulbAi.foreground": {
+      "type": "string",
+      "description": "The color used for the lightbulb AI icon."
+    },
+    "editorBracketMatch.background": {
+      "type": "string",
+      "description": "Background color behind matching brackets."
+    },
+    "editorBracketMatch.border": {
+      "type": "string",
+      "description": "Color for matching brackets boxes."
+    },
+    "editorBracketHighlight.foreground1": {
+      "type": "string",
+      "description": "Foreground color of brackets (1). Requires enabling bracket pair colorization."
+    },
+    "editorBracketHighlight.foreground2": {
+      "type": "string",
+      "description": "Foreground color of brackets (2). Requires enabling bracket pair colorization."
+    },
+    "editorBracketHighlight.foreground3": {
+      "type": "string",
+      "description": "Foreground color of brackets (3). Requires enabling bracket pair colorization."
+    },
+    "editorBracketHighlight.foreground4": {
+      "type": "string",
+      "description": "Foreground color of brackets (4). Requires enabling bracket pair colorization."
+    },
+    "editorBracketHighlight.foreground5": {
+      "type": "string",
+      "description": "Foreground color of brackets (5). Requires enabling bracket pair colorization."
+    },
+    "editorBracketHighlight.foreground6": {
+      "type": "string",
+      "description": "Foreground color of brackets (6). Requires enabling bracket pair colorization."
+    },
+    "editorBracketHighlight.unexpectedBracket.foreground": {
+      "type": "string",
+      "description": "Foreground color of unexpected brackets."
+    },
+    "editorBracketPairGuide.activeBackground1": {
+      "type": "string",
+      "description": "Background color of active bracket pair guides (1). Requires enabling bracket pair guides."
+    },
+    "editorBracketPairGuide.activeBackground2": {
+      "type": "string",
+      "description": "Background color of active bracket pair guides (2). Requires enabling bracket pair guides."
+    },
+    "editorBracketPairGuide.activeBackground3": {
+      "type": "string",
+      "description": "Background color of active bracket pair guides (3). Requires enabling bracket pair guides."
+    },
+    "editorBracketPairGuide.activeBackground4": {
+      "type": "string",
+      "description": "Background color of active bracket pair guides (4). Requires enabling bracket pair guides."
+    },
+    "editorBracketPairGuide.activeBackground5": {
+      "type": "string",
+      "description": "Background color of active bracket pair guides (5). Requires enabling bracket pair guides."
+    },
+    "editorBracketPairGuide.activeBackground6": {
+      "type": "string",
+      "description": "Background color of active bracket pair guides (6). Requires enabling bracket pair guides."
+    },
+    "editorBracketPairGuide.background1": {
+      "type": "string",
+      "description": "Background color of inactive bracket pair guides (1). Requires enabling bracket pair guides."
+    },
+    "editorBracketPairGuide.background2": {
+      "type": "string",
+      "description": "Background color of inactive bracket pair guides (2). Requires enabling bracket pair guides."
+    },
+    "editorBracketPairGuide.background3": {
+      "type": "string",
+      "description": "Background color of inactive bracket pair guides (3). Requires enabling bracket pair guides."
+    },
+    "editorBracketPairGuide.background4": {
+      "type": "string",
+      "description": "Background color of inactive bracket pair guides (4). Requires enabling bracket pair guides."
+    },
+    "editorBracketPairGuide.background5": {
+      "type": "string",
+      "description": "Background color of inactive bracket pair guides (5). Requires enabling bracket pair guides."
+    },
+    "editorBracketPairGuide.background6": {
+      "type": "string",
+      "description": "Background color of inactive bracket pair guides (6). Requires enabling bracket pair guides."
+    },
+    "editor.foldBackground": {
+      "type": "string",
+      "description": "Background color for folded ranges. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "editor.foldPlaceholderForeground": {
+      "type": "string",
+      "description": "Color of the collapsed text after the first line of a folded range."
+    },
+    "editorOverviewRuler.background": {
+      "type": "string",
+      "description": "Background color of the editor overview ruler. Only used when the minimap is enabled and placed on the right side of the editor."
+    },
+    "editorOverviewRuler.border": {
+      "type": "string",
+      "description": "Color of the overview ruler border."
+    },
+    "editorOverviewRuler.findMatchForeground": {
+      "type": "string",
+      "description": "Overview ruler marker color for find matches. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "editorOverviewRuler.rangeHighlightForeground": {
+      "type": "string",
+      "description": "Overview ruler marker color for highlighted ranges, like by the Quick Open, Symbol in File and Find features. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "editorOverviewRuler.selectionHighlightForeground": {
+      "type": "string",
+      "description": "Overview ruler marker color for selection highlights. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "editorOverviewRuler.wordHighlightForeground": {
+      "type": "string",
+      "description": "Overview ruler marker color for symbol highlights. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "editorOverviewRuler.wordHighlightStrongForeground": {
+      "type": "string",
+      "description": "Overview ruler marker color for write-access symbol highlights. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "editorOverviewRuler.wordHighlightTextForeground": {
+      "type": "string",
+      "description": "Overview ruler marker color of a textual occurrence for a symbol. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "editorOverviewRuler.modifiedForeground": {
+      "type": "string",
+      "description": "Overview ruler marker color for modified content."
+    },
+    "editorOverviewRuler.addedForeground": {
+      "type": "string",
+      "description": "Overview ruler marker color for added content."
+    },
+    "editorOverviewRuler.deletedForeground": {
+      "type": "string",
+      "description": "Overview ruler marker color for deleted content."
+    },
+    "editorOverviewRuler.errorForeground": {
+      "type": "string",
+      "description": "Overview ruler marker color for errors."
+    },
+    "editorOverviewRuler.warningForeground": {
+      "type": "string",
+      "description": "Overview ruler marker color for warnings."
+    },
+    "editorOverviewRuler.infoForeground": {
+      "type": "string",
+      "description": "Overview ruler marker color for infos."
+    },
+    "editorOverviewRuler.bracketMatchForeground": {
+      "type": "string",
+      "description": "Overview ruler marker color for matching brackets."
+    },
+    "editorOverviewRuler.inlineChatInserted": {
+      "type": "string",
+      "description": "Overview ruler marker color for inline chat inserted content."
+    },
+    "editorOverviewRuler.inlineChatRemoved": {
+      "type": "string",
+      "description": "Overview ruler marker color for inline chat removed content."
+    },
+    "editorOverviewRuler.commentDraftForeground": {
+      "type": "string",
+      "description": "Editor overview ruler decoration color for comment threads with draft comments. This color should be opaque."
+    },
+    "editorError.foreground": {
+      "type": "string",
+      "description": "Foreground color of error squiggles in the editor."
+    },
+    "editorError.border": {
+      "type": "string",
+      "description": "Border color of error boxes in the editor."
+    },
+    "editorError.background": {
+      "type": "string",
+      "description": "Background color of error text in the editor. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "editorWarning.foreground": {
+      "type": "string",
+      "description": "Foreground color of warning squiggles in the editor."
+    },
+    "editorWarning.border": {
+      "type": "string",
+      "description": "Border color of warning boxes in the editor."
+    },
+    "editorWarning.background": {
+      "type": "string",
+      "description": "Background color of warning text in the editor. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "editorInfo.foreground": {
+      "type": "string",
+      "description": "Foreground color of info squiggles in the editor."
+    },
+    "editorInfo.border": {
+      "type": "string",
+      "description": "Border color of info boxes in the editor."
+    },
+    "editorInfo.background": {
+      "type": "string",
+      "description": "Background color of info text in the editor. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "editorHint.foreground": {
+      "type": "string",
+      "description": "Foreground color of hints in the editor."
+    },
+    "editorHint.border": {
+      "type": "string",
+      "description": "Border color of hint boxes in the editor."
+    },
+    "problemsErrorIcon.foreground": {
+      "type": "string",
+      "description": "The color used for the problems error icon."
+    },
+    "problemsWarningIcon.foreground": {
+      "type": "string",
+      "description": "The color used for the problems warning icon."
+    },
+    "problemsInfoIcon.foreground": {
+      "type": "string",
+      "description": "The color used for the problems info icon."
+    },
+    "editorUnnecessaryCode.border": {
+      "type": "string",
+      "description": "Border color of unnecessary (unused) source code in the editor."
+    },
+    "editorUnnecessaryCode.opacity": {
+      "type": "string",
+      "description": "Opacity of unnecessary (unused) source code in the editor. For example, \"#000000c0\" will render the code with 75% opacity. For high contrast themes, use the editorUnnecessaryCode.border setting to underline unnecessary code instead of a fade out."
+    },
+    "editorGutter.background": {
+      "type": "string",
+      "description": "Background color of the editor gutter. The gutter contains the glyph margins and the line numbers."
+    },
+    "editorGutter.modifiedBackground": {
+      "type": "string",
+      "description": "Editor gutter background color for lines that are modified."
+    },
+    "editorGutter.modifiedSecondaryBackground": {
+      "type": "string",
+      "description": "Editor gutter secondary background color for lines that are modified."
+    },
+    "editorGutter.addedBackground": {
+      "type": "string",
+      "description": "Editor gutter background color for lines that are added."
+    },
+    "editorGutter.addedSecondaryBackground": {
+      "type": "string",
+      "description": "Editor gutter secondary background color for lines that are added."
+    },
+    "editorGutter.deletedBackground": {
+      "type": "string",
+      "description": "Editor gutter background color for lines that are deleted."
+    },
+    "editorGutter.deletedSecondaryBackground": {
+      "type": "string",
+      "description": "Editor gutter secondary background color for lines that are deleted."
+    },
+    "editorGutter.commentRangeForeground": {
+      "type": "string",
+      "description": "Editor gutter decoration color for commenting ranges."
+    },
+    "editorGutter.commentGlyphForeground": {
+      "type": "string",
+      "description": "Editor gutter decoration color for commenting glyphs."
+    },
+    "editorGutter.commentUnresolvedGlyphForeground": {
+      "type": "string",
+      "description": "Editor gutter decoration color for commenting glyphs for unresolved comment threads."
+    },
+    "editorGutter.foldingControlForeground": {
+      "type": "string",
+      "description": "Color of the folding control in the editor gutter."
+    },
+    "editorGutter.itemGlyphForeground": {
+      "type": "string",
+      "description": "Editor gutter decoration color for gutter item glyphs."
+    },
+    "editorGutter.itemBackground": {
+      "type": "string",
+      "description": "Editor gutter decoration color for gutter item background. This color should be opaque."
+    },
+    "editorGutter.commentDraftGlyphForeground": {
+      "type": "string",
+      "description": "Editor gutter decoration color for commenting glyphs for comment threads with draft comments."
+    },
+    "editorCommentsWidget.resolvedBorder": {
+      "type": "string",
+      "description": "Color of borders and arrow for resolved comments."
+    },
+    "editorCommentsWidget.unresolvedBorder": {
+      "type": "string",
+      "description": "Color of borders and arrow for unresolved comments."
+    },
+    "editorCommentsWidget.rangeBackground": {
+      "type": "string",
+      "description": "Color of background for comment ranges."
+    },
+    "editorCommentsWidget.rangeActiveBackground": {
+      "type": "string",
+      "description": "Color of background for currently selected or hovered comment range."
+    },
+    "editorCommentsWidget.replyInputBackground": {
+      "type": "string",
+      "description": "Background color for comment reply input box."
+    },
+    "inlineEdit.gutterIndicator.primaryBorder": {
+      "type": "string",
+      "description": "Border color for the primary inline edit gutter indicator."
+    },
+    "inlineEdit.gutterIndicator.primaryForeground": {
+      "type": "string",
+      "description": "Foreground color for the primary inline edit gutter indicator."
+    },
+    "inlineEdit.gutterIndicator.primaryBackground": {
+      "type": "string",
+      "description": "Background color for the primary inline edit gutter indicator."
+    },
+    "inlineEdit.gutterIndicator.secondaryBorder": {
+      "type": "string",
+      "description": "Border color for the secondary inline edit gutter indicator."
+    },
+    "inlineEdit.gutterIndicator.secondaryForeground": {
+      "type": "string",
+      "description": "Foreground color for the secondary inline edit gutter indicator."
+    },
+    "inlineEdit.gutterIndicator.secondaryBackground": {
+      "type": "string",
+      "description": "Background color for the secondary inline edit gutter indicator."
+    },
+    "inlineEdit.gutterIndicator.successfulBorder": {
+      "type": "string",
+      "description": "Border color for the successful inline edit gutter indicator."
+    },
+    "inlineEdit.gutterIndicator.successfulForeground": {
+      "type": "string",
+      "description": "Foreground color for the successful inline edit gutter indicator."
+    },
+    "inlineEdit.gutterIndicator.successfulBackground": {
+      "type": "string",
+      "description": "Background color for the successful inline edit gutter indicator."
+    },
+    "inlineEdit.gutterIndicator.background": {
+      "type": "string",
+      "description": "Background color for the inline edit gutter indicator."
+    },
+    "inlineEdit.originalBackground": {
+      "type": "string",
+      "description": "Background color for the original text in inline edits."
+    },
+    "inlineEdit.modifiedBackground": {
+      "type": "string",
+      "description": "Background color for the modified text in inline edits."
+    },
+    "inlineEdit.originalChangedLineBackground": {
+      "type": "string",
+      "description": "Background color for the changed lines in the original text of inline edits."
+    },
+    "inlineEdit.originalChangedTextBackground": {
+      "type": "string",
+      "description": "Overlay color for the changed text in the original text of inline edits."
+    },
+    "inlineEdit.modifiedChangedLineBackground": {
+      "type": "string",
+      "description": "Background color for the changed lines in the modified text of inline edits."
+    },
+    "inlineEdit.modifiedChangedTextBackground": {
+      "type": "string",
+      "description": "Overlay color for the changed text in the modified text of inline edits."
+    },
+    "inlineEdit.originalBorder": {
+      "type": "string",
+      "description": "Border color for the original text in inline edits."
+    },
+    "inlineEdit.modifiedBorder": {
+      "type": "string",
+      "description": "Border color for the modified text in inline edits."
+    },
+    "inlineEdit.tabWillAcceptModifiedBorder": {
+      "type": "string",
+      "description": "Modified border color for the inline edits widget when tab will accept it."
+    },
+    "inlineEdit.tabWillAcceptOriginalBorder": {
+      "type": "string",
+      "description": "Original border color for the inline edits widget over the original text when tab will accept it."
+    },
+    "diffEditor.insertedTextBackground": {
+      "type": "string",
+      "description": "Background color for text that got inserted. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "diffEditor.insertedTextBorder": {
+      "type": "string",
+      "description": "Outline color for the text that got inserted."
+    },
+    "diffEditor.removedTextBackground": {
+      "type": "string",
+      "description": "Background color for text that got removed. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "diffEditor.removedTextBorder": {
+      "type": "string",
+      "description": "Outline color for text that got removed."
+    },
+    "diffEditor.border": {
+      "type": "string",
+      "description": "Border color between the two text editors."
+    },
+    "diffEditor.diagonalFill": {
+      "type": "string",
+      "description": "Color of the diff editor's diagonal fill. The diagonal fill is used in side-by-side diff views."
+    },
+    "diffEditor.insertedLineBackground": {
+      "type": "string",
+      "description": "Background color for lines that got inserted. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "diffEditor.removedLineBackground": {
+      "type": "string",
+      "description": "Background color for lines that got removed. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "diffEditorGutter.insertedLineBackground": {
+      "type": "string",
+      "description": "Background color for the margin where lines got inserted."
+    },
+    "diffEditorGutter.removedLineBackground": {
+      "type": "string",
+      "description": "Background color for the margin where lines got removed."
+    },
+    "diffEditorOverview.insertedForeground": {
+      "type": "string",
+      "description": "Diff overview ruler foreground for inserted content."
+    },
+    "diffEditorOverview.removedForeground": {
+      "type": "string",
+      "description": "Diff overview ruler foreground for removed content."
+    },
+    "diffEditor.unchangedRegionBackground": {
+      "type": "string",
+      "description": "The color of unchanged blocks in diff editor."
+    },
+    "diffEditor.unchangedRegionForeground": {
+      "type": "string",
+      "description": "The foreground color of unchanged blocks in the diff editor."
+    },
+    "diffEditor.unchangedRegionShadow": {
+      "type": "string",
+      "description": "The color of the shadow around unchanged region widgets."
+    },
+    "diffEditor.unchangedCodeBackground": {
+      "type": "string",
+      "description": "The background color of unchanged code in the diff editor."
+    },
+    "diffEditor.move.border": {
+      "type": "string",
+      "description": "The border color for text that got moved in the diff editor."
+    },
+    "diffEditor.moveActive.border": {
+      "type": "string",
+      "description": "The active border color for text that got moved in the diff editor."
+    },
+    "multiDiffEditor.headerBackground": {
+      "type": "string",
+      "description": "The background color of the diff editor's header"
+    },
+    "multiDiffEditor.background": {
+      "type": "string",
+      "description": "The background color of the multi file diff editor"
+    },
+    "multiDiffEditor.border": {
+      "type": "string",
+      "description": "The border color of the multi file diff editor"
+    },
+    "chat.requestBorder": {
+      "type": "string",
+      "description": "The border color of a chat request."
+    },
+    "chat.requestBackground": {
+      "type": "string",
+      "description": "The background color of a chat request."
+    },
+    "chat.slashCommandBackground": {
+      "type": "string",
+      "description": "The background color of a chat slash command."
+    },
+    "chat.slashCommandForeground": {
+      "type": "string",
+      "description": "The foreground color of a chat slash command."
+    },
+    "chat.avatarBackground": {
+      "type": "string",
+      "description": "The background color of a chat avatar."
+    },
+    "chat.avatarForeground": {
+      "type": "string",
+      "description": "The foreground color of a chat avatar."
+    },
+    "chat.editedFileForeground": {
+      "type": "string",
+      "description": "The foreground color of a chat edited file in the edited file list."
+    },
+    "chat.linesAddedForeground": {
+      "type": "string",
+      "description": "Foreground color of lines added in chat code block pill."
+    },
+    "chat.linesRemovedForeground": {
+      "type": "string",
+      "description": "Foreground color of lines removed in chat code block pill."
+    },
+    "chat.requestCodeBorder": {
+      "type": "string",
+      "description": "Border color of code blocks within the chat request bubble."
+    },
+    "chat.requestBubbleBackground": {
+      "type": "string",
+      "description": "Background color of the chat request bubble."
+    },
+    "chat.requestBubbleHoverBackground": {
+      "type": "string",
+      "description": "Background color of the chat request bubble on hover."
+    },
+    "chat.checkpointSeparator": {
+      "type": "string",
+      "description": "Chat checkpoint separator color."
+    },
+    "chatManagement.sashBorder": {
+      "type": "string",
+      "description": "The color of the Chat Management editor splitview sash border."
+    },
+    "inlineChat.background": {
+      "type": "string",
+      "description": "Background color of the interactive editor widget."
+    },
+    "inlineChat.foreground": {
+      "type": "string",
+      "description": "Foreground color of the interactive editor widget"
+    },
+    "inlineChat.border": {
+      "type": "string",
+      "description": "Border color of the interactive editor widget."
+    },
+    "inlineChat.shadow": {
+      "type": "string",
+      "description": "Shadow color of the interactive editor widget."
+    },
+    "inlineChatInput.border": {
+      "type": "string",
+      "description": "Border color of the interactive editor input."
+    },
+    "inlineChatInput.focusBorder": {
+      "type": "string",
+      "description": "Border color of the interactive editor input when focused."
+    },
+    "inlineChatInput.placeholderForeground": {
+      "type": "string",
+      "description": "Foreground color of the interactive editor input placeholder."
+    },
+    "inlineChatInput.background": {
+      "type": "string",
+      "description": "Background color of the interactive editor input."
+    },
+    "inlineChatDiff.inserted": {
+      "type": "string",
+      "description": "Background color of inserted text in the interactive editor input."
+    },
+    "inlineChatDiff.removed": {
+      "type": "string",
+      "description": "Background color of removed text in the interactive editor input."
+    },
+    "interactive.activeCodeBorder": {
+      "type": "string",
+      "description": "The border color for the current interactive code cell when the editor has focus."
+    },
+    "interactive.inactiveCodeBorder": {
+      "type": "string",
+      "description": "The border color for the current interactive code cell when the editor does not have focus."
+    },
+    "editorWidget.foreground": {
+      "type": "string",
+      "description": "Foreground color of editor widgets, such as find/replace."
+    },
+    "editorWidget.background": {
+      "type": "string",
+      "description": "Background color of editor widgets, such as Find/Replace."
+    },
+    "editorWidget.border": {
+      "type": "string",
+      "description": "Border color of the editor widget unless the widget does not contain a border or defines its own border color."
+    },
+    "editorWidget.resizeBorder": {
+      "type": "string",
+      "description": "Border color of the resize bar of editor widgets. The color is only used if the widget chooses to have a resize border and if the color is not overridden by a widget."
+    },
+    "editorSuggestWidget.background": {
+      "type": "string",
+      "description": "Background color of the suggestion widget."
+    },
+    "editorSuggestWidget.border": {
+      "type": "string",
+      "description": "Border color of the suggestion widget."
+    },
+    "editorSuggestWidget.foreground": {
+      "type": "string",
+      "description": "Foreground color of the suggestion widget."
+    },
+    "editorSuggestWidget.focusHighlightForeground": {
+      "type": "string",
+      "description": "Color of the match highlights in the suggest widget when an item is focused."
+    },
+    "editorSuggestWidget.highlightForeground": {
+      "type": "string",
+      "description": "Color of the match highlights in the suggestion widget."
+    },
+    "editorSuggestWidget.selectedBackground": {
+      "type": "string",
+      "description": "Background color of the selected entry in the suggestion widget."
+    },
+    "editorSuggestWidget.selectedForeground": {
+      "type": "string",
+      "description": "Foreground color of the selected entry in the suggest widget."
+    },
+    "editorSuggestWidget.selectedIconForeground": {
+      "type": "string",
+      "description": "Icon foreground color of the selected entry in the suggest widget."
+    },
+    "editorSuggestWidgetStatus.foreground": {
+      "type": "string",
+      "description": "Foreground color of the suggest widget status."
+    },
+    "editorHoverWidget.foreground": {
+      "type": "string",
+      "description": "Foreground color of the editor hover."
+    },
+    "editorHoverWidget.background": {
+      "type": "string",
+      "description": "Background color of the editor hover."
+    },
+    "editorHoverWidget.border": {
+      "type": "string",
+      "description": "Border color of the editor hover."
+    },
+    "editorHoverWidget.highlightForeground": {
+      "type": "string",
+      "description": "Foreground color of the active item in the parameter hint."
+    },
+    "editorHoverWidget.statusBarBackground": {
+      "type": "string",
+      "description": "Background color of the editor hover status bar."
+    },
+    "editorGhostText.border": {
+      "type": "string",
+      "description": "Border color of the ghost text shown by inline completion providers and the suggest preview."
+    },
+    "editorGhostText.background": {
+      "type": "string",
+      "description": "Background color of the ghost text in the editor."
+    },
+    "editorGhostText.foreground": {
+      "type": "string",
+      "description": "Foreground color of the ghost text shown by inline completion providers and the suggest preview."
+    },
+    "editorStickyScroll.background": {
+      "type": "string",
+      "description": "Editor sticky scroll background color."
+    },
+    "editorStickyScroll.border": {
+      "type": "string",
+      "description": "Border color of sticky scroll in the editor."
+    },
+    "editorStickyScroll.shadow": {
+      "type": "string",
+      "description": "Shadow color of sticky scroll in the editor."
+    },
+    "editorStickyScrollGutter.background": {
+      "type": "string",
+      "description": "Background color of the gutter part of sticky scroll in the editor."
+    },
+    "editorStickyScrollHover.background": {
+      "type": "string",
+      "description": "Editor sticky scroll on hover background color."
+    },
+    "debugExceptionWidget.background": {
+      "type": "string",
+      "description": "Exception widget background color."
+    },
+    "debugExceptionWidget.border": {
+      "type": "string",
+      "description": "Exception widget border color."
+    },
+    "editorMarkerNavigation.background": {
+      "type": "string",
+      "description": "Editor marker navigation widget background."
+    },
+    "editorMarkerNavigationError.background": {
+      "type": "string",
+      "description": "Editor marker navigation widget error color."
+    },
+    "editorMarkerNavigationWarning.background": {
+      "type": "string",
+      "description": "Editor marker navigation widget warning color."
+    },
+    "editorMarkerNavigationInfo.background": {
+      "type": "string",
+      "description": "Editor marker navigation widget info color."
+    },
+    "editorMarkerNavigationError.headerBackground": {
+      "type": "string",
+      "description": "Editor marker navigation widget error heading background."
+    },
+    "editorMarkerNavigationWarning.headerBackground": {
+      "type": "string",
+      "description": "Editor marker navigation widget warning heading background."
+    },
+    "editorMarkerNavigationInfo.headerBackground": {
+      "type": "string",
+      "description": "Editor marker navigation widget info heading background."
+    },
+    "peekView.border": {
+      "type": "string",
+      "description": "Color of the peek view borders and arrow."
+    },
+    "peekViewEditor.background": {
+      "type": "string",
+      "description": "Background color of the peek view editor."
+    },
+    "peekViewEditorGutter.background": {
+      "type": "string",
+      "description": "Background color of the gutter in the peek view editor."
+    },
+    "peekViewEditor.matchHighlightBackground": {
+      "type": "string",
+      "description": "Match highlight color in the peek view editor."
+    },
+    "peekViewEditor.matchHighlightBorder": {
+      "type": "string",
+      "description": "Match highlight border color in the peek view editor."
+    },
+    "peekViewResult.background": {
+      "type": "string",
+      "description": "Background color of the peek view result list."
+    },
+    "peekViewResult.fileForeground": {
+      "type": "string",
+      "description": "Foreground color for file nodes in the peek view result list."
+    },
+    "peekViewResult.lineForeground": {
+      "type": "string",
+      "description": "Foreground color for line nodes in the peek view result list."
+    },
+    "peekViewResult.matchHighlightBackground": {
+      "type": "string",
+      "description": "Match highlight color in the peek view result list."
+    },
+    "peekViewResult.selectionBackground": {
+      "type": "string",
+      "description": "Background color of the selected entry in the peek view result list."
+    },
+    "peekViewResult.selectionForeground": {
+      "type": "string",
+      "description": "Foreground color of the selected entry in the peek view result list."
+    },
+    "peekViewTitle.background": {
+      "type": "string",
+      "description": "Background color of the peek view title area."
+    },
+    "peekViewTitleDescription.foreground": {
+      "type": "string",
+      "description": "Color of the peek view title info."
+    },
+    "peekViewTitleLabel.foreground": {
+      "type": "string",
+      "description": "Color of the peek view title."
+    },
+    "peekViewEditorStickyScroll.background": {
+      "type": "string",
+      "description": "Background color of sticky scroll in the peek view editor."
+    },
+    "peekViewEditorStickyScrollGutter.background": {
+      "type": "string",
+      "description": "Background color of the gutter part of sticky scroll in the peek view editor."
+    },
+    "merge.currentHeaderBackground": {
+      "type": "string",
+      "description": "Current header background in inline merge conflicts. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "merge.currentContentBackground": {
+      "type": "string",
+      "description": "Current content background in inline merge conflicts. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "merge.incomingHeaderBackground": {
+      "type": "string",
+      "description": "Incoming header background in inline merge conflicts. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "merge.incomingContentBackground": {
+      "type": "string",
+      "description": "Incoming content background in inline merge conflicts. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "merge.border": {
+      "type": "string",
+      "description": "Border color on headers and the splitter in inline merge conflicts."
+    },
+    "merge.commonContentBackground": {
+      "type": "string",
+      "description": "Common ancestor content background in inline merge-conflicts. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "merge.commonHeaderBackground": {
+      "type": "string",
+      "description": "Common ancestor header background in inline merge-conflicts. The color must not be opaque so as not to hide underlying decorations."
+    },
+    "editorOverviewRuler.currentContentForeground": {
+      "type": "string",
+      "description": "Current overview ruler foreground for inline merge conflicts."
+    },
+    "editorOverviewRuler.incomingContentForeground": {
+      "type": "string",
+      "description": "Incoming overview ruler foreground for inline merge conflicts."
+    },
+    "editorOverviewRuler.commonContentForeground": {
+      "type": "string",
+      "description": "Common ancestor overview ruler foreground for inline merge conflicts."
+    },
+    "editorOverviewRuler.commentForeground": {
+      "type": "string",
+      "description": "Editor overview ruler decoration color for resolved comments. This color should be opaque."
+    },
+    "editorOverviewRuler.commentUnresolvedForeground": {
+      "type": "string",
+      "description": "Editor overview ruler decoration color for unresolved comments. This color should be opaque."
+    },
+    "mergeEditor.change.background": {
+      "type": "string",
+      "description": "The background color for changes."
+    },
+    "mergeEditor.change.word.background": {
+      "type": "string",
+      "description": "The background color for word changes."
+    },
+    "mergeEditor.conflict.unhandledUnfocused.border": {
+      "type": "string",
+      "description": "The border color of unhandled unfocused conflicts."
+    },
+    "mergeEditor.conflict.unhandledFocused.border": {
+      "type": "string",
+      "description": "The border color of unhandled focused conflicts."
+    },
+    "mergeEditor.conflict.handledUnfocused.border": {
+      "type": "string",
+      "description": "The border color of handled unfocused conflicts."
+    },
+    "mergeEditor.conflict.handledFocused.border": {
+      "type": "string",
+      "description": "The border color of handled focused conflicts."
+    },
+    "mergeEditor.conflict.handled.minimapOverViewRuler": {
+      "type": "string",
+      "description": "The foreground color for changes in input 1."
+    },
+    "mergeEditor.conflict.unhandled.minimapOverViewRuler": {
+      "type": "string",
+      "description": "The foreground color for changes in input 1."
+    },
+    "mergeEditor.conflictingLines.background": {
+      "type": "string",
+      "description": "The background of the \"Conflicting Lines\" text."
+    },
+    "mergeEditor.changeBase.background": {
+      "type": "string",
+      "description": "The background color for changes in base."
+    },
+    "mergeEditor.changeBase.word.background": {
+      "type": "string",
+      "description": "The background color for word changes in base."
+    },
+    "mergeEditor.conflict.input1.background": {
+      "type": "string",
+      "description": "The background color of decorations in input 1."
+    },
+    "mergeEditor.conflict.input2.background": {
+      "type": "string",
+      "description": "The background color of decorations in input 2."
+    },
+    "panel.background": {
+      "type": "string",
+      "description": "Panel background color."
+    },
+    "panel.border": {
+      "type": "string",
+      "description": "Panel border color to separate the panel from the editor."
+    },
+    "panel.dropBorder": {
+      "type": "string",
+      "description": "Drag and drop feedback color for the panel titles. Panels are shown below the editor area and contain views like output and integrated terminal."
+    },
+    "panelTitle.activeBorder": {
+      "type": "string",
+      "description": "Border color for the active panel title."
+    },
+    "panelTitle.activeForeground": {
+      "type": "string",
+      "description": "Title color for the active panel."
+    },
+    "panelTitle.inactiveForeground": {
+      "type": "string",
+      "description": "Title color for the inactive panel."
+    },
+    "panelTitle.border": {
+      "type": "string",
+      "description": "Panel title border color on the bottom, separating the title from the views. Panels are shown below the editor area and contain views like output and integrated terminal."
+    },
+    "panelTitleBadge.background": {
+      "type": "string",
+      "description": "Panel title badge background color. Panels are shown below the editor area and contain views like output and integrated terminal."
+    },
+    "panelTitleBadge.foreground": {
+      "type": "string",
+      "description": "Panel title badge foreground color. Panels are shown below the editor area and contain views like output and integrated terminal."
+    },
+    "panelInput.border": {
+      "type": "string",
+      "description": "Input box border for inputs in the panel."
+    },
+    "panelSection.border": {
+      "type": "string",
+      "description": "Panel section border color used when multiple views are stacked horizontally in the panel. Panels are shown below the editor area and contain views like output and integrated terminal."
+    },
+    "panelSection.dropBackground": {
+      "type": "string",
+      "description": "Drag and drop feedback color for the panel sections. The color should have transparency so that the panel sections can still shine through. Panels are shown below the editor area and contain views like output and integrated terminal."
+    },
+    "panelSectionHeader.background": {
+      "type": "string",
+      "description": "Panel section header background color. Panels are shown below the editor area and contain views like output and integrated terminal."
+    },
+    "panelSectionHeader.foreground": {
+      "type": "string",
+      "description": "Panel section header foreground color. Panels are shown below the editor area and contain views like output and integrated terminal."
+    },
+    "panelStickyScroll.background": {
+      "type": "string",
+      "description": "Background color of sticky scroll in the panel."
+    },
+    "panelStickyScroll.border": {
+      "type": "string",
+      "description": "Border color of sticky scroll in the panel."
+    },
+    "panelStickyScroll.shadow": {
+      "type": "string",
+      "description": "Shadow color of sticky scroll in the panel."
+    },
+    "panelSectionHeader.border": {
+      "type": "string",
+      "description": "Panel section header border color used when multiple views are stacked vertically in the panel. Panels are shown below the editor area and contain views like output and integrated terminal."
+    },
+    "outputView.background": {
+      "type": "string",
+      "description": "Output view background color."
+    },
+    "outputViewStickyScroll.background": {
+      "type": "string",
+      "description": "Output view sticky scroll background color."
+    },
+    "statusBar.background": {
+      "type": "string",
+      "description": "Standard Status Bar background color."
+    },
+    "statusBar.foreground": {
+      "type": "string",
+      "description": "Status Bar foreground color."
+    },
+    "statusBar.border": {
+      "type": "string",
+      "description": "Status Bar border color separating the Status Bar and editor."
+    },
+    "statusBar.debuggingBackground": {
+      "type": "string",
+      "description": "Status Bar background color when a program is being debugged."
+    },
+    "statusBar.debuggingForeground": {
+      "type": "string",
+      "description": "Status Bar foreground color when a program is being debugged."
+    },
+    "statusBar.debuggingBorder": {
+      "type": "string",
+      "description": "Status Bar border color separating the Status Bar and editor when a program is being debugged."
+    },
+    "statusBar.noFolderForeground": {
+      "type": "string",
+      "description": "Status Bar foreground color when no folder is opened."
+    },
+    "statusBar.noFolderBackground": {
+      "type": "string",
+      "description": "Status Bar background color when no folder is opened."
+    },
+    "statusBar.noFolderBorder": {
+      "type": "string",
+      "description": "Status Bar border color separating the Status Bar and editor when no folder is opened."
+    },
+    "statusBarItem.activeBackground": {
+      "type": "string",
+      "description": "Status Bar item background color when clicking."
+    },
+    "statusBarItem.hoverForeground": {
+      "type": "string",
+      "description": "Status bar item foreground color when hovering. The status bar is shown in the bottom of the window."
+    },
+    "statusBarItem.hoverBackground": {
+      "type": "string",
+      "description": "Status Bar item background color when hovering."
+    },
+    "statusBarItem.prominentForeground": {
+      "type": "string",
+      "description": "Status Bar prominent items foreground color."
+    },
+    "statusBarItem.prominentBackground": {
+      "type": "string",
+      "description": "Status Bar prominent items background color."
+    },
+    "statusBarItem.prominentHoverForeground": {
+      "type": "string",
+      "description": "Status bar prominent items foreground color when hovering. Prominent items stand out from other status bar entries to indicate importance. The status bar is shown in the bottom of the window."
+    },
+    "statusBarItem.prominentHoverBackground": {
+      "type": "string",
+      "description": "Status Bar prominent items background color when hovering."
+    },
+    "statusBarItem.remoteBackground": {
+      "type": "string",
+      "description": "Background color for the remote indicator on the status bar."
+    },
+    "statusBarItem.remoteForeground": {
+      "type": "string",
+      "description": "Foreground color for the remote indicator on the status bar."
+    },
+    "statusBarItem.remoteHoverBackground": {
+      "type": "string",
+      "description": "Background color for the remote indicator on the status bar when hovering."
+    },
+    "statusBarItem.remoteHoverForeground": {
+      "type": "string",
+      "description": "Foreground color for the remote indicator on the status bar when hovering."
+    },
+    "statusBarItem.errorBackground": {
+      "type": "string",
+      "description": "Status bar error items background color. Error items stand out from other status bar entries to indicate error conditions."
+    },
+    "statusBarItem.errorForeground": {
+      "type": "string",
+      "description": "Status bar error items foreground color. Error items stand out from other status bar entries to indicate error conditions."
+    },
+    "statusBarItem.errorHoverBackground": {
+      "type": "string",
+      "description": "Status bar error items background color when hovering. Error items stand out from other status bar entries to indicate error conditions. The status bar is shown in the bottom of the window."
+    },
+    "statusBarItem.errorHoverForeground": {
+      "type": "string",
+      "description": "Status bar error items foreground color when hovering. Error items stand out from other status bar entries to indicate error conditions. The status bar is shown in the bottom of the window."
+    },
+    "statusBarItem.warningBackground": {
+      "type": "string",
+      "description": "Status bar warning items background color. Warning items stand out from other status bar entries to indicate warning conditions. The status bar is shown in the bottom of the window."
+    },
+    "statusBarItem.warningForeground": {
+      "type": "string",
+      "description": "Status bar warning items foreground color. Warning items stand out from other status bar entries to indicate warning conditions. The status bar is shown in the bottom of the window."
+    },
+    "statusBarItem.warningHoverBackground": {
+      "type": "string",
+      "description": "Status bar warning items background color when hovering. Warning items stand out from other status bar entries to indicate warning conditions. The status bar is shown in the bottom of the window."
+    },
+    "statusBarItem.warningHoverForeground": {
+      "type": "string",
+      "description": "Status bar warning items foreground color when hovering. Warning items stand out from other status bar entries to indicate warning conditions. The status bar is shown in the bottom of the window."
+    },
+    "statusBarItem.compactHoverBackground": {
+      "type": "string",
+      "description": "Status bar item background color when hovering an item that contains two hovers. The status bar is shown in the bottom of the window."
+    },
+    "statusBarItem.focusBorder": {
+      "type": "string",
+      "description": "Status bar item border color when focused on keyboard navigation. The status bar is shown in the bottom of the window."
+    },
+    "statusBar.focusBorder": {
+      "type": "string",
+      "description": "Status bar border color when focused on keyboard navigation. The status bar is shown in the bottom of the window."
+    },
+    "statusBarItem.offlineBackground": {
+      "type": "string",
+      "description": "Status bar item background color when the workbench is offline."
+    },
+    "statusBarItem.offlineForeground": {
+      "type": "string",
+      "description": "Status bar item foreground color when the workbench is offline."
+    },
+    "statusBarItem.offlineHoverForeground": {
+      "type": "string",
+      "description": "Status bar item foreground hover color when the workbench is offline."
+    },
+    "statusBarItem.offlineHoverBackground": {
+      "type": "string",
+      "description": "Status bar item background hover color when the workbench is offline."
+    },
+    "titleBar.activeBackground": {
+      "type": "string",
+      "description": "Title Bar background when the window is active."
+    },
+    "titleBar.activeForeground": {
+      "type": "string",
+      "description": "Title Bar foreground when the window is active."
+    },
+    "titleBar.inactiveBackground": {
+      "type": "string",
+      "description": "Title Bar background when the window is inactive."
+    },
+    "titleBar.inactiveForeground": {
+      "type": "string",
+      "description": "Title Bar foreground when the window is inactive."
+    },
+    "titleBar.border": {
+      "type": "string",
+      "description": "Title bar border color."
+    },
+    "menubar.selectionForeground": {
+      "type": "string",
+      "description": "Foreground color of the selected menu item in the menubar."
+    },
+    "menubar.selectionBackground": {
+      "type": "string",
+      "description": "Background color of the selected menu item in the menubar."
+    },
+    "menubar.selectionBorder": {
+      "type": "string",
+      "description": "Border color of the selected menu item in the menubar."
+    },
+    "menu.foreground": {
+      "type": "string",
+      "description": "Foreground color of menu items."
+    },
+    "menu.background": {
+      "type": "string",
+      "description": "Background color of menu items."
+    },
+    "menu.selectionForeground": {
+      "type": "string",
+      "description": "Foreground color of the selected menu item in menus."
+    },
+    "menu.selectionBackground": {
+      "type": "string",
+      "description": "Background color of the selected menu item in menus."
+    },
+    "menu.selectionBorder": {
+      "type": "string",
+      "description": "Border color of the selected menu item in menus."
+    },
+    "menu.separatorBackground": {
+      "type": "string",
+      "description": "Color of a separator menu item in menus."
+    },
+    "menu.border": {
+      "type": "string",
+      "description": "Border color of menus."
+    },
+    "commandCenter.foreground": {
+      "type": "string",
+      "description": "Foreground color of the Command Center."
+    },
+    "commandCenter.activeForeground": {
+      "type": "string",
+      "description": "Active foreground color of the Command Center."
+    },
+    "commandCenter.background": {
+      "type": "string",
+      "description": "Background color of the Command Center."
+    },
+    "commandCenter.activeBackground": {
+      "type": "string",
+      "description": "Active background color of the Command Center."
+    },
+    "commandCenter.border": {
+      "type": "string",
+      "description": "Border color of the Command Center."
+    },
+    "commandCenter.inactiveForeground": {
+      "type": "string",
+      "description": "Foreground color of the Command Center when the window is inactive."
+    },
+    "commandCenter.inactiveBorder": {
+      "type": "string",
+      "description": "Border color of the Command Center when the window is inactive."
+    },
+    "commandCenter.activeBorder": {
+      "type": "string",
+      "description": "Active border color of the Command Center."
+    },
+    "commandCenter.debuggingBackground": {
+      "type": "string",
+      "description": "Command Center background color when a program is being debugged."
+    },
+    "notificationCenter.border": {
+      "type": "string",
+      "description": "Notification Center border color."
+    },
+    "notificationCenterHeader.foreground": {
+      "type": "string",
+      "description": "Notification Center header foreground color."
+    },
+    "notificationCenterHeader.background": {
+      "type": "string",
+      "description": "Notification Center header background color."
+    },
+    "notificationToast.border": {
+      "type": "string",
+      "description": "Notification toast border color."
+    },
+    "notifications.foreground": {
+      "type": "string",
+      "description": "Notification foreground color."
+    },
+    "notifications.background": {
+      "type": "string",
+      "description": "Notification background color."
+    },
+    "notifications.border": {
+      "type": "string",
+      "description": "Notification border color separating from other notifications in the Notification Center."
+    },
+    "notificationLink.foreground": {
+      "type": "string",
+      "description": "Notification links foreground color."
+    },
+    "notificationsErrorIcon.foreground": {
+      "type": "string",
+      "description": "The color used for the notification error icon."
+    },
+    "notificationsWarningIcon.foreground": {
+      "type": "string",
+      "description": "The color used for the notification warning icon."
+    },
+    "notificationsInfoIcon.foreground": {
+      "type": "string",
+      "description": "The color used for the notification info icon."
+    },
+    "banner.background": {
+      "type": "string",
+      "description": "Banner background color."
+    },
+    "banner.foreground": {
+      "type": "string",
+      "description": "Banner foreground color."
+    },
+    "banner.iconForeground": {
+      "type": "string",
+      "description": "Color for the icon in front of the banner text."
+    },
+    "extensionButton.prominentForeground": {
+      "type": "string",
+      "description": "Extension view button foreground color (for example **Install** button)."
+    },
+    "extensionButton.prominentBackground": {
+      "type": "string",
+      "description": "Extension view button background color."
+    },
+    "extensionButton.prominentHoverBackground": {
+      "type": "string",
+      "description": "Extension view button background hover color."
+    },
+    "extensionButton.background": {
+      "type": "string",
+      "description": "Button background color for extension actions."
+    },
+    "extensionButton.foreground": {
+      "type": "string",
+      "description": "Button foreground color for extension actions."
+    },
+    "extensionButton.hoverBackground": {
+      "type": "string",
+      "description": "Button background hover color for extension actions."
+    },
+    "extensionButton.separator": {
+      "type": "string",
+      "description": "Button separator color for extension actions."
+    },
+    "extensionBadge.remoteBackground": {
+      "type": "string",
+      "description": "Background color for the remote badge in the extensions view."
+    },
+    "extensionBadge.remoteForeground": {
+      "type": "string",
+      "description": "Foreground color for the remote badge in the extensions view."
+    },
+    "extensionIcon.starForeground": {
+      "type": "string",
+      "description": "The icon color for extension ratings."
+    },
+    "extensionIcon.verifiedForeground": {
+      "type": "string",
+      "description": "The icon color for extension verified publisher."
+    },
+    "extensionIcon.preReleaseForeground": {
+      "type": "string",
+      "description": "The icon color for pre-release extension."
+    },
+    "extensionIcon.sponsorForeground": {
+      "type": "string",
+      "description": "The icon color for extension sponsor."
+    },
+    "extensionIcon.privateForeground": {
+      "type": "string",
+      "description": "The icon color for private extensions."
+    },
+    "mcpIcon.starForeground": {
+      "type": "string",
+      "description": "The icon color for mcp starred."
+    },
+    "pickerGroup.border": {
+      "type": "string",
+      "description": "Quick picker (Quick Open) color for grouping borders."
+    },
+    "pickerGroup.foreground": {
+      "type": "string",
+      "description": "Quick picker (Quick Open) color for grouping labels."
+    },
+    "quickInput.background": {
+      "type": "string",
+      "description": "Quick input background color. The quick input widget is the container for views like the color theme picker."
+    },
+    "quickInput.foreground": {
+      "type": "string",
+      "description": "Quick input foreground color. The quick input widget is the container for views like the color theme picker."
+    },
+    "quickInputList.focusBackground": {
+      "type": "string",
+      "description": "Quick picker background color for the focused item."
+    },
+    "quickInputList.focusForeground": {
+      "type": "string",
+      "description": "Quick picker foreground color for the focused item."
+    },
+    "quickInputList.focusIconForeground": {
+      "type": "string",
+      "description": "Quick picker icon foreground color for the focused item."
+    },
+    "quickInputTitle.background": {
+      "type": "string",
+      "description": "Quick picker title background color. The quick picker widget is the container for pickers like the Command Palette."
+    },
+    "keybindingLabel.background": {
+      "type": "string",
+      "description": "Keybinding label background color. The keybinding label is used to represent a keyboard shortcut."
+    },
+    "keybindingLabel.foreground": {
+      "type": "string",
+      "description": "Keybinding label foreground color. The keybinding label is used to represent a keyboard shortcut."
+    },
+    "keybindingLabel.border": {
+      "type": "string",
+      "description": "Keybinding label border color. The keybinding label is used to represent a keyboard shortcut."
+    },
+    "keybindingLabel.bottomBorder": {
+      "type": "string",
+      "description": "Keybinding label border bottom color. The keybinding label is used to represent a keyboard shortcut."
+    },
+    "keybindingTable.headerBackground": {
+      "type": "string",
+      "description": "Background color for the keyboard shortcuts table header."
+    },
+    "keybindingTable.rowsBackground": {
+      "type": "string",
+      "description": "Background color for the keyboard shortcuts table alternating rows."
+    },
+    "terminal.background": {
+      "type": "string",
+      "description": "The background of the Integrated Terminal's viewport."
+    },
+    "terminal.border": {
+      "type": "string",
+      "description": "The color of the border that separates split panes within the terminal. This defaults to panel.border."
+    },
+    "terminal.foreground": {
+      "type": "string",
+      "description": "The default foreground color of the Integrated Terminal."
+    },
+    "terminal.ansiBlack": {
+      "type": "string",
+      "description": "'Black' ANSI color in the terminal."
+    },
+    "terminal.ansiBlue": {
+      "type": "string",
+      "description": "'Blue' ANSI color in the terminal."
+    },
+    "terminal.ansiBrightBlack": {
+      "type": "string",
+      "description": "'BrightBlack' ANSI color in the terminal."
+    },
+    "terminal.ansiBrightBlue": {
+      "type": "string",
+      "description": "'BrightBlue' ANSI color in the terminal."
+    },
+    "terminal.ansiBrightCyan": {
+      "type": "string",
+      "description": "'BrightCyan' ANSI color in the terminal."
+    },
+    "terminal.ansiBrightGreen": {
+      "type": "string",
+      "description": "'BrightGreen' ANSI color in the terminal."
+    },
+    "terminal.ansiBrightMagenta": {
+      "type": "string",
+      "description": "'BrightMagenta' ANSI color in the terminal."
+    },
+    "terminal.ansiBrightRed": {
+      "type": "string",
+      "description": "'BrightRed' ANSI color in the terminal."
+    },
+    "terminal.ansiBrightWhite": {
+      "type": "string",
+      "description": "'BrightWhite' ANSI color in the terminal."
+    },
+    "terminal.ansiBrightYellow": {
+      "type": "string",
+      "description": "'BrightYellow' ANSI color in the terminal."
+    },
+    "terminal.ansiCyan": {
+      "type": "string",
+      "description": "'Cyan' ANSI color in the terminal."
+    },
+    "terminal.ansiGreen": {
+      "type": "string",
+      "description": "'Green' ANSI color in the terminal."
+    },
+    "terminal.ansiMagenta": {
+      "type": "string",
+      "description": "'Magenta' ANSI color in the terminal."
+    },
+    "terminal.ansiRed": {
+      "type": "string",
+      "description": "'Red' ANSI color in the terminal."
+    },
+    "terminal.ansiWhite": {
+      "type": "string",
+      "description": "'White' ANSI color in the terminal."
+    },
+    "terminal.ansiYellow": {
+      "type": "string",
+      "description": "'Yellow' ANSI color in the terminal."
+    },
+    "scmGraph.historyItemHoverLabelForeground": {
+      "type": "string",
+      "description": "History item hover label foreground color."
+    },
+    "scmGraph.foreground1": {
+      "type": "string",
+      "description": "Source control graph foreground color (1)."
+    },
+    "scmGraph.foreground2": {
+      "type": "string",
+      "description": "Source control graph foreground color (2)."
+    },
+    "scmGraph.foreground3": {
+      "type": "string",
+      "description": "Source control graph foreground color (3)."
+    },
+    "scmGraph.foreground4": {
+      "type": "string",
+      "description": "Source control graph foreground color (4)."
+    },
+    "scmGraph.foreground5": {
+      "type": "string",
+      "description": "Source control graph foreground color (5)."
+    },
+    "scmGraph.historyItemHoverAdditionsForeground": {
+      "type": "string",
+      "description": "History item hover additions foreground color."
+    },
+    "scmGraph.historyItemHoverDeletionsForeground": {
+      "type": "string",
+      "description": "History item hover deletions foreground color."
+    },
+    "scmGraph.historyItemRefColor": {
+      "type": "string",
+      "description": "History item reference color."
+    },
+    "scmGraph.historyItemRemoteRefColor": {
+      "type": "string",
+      "description": "History item remote reference color."
+    },
+    "scmGraph.historyItemBaseRefColor": {
+      "type": "string",
+      "description": "History item base reference color."
+    },
+    "scmGraph.historyItemHoverDefaultLabelForeground": {
+      "type": "string",
+      "description": "History item hover default label foreground color."
+    },
+    "scmGraph.historyItemHoverDefaultLabelBackground": {
+      "type": "string",
+      "description": "History item hover default label background color."
+    },
+    "terminalSymbolIcon.aliasForeground": {
+      "type": "string",
+      "description": "The foreground color for an alias icon. These icons will appear in the terminal suggest widget."
+    },
+    "terminalSymbolIcon.branchForeground": {
+      "type": "string",
+      "description": "The foreground color for a branch icon. These icons will appear in the terminal suggest widget."
+    },
+    "terminalSymbolIcon.commitForeground": {
+      "type": "string",
+      "description": "The foreground color for a commit icon. These icons will appear in the terminal suggest widget."
+    },
+    "terminalSymbolIcon.flagForeground": {
+      "type": "string",
+      "description": "The foreground color for a flag icon. These icons will appear in the terminal suggest widget."
+    },
+    "terminalSymbolIcon.optionForeground": {
+      "type": "string",
+      "description": "The foreground color for an option icon. These icons will appear in the terminal suggest widget."
+    },
+    "terminalSymbolIcon.optionValueForeground": {
+      "type": "string",
+      "description": "The foreground color for an enum member icon. These icons will appear in the terminal suggest widget."
+    },
+    "terminalSymbolIcon.methodForeground": {
+      "type": "string",
+      "description": "The foreground color for a method icon. These icons will appear in the terminal suggest widget."
+    },
+    "terminalSymbolIcon.argumentForeground": {
+      "type": "string",
+      "description": "The foreground color for an argument icon. These icons will appear in the terminal suggest widget."
+    },
+    "terminalSymbolIcon.inlineSuggestionForeground": {
+      "type": "string",
+      "description": "The foreground color for an inline suggestion icon. These icons will appear in the terminal suggest widget."
+    },
+    "terminalSymbolIcon.fileForeground": {
+      "type": "string",
+      "description": "The foreground color for a file icon. These icons will appear in the terminal suggest widget."
+    },
+    "terminalSymbolIcon.folderForeground": {
+      "type": "string",
+      "description": "The foreground color for a folder icon. These icons will appear in the terminal suggest widget."
+    },
+    "terminalSymbolIcon.pullRequestDoneForeground": {
+      "type": "string",
+      "description": "The foreground color for a completed pull request icon. These icons will appear in the terminal suggest widget."
+    },
+    "terminalSymbolIcon.pullRequestForeground": {
+      "type": "string",
+      "description": "The foreground color for a pull request icon. These icons will appear in the terminal suggest widget."
+    },
+    "terminalSymbolIcon.remoteForeground": {
+      "type": "string",
+      "description": "The foreground color for a remote icon. These icons will appear in the terminal suggest widget."
+    },
+    "terminalSymbolIcon.stashForeground": {
+      "type": "string",
+      "description": "The foreground color for a stash icon. These icons will appear in the terminal suggest widget."
+    },
+    "terminalSymbolIcon.symbolText": {
+      "type": "string",
+      "description": "The foreground color for a plaintext suggestion. These icons will appear in the terminal suggest widget."
+    },
+    "terminalSymbolIcon.symbolicLinkFileForeground": {
+      "type": "string",
+      "description": "The foreground color for a symbolic link file icon. These icons will appear in the terminal suggest widget."
+    },
+    "terminalSymbolIcon.symbolicLinkFolderForeground": {
+      "type": "string",
+      "description": "The foreground color for a symbolic link folder icon. These icons will appear in the terminal suggest widget."
+    },
+    "terminalSymbolIcon.tagForeground": {
+      "type": "string",
+      "description": "The foreground color for a tag icon. These icons will appear in the terminal suggest widget."
+    },
+    "gauge.background": {
+      "type": "string",
+      "description": "Gauge background color."
+    },
+    "gauge.foreground": {
+      "type": "string",
+      "description": "Gauge foreground color."
+    },
+    "gauge.border": {
+      "type": "string",
+      "description": "Gauge border color."
+    },
+    "gauge.warningBackground": {
+      "type": "string",
+      "description": "Gauge warning background color."
+    },
+    "gauge.warningForeground": {
+      "type": "string",
+      "description": "Gauge warning foreground color."
+    },
+    "gauge.errorBackground": {
+      "type": "string",
+      "description": "Gauge error background color."
+    },
+    "gauge.errorForeground": {
+      "type": "string",
+      "description": "Gauge error foreground color."
+    },
+    "markdownAlert.note.foreground": {
+      "type": "string",
+      "description": "Foreground color for note alerts in markdown."
+    },
+    "markdownAlert.tip.foreground": {
+      "type": "string",
+      "description": "Foreground color for tip alerts in markdown."
+    },
+    "markdownAlert.important.foreground": {
+      "type": "string",
+      "description": "Foreground color for important alerts in markdown."
+    },
+    "markdownAlert.warning.foreground": {
+      "type": "string",
+      "description": "Foreground color for warning alerts in markdown."
+    },
+    "markdownAlert.caution.foreground": {
+      "type": "string",
+      "description": "Foreground color for caution alerts in markdown."
+    },
+    "testing.runAction": {
+      "type": "string",
+      "description": "Color for 'run' icons in the editor."
+    },
+    "testing.iconErrored": {
+      "type": "string",
+      "description": "Color for the 'Errored' icon in the test explorer."
+    },
+    "testing.iconFailed": {
+      "type": "string",
+      "description": "Color for the 'failed' icon in the test explorer."
+    },
+    "testing.iconPassed": {
+      "type": "string",
+      "description": "Color for the 'passed' icon in the test explorer."
+    },
+    "testing.iconQueued": {
+      "type": "string",
+      "description": "Color for the 'Queued' icon in the test explorer."
+    },
+    "testing.iconUnset": {
+      "type": "string",
+      "description": "Color for the 'Unset' icon in the test explorer."
+    },
+    "testing.iconSkipped": {
+      "type": "string",
+      "description": "Color for the 'Skipped' icon in the test explorer."
+    },
+    "testing.iconErrored.retired": {
+      "type": "string",
+      "description": "Retired color for the 'Errored' icon in the test explorer."
+    },
+    "testing.iconFailed.retired": {
+      "type": "string",
+      "description": "Retired color for the 'failed' icon in the test explorer."
+    },
+    "testing.iconPassed.retired": {
+      "type": "string",
+      "description": "Retired color for the 'passed' icon in the test explorer."
+    },
+    "testing.iconQueued.retired": {
+      "type": "string",
+      "description": "Retired color for the 'Queued' icon in the test explorer."
+    },
+    "testing.iconUnset.retired": {
+      "type": "string",
+      "description": "Retired color for the 'Unset' icon in the test explorer."
+    },
+    "testing.iconSkipped.retired": {
+      "type": "string",
+      "description": "Retired color for the 'Skipped' icon in the test explorer."
+    },
+    "testing.peekBorder": {
+      "type": "string",
+      "description": "Color of the peek view borders and arrow."
+    },
+    "testing.peekHeaderBackground": {
+      "type": "string",
+      "description": "Color of the peek view borders and arrow."
+    },
+    "testing.message.error.lineBackground": {
+      "type": "string",
+      "description": "Margin color beside error messages shown inline in the editor."
+    },
+    "testing.message.info.decorationForeground": {
+      "type": "string",
+      "description": "Text color of test info messages shown inline in the editor."
+    },
+    "testing.message.info.lineBackground": {
+      "type": "string",
+      "description": "Margin color beside info messages shown inline in the editor."
+    },
+    "testing.messagePeekBorder": {
+      "type": "string",
+      "description": "Color of the peek view borders and arrow when peeking a logged message."
+    },
+    "testing.messagePeekHeaderBackground": {
+      "type": "string",
+      "description": "Color of the peek view borders and arrow when peeking a logged message."
+    },
+    "testing.coveredBackground": {
+      "type": "string",
+      "description": "Background color of text that was covered."
+    },
+    "testing.coveredBorder": {
+      "type": "string",
+      "description": "Border color of text that was covered."
+    },
+    "testing.coveredGutterBackground": {
+      "type": "string",
+      "description": "Gutter color of regions where code was covered."
+    },
+    "testing.uncoveredBranchBackground": {
+      "type": "string",
+      "description": "Background of the widget shown for an uncovered branch."
+    },
+    "testing.uncoveredBackground": {
+      "type": "string",
+      "description": "Background color of text that was not covered."
+    },
+    "testing.uncoveredBorder": {
+      "type": "string",
+      "description": "Border color of text that was not covered."
+    },
+    "testing.uncoveredGutterBackground": {
+      "type": "string",
+      "description": "Gutter color of regions where code not covered."
+    },
+    "testing.coverCountBadgeBackground": {
+      "type": "string",
+      "description": "Background for the badge indicating execution count."
+    },
+    "testing.coverCountBadgeForeground": {
+      "type": "string",
+      "description": "Foreground for the badge indicating execution count."
+    },
+    "testing.message.error.badgeBackground": {
+      "type": "string",
+      "description": "Background color of test error messages shown inline in the editor."
+    },
+    "testing.message.error.badgeBorder": {
+      "type": "string",
+      "description": "Border color of test error messages shown inline in the editor."
+    },
+    "testing.message.error.badgeForeground": {
+      "type": "string",
+      "description": "Text color of test error messages shown inline in the editor."
+    },
+    "debugConsole.infoForeground": {
+      "type": "string",
+      "description": "Foreground color for info messages in debug REPL console."
+    },
+    "debugConsole.warningForeground": {
+      "type": "string",
+      "description": "Foreground color for warning messages in debug REPL console."
+    },
+    "debugConsole.errorForeground": {
+      "type": "string",
+      "description": "Foreground color for error messages in debug REPL console."
+    },
+    "debugConsole.sourceForeground": {
+      "type": "string",
+      "description": "Foreground color for source filenames in debug REPL console."
+    },
+    "debugConsoleInputIcon.foreground": {
+      "type": "string",
+      "description": "Foreground color for debug console input marker icon."
+    }
+  }
+}

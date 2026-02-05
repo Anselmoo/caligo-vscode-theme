@@ -1,0 +1,23 @@
+# Lefthook configuration
+# Runs lightweight checks on pre-commit and more expensive checks on pre-push
+pre-commit:
+  parallel: true
+  commands:
+    lint-fix:
+      run: npm run lint:fix
+      include: '^(src/|tests/|scripts/|\.github/|README\.md)'
+    lint:
+      run: npm run lint
+      include: '^(src/|tests/|scripts/|\.github/|README\.md)'
+
+pre-push:
+  commands:
+    test:
+      run: npm run test:unit
+      include: "^(src/|tests/)"
+    build:
+      run: npm run build
+      include: "^(src/)"
+    underscores:
+      run: npm run check:underscores
+      include: "^(src/|tests/)"
