@@ -49,6 +49,27 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     "editor.wordHighlightBackground": withAlpha(p.bg2, 0.85),
     "editor.wordHighlightStrongBackground": withAlpha(p.bg2, 0.95),
 
+    // Editor features
+    "editor.foldBackground": withAlpha(p.bg2, 0.1),
+    "editor.findMatchBackground": p.accentMuted,
+    "editor.findMatchHighlightBackground": withAlpha(p.accentMuted, 0.5),
+    "editor.findMatchBorder": p.accent,
+    "editor.linkedEditingBackground": withAlpha(p.accent, 0.07),
+    "editorBracketMatch.background": withAlpha(p.hueGreen, 0.25),
+    "editorBracketMatch.border": withAlpha(p.hueGreen, 0.6),
+    "editorWhitespace.foreground": withAlpha(p.fgMuted, 0.3),
+    "editorWidget.background": p.bg2,
+    "editorWidget.foreground": p.fg0,
+    "editorWidget.border": p.border,
+
+    // Inlay hints
+    "editorInlayHint.background": withAlpha(p.fgMuted, 0.2),
+    "editorInlayHint.foreground": p.fgMuted,
+    "editorInlayHint.typeBackground": withAlpha(p.fgMuted, 0.2),
+    "editorInlayHint.typeForeground": p.fgMuted,
+    "editorInlayHint.paramBackground": withAlpha(p.fgMuted, 0.2),
+    "editorInlayHint.paramForeground": p.fgMuted,
+
     "editorIndentGuide.background": withAlpha(p.border, 0.35),
     "editorIndentGuide.activeBackground": withAlpha(p.border, 0.65),
 
@@ -57,6 +78,14 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     "tab.inactiveBackground": p.bg1,
     "tab.activeForeground": p.fg0,
     "tab.inactiveForeground": withAlpha(p.fg1, 0.8),
+    // Tab & editor group enhancements
+    "tab.border": p.border,
+    "tab.activeBorderTop": p.accent,
+    "tab.unfocusedActiveBorderTop": p.border,
+    "tab.hoverBackground": p.bg0,
+    "tab.unfocusedHoverBackground": withAlpha(p.bg2, 0.1),
+    "editorGroupHeader.tabsBorder": p.border,
+    "editorGroup.border": p.border,
 
     "sideBar.background": p.bg1,
     "sideBar.foreground": p.fg1,
@@ -70,6 +99,27 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     "statusBar.foreground": p.fg1,
     "statusBarItem.hoverBackground": withAlpha(p.bg2, 0.85),
 
+    // Interactive elements
+    // Buttons
+    "button.background": p.accent,
+    "button.foreground": p.fg0,
+    "button.hoverBackground": p.accentSoft,
+    "button.secondaryBackground": p.bg2,
+    "button.secondaryForeground": p.fg1,
+    "button.secondaryHoverBackground": withAlpha(p.bg2, 0.8),
+
+    // Checkbox
+    "checkbox.background": p.bg2,
+    "checkbox.border": p.border,
+    "checkbox.foreground": p.fg0,
+
+    // Dropdown additions
+    "dropdown.border": p.border,
+    "dropdown.listBackground": p.bg2,
+
+    // Progress
+    "progressBar.background": p.accent,
+
     "titleBar.activeBackground": p.bg1,
     "titleBar.activeForeground": p.fg1,
     "titleBar.inactiveBackground": p.bg1,
@@ -80,6 +130,24 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     "panelTitle.activeForeground": p.fg0,
     "panelTitle.inactiveForeground": withAlpha(p.fg1, 0.7),
 
+    // Debug & peek view
+    "debugToolBar.background": p.bg2,
+    "debugToolBar.border": p.border,
+    "editor.stackFrameHighlightBackground": withAlpha(p.accentMuted, 0.4),
+    "editor.focusedStackFrameHighlightBackground": withAlpha(p.semantic.successMuted, 0.4),
+    "peekView.border": p.accent,
+    "peekViewEditor.background": withAlpha(p.bg2, 0.5),
+    "peekViewEditor.matchHighlightBackground": withAlpha(p.accentMuted, 0.4),
+    "peekViewResult.background": p.bg1,
+    "peekViewResult.fileForeground": p.fg0,
+    "peekViewResult.lineForeground": p.fg1,
+    "peekViewResult.matchHighlightBackground": withAlpha(p.accentMuted, 0.4),
+    "peekViewResult.selectionBackground": withAlpha(p.accentMuted, 0.35),
+    "peekViewResult.selectionForeground": p.fg0,
+    "peekViewTitle.background": p.bg2,
+    "peekViewTitleLabel.foreground": p.fg0,
+    "peekViewTitleDescription.foreground": p.fgMuted,
+
     "input.background": p.bg2,
     "input.foreground": p.fg0,
     "input.placeholderForeground": withAlpha(p.fgMuted, 0.8),
@@ -87,14 +155,62 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     "dropdown.background": p.bg2,
     "dropdown.foreground": p.fg0,
 
+    // Settings & welcome page
+    "settings.headerForeground": p.fg0,
+    "settings.modifiedItemIndicator": p.accentMuted,
+    "settings.dropdownBackground": p.bg2,
+    "settings.dropdownForeground": p.fg0,
+    "settings.dropdownBorder": p.border,
+    "settings.checkboxBackground": p.bg2,
+    "settings.checkboxForeground": p.fg0,
+    "settings.checkboxBorder": p.border,
+    "settings.textInputBackground": p.bg2,
+    "settings.textInputForeground": p.fg0,
+    "settings.textInputBorder": p.border,
+    "settings.numberInputBackground": p.bg2,
+    "settings.numberInputForeground": p.fg0,
+    "settings.numberInputBorder": p.border,
+    "welcomePage.background": p.bg0,
+    "welcomePage.tileBackground": p.bg1,
+    "welcomePage.tileHoverBackground": p.bg2,
+    "welcomePage.tileBorder": p.border,
+    "welcomePage.progress.foreground": p.accent,
+    "welcomePage.progress.background": p.bg2,
+
     "list.hoverBackground": withAlpha(p.bg2, 0.65),
     "list.activeSelectionBackground": withAlpha(p.accentMuted, 0.35),
     "list.inactiveSelectionBackground": withAlpha(p.accentMuted, 0.22),
     "list.activeSelectionForeground": p.fg0,
     "list.inactiveSelectionForeground": p.fg1,
 
+    // List & tree enhancements
+    "list.focusForeground": p.fg0,
+    "list.focusBackground": withAlpha(p.accent, 0.15),
+    "list.inactiveFocusBackground": withAlpha(p.accent, 0.15),
+    "list.highlightForeground": p.accent,
+    "list.hoverForeground": p.fg0,
+    "tree.indentGuidesStroke": p.border,
+
+    // Scrollbar & minimap
+    "scrollbar.shadow": withAlpha(p.bg0, 0.2),
+    "scrollbarSlider.background": withAlpha(p.fgMuted, 0.2),
+    "scrollbarSlider.hoverBackground": withAlpha(p.fgMuted, 0.24),
+    "scrollbarSlider.activeBackground": withAlpha(p.fgMuted, 0.28),
+    "minimapSlider.background": withAlpha(p.fgMuted, 0.2),
+    "minimapSlider.hoverBackground": withAlpha(p.fgMuted, 0.24),
+    "minimapSlider.activeBackground": withAlpha(p.fgMuted, 0.28),
+    "editorOverviewRuler.border": p.bg0,
+
     "badge.background": withAlpha(p.accentSubtle, 0.85),
     "badge.foreground": p.fg0,
+
+    // Notifications
+    "notifications.foreground": p.fg0,
+    "notifications.background": p.bg1,
+    "notifications.border": p.border,
+    "notificationCenterHeader.foreground": p.fgMuted,
+    "notificationCenterHeader.background": p.bg2,
+    "notificationLink.foreground": p.accent,
 
     // Terminal ANSI (use decorative hue wheel - these are syntax colors, not semantic)
     "terminal.foreground": p.fg0,
@@ -115,6 +231,50 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     "terminal.ansiBrightMagenta": p.huePurple,
     "terminal.ansiBrightCyan": p.hueCyan,
     "terminal.ansiBrightWhite": p.fg0,
+
+    // Bracket pair colorization - use decorative hue wheel for visual distinction
+    "editorBracketHighlight.foreground1": p.hueCyan,
+    "editorBracketHighlight.foreground2": p.hueGreen,
+    "editorBracketHighlight.foreground3": p.hueYellow,
+    "editorBracketHighlight.foreground4": p.hueRed,
+    "editorBracketHighlight.foreground5": p.huePurple,
+    "editorBracketHighlight.foreground6": p.hueBlue,
+    "editorBracketHighlight.unexpectedBracket.foreground": p.fgMuted,
+
+    // Symbol icons - map to harmony palette for consistent theming
+    "symbolIcon.arrayForeground": p.harmony.types,
+    "symbolIcon.booleanForeground": p.harmony.constants,
+    "symbolIcon.classForeground": p.harmony.types,
+    "symbolIcon.colorForeground": p.hueCyan,
+    "symbolIcon.constantForeground": p.harmony.constants,
+    "symbolIcon.constructorForeground": p.harmony.functions,
+    "symbolIcon.enumeratorForeground": p.harmony.types,
+    "symbolIcon.enumeratorMemberForeground": p.harmony.constants,
+    "symbolIcon.eventForeground": p.fgMuted,
+    "symbolIcon.fieldForeground": p.harmony.variables,
+    "symbolIcon.fileForeground": p.accentMuted,
+    "symbolIcon.folderForeground": p.accentMuted,
+    "symbolIcon.functionForeground": p.harmony.functions,
+    "symbolIcon.interfaceForeground": p.harmony.types,
+    "symbolIcon.keyForeground": p.harmony.constants,
+    "symbolIcon.keywordForeground": p.harmony.keywords,
+    "symbolIcon.methodForeground": p.harmony.functions,
+    "symbolIcon.moduleForeground": p.harmony.types,
+    "symbolIcon.namespaceForeground": p.harmony.types,
+    "symbolIcon.nullForeground": p.fgMuted,
+    "symbolIcon.numberForeground": p.harmony.numbers,
+    "symbolIcon.objectForeground": p.harmony.types,
+    "symbolIcon.operatorForeground": p.fgMuted,
+    "symbolIcon.packageForeground": p.harmony.types,
+    "symbolIcon.propertyForeground": p.harmony.variables,
+    "symbolIcon.referenceForeground": p.harmony.constants,
+    "symbolIcon.snippetForeground": p.hueCyan,
+    "symbolIcon.stringForeground": p.harmony.strings,
+    "symbolIcon.structForeground": p.harmony.types,
+    "symbolIcon.textForeground": p.fg1,
+    "symbolIcon.typeParameterForeground": p.harmony.types,
+    "symbolIcon.unitForeground": p.harmony.constants,
+    "symbolIcon.variableForeground": p.harmony.variables,
   };
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -127,6 +287,12 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     // Handle background vs foreground variants
     const isBackground = key.toLowerCase().includes("background");
     const isBorder = key.toLowerCase().includes("border");
+    // Gutter indicators need visible solid colors, not transparent backgrounds
+    // These are the colored bars in the editor gutter showing git changes
+    const isGutter =
+      key.startsWith("editorGutter.") ||
+      key.startsWith("minimapGutter.") ||
+      key.startsWith("diffEditorGutter.");
 
     // Type-safe includes check using Array.prototype.some
     const isError = (SEMANTIC_COLOR_KEYS.error as readonly string[]).includes(key);
@@ -135,21 +301,26 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     const isInfo = (SEMANTIC_COLOR_KEYS.info as readonly string[]).includes(key);
 
     if (isError) {
+      // Gutter colors use muted with high alpha for visibility (like Dracula/Primer)
+      if (isGutter) return withAlpha(p.semantic.errorMuted, 0.8);
       if (isBackground) return p.semantic.errorBg;
       if (isBorder) return p.semantic.errorMuted;
       return p.semantic.error;
     }
     if (isWarning) {
+      if (isGutter) return withAlpha(p.semantic.warningMuted, 0.8);
       if (isBackground) return p.semantic.warningBg;
       if (isBorder) return p.semantic.warningMuted;
       return p.semantic.warning;
     }
     if (isSuccess) {
+      if (isGutter) return withAlpha(p.semantic.successMuted, 0.8);
       if (isBackground) return p.semantic.successBg;
       if (isBorder) return p.semantic.successMuted;
       return p.semantic.success;
     }
     if (isInfo) {
+      if (isGutter) return withAlpha(p.semantic.infoMuted, 0.8);
       if (isBackground) return p.semantic.infoBg;
       if (isBorder) return p.semantic.infoMuted;
       return p.semantic.info;
@@ -190,6 +361,8 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
           functions: p.hueBlue,
           types: p.hueCyan,
           constants: p.hueYellow,
+          attributes: p.huePurple,
+          tags: p.hueRed,
         }
       : {
           strings: p.harmony.strings,
@@ -198,6 +371,8 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
           functions: p.harmony.functions,
           types: p.harmony.types,
           constants: p.harmony.constants,
+          attributes: p.harmony.attributes,
+          tags: p.harmony.tags,
         };
 
   const tokenColors: VscodeThemeJson["tokenColors"] = [
@@ -216,38 +391,111 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     },
     {
       name: "Numbers",
-      scope: ["constant.numeric"],
+      scope: ["constant.numeric", "constant.character.numeric"],
       settings: { foreground: syntax.numbers },
     },
     {
       name: "Keywords",
-      scope: ["keyword", "storage.type", "storage.modifier"],
+      scope: [
+        "keyword",
+        "keyword.control",
+        "keyword.other",
+        "keyword.operator",
+        "storage.type",
+        "storage.modifier",
+        "storage.class",
+        "storage.type.class",
+        "storage.type.function",
+        "storage.type.struct",
+        "storage.type.enum",
+      ],
       settings: { foreground: syntax.keywords },
     },
     {
       name: "Functions",
-      scope: ["entity.name.function", "support.function"],
+      scope: [
+        "entity.name.function",
+        "entity.name.method",
+        "support.function",
+        "support.method",
+        "variable.function",
+        "meta.function-call",
+        "meta.function-call.generic",
+      ],
       settings: { foreground: syntax.functions },
     },
     {
       name: "Types",
-      scope: ["entity.name.type", "support.type"],
+      scope: [
+        "entity.name.type",
+        "entity.name.class",
+        "entity.name.struct",
+        "entity.name.enum",
+        "entity.name.interface",
+        "entity.name.trait",
+        "support.type",
+      ],
       settings: { foreground: syntax.types },
     },
     {
       name: "Variables",
-      scope: ["variable", "support.variable"],
+      scope: [
+        "variable",
+        "support.variable",
+        "variable.parameter",
+        "variable.language",
+        "variable.other.readwrite",
+        "meta.definition.variable",
+      ],
       settings: { foreground: p.fg0 },
     },
     {
       name: "Constants",
-      scope: ["constant", "variable.other.constant"],
+      scope: [
+        "constant",
+        "constant.language",
+        "constant.character",
+        "variable.other.constant",
+        "support.constant",
+      ],
       settings: { foreground: syntax.constants },
     },
     {
       name: "Operators",
-      scope: ["keyword.operator", "punctuation.separator", "punctuation.accessor"],
+      scope: [
+        "keyword.operator",
+        "punctuation.separator",
+        "punctuation.accessor",
+        "punctuation.terminator",
+        "punctuation.section",
+        "punctuation.definition.template-expression",
+      ],
       settings: { foreground: withAlpha(p.fg0, 0.85) },
+    },
+    {
+      name: "Tags",
+      scope: [
+        "entity.name.tag",
+        "entity.name.tag.html",
+        "entity.name.tag.xml",
+        "entity.name.tag.jsx",
+        "entity.name.tag.tsx",
+        "meta.tag",
+      ],
+      settings: { foreground: syntax.tags },
+    },
+    {
+      name: "Attributes",
+      scope: [
+        "entity.other.attribute-name",
+        "entity.other.attribute-name.class",
+        "entity.other.attribute-name.id",
+        "entity.other.attribute-name.jsx",
+        "entity.other.attribute-name.tsx",
+        "support.type.property-name",
+        "meta.attribute",
+      ],
+      settings: { foreground: syntax.attributes },
     },
   ];
 
