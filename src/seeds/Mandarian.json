@@ -1,8 +1,8 @@
 {
   "id": "Mandarian",
   "displayName": "Mandarian",
-  "background": { "mode": "oklch", "l": 0.18, "c": 0.04, "h": 50 },
-  "accent": { "mode": "oklch", "l": 0.7, "c": 0.18, "h": 55 },
+  "background": { "mode": "oklch", "l": 0.18, "c": 0.045, "h": 70 },
+  "accent": { "mode": "oklch", "l": 0.73, "c": 0.21, "h": 78 },
   "intentMode": true,
   "harmony": "none",
   "variants": [

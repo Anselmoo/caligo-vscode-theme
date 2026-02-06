@@ -1,8 +1,8 @@
 {
   "id": "Cinder",
   "displayName": "Cinder",
-  "background": { "mode": "oklch", "l": 0.18, "c": 0.04, "h": 40 },
-  "accent": { "mode": "oklch", "l": 0.7, "c": 0.18, "h": 35 },
+  "background": { "mode": "oklch", "l": 0.08, "c": 0.02, "h": 22 },
+  "accent": { "mode": "oklch", "l": 0.45, "c": 0.18, "h": 28 },
   "harmony": "none",
   "intentMode": true,
   "intentEmphasis": "balanced",

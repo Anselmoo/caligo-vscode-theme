@@ -1,8 +1,8 @@
 {
   "id": "GraphiteFlux",
   "displayName": "Graphite Flux",
-  "background": { "mode": "oklch", "l": 0.18, "c": 0.035, "h": 280 },
-  "accent": { "mode": "oklch", "l": 0.7, "c": 0.18, "h": 175 },
+  "background": { "mode": "oklch", "l": 0.165, "c": 0.02, "h": 230 },
+  "accent": { "mode": "oklch", "l": 0.69, "c": 0.2, "h": 190 },
   "intentMode": true,
   "harmony": "none",
   "variants": [
