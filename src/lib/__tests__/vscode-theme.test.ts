@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import { describe, expect, it } from "vitest";
 import type { Seed } from "../constraints.js";
 import { derivePalette } from "../palette.js";
@@ -71,6 +72,8 @@ describe("buildVscodeThemeJson", () => {
     expect(scopes.includes("Keywords")).toBe(true);
     expect(scopes.includes("Functions")).toBe(true);
     expect(scopes.includes("Types")).toBe(true);
+    expect(scopes.includes("Tags")).toBe(true);
+    expect(scopes.includes("Attributes")).toBe(true);
   });
 
   it("should use hex color format for all colors", () => {
