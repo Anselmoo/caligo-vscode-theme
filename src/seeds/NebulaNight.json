@@ -1,8 +1,8 @@
 {
   "id": "NebulaNight",
   "displayName": "Nebula Night",
-  "background": { "mode": "oklch", "l": 0.165, "c": 0.05, "h": 305 },
-  "accent": { "mode": "oklch", "l": 0.75, "c": 0.21, "h": 320 },
+  "background": { "mode": "oklch", "l": 0.14, "c": 0.03, "h": 170 },
+  "accent": { "mode": "oklch", "l": 0.7, "c": 0.08, "h": 240 },
   "intentMode": true,
   "harmony": "none",
   "variants": [
