@@ -38,6 +38,21 @@ async function ensureDir(dirPath: string): Promise<void> {
   await fs.mkdir(dirPath, { recursive: true });
 }
 
+async function cleanJsonFiles(dirPath: string): Promise<void> {
+  try {
+    const entries = await fs.readdir(dirPath, { withFileTypes: true });
+    await Promise.all(
+      entries
+        .filter(entry => entry.isFile() && entry.name.endsWith(".json"))
+        .map(entry => fs.unlink(path.join(dirPath, entry.name)))
+    );
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+      throw error;
+    }
+  }
+}
+
 function sanitizeIdForFilename(id: string): string {
   // The extension contributes filenames without spaces.
   // Keep it strict and predictable.
@@ -142,6 +157,13 @@ async function main(): Promise<void> {
     ensureDir(buildReportsDir),
     ensureDir(buildPreviewDir),
     ensureDir(buildPreviewAssetsDir),
+  ]);
+
+  await Promise.all([
+    cleanJsonFiles(outThemesDir),
+    cleanJsonFiles(buildThemesDir),
+    cleanJsonFiles(buildPalettesDir),
+    cleanJsonFiles(buildReportsDir),
   ]);
 
   const derived: DerivedPalette[] = [];
