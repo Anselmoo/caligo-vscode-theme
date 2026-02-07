@@ -11,8 +11,7 @@ const currentYear = new Date().getFullYear();
             &copy; {{ currentYear }} Anselm Hahn. MIT Licensed.
           </p>
           <p class="footer-tagline">
-            <i class="pi pi-moon"></i>
-            Built with <i class="pi pi-heart-fill"></i> for developers who code after dark
+            Built with <i class="pi pi-heart-fill"></i> for developers who code after dark <i class="pi pi-moon"></i>
           </p>
         </div>
         <div class="footer-links">
