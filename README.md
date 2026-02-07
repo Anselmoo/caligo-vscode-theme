@@ -129,12 +129,22 @@ Beyond syntax colors, Caligo includes intent-based highlighting:
 - [**Contributing**](CONTRIBUTING.md) — Development setup & guidelines
 - [**Quick Start**](QUICKSTART.md) — Developer quick start guide
 
-## 📄 License
+<br>
 
-[MIT](LICENSE) © [Anselm Hahn](https://github.com/Anselmoo)
-
----
-
-<p align="center">
-  <sub>Built with 🌙 for developers who code after dark</sub>
-</p>
+<div align="center">
+  <hr>
+  <br>
+  <p>
+    &copy; 2026 Anselm Hahn. MIT Licensed.
+  </p>
+  <p>
+    Built with ❤️ for developers who code after dark 🌙
+  </p>
+  <p>
+    <a href="https://marketplace.visualstudio.com/items?itemName=AnselmHahn.caligo-vscode-theme">Marketplace</a> •
+    <a href="https://github.com/Anselmoo/caligo-vscode-theme">GitHub</a> •
+    <a href="https://anselmoo.github.io/caligo-vscode-theme/#/gallery">Gallery</a> •
+    <a href="CONTRIBUTING.md">Contributing</a> •
+    <a href="LICENSE">License</a>
+  </p>
+</div>
