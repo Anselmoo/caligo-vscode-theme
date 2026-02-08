@@ -26,6 +26,7 @@ export const pythonMapper: LanguageMapper = {
       modifiers: ["async"],
       description: "Async function definitions",
       examples: ["async def fetch_data():"],
+      fontStyle: "italic",
     },
 
     "keyword.async": {
@@ -33,6 +34,7 @@ export const pythonMapper: LanguageMapper = {
       modifiers: ["async"],
       description: "Async/await keywords",
       examples: ["await fetch_data()", "async with ..."],
+      fontStyle: "italic",
     },
 
     // CONTEXT MANAGERS → CONTROL FLOW
@@ -85,12 +87,13 @@ export const pythonMapper: LanguageMapper = {
       examples: ["import os", "from typing import List"],
     },
 
-    // SELF → USAGE (special variable)
+    // SELF → CONTROL FLOW (special variable that should stand out)
     "variable.self": {
-      layer: "usage",
+      layer: "controlFlow",
       modifiers: ["builtin"],
       description: "Self parameter",
       examples: ["self.value", "self.method()"],
+      fontStyle: "italic",
     },
 
     // CLASS DECORATORS → META

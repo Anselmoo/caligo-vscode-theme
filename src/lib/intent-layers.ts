@@ -15,6 +15,7 @@
  */
 
 import { type OkLch, oklch, toHex } from "./color.js";
+import { getAvailableLanguages, getLanguageMapper } from "./language-mappings/index.js";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // INTENT LAYER DEFINITIONS
@@ -381,6 +382,7 @@ export function deriveIntentPaletteWithHarmony(
 /**
  * Generate semantic token colors using intent-based mapping.
  * This replaces the syntax-based approach with intent-based coloring.
+ * Now with language-specific intelligence via language mappers.
  */
 export function deriveIntentSemanticTokenColors(
   palette: DerivedIntentPalette,
@@ -392,7 +394,8 @@ export function deriveIntentSemanticTokenColors(
     return palette[intent];
   };
 
-  return {
+  // Start with base semantic token colors (language-agnostic)
+  const colors: Record<string, string | { foreground?: string; fontStyle?: string }> = {
     // TYPE-LIKE CONSTRUCTS → mostly DECLARATION
     class: getIntentColor("class"),
     interface: getIntentColor("interface"),
@@ -459,54 +462,35 @@ export function deriveIntentSemanticTokenColors(
     "*.declaration": {
       fontStyle: "bold",
     },
-
-    // ═══════════════════════════════════════════════════════════════════════
-    // LANGUAGE-SPECIFIC OVERRIDES
-    // ═══════════════════════════════════════════════════════════════════════
-
-    // Python: Decorators and magic methods use mutation intent
-    "decorator:python": palette.mutation,
-    "method.magic:python": palette.mutation,
-
-    // Rust: Macros, attributes, and lifetimes use mutation
-    "macro:rust": palette.mutation,
-    "attribute:rust": palette.mutation,
-    "lifetime:rust": palette.mutation,
-
-    // Java: Annotations treated as mutation
-    "decorator:java": palette.mutation,
-    "decorator.override:java": {
-      foreground: fgMuted,
-      fontStyle: "italic",
-    },
-
-    // Go: Struct tags are metadata (mutation)
-    "string.structTag:go": palette.mutation,
-
-    // C#: Attributes and properties
-    "attribute:csharp": palette.mutation,
-    "property.get:csharp": palette.usage,
-    "property.set:csharp": palette.mutation,
-
-    // C++: Template and concepts
-    "keyword.template:cpp": palette.declaration,
-    "keyword.concept:cpp": palette.mutation,
-
-    // Kotlin: Delegation and coroutines
-    "keyword.by:kotlin": palette.mutation,
-    "keyword.suspend:kotlin": palette.controlFlow,
-
-    // Lua: Metatables
-    "function.metatable:lua": palette.mutation,
-
-    // Ruby: Symbols and metaprogramming
-    "symbol:ruby": palette.data,
-    "method.metaprogramming:ruby": palette.mutation,
-
-    // Shell: Pipes and redirects
-    "operator.pipe:shellscript": palette.controlFlow,
-    "operator.redirect:shellscript": palette.controlFlow,
   };
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // DYNAMIC LANGUAGE-SPECIFIC OVERRIDES
+  // ═══════════════════════════════════════════════════════════════════════
+
+  // Dynamically generate language-specific token colors from language mappers
+  for (const lang of getAvailableLanguages()) {
+    const mapper = getLanguageMapper(lang);
+    if (!mapper) continue;
+
+    // For each mapping in the language mapper, generate a scoped token
+    for (const [tokenPattern, rule] of Object.entries(mapper.mappings)) {
+      const scopedToken = `${tokenPattern}:${lang}`;
+      const intentColor = palette[rule.layer];
+
+      // Apply font style if specified
+      if (rule.fontStyle) {
+        colors[scopedToken] = {
+          foreground: intentColor,
+          fontStyle: rule.fontStyle,
+        };
+      } else {
+        colors[scopedToken] = intentColor;
+      }
+    }
+  }
+
+  return colors;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
