@@ -34,13 +34,42 @@
 
 ---
 
-## ✨ Features
+## What is Caligo?
+
+Caligo is a **professional dark theme collection** for Visual Studio Code, built on color science principles. Unlike traditional hand-picked color schemes, Caligo uses **OKLCH** — a perceptually uniform color space — to generate mathematically harmonious themes that are easy on the eyes and maintain consistent readability.
+
+Choose from **50 carefully crafted themes**: 10 distinctive seed palettes × 5 color harmony variants.
+
+## Why Caligo?
+
+### 🔬 OKLCH Color Science
+
+Traditional themes rely on trial-and-error hex codes. Caligo leverages **OKLCH** for predictable, perceptually uniform colors:
+
+- **Consistent brightness** — Colors at equal lightness values look equally bright
+- **Preserved readability** — Harmony transformations maintain contrast ratios
+- **Mathematical precision** — "Colors that look equally different, are equally different"
+
+### ✨ Key Features
 
 - **50 themes** from 10 seed palettes × 5 color harmonies
-- **OKLCH color science** — perceptually uniform, mathematically derived colors
 - **High contrast** — designed with accessibility in mind using APCA-W3 contrast validation
 - **Semantic highlighting** — intent-aware colors for declarations, mutations, control flow
 - **Consistent syntax** — harmonized bracket pairs, git diff, and terminal colors
+- **Zero configuration** — works beautifully out of the box
+
+### 🎯 Semantic Highlighting
+
+Beyond basic syntax colors, Caligo provides intent-based highlighting:
+
+| Intent       | Purpose       | Examples                     |
+| ------------ | ------------- | ---------------------------- |
+| Declaration  | Definitions   | `const`, `function`, `class` |
+| Mutation     | State changes | `=`, `++`, `--`              |
+| Control Flow | Logic         | `if`, `for`, `return`        |
+| Data         | Values        | Literals, constants          |
+
+*Requires language server support (TypeScript, Python/Pylance, Rust, etc.)*
 
 ## 📦 Installation
 
@@ -56,32 +85,36 @@ code --install-extension AnselmHahn.caligo-vscode-theme
 
 ## 🖼️ Theme Gallery
 
-<p align="center">
-  <img src="images/icon.png" alt="Caligo Icon" width="88" height="88">
-</p>
+<div align="center">
+  <p>
+    <img src="images/icon.png" alt="Caligo Icon" width="88" height="88">
+  </p>
 
-<table>
-<tr>
-<td align="center" width="33%">
-<img src="https://anselmoo.github.io/caligo-vscode-theme/screenshots/caligo-aurora-noir-balanced-typescript.png" width="100%" alt="Aurora Noir">
-<br><strong>Aurora Noir</strong>
-</td>
-<td align="center" width="33%">
-<img src="https://anselmoo.github.io/caligo-vscode-theme/screenshots/caligo-eclipse-balanced-typescript.png" width="100%" alt="Eclipse">
-<br><strong>Eclipse</strong>
-</td>
-<td align="center" width="33%">
-<img src="https://anselmoo.github.io/caligo-vscode-theme/screenshots/caligo-mandarian-balanced-typescript.png" width="100%" alt="Mandarian">
-<br><strong>Mandarian</strong>
-</td>
-</tr>
-</table>
+  <table>
+    <tr>
+      <td align="center" width="33%">
+        <img src="https://anselmoo.github.io/caligo-vscode-theme/screenshots/caligo-aurora-noir-balanced-typescript.png" width="100%" alt="Aurora Noir">
+        <br><strong>Aurora Noir</strong>
+      </td>
+      <td align="center" width="33%">
+        <img src="https://anselmoo.github.io/caligo-vscode-theme/screenshots/caligo-eclipse-balanced-typescript.png" width="100%" alt="Eclipse">
+        <br><strong>Eclipse</strong>
+      </td>
+      <td align="center" width="33%">
+        <img src="https://anselmoo.github.io/caligo-vscode-theme/screenshots/caligo-mandarian-balanced-typescript.png" width="100%" alt="Mandarian">
+        <br><strong>Mandarian</strong>
+      </td>
+    </tr>
+  </table>
 
-<p align="center">
-  <a href="https://anselmoo.github.io/caligo-vscode-theme/#/gallery"><strong>→ Browse all 50 themes</strong></a>
-</p>
+  <p>
+    <a href="https://anselmoo.github.io/caligo-vscode-theme/#/gallery"><strong>→ Browse all 50 themes</strong></a>
+  </p>
+</div>
 
 ### Seed Palettes
+
+Each palette is designed to evoke a distinct visual character and mood:
 
 | Palette              | Character                              |
 | -------------------- | -------------------------------------- |
@@ -97,29 +130,6 @@ code --install-extension AnselmHahn.caligo-vscode-theme
 | **Void Ember**       | Smoldering darkness                    |
 
 Each palette has 5 harmony variants: **Balanced**, **Analogous**, **Triadic**, **Split-Complementary**, **Monochromatic**
-
-## 🔬 Why OKLCH?
-
-Traditional themes use hand-picked hex codes. Caligo uses **OKLCH** — a perceptually uniform color space where:
-
-- Colors at equal lightness *look* equally bright
-- Harmony transformations preserve readability
-- Contrast ratios are predictable
-
-> *"Colors that look equally different, are equally different."*
-
-## 🎯 Semantic Highlighting
-
-Beyond syntax colors, Caligo includes intent-based highlighting:
-
-| Intent       | Purpose       | Examples                     |
-| ------------ | ------------- | ---------------------------- |
-| Declaration  | Definitions   | `const`, `function`, `class` |
-| Mutation     | State changes | `=`, `++`, `--`              |
-| Control Flow | Logic         | `if`, `for`, `return`        |
-| Data         | Values        | Literals, constants          |
-
-*Requires language server support (TypeScript, Python/Pylance, Rust, etc.)*
 
 ---
 
