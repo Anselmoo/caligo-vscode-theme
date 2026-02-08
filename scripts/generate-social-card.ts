@@ -145,11 +145,11 @@ function generateSocialCard(): void {
     success = generateWithSips();
   } else {
     console.error("❌ Error: No suitable SVG conversion tool found!");
-    console.error("\nPlease install one of the following:");
+    console.error("\nPlease install one of the following (in order of preference):");
+    console.error("  • librsvg: brew install librsvg (macOS) or apt install librsvg2-bin (Linux)");
     console.error(
       "  • ImageMagick: brew install imagemagick (macOS) or apt install imagemagick (Linux)"
     );
-    console.error("  • librsvg: brew install librsvg (macOS) or apt install librsvg2-bin (Linux)");
     console.error("  • Inkscape: brew install inkscape (macOS) or apt install inkscape (Linux)");
     console.error("  • sips: Built-in on macOS");
     process.exit(1);
