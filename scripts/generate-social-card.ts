@@ -146,11 +146,15 @@ function generateSocialCard(): void {
   } else {
     console.error("❌ Error: No suitable SVG conversion tool found!");
     console.error("\nPlease install one of the following (in order of preference):");
-    console.error("  • librsvg: brew install librsvg (macOS) or apt install librsvg2-bin (Linux)");
     console.error(
-      "  • ImageMagick: brew install imagemagick (macOS) or apt install imagemagick (Linux)"
+      "  • librsvg: apt install librsvg2-bin (Linux) | brew install librsvg (macOS) | https://github.com/miyako/console-rsvg-convert (Windows)"
     );
-    console.error("  • Inkscape: brew install inkscape (macOS) or apt install inkscape (Linux)");
+    console.error(
+      "  • ImageMagick: apt install imagemagick (Linux) | brew install imagemagick (macOS) | choco install imagemagick (Windows)"
+    );
+    console.error(
+      "  • Inkscape: apt install inkscape (Linux) | brew install inkscape (macOS) | choco install inkscape (Windows)"
+    );
     console.error("  • sips: Built-in on macOS");
     process.exit(1);
   }
