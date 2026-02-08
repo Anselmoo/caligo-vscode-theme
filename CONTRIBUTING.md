@@ -58,6 +58,16 @@ All theme colors are derived from JSON seeds in `src/seeds/*.json`. Each seed de
 
 Always run `npm run build` after TypeScript changes and `npm run generate` to regenerate themes.
 
+### Social Card Assets
+
+The repository includes a GitHub social card with a 40pt safe margin following GitHub's Repo Card Template guidance. To regenerate the social card PNG from the SVG source:
+
+```bash
+npm run images:social-card
+```
+
+See `images/SOCIAL_CARD.md` for details about the safe margin specification and usage instructions.
+
 ## Testing
 
 - **Unit tests:** `npm test` (schema coverage, constraint validation)
