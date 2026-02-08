@@ -167,3 +167,10 @@ export function getLanguageDisplayName(language: SupportedLanguage): string {
   const mapper = LANGUAGE_MAPPERS[language as keyof typeof LANGUAGE_MAPPERS];
   return mapper?.displayName ?? language;
 }
+
+/**
+ * Get a language mapper by language identifier.
+ */
+export function getLanguageMapper(language: SupportedLanguage) {
+  return LANGUAGE_MAPPERS[language as keyof typeof LANGUAGE_MAPPERS];
+}

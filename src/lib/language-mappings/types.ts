@@ -39,6 +39,8 @@ export interface LanguageIntentRule {
   description: string;
   /** Examples of code that triggers this rule */
   examples?: string[];
+  /** Optional font style for this token */
+  fontStyle?: "italic" | "bold" | "underline" | "strikethrough";
 }
 
 /**
