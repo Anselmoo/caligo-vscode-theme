@@ -28,8 +28,8 @@ npm run images:social-card
 ```
 
 This script uses available system tools in order of preference:
-1. ImageMagick (`convert`)
-2. librsvg (`rsvg-convert`)
+1. librsvg (`rsvg-convert`) - best gradient and color support
+2. ImageMagick (`convert`)
 3. Inkscape
 4. sips (macOS only)
 

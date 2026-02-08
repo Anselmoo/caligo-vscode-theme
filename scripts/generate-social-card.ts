@@ -31,11 +31,13 @@ const TARGET_WIDTH = 1280;
 const TARGET_HEIGHT = 640;
 
 /**
- * Check if a command exists on the system
+ * Check if a command exists on the system (cross-platform)
  */
 function commandExists(cmd: string): boolean {
   try {
-    execSync(`which ${cmd}`, { stdio: "ignore" });
+    const isWindows = process.platform === "win32";
+    const checkCmd = isWindows ? `where ${cmd}` : `command -v ${cmd}`;
+    execSync(checkCmd, { stdio: "ignore" });
     return true;
   } catch {
     return false;
