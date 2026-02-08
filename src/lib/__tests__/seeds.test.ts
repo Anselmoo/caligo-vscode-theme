@@ -49,6 +49,13 @@ describe("loadSeedById", () => {
     expect(seed?.displayName).toBe("Eclipse");
   });
 
+  it("should load updated Cinder background values", async () => {
+    const seed = await loadSeedById("Cinder");
+
+    expect(seed).toBeTruthy();
+    expect(seed?.background).toEqual({ mode: "oklch", l: 0.12, c: 0.05, h: 20 });
+  });
+
   it("should return undefined for non-existent seed", async () => {
     const seed = await loadSeedById("NonExistentSeed");
 
