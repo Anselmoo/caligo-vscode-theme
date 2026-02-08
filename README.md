@@ -143,18 +143,58 @@ code --install-extension AnselmHahn.caligo-vscode-theme
 
 Each palette is designed to evoke a distinct visual character and mood:
 
-| Palette              | Character                              |
-| -------------------- | -------------------------------------- |
-| **Aurora Noir**      | Cyan-teal aurora over deep ocean       |
-| **Cinder**           | Warm amber glow from smoldering embers |
-| **Deep Sable**       | Rich earth tones with deep warmth      |
-| **Eclipse**          | Solar corona against void black        |
-| **Graphite Flux**    | Industrial steel with electric accents |
-| **Mandarian**        | Vibrant citrus energy                  |
-| **Midnight Atelier** | Artist's studio at night               |
-| **Nebula Night**     | Cosmic dust and starlight              |
-| **Obsidian Glow**    | Volcanic glass with inner fire         |
-| **Void Ember**       | Smoldering darkness                    |
+<div align="center">
+  <table>
+    <thead>
+      <tr>
+        <th align="left">Palette</th>
+        <th align="left">Character</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Aurora Noir</strong></td>
+        <td>Cyan-teal aurora over deep ocean</td>
+      </tr>
+      <tr>
+        <td><strong>Cinder</strong></td>
+        <td>Warm amber glow from smoldering embers</td>
+      </tr>
+      <tr>
+        <td><strong>Deep Sable</strong></td>
+        <td>Rich earth tones with deep warmth</td>
+      </tr>
+      <tr>
+        <td><strong>Eclipse</strong></td>
+        <td>Solar corona against void black</td>
+      </tr>
+      <tr>
+        <td><strong>Graphite Flux</strong></td>
+        <td>Industrial steel with electric accents</td>
+      </tr>
+      <tr>
+        <td><strong>Mandarian</strong></td>
+        <td>Vibrant citrus energy</td>
+      </tr>
+      <tr>
+        <td><strong>Midnight Atelier</strong></td>
+        <td>Artist's studio at night</td>
+      </tr>
+      <tr>
+        <td><strong>Nebula Night</strong></td>
+        <td>Cosmic dust and starlight</td>
+      </tr>
+      <tr>
+        <td><strong>Obsidian Glow</strong></td>
+        <td>Volcanic glass with inner fire</td>
+      </tr>
+      <tr>
+        <td><strong>Void Ember</strong></td>
+        <td>Smoldering darkness</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 Each palette has 5 harmony variants: **Balanced**, **Analogous**, **Triadic**, **Split-Complementary**, **Monochromatic**
 
