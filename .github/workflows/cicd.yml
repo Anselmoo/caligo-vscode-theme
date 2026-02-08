@@ -66,6 +66,16 @@ jobs:
           else
             echo "⚠️ coverage-summary.json not found" >> $GITHUB_STEP_SUMMARY
           fi
+      - name: Upload coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./coverage/lcov.info
+          flags: unittests
+          name: unit-tests
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: VSIX local build test
         run: npm run marketplace:package
       - name: Cleanup generated themes
@@ -331,15 +341,11 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-  release:
-    name: Release
+  release-package:
+    name: Release - Build VSIX
     if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
     needs: [unit-tests, screenshots, build-pages]
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      packages: write
-      pages: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -359,6 +365,26 @@ jobs:
           VSIX=$(ls *.vsix || true)
           if [ -z "$VSIX" ]; then echo "No VSIX found" && exit 1; fi
           echo "vsix=$VSIX" >> $GITHUB_OUTPUT
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vsix
+          path: ${{ steps.find_vsix.outputs.vsix }}
+          retention-days: 30
+
+  release-github:
+    name: Release - GitHub
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+    needs: release-package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download VSIX artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vsix
+          path: artifacts/vsix
       - name: Create GitHub Release (gh)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -383,7 +409,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload "${{ github.ref_name }}" "${{ steps.find_vsix.outputs.vsix }}" \
+          VSIX_FILE=$(find artifacts/vsix -maxdepth 1 -type f -name '*.vsix' -print -quit)
+          if [ -z "$VSIX_FILE" ]; then echo "No VSIX file found" && exit 1; fi
+          gh release upload "${{ github.ref_name }}" "$VSIX_FILE" \
             --repo "${{ github.repository }}" \
             --clobber
       - name: Release summary
@@ -391,5 +419,23 @@ jobs:
           echo "### GitHub Release" >> $GITHUB_STEP_SUMMARY
           echo "✅ Release ${{ github.ref_name }} created" >> $GITHUB_STEP_SUMMARY
           echo "🔗 https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+
+  release-marketplace:
+    name: Release - VS Code Marketplace
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+    needs: release-package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download VSIX artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vsix
+          path: artifacts/vsix
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
       - name: Publish to Visual Studio Marketplace
-        run: npx vsce publish --no-dependencies --pat "${{ secrets.VSCE_PAT }}"
+        run: |
+          VSIX_FILE=$(find artifacts/vsix -maxdepth 1 -type f -name '*.vsix' -print -quit)
+          if [ -z "$VSIX_FILE" ]; then echo "No VSIX file found" && exit 1; fi
+          npx vsce publish --no-dependencies --packagePath "$VSIX_FILE" --pat "${{ secrets.VSCE_PAT }}"
