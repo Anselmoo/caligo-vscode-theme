@@ -62,12 +62,39 @@ Traditional themes rely on trial-and-error hex codes. Caligo leverages **OKLCH**
 
 Beyond basic syntax colors, Caligo provides intent-based highlighting:
 
-| Intent       | Purpose       | Examples                     |
-| ------------ | ------------- | ---------------------------- |
-| Declaration  | Definitions   | `const`, `function`, `class` |
-| Mutation     | State changes | `=`, `++`, `--`              |
-| Control Flow | Logic         | `if`, `for`, `return`        |
-| Data         | Values        | Literals, constants          |
+<div align="center">
+  <table>
+    <thead>
+      <tr>
+        <th align="left">Intent</th>
+        <th align="left">Purpose</th>
+        <th align="left">Examples</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Declaration</td>
+        <td>Definitions</td>
+        <td><code>const</code>, <code>function</code>, <code>class</code></td>
+      </tr>
+      <tr>
+        <td>Mutation</td>
+        <td>State changes</td>
+        <td><code>=</code>, <code>++</code>, <code>--</code></td>
+      </tr>
+      <tr>
+        <td>Control Flow</td>
+        <td>Logic</td>
+        <td><code>if</code>, <code>for</code>, <code>return</code></td>
+      </tr>
+      <tr>
+        <td>Data</td>
+        <td>Values</td>
+        <td>Literals, constants</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 *Requires language server support (TypeScript, Python/Pylance, Rust, etc.)*
 
