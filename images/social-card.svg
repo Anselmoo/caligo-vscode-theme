@@ -1,13 +1,13 @@
-<svg width="1280" height="640" viewBox="0 0 1280 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="1280" height="640" viewBox="0 0 1280 640" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <defs>
-        <linearGradient id="bg-gradient" x1="0" y1="0" x2="1280" y2="640" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stop-color="#0f1118" />
-            <stop offset="1" stop-color="#232834" />
+        <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#0f1118;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#232834;stop-opacity:1" />
         </linearGradient>
-        <linearGradient id="text-gradient" x1="0" y1="0" x2="100%" y2="0%">
-            <stop offset="0" stop-color="#00c098"/> <!-- Teal -->
-            <stop offset="0.5" stop-color="#00b4d8"/> <!-- Sky Blue -->
-            <stop offset="1" stop-color="#9b90ff"/> <!-- Purple -->
+        <linearGradient id="text-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#00c098;stop-opacity:1" />
+            <stop offset="50%" style="stop-color:#00b4d8;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#9b90ff;stop-opacity:1" />
         </linearGradient>
 
         <!-- Inner Glow for the Ring -->

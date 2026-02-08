@@ -7,8 +7,8 @@
  * - Safe margin: 40pt (~53px at 96 DPI) around important content
  *
  * The script attempts to use available system tools in order of preference:
- * 1. ImageMagick (convert) - most common on Linux/macOS via Homebrew
- * 2. rsvg-convert - librsvg2 tool, common on Linux
+ * 1. rsvg-convert - librsvg2 tool, best gradient/color support
+ * 2. ImageMagick (convert) - common on Linux/macOS via Homebrew
  * 3. Inkscape - full-featured SVG editor with CLI
  * 4. sips - macOS built-in tool (for compatibility with existing workflow)
  *
@@ -130,12 +130,13 @@ function generateSocialCard(): void {
   }
 
   // Try available tools in order of preference
+  // rsvg-convert is preferred for better gradient/color support
   let success = false;
 
-  if (commandExists("convert")) {
-    success = generateWithImageMagick();
-  } else if (commandExists("rsvg-convert")) {
+  if (commandExists("rsvg-convert")) {
     success = generateWithRsvg();
+  } else if (commandExists("convert")) {
+    success = generateWithImageMagick();
   } else if (commandExists("inkscape")) {
     success = generateWithInkscape();
   } else if (commandExists("sips")) {
