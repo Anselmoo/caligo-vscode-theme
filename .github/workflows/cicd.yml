@@ -409,7 +409,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          VSIX_FILE=$(ls artifacts/vsix/*.vsix | head -n 1)
+          VSIX_FILE=$(find artifacts/vsix -maxdepth 1 -type f -name '*.vsix' -print -quit)
           if [ -z "$VSIX_FILE" ]; then echo "No VSIX file found" && exit 1; fi
           gh release upload "${{ github.ref_name }}" "$VSIX_FILE" \
             --repo "${{ github.repository }}" \
@@ -434,9 +434,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
       - name: Publish to Visual Studio Marketplace
         run: |
-          VSIX_FILE=$(ls artifacts/vsix/*.vsix | head -n 1)
+          VSIX_FILE=$(find artifacts/vsix -maxdepth 1 -type f -name '*.vsix' -print -quit)
           if [ -z "$VSIX_FILE" ]; then echo "No VSIX file found" && exit 1; fi
           npx vsce publish --no-dependencies --packagePath "$VSIX_FILE" --pat "${{ secrets.VSCE_PAT }}"
