@@ -293,6 +293,9 @@ jobs:
   build-vsix:
     name: Build VSIX
     needs: [unit-tests, e2e-tests]
+    if: >
+      (github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
+      || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -310,9 +313,14 @@ jobs:
       - name: Find VSIX
         id: find_vsix
         run: |
-          VSIX=$(ls *.vsix || true)
-          if [ -z "$VSIX" ]; then echo "No VSIX found" && exit 1; fi
-          echo "vsix=$VSIX" >> $GITHUB_OUTPUT
+          shopt -s nullglob
+          vsix_files=( *.vsix )
+          if [ ${#vsix_files[@]} -eq 0 ]; then
+            echo "No VSIX found"
+            exit 1
+          fi
+          VSIX="${vsix_files[0]}"
+          echo "vsix=$VSIX" >> "$GITHUB_OUTPUT"
       - name: Upload VSIX artifact
         uses: actions/upload-artifact@v4
         with:
@@ -372,8 +380,6 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - uses: actions/configure-pages@v5
-        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
       - run: npm ci
       - name: Build pages
         run: npm run pages:build
@@ -398,10 +404,34 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
+  release-gate:
+    name: Release Gate
+    if: ${{ (startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch') }}
+    needs: [build-vsix, build-pages-main, build-pages-other]
+    runs-on: ubuntu-latest
+    outputs:
+      ready: ${{ steps.check.outputs.ready }}
+    steps:
+      - name: Check release readiness
+        id: check
+        run: |
+          if [[ "${{ needs.build-vsix.result }}" == "success" ]] && \
+             [[ "${{ needs.build-pages-main.result }}" != "failure" ]] && \
+             [[ "${{ needs.build-pages-other.result }}" != "failure" ]] && \
+             ( [[ "${{ needs.build-pages-main.result }}" == "success" ]] || \
+               [[ "${{ needs.build-pages-other.result }}" == "success" ]] ); then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            echo "✅ Release checks passed"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "❌ Release checks failed"
+            exit 1
+          fi
+
   release-github:
     name: Release - GitHub
-    if: ${{ (startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch') && needs.build-vsix.result == 'success' && (needs.build-pages-main.result != 'failure') && (needs.build-pages-other.result != 'failure') && (needs.build-pages-main.result == 'success' || needs.build-pages-other.result == 'success') }}
-    needs: [build-vsix, build-pages-main, build-pages-other]
+    if: ${{ needs.release-gate.outputs.ready == 'true' }}
+    needs: release-gate
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -448,8 +478,8 @@ jobs:
 
   release-marketplace:
     name: Release - VS Code Marketplace
-    if: ${{ (startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch') && needs.build-vsix.result == 'success' && (needs.build-pages-main.result != 'failure') && (needs.build-pages-other.result != 'failure') && (needs.build-pages-main.result == 'success' || needs.build-pages-other.result == 'success') }}
-    needs: [build-vsix, build-pages-main, build-pages-other]
+    if: ${{ needs.release-gate.outputs.ready == 'true' }}
+    needs: release-gate
     runs-on: ubuntu-latest
     steps:
       - name: Download VSIX artifact
