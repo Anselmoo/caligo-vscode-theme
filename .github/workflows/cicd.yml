@@ -76,8 +76,6 @@ jobs:
           fail_ci_if_error: false
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      - name: VSIX local build test
-        run: npm run marketplace:package
       - name: Cleanup generated themes
         if: always()
         run: node ./scripts/cleanup-themes.js
@@ -92,6 +90,7 @@ jobs:
   screenshots-smoke:
     name: VS Code Screenshots (smoke)
     needs: unit-tests
+    if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -168,6 +167,7 @@ jobs:
   screenshots:
     name: VS Code Screenshots
     needs: [unit-tests, screenshots-smoke]
+    if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -290,9 +290,40 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-  build-pages:
-    name: Build Pages
+  build-vsix:
+    name: Build VSIX
+    needs: [unit-tests, e2e-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Mark workspace as a safe git directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Build VSIX
+        run: npm run marketplace:package
+      - name: Find VSIX
+        id: find_vsix
+        run: |
+          VSIX=$(ls *.vsix || true)
+          if [ -z "$VSIX" ]; then echo "No VSIX found" && exit 1; fi
+          echo "vsix=$VSIX" >> $GITHUB_OUTPUT
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vsix
+          path: ${{ steps.find_vsix.outputs.vsix }}
+          retention-days: 30
+
+  build-pages-main:
+    name: Build Pages (main)
     needs: [unit-tests, screenshots]
+    if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -328,10 +359,36 @@ jobs:
         with:
           path: ./dist
 
+  build-pages-other:
+    name: Build Pages (non-main)
+    needs: unit-tests
+    if: ${{ github.ref != 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mark workspace as a safe git directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - uses: actions/configure-pages@v5
+        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+      - run: npm ci
+      - name: Build pages
+        run: npm run pages:build
+        env:
+          VITE_BASE: /${{ github.event.repository.name }}/
+      - name: Upload Pages artifact
+        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
   deploy:
     name: Deploy Pages
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main') }}
-    needs: build-pages
+    if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
+    needs: build-pages-main
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -341,41 +398,10 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-  release-package:
-    name: Release - Build VSIX
-    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
-    needs: [unit-tests, screenshots, build-pages]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Mark workspace as a safe git directory
-        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-      - run: npm ci
-      - name: Build & package
-        run: npm run release:ci
-      - name: Find VSIX
-        id: find_vsix
-        run: |
-          VSIX=$(ls *.vsix || true)
-          if [ -z "$VSIX" ]; then echo "No VSIX found" && exit 1; fi
-          echo "vsix=$VSIX" >> $GITHUB_OUTPUT
-      - name: Upload VSIX artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: vsix
-          path: ${{ steps.find_vsix.outputs.vsix }}
-          retention-days: 30
-
   release-github:
     name: Release - GitHub
-    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
-    needs: release-package
+    if: ${{ (startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch') && needs.build-vsix.result == 'success' && (needs.build-pages-main.result != 'failure') && (needs.build-pages-other.result != 'failure') && (needs.build-pages-main.result == 'success' || needs.build-pages-other.result == 'success') }}
+    needs: [build-vsix, build-pages-main, build-pages-other]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -422,8 +448,8 @@ jobs:
 
   release-marketplace:
     name: Release - VS Code Marketplace
-    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
-    needs: release-package
+    if: ${{ (startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch') && needs.build-vsix.result == 'success' && (needs.build-pages-main.result != 'failure') && (needs.build-pages-other.result != 'failure') && (needs.build-pages-main.result == 'success' || needs.build-pages-other.result == 'success') }}
+    needs: [build-vsix, build-pages-main, build-pages-other]
     runs-on: ubuntu-latest
     steps:
       - name: Download VSIX artifact
