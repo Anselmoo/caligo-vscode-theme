@@ -109,6 +109,17 @@ For Vue landing page development, see [docs/vue-development.md](docs/vue-develop
 5. Push your branch and open a PR with a clear description
 6. Wait for review and CI checks
 
+## Extension Packaging (VSIX)
+
+The published extension should stay lean. The VSIX is expected to include only:
+
+- `themes/*.json` (generated theme files)
+- `build/extension.js` (+ source map)
+- `images/icon.png` and `images/banner.png` (extension icon + README banner)
+- `README.md`, `CHANGELOG.md`, `LICENSE`, and `package.json`
+
+Everything else (Vue app, reports, screenshots, social cards, SVG sources, tests) should remain excluded via `.vscodeignore`.
+
 ## Publication Checklist
 
 - [ ] All changes are in `src/` (no generated artifacts tracked)

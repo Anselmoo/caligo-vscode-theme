@@ -9,6 +9,9 @@ test(".vscodeignore exists and excludes common dev artifacts", () => {
   expect(ignore.includes("build/**") || ignore.includes("build/")).toBe(true);
   expect(ignore.includes("tests/**") || ignore.includes("tests/")).toBe(true);
   expect(ignore.includes("*.vsix")).toBe(true);
+  expect(ignore.includes("images/**") || ignore.includes("images/")).toBe(true);
+  expect(ignore.includes("!images/icon.png")).toBe(true);
+  expect(ignore.includes("!images/banner.png")).toBe(true);
 });
 
 // Sanity: ensure themes directory exists and has JSON files
