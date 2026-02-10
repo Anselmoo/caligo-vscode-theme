@@ -36,6 +36,11 @@ mockup/**
 !LICENSE
 !THEME_DESIGN_CONCEPT.md
 
+# Images (keep only extension + README assets)
+images/**
+!images/icon.png
+!images/banner.png
+
 # Dependencies (bundled separately)
 node_modules/**
 package-lock.json
