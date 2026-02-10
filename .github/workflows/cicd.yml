@@ -407,7 +407,7 @@ jobs:
   release-gate:
     name: Release Gate
     if: ${{ (startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch') }}
-    needs: [build-vsix, build-pages-main, build-pages-other]
+    needs: [build-vsix, build-pages-other]
     runs-on: ubuntu-latest
     outputs:
       ready: ${{ steps.check.outputs.ready }}
@@ -416,10 +416,7 @@ jobs:
         id: check
         run: |
           if [[ "${{ needs.build-vsix.result }}" == "success" ]] && \
-             [[ "${{ needs.build-pages-main.result }}" != "failure" ]] && \
-             [[ "${{ needs.build-pages-other.result }}" != "failure" ]] && \
-             ( [[ "${{ needs.build-pages-main.result }}" == "success" ]] || \
-               [[ "${{ needs.build-pages-other.result }}" == "success" ]] ); then
+             [[ "${{ needs.build-pages-other.result }}" == "success" ]]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
             echo "✅ Release checks passed"
           else
