@@ -258,6 +258,100 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
+  screenshots-release:
+    name: VS Code Screenshots (release)
+    needs: unit-tests
+    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mark workspace as a safe git directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Build local VS Code Playwright Docker image
+        run: |
+          docker build -f tools/docker/vscode-playwright.Dockerfile -t caligo-vscode-playwright:ci .
+
+      - name: Quick VS Code launch diagnostic (inside container)
+        timeout-minutes: 3
+        run: |
+          mkdir -p build
+          docker run --init --rm --cap-add SYS_ADMIN --ipc=host -v "$GITHUB_WORKSPACE:/work" -w /work caligo-vscode-playwright:ci /bin/bash -lc 'mkdir -p /tmp/vscode-launch /tmp/vscode-user-data /work/build; chown -R pwuser:pwuser /tmp/vscode-launch /tmp/vscode-user-data /work/build || true; su -s /bin/bash pwuser -c "timeout 2m xvfb-run --auto-servernum --server-args=\" -screen 0 1920x1080x24\" /usr/share/code/code --verbose --no-sandbox --user-data-dir /tmp/vscode-user-data --disable-gpu --disable-dev-shm-usage > /tmp/vscode-launch/log.txt 2>&1 || true"; cp /tmp/vscode-launch/log.txt /work/build/vscode-launch.log || true'
+      - name: Upload VS Code quick-launch diagnostic (release)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vscode-diagnostic-release
+          path: build/vscode-launch.log
+          if-no-files-found: ignore
+          retention-days: 30
+
+      - name: Prepare workspace & install dependencies inside image
+        run: |
+          docker run --rm --cap-add SYS_ADMIN --ipc=host -v "$GITHUB_WORKSPACE:/work" -w /work caligo-vscode-playwright:ci /bin/bash -lc 'mkdir -p /work/node_modules /work/build /work/public /work/tmp-screenshots-reuse; chown -R pwuser:pwuser /work/node_modules /work/build /work/public /work/tmp-screenshots-reuse || true; su -s /bin/bash pwuser -c "npm ci --ignore-scripts"'
+      - name: Generate themes (inside container)
+        run: |
+          docker run --rm --cap-add SYS_ADMIN --ipc=host -v "$GITHUB_WORKSPACE:/work" -w /work caligo-vscode-playwright:ci /bin/bash -lc 'mkdir -p /work/build /work/public /work/tmp-screenshots-reuse; chown -R pwuser:pwuser /work/build /work/public /work/tmp-screenshots-reuse || true; su -s /bin/bash pwuser -c "npm run generate"'
+      - name: Generate theme screenshots
+        env:
+          DEBUG: pw:browser*
+          ELECTRON_ENABLE_LOGGING: "1"
+          ELECTRON_ENABLE_STACK_DUMPING: "1"
+          CODE_EXECUTABLE: /usr/share/code/code
+          CODE_ARGS: "--disable-workspace-trust --no-sandbox --disable-gpu --disable-dev-shm-usage"
+        run: |
+          docker run --rm --cap-add SYS_ADMIN --ipc=host -v "$GITHUB_WORKSPACE:/work" -w /work -e DEBUG="$DEBUG" -e ELECTRON_ENABLE_LOGGING="$ELECTRON_ENABLE_LOGGING" -e ELECTRON_ENABLE_STACK_DUMPING="$ELECTRON_ENABLE_STACK_DUMPING" -e CODE_EXECUTABLE="$CODE_EXECUTABLE" -e CODE_ARGS="$CODE_ARGS" caligo-vscode-playwright:ci /bin/bash -lc 'mkdir -p /tmp/vscode-user-data /work/build /work/tmp-screenshots-reuse; chown -R pwuser:pwuser /tmp/vscode-user-data /work/build /work/tmp-screenshots-reuse || true; su -s /bin/bash pwuser -c "cd /work && DEBUG=\"$DEBUG\" ELECTRON_ENABLE_LOGGING=\"$ELECTRON_ENABLE_LOGGING\" ELECTRON_ENABLE_STACK_DUMPING=\"$ELECTRON_ENABLE_STACK_DUMPING\" CODE_EXECUTABLE=\"$CODE_EXECUTABLE\" CODE_ARGS=\"$CODE_ARGS\" timeout 50m xvfb-run --auto-servernum --server-args=\" -screen 0 1920x1080x24\" npm run screenshots:vscode:reused 2>&1 | tee /tmp/vscode-screenshots.log /work/build/vscode-screenshots.log || true"; cp /tmp/vscode-screenshots.log /work/build/vscode-screenshots.log || true; if [ -f /work/build/screenshots-report.json ]; then echo "report already in build"; elif [ -f /tmp/screenshot-report.json ]; then cp /tmp/screenshot-report.json /work/build/screenshots-report.json || true; elif [ -f /tmp/caligo-vscode-playwright/screenshots-report.json ]; then cp /tmp/caligo-vscode-playwright/screenshots-report.json /work/build/screenshots-report.json || true; fi; if [ -d /tmp-screenshots-reuse ] && [ -z "$(ls -A /work/tmp-screenshots-reuse 2>/dev/null)" ]; then cp -R /tmp-screenshots-reuse/* /work/tmp-screenshots-reuse/ || true; fi; if [ -f /work/build/screenshots-report.json ]; then echo "report copied"; fi'
+        timeout-minutes: 60
+
+      - name: Validate screenshots instrumentation
+        if: always()
+        run: |
+          if [ -f build/screenshots-report.json ]; then
+            node -e "const j=JSON.parse(require('fs').readFileSync('build/screenshots-report.json','utf-8')); if ((j.electronLaunchCount||0) > 1) { console.error('ERROR: electronLaunchCount > 1'); process.exit(1); } if (j.errors && j.errors.length) { console.error('ERROR: instrumentation reported errors', j.errors); process.exit(1); } console.log('Instrumentation OK:', j.electronLaunchCount, 'launches');"
+          else
+            echo "No instrumentation file found; continuing";
+          fi
+
+      - name: Upload screenshots instrumentation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-instrumentation-release
+          path: build/screenshots-report.json
+          if-no-files-found: ignore
+          retention-days: 30
+      - name: Debug screenshots artifacts
+        if: always()
+        run: |
+          echo "--- build directory ---"
+          ls -la build || true
+          echo "--- tmp-screenshots-reuse ---"
+          ls -la tmp-screenshots-reuse || true
+          echo "--- report search ---"
+          find . -maxdepth 6 -name "screenshots-report.json" -print || true
+
+      - name: Run screenshot integration tests
+        run: npm run test:integration
+        env:
+          CI: true
+
+      - name: Copy screenshots to public directory
+        run: npx tsx scripts/copy-screenshots.ts
+
+      - name: "Debug: List public/screenshots directory"
+        if: always()
+        run: |
+          echo "--- public/screenshots listing ---"
+          ls -la public/screenshots || true
+
+      - name: Upload Screenshot Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-release
+          path: public/screenshots/
+          if-no-files-found: error
+          retention-days: 90
+
   e2e-tests:
     name: E2E Tests
     needs: unit-tests
@@ -370,7 +464,7 @@ jobs:
   build-pages-other:
     name: Build Pages (non-main)
     needs: unit-tests
-    if: ${{ github.ref != 'refs/heads/main' }}
+    if: ${{ github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -391,6 +485,42 @@ jobs:
         with:
           path: ./dist
 
+  build-pages-release:
+    name: Build Pages (release)
+    needs: [unit-tests, screenshots-release]
+    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mark workspace as a safe git directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - uses: actions/configure-pages@v5
+      - run: npm ci
+      - name: Download Screenshots
+        uses: actions/download-artifact@v4
+        with:
+          name: screenshots-release
+          path: public/screenshots/
+      - name: Build pages
+        run: npm run pages:build
+        env:
+          VITE_BASE: /${{ github.event.repository.name }}/
+      - name: Upload Screenshots Manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-manifest-release
+          path: public/screenshots-manifest.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
   deploy:
     name: Deploy Pages
     if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
@@ -404,10 +534,23 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
+  deploy-release:
+    name: Deploy Pages (release)
+    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    needs: build-pages-release
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
   release-gate:
     name: Release Gate
-    if: ${{ (startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch') }}
-    needs: [build-vsix, build-pages-other]
+    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    needs: [build-vsix, build-pages-release]
     runs-on: ubuntu-latest
     outputs:
       ready: ${{ steps.check.outputs.ready }}
@@ -416,7 +559,7 @@ jobs:
         id: check
         run: |
           if [[ "${{ needs.build-vsix.result }}" == "success" ]] && \
-             [[ "${{ needs.build-pages-other.result }}" == "success" ]]; then
+             [[ "${{ needs.build-pages-release.result }}" == "success" ]]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
             echo "✅ Release checks passed"
           else
