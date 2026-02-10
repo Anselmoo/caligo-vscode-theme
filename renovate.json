@@ -1,7 +1,32 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:base"],
+  "extends": [
+    "config:base",
+    ":semanticCommits",
+    ":semanticCommitTypeAll(chore)",
+    ":semanticCommitScope(deps)"
+  ],
   "schedule": ["before 3am on Monday"],
-  "dependencyDashboard": false,
-  "automerge": false
+  "dependencyDashboard": true,
+  "labels": ["dependencies", "renovate"],
+  "automerge": false,
+  "rebaseWhen": "behind-base-branch",
+  "rangeStrategy": "bump",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 3am on Monday"]
+  },
+  "packageRules": [
+    {
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true,
+      "automerge": false
+    }
+  ]
 }
