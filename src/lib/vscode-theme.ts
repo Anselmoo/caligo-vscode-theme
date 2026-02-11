@@ -420,7 +420,11 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     },
     {
       name: "String Punctuation",
-      scope: ["punctuation.definition.string.begin", "punctuation.definition.string.end"],
+      scope: [
+        "punctuation.definition.string.begin",
+        "punctuation.definition.string.end",
+        "punctuation.definition.string",
+      ],
       settings: { foreground: withAlpha(syntax.strings, 0.85) },
     },
     {
@@ -519,7 +523,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     },
     {
       name: "Storage Imports",
-      scope: ["storage.modifier.package", "storage.modifier.import", "storage.type.java"],
+      scope: ["storage.modifier.package", "storage.modifier.import"],
       settings: { foreground: p.fg0 },
     },
     {
@@ -625,7 +629,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     {
       name: "Support Variables",
       scope: ["support.variable"],
-      settings: { foreground: syntax.constants },
+      settings: { foreground: syntax.variables },
     },
     {
       name: "Operators",
