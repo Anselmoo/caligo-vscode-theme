@@ -120,6 +120,17 @@ The published extension should stay lean. The VSIX is expected to include only:
 
 Everything else (Vue app, reports, screenshots, social cards, SVG sources, tests) should remain excluded via `.vscodeignore`.
 
+## Release-Based Pages Publication
+
+- **Development mode (preview):** Pushes to `main` build and deploy the Vue app to GitHub Pages.
+- **Release mode (production):** Publishing a GitHub Release with a `vX.Y.Z` tag triggers the release workflow to build screenshots, publish Pages, and push the VSIX.
+- **Note:** Tag pushes alone no longer deploy Pages; the release must be published.
+
+**Release steps:**
+1. Create or push the `vX.Y.Z` tag on `main`.
+2. Publish the GitHub Release (draft → publish or `gh release create`).
+3. CI builds and deploys the production Pages site and publishes the VSIX.
+
 ## Publication Checklist
 
 - [ ] All changes are in `src/` (no generated artifacts tracked)
