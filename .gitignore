@@ -13,6 +13,8 @@ public/screenshots/
 
 # Generated themes
 themes/Caligo-*-*.json
+themes/example-theme.json
+.generated-themes-by-pretest
 build/themes/
 
 # Vue/Vite build outputs
