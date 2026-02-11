@@ -28,6 +28,10 @@ export function deriveSemanticTokenColors(p: DerivedPalette): SemanticTokenColor
     enum: p.harmony.types,
     typeParameter: p.accentMuted,
     struct: p.harmony.types,
+    "class.defaultLibrary": {
+      foreground: p.harmony.types,
+      fontStyle: "bold",
+    },
 
     // ═══════════════════════════════════════════════════════════════════════
     // FUNCTION-LIKE CONSTRUCTS
@@ -38,6 +42,10 @@ export function deriveSemanticTokenColors(p: DerivedPalette): SemanticTokenColor
     method: p.harmony.functions,
     "method.declaration": p.harmony.functions,
     "method.async": p.harmony.functions,
+    "function.defaultLibrary": {
+      foreground: p.harmony.functions,
+      fontStyle: "bold",
+    },
 
     // ═══════════════════════════════════════════════════════════════════════
     // VARIABLES AND PARAMETERS
@@ -49,6 +57,8 @@ export function deriveSemanticTokenColors(p: DerivedPalette): SemanticTokenColor
       foreground: p.harmony.constants,
       fontStyle: "bold",
     },
+    event: p.fgMuted,
+    label: p.harmony.keywords,
 
     // ═══════════════════════════════════════════════════════════════════════
     // PROPERTIES AND MEMBERS
@@ -105,6 +115,18 @@ export function deriveSemanticTokenColors(p: DerivedPalette): SemanticTokenColor
     "*.declaration": {
       fontStyle: "bold",
     },
+    "*.static": {
+      fontStyle: "underline",
+    },
+    "*.abstract": {
+      fontStyle: "italic",
+    },
+    "*.modification": {
+      foreground: p.harmony.variables,
+    },
+    "*.documentation": {
+      fontStyle: "italic",
+    },
 
     // ═══════════════════════════════════════════════════════════════════════
     // LANGUAGE-SPECIFIC OVERRIDES
@@ -113,6 +135,10 @@ export function deriveSemanticTokenColors(p: DerivedPalette): SemanticTokenColor
     // Python: Decorators and magic methods use attributes color
     "decorator:python": p.harmony.attributes,
     "method.magic:python": p.harmony.attributes,
+    "parameter:python": {
+      foreground: p.harmony.variables,
+      fontStyle: "italic",
+    },
 
     // Rust: Macros, attributes, and lifetimes
     "macro:rust": p.harmony.attributes,
@@ -128,6 +154,32 @@ export function deriveSemanticTokenColors(p: DerivedPalette): SemanticTokenColor
 
     // Go: Struct tags are metadata
     "string.structTag:go": p.harmony.attributes,
+
+    // TypeScript/JavaScript: highlight language defaults and readonlys
+    "variable:typescript": p.harmony.variables,
+    "variable:javascript": p.harmony.variables,
+    "variable.readonly:typescript": {
+      foreground: p.harmony.constants,
+      fontStyle: "bold",
+    },
+    "function.defaultLibrary:typescript": {
+      foreground: p.harmony.functions,
+      fontStyle: "bold",
+    },
+    "class.defaultLibrary:typescript": {
+      foreground: p.harmony.types,
+      fontStyle: "bold",
+    },
+    "variable.defaultLibrary:javascript": {
+      foreground: p.harmony.constants,
+      fontStyle: "bold",
+    },
+    "type:typescript": p.harmony.types,
+    "enumMember:typescript": p.harmony.constants,
+
+    // CSS/SCSS properties
+    "property:css": p.harmony.attributes,
+    "property:scss": p.harmony.attributes,
 
     // C#: Attributes and properties
     "attribute:csharp": p.harmony.attributes,

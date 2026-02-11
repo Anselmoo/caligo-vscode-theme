@@ -360,6 +360,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
           keywords: p.huePurple,
           functions: p.hueBlue,
           types: p.hueCyan,
+          variables: p.harmony.variables,
           constants: p.hueYellow,
           attributes: p.huePurple,
           tags: p.hueRed,
@@ -370,6 +371,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
           keywords: p.harmony.keywords,
           functions: p.harmony.functions,
           types: p.harmony.types,
+          variables: p.harmony.variables,
           constants: p.harmony.constants,
           attributes: p.harmony.attributes,
           tags: p.harmony.tags,
@@ -378,16 +380,115 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
   const tokenColors: VscodeThemeJson["tokenColors"] = [
     {
       name: "Comments",
-      scope: ["comment", "punctuation.definition.comment"],
+      scope: ["comment", "punctuation.definition.comment", "string.comment"],
       settings: {
         foreground: withAlpha(p.fgMuted, 0.75),
         fontStyle: "italic",
       },
     },
     {
+      name: "Doc Comment Keywords",
+      scope: ["comment.block.documentation keyword", "comment.block.documentation storage.type"],
+      settings: { foreground: syntax.attributes },
+    },
+    {
+      name: "Doc Comment Types",
+      scope: [
+        "comment.block.documentation entity.name.type",
+        "comment.block.documentation entity.name.class",
+        "comment.block.documentation entity.name.interface",
+      ],
+      settings: { foreground: syntax.types, fontStyle: "italic" },
+    },
+    {
+      name: "Doc Comment Parameters",
+      scope: [
+        "comment.block.documentation variable",
+        "comment.block.documentation entity.name.variable",
+      ],
+      settings: { foreground: syntax.variables, fontStyle: "italic" },
+    },
+    {
+      name: "Doc Comment Type Brackets",
+      scope: ["comment.block.documentation entity.name.type punctuation.definition.bracket"],
+      settings: { foreground: syntax.types },
+    },
+    {
       name: "Strings",
-      scope: ["string", "punctuation.definition.string"],
+      scope: ["string"],
       settings: { foreground: syntax.strings },
+    },
+    {
+      name: "String Punctuation",
+      scope: ["punctuation.definition.string.begin", "punctuation.definition.string.end"],
+      settings: { foreground: withAlpha(syntax.strings, 0.85) },
+    },
+    {
+      name: "String Interpolation",
+      scope: ["string variable", "variable.other.interpolation"],
+      settings: { foreground: syntax.variables },
+    },
+    {
+      name: "String Escapes",
+      scope: ["constant.character.escape", "constant.character.escape.regexp"],
+      settings: { foreground: syntax.constants },
+    },
+    {
+      name: "Template Interpolation",
+      scope: [
+        "punctuation.definition.template-expression.begin",
+        "punctuation.definition.template-expression.end",
+        "punctuation.section.embedded",
+      ],
+      settings: { foreground: p.accent },
+    },
+    {
+      name: "Docstrings",
+      scope: ["string.quoted.docstring.multi", "string.quoted.docstring"],
+      settings: { foreground: withAlpha(p.fgMuted, 0.75) },
+    },
+    {
+      name: "Regex",
+      scope: ["source.regexp", "string.regexp"],
+      settings: { foreground: syntax.strings },
+    },
+    {
+      name: "Regex Character Classes",
+      scope: ["string.regexp.character-class", "constant.other.character-class.regexp"],
+      settings: { foreground: syntax.types },
+    },
+    {
+      name: "Regex Escapes",
+      scope: ["string.regexp constant.character.escape", "constant.character.escape.regexp"],
+      settings: { foreground: p.hueGreen, fontStyle: "bold" },
+    },
+    {
+      name: "Regex Groups",
+      scope: ["punctuation.definition.group.regexp"],
+      settings: { foreground: syntax.constants },
+    },
+    {
+      name: "Regex Assertions",
+      scope: ["punctuation.definition.group.assertion.regexp"],
+      settings: { foreground: p.hueRed },
+    },
+    {
+      name: "Regex Character Class Punctuation",
+      scope: ["punctuation.definition.character-class.regexp"],
+      settings: { foreground: syntax.types },
+    },
+    {
+      name: "Regex Delimiters",
+      scope: [
+        "string.regexp punctuation.definition.string.begin",
+        "string.regexp punctuation.definition.string.end",
+      ],
+      settings: { foreground: p.hueRed },
+    },
+    {
+      name: "Regex Lookahead",
+      scope: ["meta.assertion.look-ahead.regexp", "meta.assertion.look-behind.regexp"],
+      settings: { foreground: p.hueGreen },
     },
     {
       name: "Numbers",
@@ -412,6 +513,16 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
       settings: { foreground: syntax.keywords },
     },
     {
+      name: "New Keyword",
+      scope: ["keyword.control.new", "keyword.operator.new"],
+      settings: { foreground: syntax.keywords, fontStyle: "bold" },
+    },
+    {
+      name: "Storage Imports",
+      scope: ["storage.modifier.package", "storage.modifier.import", "storage.type.java"],
+      settings: { foreground: p.fg0 },
+    },
+    {
       name: "Functions",
       scope: [
         "entity.name.function",
@@ -425,6 +536,24 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
       settings: { foreground: syntax.functions },
     },
     {
+      name: "Function Parameters",
+      scope: [
+        "variable.parameter",
+        "variable.parameter.function",
+        "entity.name.variable.parameter",
+      ],
+      settings: { foreground: syntax.variables, fontStyle: "italic" },
+    },
+    {
+      name: "Decorators",
+      scope: [
+        "meta.decorator variable.other.readwrite",
+        "meta.decorator variable.other.property",
+        "meta.decorator punctuation.definition",
+      ],
+      settings: { foreground: syntax.attributes, fontStyle: "italic" },
+    },
+    {
       name: "Types",
       scope: [
         "entity.name.type",
@@ -433,21 +562,38 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
         "entity.name.enum",
         "entity.name.interface",
         "entity.name.trait",
-        "support.type",
       ],
       settings: { foreground: syntax.types },
+    },
+    {
+      name: "Inherited Classes",
+      scope: ["entity.other.inherited-class"],
+      settings: { foreground: syntax.types, fontStyle: "italic" },
+    },
+    {
+      name: "Type Parameters",
+      scope: ["entity.name.type.type-parameter"],
+      settings: { foreground: p.accentMuted },
+    },
+    {
+      name: "Type Annotations",
+      scope: ["storage.type.annotation", "meta.type.annotation", "meta.return-type"],
+      settings: { foreground: syntax.types, fontStyle: "italic" },
     },
     {
       name: "Variables",
       scope: [
         "variable",
-        "support.variable",
-        "variable.parameter",
-        "variable.language",
         "variable.other.readwrite",
         "meta.definition.variable",
+        "entity.name.variable",
       ],
-      settings: { foreground: p.fg0 },
+      settings: { foreground: syntax.variables },
+    },
+    {
+      name: "this/self/super",
+      scope: ["variable.language", "keyword.other.this"],
+      settings: { foreground: syntax.keywords, fontStyle: "italic" },
     },
     {
       name: "Constants",
@@ -456,21 +602,49 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
         "constant.language",
         "constant.character",
         "variable.other.constant",
+        "variable.other.enummember",
         "support.constant",
       ],
+      settings: { foreground: syntax.constants },
+    },
+    {
+      name: "Support Types",
+      scope: ["support", "support.type", "support.class", "support.other.namespace"],
+      settings: { foreground: syntax.types, fontStyle: "italic" },
+    },
+    {
+      name: "Support Functions",
+      scope: ["support.function", "support.method", "support.function.any-method"],
+      settings: { foreground: syntax.functions },
+    },
+    {
+      name: "Support Constants",
+      scope: ["support.constant"],
+      settings: { foreground: syntax.constants },
+    },
+    {
+      name: "Support Variables",
+      scope: ["support.variable"],
       settings: { foreground: syntax.constants },
     },
     {
       name: "Operators",
       scope: [
         "keyword.operator",
-        "punctuation.separator",
         "punctuation.accessor",
         "punctuation.terminator",
         "punctuation.section",
-        "punctuation.definition.template-expression",
       ],
       settings: { foreground: withAlpha(p.fg0, 0.85) },
+    },
+    {
+      name: "Punctuation Separators",
+      scope: [
+        "punctuation.separator",
+        "punctuation.separator.key-value",
+        "punctuation.separator.namespace",
+      ],
+      settings: { foreground: p.accent },
     },
     {
       name: "Tags",
@@ -492,10 +666,155 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
         "entity.other.attribute-name.id",
         "entity.other.attribute-name.jsx",
         "entity.other.attribute-name.tsx",
-        "support.type.property-name",
         "meta.attribute",
       ],
       settings: { foreground: syntax.attributes },
+    },
+    {
+      name: "Property Names",
+      scope: [
+        "support.type.property-name",
+        "support.type.property-name.json",
+        "meta.property-name",
+        "meta.property-name.css",
+        "meta.property-name.scss",
+        "meta.module-reference",
+      ],
+      settings: { foreground: syntax.attributes },
+    },
+    {
+      name: "Markup Headings",
+      scope: ["markup.heading", "entity.name.section"],
+      settings: { foreground: p.accent, fontStyle: "bold" },
+    },
+    {
+      name: "Markup Bold",
+      scope: ["markup.bold", "punctuation.definition.bold"],
+      settings: { foreground: p.hueOrange, fontStyle: "bold" },
+    },
+    {
+      name: "Markup Italic",
+      scope: ["markup.italic", "punctuation.definition.italic"],
+      settings: { foreground: p.hueYellow, fontStyle: "italic" },
+    },
+    {
+      name: "Markup Underline",
+      scope: ["markup.underline"],
+      settings: { foreground: p.fg0, fontStyle: "underline" },
+    },
+    {
+      name: "Markup Strikethrough",
+      scope: ["markup.strikethrough"],
+      settings: { foreground: p.fg0, fontStyle: "strikethrough" },
+    },
+    {
+      name: "Markup Links",
+      scope: ["markup.underline.link", "markup.underline.link.image"],
+      settings: { foreground: p.hueCyan, fontStyle: "underline" },
+    },
+    {
+      name: "Markup Inline Code",
+      scope: ["markup.inline.raw", "markup.raw.inline"],
+      settings: { foreground: syntax.strings },
+    },
+    {
+      name: "Markup Quotes",
+      scope: ["markup.quote"],
+      settings: { foreground: p.hueYellow, fontStyle: "italic" },
+    },
+    {
+      name: "Markup Inserted",
+      scope: ["markup.inserted", "markup.inserted.diff", "markup.inserted.git_gutter"],
+      settings: {
+        foreground: p.hueGreen,
+        background: withAlpha(p.hueGreen, 0.15),
+      },
+    },
+    {
+      name: "Markup Deleted",
+      scope: ["markup.deleted", "markup.deleted.diff", "markup.deleted.git_gutter"],
+      settings: {
+        foreground: p.hueRed,
+        background: withAlpha(p.hueRed, 0.15),
+      },
+    },
+    {
+      name: "Markup Changed",
+      scope: ["markup.changed", "markup.changed.diff", "markup.changed.git_gutter"],
+      settings: {
+        foreground: p.hueOrange,
+        background: withAlpha(p.hueOrange, 0.15),
+      },
+    },
+    {
+      name: "Markup Ignored",
+      scope: ["markup.ignored", "markup.untracked"],
+      settings: { foreground: p.fgMuted },
+    },
+    {
+      name: "Markup List Punctuation",
+      scope: ["punctuation.definition.list.begin.markdown"],
+      settings: { foreground: p.hueCyan },
+    },
+    {
+      name: "Markup Reference Links",
+      scope: ["constant.other.reference.link", "string.other.link"],
+      settings: { foreground: p.hueCyan, fontStyle: "underline" },
+    },
+    {
+      name: "Serialization Keys",
+      scope: ["entity.name.tag.yaml", "variable.other.key.toml"],
+      settings: { foreground: syntax.types },
+    },
+    {
+      name: "Serialization Dates",
+      scope: ["constant.other.date", "constant.other.timestamp"],
+      settings: { foreground: syntax.numbers },
+    },
+    {
+      name: "Serialization Aliases",
+      scope: ["variable.other.alias.yaml"],
+      settings: { foreground: syntax.strings, fontStyle: "italic underline" },
+    },
+    {
+      name: "Makefile Targets",
+      scope: ["entity.name.function.target.makefile"],
+      settings: { foreground: syntax.functions },
+    },
+    {
+      name: "Invalid",
+      scope: ["invalid"],
+      settings: { foreground: p.semantic.error, fontStyle: "italic underline" },
+    },
+    {
+      name: "Invalid Broken",
+      scope: ["invalid.broken"],
+      settings: { foreground: p.semantic.error, fontStyle: "italic" },
+    },
+    {
+      name: "Invalid Deprecated",
+      scope: ["invalid.deprecated"],
+      settings: { foreground: p.fgMuted, fontStyle: "italic underline" },
+    },
+    {
+      name: "Invalid Illegal",
+      scope: ["invalid.illegal"],
+      settings: { foreground: p.semantic.error, fontStyle: "italic underline" },
+    },
+    {
+      name: "Invalid Unimplemented",
+      scope: ["invalid.unimplemented"],
+      settings: { foreground: p.semantic.warning, fontStyle: "italic" },
+    },
+    {
+      name: "Message Error",
+      scope: ["message.error"],
+      settings: { foreground: p.semantic.error },
+    },
+    {
+      name: "Carriage Return",
+      scope: ["carriage-return"],
+      settings: { foreground: p.fg0, background: p.semantic.error },
     },
   ];
 
