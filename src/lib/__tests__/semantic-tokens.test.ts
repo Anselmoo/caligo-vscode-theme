@@ -45,6 +45,14 @@ describe("deriveSemanticTokenColors", () => {
     expect(tokens.parameter).toBe(palette.harmony.variables);
   });
 
+  it("should map events and labels", () => {
+    const palette = derivePalette(testSeed, "Balanced");
+    const tokens = deriveSemanticTokenColors(palette);
+
+    expect(tokens.event).toBe(palette.fgMuted);
+    expect(tokens.label).toBe(palette.harmony.keywords);
+  });
+
   it("should map readonly variables to harmony.constants", () => {
     const palette = derivePalette(testSeed, "Balanced");
     const tokens = deriveSemanticTokenColors(palette);
@@ -84,6 +92,27 @@ describe("deriveSemanticTokenColors", () => {
     const style = (tokens["*.deprecated"] as { fontStyle?: string }).fontStyle;
     expect(style?.includes("italic")).toBe(true);
     expect(style?.includes("strikethrough")).toBe(true);
+  });
+
+  it("should apply modifier styles for static and abstract tokens", () => {
+    const palette = derivePalette(testSeed, "Balanced");
+    const tokens = deriveSemanticTokenColors(palette);
+
+    expect((tokens["*.static"] as { fontStyle?: string }).fontStyle).toBe("underline");
+    expect((tokens["*.abstract"] as { fontStyle?: string }).fontStyle).toBe("italic");
+    expect((tokens["*.modification"] as { foreground?: string }).foreground).toBe(
+      palette.harmony.variables
+    );
+  });
+
+  it("should include language-specific overrides", () => {
+    const palette = derivePalette(testSeed, "Balanced");
+    const tokens = deriveSemanticTokenColors(palette);
+
+    expect(tokens["variable:typescript"]).toBe(palette.harmony.variables);
+    expect(tokens["property:css"]).toBe(palette.harmony.attributes);
+    expect((tokens["function.defaultLibrary"] as { fontStyle?: string }).fontStyle).toBe("bold");
+    expect((tokens["parameter:python"] as { fontStyle?: string }).fontStyle).toBe("italic");
   });
 
   it("should use different colors for triadic harmony mode", () => {

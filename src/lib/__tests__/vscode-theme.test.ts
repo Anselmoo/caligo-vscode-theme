@@ -74,6 +74,32 @@ describe("buildVscodeThemeJson", () => {
     expect(scopes.includes("Types")).toBe(true);
     expect(scopes.includes("Tags")).toBe(true);
     expect(scopes.includes("Attributes")).toBe(true);
+    expect(scopes.includes("Function Parameters")).toBe(true);
+    expect(scopes.includes("Markup Headings")).toBe(true);
+    expect(scopes.includes("Invalid")).toBe(true);
+  });
+
+  it("should style variables and parameters distinctly", () => {
+    const seed: Seed = {
+      id: "TestSeed",
+      displayName: "Test Seed",
+      background: { mode: "oklch", l: 0.18, c: 0.03, h: 220 },
+      accent: { mode: "oklch", l: 0.7, c: 0.15, h: 215 },
+    };
+
+    const palette = derivePalette(seed, "Balanced");
+    const theme = buildVscodeThemeJson(palette);
+
+    const variables = theme.tokenColors.find(tc => tc.name === "Variables");
+    const parameters = theme.tokenColors.find(tc => tc.name === "Function Parameters");
+
+    expect((variables?.settings as { foreground?: string })?.foreground).toBe(
+      palette.harmony.variables
+    );
+    expect((parameters?.settings as { fontStyle?: string })?.fontStyle).toBe("italic");
+    expect((parameters?.settings as { foreground?: string })?.foreground).toBe(
+      palette.harmony.variables
+    );
   });
 
   it("should use hex color format for all colors", () => {
