@@ -127,7 +127,7 @@ Everything else (Vue app, reports, screenshots, social cards, SVG sources, tests
 - **Note:** Tag pushes alone no longer deploy Pages; the release must be published.
 
 **Release steps:**
-1. Create or push the `vX.Y.Z` tag on `main`.
+1. Create and push the `vX.Y.Z` tag from the `main` branch.
 2. Publish the GitHub Release (draft → publish or `gh release create`).
 3. CI builds and deploys the production Pages site and publishes the VSIX.
 
