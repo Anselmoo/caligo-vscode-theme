@@ -81,7 +81,7 @@ jobs:
         run: node ./scripts/cleanup-themes.js
       - name: Upload coverage artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: coverage
           path: coverage/
@@ -107,7 +107,7 @@ jobs:
           docker run --init --rm --cap-add SYS_ADMIN --ipc=host -v "$GITHUB_WORKSPACE:/work" -w /work caligo-vscode-playwright:ci /bin/bash -lc 'mkdir -p /tmp/vscode-launch /tmp/vscode-user-data /work/build; chown -R pwuser:pwuser /tmp/vscode-launch /tmp/vscode-user-data /work/build || true; su -s /bin/bash pwuser -c "timeout 2m xvfb-run --auto-servernum --server-args=\" -screen 0 1920x1080x24\" /usr/share/code/code --verbose --no-sandbox --user-data-dir /tmp/vscode-user-data --disable-gpu --disable-dev-shm-usage > /tmp/vscode-launch/log.txt 2>&1 || true"; cp /tmp/vscode-launch/log.txt /work/build/vscode-launch-smoke.log || true'
       - name: Upload VS Code quick-launch diagnostic (smoke)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: vscode-diagnostic-smoke
           path: build/vscode-launch-smoke.log
@@ -139,7 +139,7 @@ jobs:
 
       - name: Upload smoke instrumentation
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: screenshots-instrumentation-smoke
           path: build/screenshots-report.json
@@ -147,7 +147,7 @@ jobs:
           retention-days: 7
       - name: Upload smoke screenshots
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: screenshots-smoke
           path: public/screenshots/
@@ -184,7 +184,7 @@ jobs:
           docker run --init --rm --cap-add SYS_ADMIN --ipc=host -v "$GITHUB_WORKSPACE:/work" -w /work caligo-vscode-playwright:ci /bin/bash -lc 'mkdir -p /tmp/vscode-launch /tmp/vscode-user-data /work/build; chown -R pwuser:pwuser /tmp/vscode-launch /tmp/vscode-user-data /work/build || true; su -s /bin/bash pwuser -c "timeout 2m xvfb-run --auto-servernum --server-args=\" -screen 0 1920x1080x24\" /usr/share/code/code --verbose --no-sandbox --user-data-dir /tmp/vscode-user-data --disable-gpu --disable-dev-shm-usage > /tmp/vscode-launch/log.txt 2>&1 || true"; cp /tmp/vscode-launch/log.txt /work/build/vscode-launch.log || true'
       - name: Upload VS Code quick-launch diagnostic (screenshots)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: vscode-diagnostic
           path: build/vscode-launch.log
@@ -219,7 +219,7 @@ jobs:
 
       - name: Upload screenshots instrumentation
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: screenshots-instrumentation
           path: build/screenshots-report.json
@@ -250,7 +250,7 @@ jobs:
           ls -la public/screenshots || true
 
       - name: Upload Screenshot Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: screenshots
           path: public/screenshots/
@@ -278,7 +278,7 @@ jobs:
           docker run --init --rm --cap-add SYS_ADMIN --ipc=host -v "$GITHUB_WORKSPACE:/work" -w /work caligo-vscode-playwright:ci /bin/bash -lc 'mkdir -p /tmp/vscode-launch /tmp/vscode-user-data /work/build; chown -R pwuser:pwuser /tmp/vscode-launch /tmp/vscode-user-data /work/build || true; su -s /bin/bash pwuser -c "timeout 2m xvfb-run --auto-servernum --server-args=\" -screen 0 1920x1080x24\" /usr/share/code/code --verbose --no-sandbox --user-data-dir /tmp/vscode-user-data --disable-gpu --disable-dev-shm-usage > /tmp/vscode-launch/log.txt 2>&1 || true"; cp /tmp/vscode-launch/log.txt /work/build/vscode-launch.log || true'
       - name: Upload VS Code quick-launch diagnostic (release)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: vscode-diagnostic-release
           path: build/vscode-launch.log
@@ -313,7 +313,7 @@ jobs:
 
       - name: Upload screenshots instrumentation
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: screenshots-instrumentation-release
           path: build/screenshots-report.json
@@ -344,7 +344,7 @@ jobs:
           ls -la public/screenshots || true
 
       - name: Upload Screenshot Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: screenshots-release
           path: public/screenshots/
@@ -376,7 +376,7 @@ jobs:
         continue-on-error: true
       - name: Upload E2E Test Results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: e2e-test-results
           path: test-results/
@@ -415,7 +415,7 @@ jobs:
           VSIX="${vsix_files[0]}"
           echo "vsix=$VSIX" >> "$GITHUB_OUTPUT"
       - name: Upload VSIX artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: vsix
           path: ${{ steps.find_vsix.outputs.vsix }}
@@ -438,7 +438,7 @@ jobs:
         if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
       - run: npm ci
       - name: Download Screenshots
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: screenshots
           path: public/screenshots/
@@ -448,7 +448,7 @@ jobs:
           VITE_BASE: /${{ github.event.repository.name }}/
       - name: Upload Screenshots Manifest
         if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: screenshots-manifest
           path: public/screenshots-manifest.json
@@ -500,7 +500,7 @@ jobs:
       - uses: actions/configure-pages@v5
       - run: npm ci
       - name: Download Screenshots
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: screenshots-release
           path: public/screenshots/
@@ -509,7 +509,7 @@ jobs:
         env:
           VITE_BASE: /${{ github.event.repository.name }}/
       - name: Upload Screenshots Manifest
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: screenshots-manifest-release
           path: public/screenshots-manifest.json
@@ -576,7 +576,7 @@ jobs:
       contents: write
     steps:
       - name: Download VSIX artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: vsix
           path: artifacts/vsix
@@ -622,7 +622,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download VSIX artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: vsix
           path: artifacts/vsix
