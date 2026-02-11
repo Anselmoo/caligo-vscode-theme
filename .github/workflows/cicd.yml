@@ -582,29 +582,16 @@ jobs:
         with:
           name: vsix
           path: artifacts/vsix
-      - name: Create GitHub Release (gh)
+      - name: Verify GitHub Release (gh)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG="${{ github.ref_name }}"
-          VERSION="${TAG#v}"
           if gh release view "$TAG" --repo "${{ github.repository }}" >/dev/null 2>&1; then
-            echo "Release $TAG already exists; skipping create."
+            echo "Release $TAG found."
           else
-            gh release create "$TAG" \
-              --repo "${{ github.repository }}" \
-              --title "Caligo $TAG" \
-              --notes "## Caligo ${VERSION}
-
-            ### 📦 Installation
-            \`\`\`bash
-            code --install-extension AnselmHahn.caligo-vscode-theme@${VERSION}
-            \`\`\`
-
-            ### 🔗 Links
-            - [Marketplace](https://marketplace.visualstudio.com/items?itemName=AnselmHahn.caligo-vscode-theme)
-            - [Gallery](https://anselmoo.github.io/caligo-vscode-theme/#/gallery)
-            - [Changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md)"
+            echo "Release $TAG not found."
+            exit 1
           fi
       - name: Upload VSIX to release
         env:
