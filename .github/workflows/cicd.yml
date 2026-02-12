@@ -456,7 +456,7 @@ jobs:
           retention-days: 30
       - name: Upload Pages artifact
         if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: ./dist
 
@@ -480,7 +480,7 @@ jobs:
           VITE_BASE: /${{ github.event.repository.name }}/
       - name: Upload Pages artifact
         if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: ./dist
 
@@ -516,7 +516,7 @@ jobs:
           if-no-files-found: error
           retention-days: 30
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: ./dist
 
