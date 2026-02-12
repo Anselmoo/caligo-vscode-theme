@@ -581,6 +581,7 @@ jobs:
         with:
           node-version: 20
       - name: Publish to Visual Studio Marketplace
+        id: publish
         run: |
           VSIX_FILE=$(find artifacts/vsix -maxdepth 1 -type f -name '*.vsix' -print -quit)
           if [ -z "$VSIX_FILE" ]; then echo "No VSIX file found" && exit 1; fi
@@ -589,7 +590,11 @@ jobs:
         if: always()
         run: |
           echo "### VS Code Marketplace" >> $GITHUB_STEP_SUMMARY
-          echo "✅ Version ${{ github.ref_name }} published to Marketplace" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.publish.outcome }}" == "success" ]; then
+            echo "✅ Version ${{ github.ref_name }} published to Marketplace" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Failed to publish version ${{ github.ref_name }} to Marketplace" >> $GITHUB_STEP_SUMMARY
+          fi
           echo "🔗 https://marketplace.visualstudio.com/items?itemName=AnselmHahn.caligo-vscode-theme" >> $GITHUB_STEP_SUMMARY
 
   release-pages:
@@ -637,13 +642,19 @@ jobs:
         if: always()
         run: |
           echo "### Release Pages" >> $GITHUB_STEP_SUMMARY
-          echo "✅ Pages release deployment completed for ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.deployment.outcome }}" == "success" ]; then
+            echo "✅ Pages release deployment completed for ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Pages release deployment failed for ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          fi
           echo "🔗 https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/" >> $GITHUB_STEP_SUMMARY
 
   release-sbom:
     name: Release - SBOM
     if: ${{ needs.release-gate.outputs.ready == 'true' }}
-    needs: release-gate
+    needs:
+      - release-gate
+      - release-github
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -662,13 +673,15 @@ jobs:
           name: vsix
           path: artifacts/vsix
       - name: Generate SBOM
-        uses: anchore/sbom-action@v0
+        id: generate-sbom
+        uses: anchore/sbom-action@v0.17.0
         with:
           path: .
           artifact-name: sbom-spdx.json
           output-file: sbom-spdx.json
           format: spdx-json
       - name: Upload SBOM to GitHub Release
+        id: upload-sbom
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -679,4 +692,8 @@ jobs:
         if: always()
         run: |
           echo "### SBOM" >> $GITHUB_STEP_SUMMARY
-          echo "✅ SBOM generated and attached to release ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.generate-sbom.outcome }}" == "success" ] && [ "${{ steps.upload-sbom.outcome }}" == "success" ]; then
+            echo "✅ SBOM generated and attached to release ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Failed to generate or attach SBOM to release ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          fi
