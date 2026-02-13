@@ -2,7 +2,7 @@
   "name": "caligo-vscode-theme",
   "displayName": "Caligo Dark+ Theme",
   "description": "Perceptual dark themes with OKLCH-based harmony variants — 50 professionally crafted color schemes",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "publisher": "AnselmHahn",
   "author": {
     "name": "Anselm Hahn",
@@ -17,8 +17,10 @@
   },
   "homepage": "https://anselmoo.github.io/caligo-vscode-theme/",
   "qna": "https://github.com/Anselmoo/caligo-vscode-theme/discussions",
-  "sponsor": {
-    "url": "https://github.com/sponsors/Anselmoo"
+  "__metadata": {
+    "id": "3377da3a-2c9c-464a-a5cd-c58175ce56bb",
+    "publisherDisplayName": "Anselm Hahn",
+    "publisherId": "773138e0-679d-40ec-9ae9-ac986906b809"
   },
   "badges": [
     {
