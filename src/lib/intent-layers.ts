@@ -388,9 +388,66 @@ export function deriveIntentSemanticTokenColors(
   palette: DerivedIntentPalette,
   fgMuted: string
 ): Record<string, string | { foreground?: string; fontStyle?: string }> {
+  const inferFallbackIntent = (token: string): IntentLayer => {
+    const selector = token.split(":", 1)[0];
+
+    if (
+      selector.includes(".declaration") ||
+      selector.includes(".definition") ||
+      /^(class|interface|type|enum|namespace|module|struct|typeParameter)$/.test(selector)
+    ) {
+      return "declaration";
+    }
+
+    if (
+      selector.includes(".modification") ||
+      selector === "operator" ||
+      selector === "decorator" ||
+      selector === "macro"
+    ) {
+      return "mutation";
+    }
+
+    if (
+      selector === "keyword" ||
+      selector.startsWith("keyword.") ||
+      selector === "label" ||
+      selector === "event"
+    ) {
+      return "controlFlow";
+    }
+
+    if (
+      selector === "string" ||
+      selector === "number" ||
+      selector === "regexp" ||
+      selector === "comment" ||
+      selector === "comment.documentation"
+    ) {
+      return "data";
+    }
+
+    if (selector.includes("documentation")) {
+      return "documentation";
+    }
+
+    if (selector.startsWith("parameter") || selector.startsWith("variable")) {
+      return "usage";
+    }
+
+    if (selector.startsWith("property") || selector.startsWith("method")) {
+      return "usage";
+    }
+
+    if (selector.startsWith("attribute") || selector.startsWith("annotation")) {
+      return "meta";
+    }
+
+    return "usage";
+  };
+
   const getIntentColor = (token: string): string => {
-    const intent = SEMANTIC_TOKEN_TO_INTENT[token];
-    if (!intent) return palette.usage; // Default to usage for unknown tokens
+    const intent = SEMANTIC_TOKEN_TO_INTENT[token] ?? inferFallbackIntent(token);
     return palette[intent];
   };
 
@@ -407,24 +464,45 @@ export function deriveIntentSemanticTokenColors(
     // FUNCTION-LIKE → DECLARATION for definitions
     function: getIntentColor("function"),
     "function.declaration": getIntentColor("function.declaration"),
+    "function.definition": getIntentColor("function.declaration"),
     "function.async": getIntentColor("function"),
     method: getIntentColor("method"),
     "method.declaration": getIntentColor("method.declaration"),
+    "method.definition": getIntentColor("method.declaration"),
     "method.async": getIntentColor("method"),
 
     // VARIABLES → USAGE (reads) or DECLARATION (defines)
     variable: getIntentColor("variable"),
+    "variable.declaration": getIntentColor("variable.declaration"),
+    "variable.definition": getIntentColor("variable.declaration"),
     parameter: getIntentColor("parameter"),
+    "parameter.declaration": getIntentColor("parameter.declaration"),
+    "parameter.definition": getIntentColor("parameter.declaration"),
     "variable.readonly": getIntentColor("variable.readonly"),
     "variable.defaultLibrary": {
       foreground: getIntentColor("function.defaultLibrary"),
       fontStyle: "bold",
     },
+    "variable.readonly.defaultLibrary": {
+      foreground: getIntentColor("function.defaultLibrary"),
+      fontStyle: "bold underline",
+    },
+    event: getIntentColor("enumMember"),
+    label: getIntentColor("keyword"),
 
     // PROPERTIES → USAGE
     property: getIntentColor("property"),
     "property.readonly": getIntentColor("property.readonly"),
     "property.declaration": getIntentColor("property.declaration"),
+    "property.definition": getIntentColor("property.declaration"),
+    "property.defaultLibrary": {
+      foreground: getIntentColor("enumMember"),
+      fontStyle: "bold",
+    },
+    "property.readonly.defaultLibrary": {
+      foreground: getIntentColor("enumMember"),
+      fontStyle: "bold underline",
+    },
     enumMember: getIntentColor("enumMember"),
 
     // DECORATORS → MUTATION (they modify behavior)
@@ -433,6 +511,7 @@ export function deriveIntentSemanticTokenColors(
 
     // KEYWORDS → CONTROL FLOW
     keyword: getIntentColor("keyword"),
+    modifier: getIntentColor("keyword"),
     operator: getIntentColor("operator"),
 
     // NAMESPACES → DECLARATION
@@ -460,6 +539,30 @@ export function deriveIntentSemanticTokenColors(
       fontStyle: "italic strikethrough",
     },
     "*.declaration": {
+      fontStyle: "bold",
+    },
+    "*.definition": {
+      fontStyle: "bold",
+    },
+    "*.readonly": {
+      fontStyle: "underline",
+    },
+    "*.static": {
+      fontStyle: "underline",
+    },
+    "*.abstract": {
+      fontStyle: "italic",
+    },
+    "*.async": {
+      fontStyle: "italic",
+    },
+    "*.modification": {
+      foreground: palette.mutation,
+    },
+    "*.documentation": {
+      fontStyle: "italic",
+    },
+    "*.defaultLibrary": {
       fontStyle: "bold",
     },
   };

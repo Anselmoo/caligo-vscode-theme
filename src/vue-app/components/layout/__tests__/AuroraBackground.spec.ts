@@ -4,15 +4,18 @@ import AuroraBackground from "@/components/layout/AuroraBackground.vue";
 
 // Minimal matchMedia mock helper
 function mockMatchMedia(matches = false) {
-  (window as any).matchMedia = (query: string) =>
-    ({
-      matches,
-      media: query,
-      addEventListener: () => {},
-      removeEventListener: () => {},
-      addListener: () => {},
-      removeListener: () => {},
-    }) as unknown as MediaQueryList;
+  Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    value: (query: string): MediaQueryList =>
+      ({
+        matches,
+        media: query,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        addListener: () => {},
+        removeListener: () => {},
+      }) as MediaQueryList,
+  });
 }
 
 // Mock Canvas API for JsDOM

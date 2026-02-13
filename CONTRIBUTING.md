@@ -71,6 +71,10 @@ See `images/SOCIAL_CARD.md` for details about the safe margin specification and 
 ## Testing
 
 - **Unit tests:** `npm test` (schema coverage, constraint validation)
+- **Semantic quality gates:** `npm run generate && npx tsx scripts/test-contrast.ts`
+  - Enforces semantic token coverage thresholds (types/modifiers), APCA-based readability checks, and OKLCH ΔE separation checks from generated reports.
+- **Semantic screenshot gate:** `npm run test:semantic-snapshots`
+  - Runs Playwright visual snapshots from `tests/preview-visual.spec.ts` with diff thresholds.
 - **Visual testing:** Press `F5` in VS Code to launch Extension Development Host
 - **Preview validation:** Open `build/preview/index.html` after regenerating
 

@@ -2,6 +2,7 @@
 import { defineAsyncComponent, ref } from "vue";
 import AnalysisAsyncError from "../components/analysis/AnalysisAsyncError.vue";
 import AnalysisAsyncLoading from "../components/analysis/AnalysisAsyncLoading.vue";
+import { useThemeAnalysis } from "../composables/useThemeAnalysis.js";
 
 const activeTab = ref("wheel");
 
@@ -24,7 +25,23 @@ const LightnessPlots = defineAsyncComponent({
 const tabs = [
   { id: "wheel", label: "OKLCH Polar Wheel", icon: "pi-circle" },
   { id: "density", label: "C-L- & H-L-Density Map", icon: "pi-chart-scatter" },
+  { id: "overlap", label: "Mode Overlap Heatmap", icon: "pi-th-large" },
 ];
+
+const { modeOverlapHeatmap } = useThemeAnalysis();
+
+function getOverlapCell(from: string, to: string) {
+  return modeOverlapHeatmap.value?.cells.find(cell => cell.from === from && cell.to === to) ?? null;
+}
+
+function overlapCellStyle(overlap: number) {
+  const alpha = Math.min(0.95, Math.max(0.08, overlap));
+  const green = Math.round(80 + (1 - overlap) * 120);
+  const red = Math.round(80 + overlap * 140);
+  return {
+    background: `rgba(${red}, ${green}, 120, ${alpha})`,
+  };
+}
 
 const references = [
   {
@@ -76,6 +93,9 @@ void OKLCHPolarWheel;
 void LightnessPlots;
 void tabs;
 void references;
+void modeOverlapHeatmap;
+void getOverlapCell;
+void overlapCellStyle;
 </script>
 
 <template>
@@ -114,6 +134,46 @@ void references;
             </div>
             <div v-show="activeTab === 'density'" class="tab-panel">
               <LightnessPlots />
+            </div>
+            <div v-show="activeTab === 'overlap'" class="tab-panel">
+              <div class="mode-overlap" v-if="modeOverlapHeatmap">
+                <h3 class="mode-overlap-title">
+                  Mode overlap for {{ modeOverlapHeatmap.seedId }}
+                </h3>
+                <p class="mode-overlap-subtitle">
+                  Lower overlap means stronger visual separation between harmony modes.
+                </p>
+                <div class="mode-overlap-grid">
+                  <div class="mode-overlap-row mode-overlap-header">
+                    <div class="mode-overlap-corner">Mode</div>
+                    <div
+                      v-for="modeId in modeOverlapHeatmap.modes"
+                      :key="`head-${modeId}`"
+                      class="mode-overlap-head"
+                    >
+                      {{ modeId }}
+                    </div>
+                  </div>
+                  <div
+                    v-for="rowMode in modeOverlapHeatmap.modes"
+                    :key="`row-${rowMode}`"
+                    class="mode-overlap-row"
+                  >
+                    <div class="mode-overlap-label">{{ rowMode }}</div>
+                    <div
+                      v-for="colMode in modeOverlapHeatmap.modes"
+                      :key="`cell-${rowMode}-${colMode}`"
+                      class="mode-overlap-cell"
+                      :style="overlapCellStyle(getOverlapCell(rowMode, colMode)?.overlap ?? 0)"
+                    >
+                      {{
+                        ((getOverlapCell(rowMode, colMode)?.overlap ?? 0) * 100).toFixed(0)
+                      }}%
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p v-else class="mode-overlap-empty">Theme overlap data is unavailable.</p>
             </div>
           </div>
         </div>
@@ -243,6 +303,56 @@ void references;
 
 .tab-panel {
   animation: fadeIn 0.3s ease;
+}
+
+.mode-overlap-title {
+  margin: 0 0 var(--space-xs);
+  color: var(--text-strong);
+}
+
+.mode-overlap-subtitle {
+  margin: 0 0 var(--space-md);
+  color: var(--text-subtle);
+}
+
+.mode-overlap-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mode-overlap-row {
+  display: grid;
+  grid-template-columns: 120px repeat(5, minmax(100px, 1fr));
+  gap: 6px;
+}
+
+.mode-overlap-corner,
+.mode-overlap-head,
+.mode-overlap-label,
+.mode-overlap-cell {
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  text-align: center;
+  font-size: var(--text-xs);
+}
+
+.mode-overlap-corner,
+.mode-overlap-head,
+.mode-overlap-label {
+  background: rgba(var(--bg2-rgb), 0.35);
+  color: var(--text-strong);
+  font-weight: 700;
+}
+
+.mode-overlap-cell {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.mode-overlap-empty {
+  color: var(--text-subtle);
 }
 
 @keyframes fadeIn {

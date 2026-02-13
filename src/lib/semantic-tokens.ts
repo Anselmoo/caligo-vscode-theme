@@ -38,9 +38,11 @@ export function deriveSemanticTokenColors(p: DerivedPalette): SemanticTokenColor
     // ═══════════════════════════════════════════════════════════════════════
     function: p.harmony.functions,
     "function.declaration": p.harmony.functions,
+    "function.definition": p.harmony.functions,
     "function.async": p.harmony.functions,
     method: p.harmony.functions,
     "method.declaration": p.harmony.functions,
+    "method.definition": p.harmony.functions,
     "method.async": p.harmony.functions,
     "function.defaultLibrary": {
       foreground: p.harmony.functions,
@@ -51,13 +53,21 @@ export function deriveSemanticTokenColors(p: DerivedPalette): SemanticTokenColor
     // VARIABLES AND PARAMETERS
     // ═══════════════════════════════════════════════════════════════════════
     variable: p.harmony.variables,
+    "variable.declaration": p.harmony.variables,
+    "variable.definition": p.harmony.variables,
     parameter: p.harmony.variables,
+    "parameter.declaration": p.harmony.variables,
+    "parameter.definition": p.harmony.variables,
     "variable.readonly": p.harmony.constants,
     "variable.defaultLibrary": {
       foreground: p.harmony.constants,
       fontStyle: "bold",
     },
-    event: p.fgMuted,
+    "variable.readonly.defaultLibrary": {
+      foreground: p.harmony.constants,
+      fontStyle: "bold underline",
+    },
+    event: p.harmony.constants,
     label: p.harmony.keywords,
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -66,6 +76,15 @@ export function deriveSemanticTokenColors(p: DerivedPalette): SemanticTokenColor
     property: p.fg0,
     "property.readonly": p.harmony.constants,
     "property.declaration": p.fg0,
+    "property.definition": p.fg0,
+    "property.defaultLibrary": {
+      foreground: p.harmony.constants,
+      fontStyle: "bold",
+    },
+    "property.readonly.defaultLibrary": {
+      foreground: p.harmony.constants,
+      fontStyle: "bold underline",
+    },
     enumMember: p.harmony.constants,
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -78,7 +97,8 @@ export function deriveSemanticTokenColors(p: DerivedPalette): SemanticTokenColor
     // KEYWORDS AND OPERATORS
     // ═══════════════════════════════════════════════════════════════════════
     keyword: p.harmony.keywords,
-    operator: p.fgMuted,
+    modifier: p.harmony.keywords,
+    operator: p.harmony.keywords,
 
     // ═══════════════════════════════════════════════════════════════════════
     // NAMESPACES AND MODULES
@@ -115,10 +135,19 @@ export function deriveSemanticTokenColors(p: DerivedPalette): SemanticTokenColor
     "*.declaration": {
       fontStyle: "bold",
     },
+    "*.definition": {
+      fontStyle: "bold",
+    },
+    "*.readonly": {
+      fontStyle: "underline",
+    },
     "*.static": {
       fontStyle: "underline",
     },
     "*.abstract": {
+      fontStyle: "italic",
+    },
+    "*.async": {
       fontStyle: "italic",
     },
     "*.modification": {
@@ -126,6 +155,9 @@ export function deriveSemanticTokenColors(p: DerivedPalette): SemanticTokenColor
     },
     "*.documentation": {
       fontStyle: "italic",
+    },
+    "*.defaultLibrary": {
+      fontStyle: "bold",
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -161,6 +193,10 @@ export function deriveSemanticTokenColors(p: DerivedPalette): SemanticTokenColor
     "variable.readonly:typescript": {
       foreground: p.harmony.constants,
       fontStyle: "bold",
+    },
+    "variable.readonly.defaultLibrary:typescript": {
+      foreground: p.harmony.constants,
+      fontStyle: "bold underline",
     },
     "function.defaultLibrary:typescript": {
       foreground: p.harmony.functions,

@@ -23,15 +23,20 @@ export interface ContrastDataMap {
   [themeKey: string]: ContrastData;
 }
 
+type ContrastWindow = Window & {
+  __CALIGO_CONTRAST__?: ContrastDataMap;
+};
+
 export function useContrastData() {
   const baseUrl = import.meta.env.BASE_URL || "/";
   const contrastData = ref<ContrastDataMap>({});
   const isLoaded = ref(false);
 
   onMounted(async () => {
+    const contrastWindow = window as ContrastWindow;
     // Try to load from window global first (if available from analysis.html)
-    if (typeof window !== "undefined" && (window as any).__CALIGO_CONTRAST__) {
-      contrastData.value = (window as any).__CALIGO_CONTRAST__;
+    if (typeof window !== "undefined" && contrastWindow.__CALIGO_CONTRAST__) {
+      contrastData.value = contrastWindow.__CALIGO_CONTRAST__;
       isLoaded.value = true;
       return;
     }

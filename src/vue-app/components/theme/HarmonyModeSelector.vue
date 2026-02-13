@@ -4,6 +4,7 @@ import { useTheme } from "@/composables/useTheme";
 import type { ThemeHarmonyId, ThemeIndexEntry } from "@/types/theme";
 import { HARMONY_ICONS } from "@/utils/harmony-utils";
 
+// biome-ignore lint/correctness/noUnusedVariables: used in Vue template
 const { currentTheme, themes, setTheme, harmonies } = useTheme();
 
 const selectedHarmonyId = ref<ThemeHarmonyId>("balanced");

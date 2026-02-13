@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// biome-ignore lint/correctness/noUnusedVariables: used in Vue template
 const currentYear = new Date().getFullYear();
 </script>
 

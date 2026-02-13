@@ -3,8 +3,16 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import type { ThemeMode } from "./lib/constraints.js";
 import { wcagContrastRatio } from "./lib/contrast.js";
+import {
+  buildModeDistinctnessSample,
+  evaluateModeDistinctness,
+  harmonyModeToId,
+  type ModeDistinctnessSample,
+} from "./lib/mode-distinctness.js";
 import { type DerivedPalette, derivePalette } from "./lib/palette.js";
 import { expandSeedVariants, loadAllSeeds, loadSeedById } from "./lib/seeds.js";
+import { evaluateSemanticTokenQuality } from "./lib/semantic-token-quality.js";
+import type { SemanticTokenColors } from "./lib/semantic-tokens.js";
 import { buildVscodeThemeJson } from "./lib/vscode-theme.js";
 
 type CliArgs = {
@@ -63,7 +71,11 @@ function makeThemeFilename(seedId: string, _mode: ThemeMode): string {
   return `Caligo-${sanitizeIdForFilename(seedId)}.json`;
 }
 
-function buildContrastReport(p: DerivedPalette) {
+function buildContrastReport(
+  p: DerivedPalette,
+  semanticTokenColors: SemanticTokenColors,
+  modeDistinctnessSource: ModeDistinctnessSample
+) {
   return {
     seed: p.seed,
     mode: p.mode,
@@ -82,6 +94,8 @@ function buildContrastReport(p: DerivedPalette) {
       mutedOnBg1: wcagContrastRatio(p.fgMuted, p.bg1),
       lineNumbersOnBg: wcagContrastRatio(p.fgMuted, p.bg0),
     },
+    semanticQuality: evaluateSemanticTokenQuality(semanticTokenColors, p.bg0),
+    modeDistinctnessSource,
   };
 }
 
@@ -167,6 +181,7 @@ async function main(): Promise<void> {
   ]);
 
   const derived: DerivedPalette[] = [];
+  const modeDistinctnessSamples: ModeDistinctnessSample[] = [];
 
   for (const seed of normalizedSeeds) {
     // Generate base theme with seed's default harmony mode (labeled as "Balanced")
@@ -178,6 +193,13 @@ async function main(): Promise<void> {
     derived.push(basePalette);
 
     const baseTheme = buildVscodeThemeJson(basePalette);
+    const baseSemanticTokenColors = baseTheme.semanticTokenColors ?? {};
+    const baseModeDistinctness = buildModeDistinctnessSample(
+      seed.id,
+      "balanced",
+      basePalette,
+      baseSemanticTokenColors
+    );
     const baseFilename = makeThemeFilename(seed.id, mode);
 
     const baseThemeJson = `${JSON.stringify(baseTheme, null, 2)}\n`;
@@ -193,13 +215,18 @@ async function main(): Promise<void> {
       "utf8"
     );
 
-    const baseReport = buildContrastReport(basePalette);
+    const baseReport = buildContrastReport(
+      basePalette,
+      baseSemanticTokenColors,
+      baseModeDistinctness
+    );
     const baseReportJson = `${JSON.stringify(baseReport, null, 2)}\n`;
     await fs.writeFile(
       path.join(buildReportsDir, `${seed.id}-${mode}-report.json`),
       baseReportJson,
       "utf8"
     );
+    modeDistinctnessSamples.push(baseModeDistinctness);
 
     // Generate variant themes if variants are defined
     if (seed.variants && seed.variants.length > 0) {
@@ -220,6 +247,13 @@ async function main(): Promise<void> {
         derived.push(variantPalette);
 
         const variantTheme = buildVscodeThemeJson(variantPalette);
+        const variantSemanticTokenColors = variantTheme.semanticTokenColors ?? {};
+        const variantModeDistinctness = buildModeDistinctnessSample(
+          seed.id,
+          harmonyModeToId(variant.harmony ?? seed.harmony),
+          variantPalette,
+          variantSemanticTokenColors
+        );
         const variantFilename = makeThemeFilename(variantSeed.id, mode);
 
         const variantThemeJson = `${JSON.stringify(variantTheme, null, 2)}\n`;
@@ -235,16 +269,29 @@ async function main(): Promise<void> {
           "utf8"
         );
 
-        const variantReport = buildContrastReport(variantPalette);
+        const variantReport = buildContrastReport(
+          variantPalette,
+          variantSemanticTokenColors,
+          variantModeDistinctness
+        );
         const variantReportJson = `${JSON.stringify(variantReport, null, 2)}\n`;
         await fs.writeFile(
           path.join(buildReportsDir, `${variantSeed.id}-${mode}-report.json`),
           variantReportJson,
           "utf8"
         );
+        modeDistinctnessSamples.push(variantModeDistinctness);
       }
     }
   }
+
+  const modeDistinctnessReport = evaluateModeDistinctness(modeDistinctnessSamples);
+  const modeDistinctnessJson = `${JSON.stringify(modeDistinctnessReport, null, 2)}\n`;
+  await fs.writeFile(
+    path.join(buildReportsDir, "mode-distinctness.json"),
+    modeDistinctnessJson,
+    "utf8"
+  );
 }
 
 await main();
