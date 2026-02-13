@@ -3,7 +3,6 @@ import { computed } from "vue";
 import { useTheme } from "@/composables/useTheme";
 import type { CaligoTheme } from "@/types/theme";
 
-// biome-ignore lint/correctness/noUnusedVariables: used in Vue template
 const { currentTheme, themes, setTheme, themeIndex } = useTheme();
 
 const currentSeedId = computed(() => currentTheme.value?.seedId || "");
@@ -24,6 +23,7 @@ function handleSeedChange(event: Event) {
   }
 }
 void handleSeedChange;
+void themeIndex;
 </script>
 
 <template>

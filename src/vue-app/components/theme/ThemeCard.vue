@@ -8,16 +8,16 @@ interface Props {
 
 const props = defineProps<Props>();
 
-// biome-ignore lint/correctness/noUnusedVariables: used in Vue template
 const accentStyle = computed(() => ({
   backgroundColor: props.theme.colors.accent,
   color: props.theme.colors.bg0,
 }));
 
-// biome-ignore lint/correctness/noUnusedVariables: used in Vue template
 const coreColors = computed(() => {
   return props.theme.core.slice(0, 6); // Show first 6 core colors
 });
+void accentStyle;
+void coreColors;
 </script>
 
 <template>

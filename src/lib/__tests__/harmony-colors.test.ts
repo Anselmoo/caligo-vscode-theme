@@ -257,3 +257,17 @@ describe("harmony-colors", () => {
     });
   });
 });
+
+import { describe, expect, it } from "vitest";
+import { midpointHue } from "../harmony-colors.js";
+
+describe("midpointHue", () => {
+  it("returns the midpoint between two hues", () => {
+    expect(midpointHue(0, 60)).toBe(30);
+  });
+
+  it("handles wrap-around across 360 degrees", () => {
+    expect(midpointHue(350, 10)).toBe(0);
+    expect(midpointHue(10, 350)).toBe(0);
+  });
+});

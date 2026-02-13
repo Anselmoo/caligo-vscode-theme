@@ -9,6 +9,11 @@ import {
   type IntentEmphasis,
   validateIntentPaletteDistances,
 } from "../intent-layers.js";
+import {
+  deriveIntentPalette,
+  deriveIntentSemanticTokenColors,
+  inferFallbackIntent,
+} from "../intent-layers.js";
 
 describe("intent-layers", () => {
   describe("deriveIntentPalette", () => {
@@ -323,5 +328,16 @@ describe("intent-layers", () => {
       expect(balanced.meta).toBe(1.0);
       expect(balanced.documentation).toBe(1.0);
     });
+  });
+});
+
+describe("inferFallbackIntent", () => {
+  it("handles compound modifiers and language-specific selectors", () => {
+    expect(inferFallbackIntent("variable.readonly.defaultLibrary")).toBe("usage");
+    expect(inferFallbackIntent("property:css")).toBe("usage");
+  });
+
+  it("treats definition selectors as declarations", () => {
+    expect(inferFallbackIntent("function.definition")).toBe("declaration");
   });
 });

@@ -144,6 +144,14 @@ function normalizeHue(h: number): number {
 }
 
 /**
+ * Find the shortest midpoint between two hues, handling wrap-around at 360°.
+ */
+export function midpointHue(h1: number, h2: number): number {
+  const delta = ((h2 - h1 + 540) % 360) - 180;
+  return normalizeHue(h1 + delta / 2);
+}
+
+/**
  * Generate harmony hues from a base hue and mode.
  */
 export function getHarmonyHues(baseHue: number, mode: HarmonyMode): number[] {
@@ -162,10 +170,6 @@ function mapHuesToSyntaxRoles(
   baseHue: number,
   mode: HarmonyMode
 ): Record<keyof typeof SYNTAX_LC_DEFAULTS, number> {
-  const midpointHue = (h1: number, h2: number): number => {
-    const delta = ((h2 - h1 + 540) % 360) - 180;
-    return normalizeHue(h1 + delta / 2);
-  };
   const h = harmonyHues;
   const n = h.length;
 
