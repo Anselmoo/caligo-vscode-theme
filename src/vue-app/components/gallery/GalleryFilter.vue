@@ -20,21 +20,25 @@ interface Emits {
 defineProps<Props>();
 const emit = defineEmits<Emits>();
 
+// biome-ignore lint/correctness/noUnusedVariables: used in Vue template
 const handleSearchInput = (event: Event) => {
   const input = event.target as HTMLInputElement;
   emit("update:search", input.value);
 };
 
+// biome-ignore lint/correctness/noUnusedVariables: used in Vue template
 const handleSeedChange = (event: Event) => {
   const select = event.target as HTMLSelectElement;
   emit("update:seed", select.value);
 };
 
+// biome-ignore lint/correctness/noUnusedVariables: used in Vue template
 const handleHarmonyChange = (event: Event) => {
   const select = event.target as HTMLSelectElement;
   emit("update:harmony", select.value);
 };
 
+// biome-ignore lint/correctness/noUnusedVariables: used in Vue template
 const handleClear = () => {
   emit("clear");
 };

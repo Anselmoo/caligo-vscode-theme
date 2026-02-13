@@ -27,5 +27,12 @@ describe("deriveIntentSemanticTokenColors", () => {
     const depStyle = (tokens["*.deprecated"] as { fontStyle?: string }).fontStyle;
     expect(depStyle?.includes("italic")).toBe(true);
     expect(depStyle?.includes("strikethrough")).toBe(true);
+
+    expect((tokens["*.definition"] as { fontStyle?: string }).fontStyle).toBe("bold");
+    expect((tokens["*.readonly"] as { fontStyle?: string }).fontStyle).toBe("underline");
+    expect((tokens["*.defaultLibrary"] as { fontStyle?: string }).fontStyle).toBe("bold");
+    expect(tokens["function.definition"]).toBe(palette.declaration);
+    expect(tokens["variable.definition"]).toBe(palette.declaration);
+    expect(tokens.modifier).toBe(palette.controlFlow);
   });
 });

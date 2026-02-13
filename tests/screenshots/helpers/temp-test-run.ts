@@ -6,8 +6,10 @@ export function runScript(
   args: string[],
   cwd = process.cwd(),
   timeout = 5 * 60 * 1000
-): Promise<{ code: number | null; stdout: string; stderr: string } & { instrumentation?: any }> {
-  return new Promise((resolve, reject) => {
+): Promise<
+  { code: number | null; stdout: string; stderr: string } & { instrumentation?: unknown }
+> {
+  return new Promise((resolve, _reject) => {
     const cp = spawn("npx", ["tsx", "scripts/capture-vscode-screenshots-reuse.ts", ...args], {
       cwd,
       env: { ...process.env, CI: process.env.CI ?? "true" },

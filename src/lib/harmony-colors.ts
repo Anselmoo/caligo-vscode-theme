@@ -162,6 +162,10 @@ function mapHuesToSyntaxRoles(
   baseHue: number,
   mode: HarmonyMode
 ): Record<keyof typeof SYNTAX_LC_DEFAULTS, number> {
+  const midpointHue = (h1: number, h2: number): number => {
+    const delta = ((h2 - h1 + 540) % 360) - 180;
+    return normalizeHue(h1 + delta / 2);
+  };
   const h = harmonyHues;
   const n = h.length;
 
@@ -184,53 +188,61 @@ function mapHuesToSyntaxRoles(
 
   // For analogous (3 hues): distribute across roles
   if (n === 3 && mode === "analogous") {
+    const hLow = midpointHue(h[0], h[1]);
+    const hHigh = midpointHue(h[1], h[2]);
     return {
       strings: h[2], // +30 from base
       numbers: h[0], // -30 from base
       keywords: h[1], // base
-      functions: h[2], // +30 from base
-      types: h[0], // -30 from base
+      functions: hHigh, // midpoint between base and +30
+      types: hLow, // midpoint between -30 and base
       variables: h[1], // base (neutral)
       constants: h[2], // +30 from base
-      operators: h[1], // base (muted)
+      operators: hLow, // keep subtle but distinct from base
       comments: h[1], // base (muted)
       attributes: h[0], // -30 from base
-      tags: h[1], // base
+      tags: hHigh, // midpoint toward warm side
     };
   }
 
   // For triadic (3 hues): maximally different
   // IMPORTANT: Keywords use h[1] to avoid collision with accent (which uses baseHue = h[0])
   if (mode === "triadic") {
+    const h01 = midpointHue(h[0], h[1]);
+    const h12 = midpointHue(h[1], h[2]);
+    const h20 = midpointHue(h[2], h[0]);
     return {
-      strings: h[1], // +120 degrees
-      numbers: h[2], // +240 degrees
-      keywords: h[2], // +240 degrees (CHANGED: was h[0] which matched accent)
+      strings: h12, // midpoint between +120 and +240
+      numbers: h20, // midpoint between +240 and base
+      keywords: h[2], // +240 degrees
       functions: h[1], // +120 degrees
-      types: h[0], // base (swap with keywords for variety)
+      types: h01, // midpoint between base and +120
       variables: h[0], // base (neutral)
-      constants: h[2], // +240 degrees
-      operators: h[1], // +120 degrees (muted)
+      constants: h20, // complementary midpoint for contrast from keywords
+      operators: h01, // muted, but different from variables/comments
       comments: h[0], // base (muted)
       attributes: h[2], // +240 degrees
-      tags: h[1], // +120 degrees
+      tags: h12, // midpoint to prevent keyword/function collisions
     };
   }
 
   // For split-complementary (3 hues)
   if (mode === "split-complementary") {
+    const h01 = midpointHue(h[0], h[1]);
+    const h12 = midpointHue(h[1], h[2]);
+    const h20 = midpointHue(h[2], h[0]);
     return {
-      strings: h[1], // +150
-      numbers: h[2], // +210
+      strings: h01, // midpoint between base and +150
+      numbers: h12, // midpoint between +150 and +210
       keywords: h[0], // base
       functions: h[1], // +150
       types: h[2], // +210
-      variables: h[0], // base (neutral)
-      constants: h[0], // base
-      operators: h[0], // base (muted)
+      variables: h20, // midpoint between +210 and base
+      constants: h[1], // +150
+      operators: h20, // muted and distinct from keywords
       comments: h[0], // base (muted)
       attributes: h[2], // +210
-      tags: h[1], // +150
+      tags: h12, // midpoint toward cool flank
     };
   }
 
@@ -530,22 +542,22 @@ export function deriveHarmonyAccentShift(mode: HarmonyMode): HarmonyAccentShift 
     case "analogous":
       // Analogous: subtle shift within ±30° band, slightly cooler for distinction
       // Keeps UI cohesive with syntax colors while being noticeably different from "none"
-      return { hueOffset: -15, lightnessAdjust: 0.02, chromaMultiplier: 0.95 };
+      return { hueOffset: -20, lightnessAdjust: 0.02, chromaMultiplier: 0.95 };
 
     case "triadic":
-      // Triadic: shift to secondary harmony position (+120°) for vibrant contrast
+      // Triadic: shift to secondary harmony anchor (+120°) for strong mode identity
       // This creates a dramatically different UI feel while staying harmonious
-      return { hueOffset: 60, lightnessAdjust: 0, chromaMultiplier: 1.05 };
+      return { hueOffset: 120, lightnessAdjust: 0, chromaMultiplier: 1.05 };
 
     case "split-complementary":
-      // Split-complementary: shift toward the complement region (+165° = midpoint of 150° and 180°)
-      // Creates high contrast UI that pairs well with the syntax split-complement colors
-      return { hueOffset: 75, lightnessAdjust: -0.02, chromaMultiplier: 1.1 };
+      // Split-complementary: anchor around complement (+180°) for clear separation
+      // from triadic while preserving split-complement syntax relationships
+      return { hueOffset: 180, lightnessAdjust: -0.02, chromaMultiplier: 1.1 };
 
     case "monochromatic":
-      // Monochromatic: no hue shift, but increase saturation slightly for UI punch
-      // The mono look comes from syntax, UI accent can stay vivid as the "one color"
-      return { hueOffset: 0, lightnessAdjust: 0.03, chromaMultiplier: 1.15 };
+      // Monochromatic: keep a near-base hue but offset slightly for better
+      // separation from balanced mode while preserving monochrome character.
+      return { hueOffset: 8, lightnessAdjust: 0.03, chromaMultiplier: 1.2 };
 
     default:
       return { hueOffset: 0, lightnessAdjust: 0, chromaMultiplier: 1.0 };

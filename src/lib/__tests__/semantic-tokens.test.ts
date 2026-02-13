@@ -49,7 +49,7 @@ describe("deriveSemanticTokenColors", () => {
     const palette = derivePalette(testSeed, "Balanced");
     const tokens = deriveSemanticTokenColors(palette);
 
-    expect(tokens.event).toBe(palette.fgMuted);
+    expect(tokens.event).toBe(palette.harmony.constants);
     expect(tokens.label).toBe(palette.harmony.keywords);
   });
 
@@ -103,6 +103,10 @@ describe("deriveSemanticTokenColors", () => {
     expect((tokens["*.modification"] as { foreground?: string }).foreground).toBe(
       palette.harmony.variables
     );
+    expect((tokens["*.definition"] as { fontStyle?: string }).fontStyle).toBe("bold");
+    expect((tokens["*.readonly"] as { fontStyle?: string }).fontStyle).toBe("underline");
+    expect((tokens["*.async"] as { fontStyle?: string }).fontStyle).toBe("italic");
+    expect((tokens["*.defaultLibrary"] as { fontStyle?: string }).fontStyle).toBe("bold");
   });
 
   it("should include language-specific overrides", () => {
@@ -113,6 +117,22 @@ describe("deriveSemanticTokenColors", () => {
     expect(tokens["property:css"]).toBe(palette.harmony.attributes);
     expect((tokens["function.defaultLibrary"] as { fontStyle?: string }).fontStyle).toBe("bold");
     expect((tokens["parameter:python"] as { fontStyle?: string }).fontStyle).toBe("italic");
+    expect(
+      (tokens["variable.readonly.defaultLibrary:typescript"] as { fontStyle?: string }).fontStyle
+    ).toBe("bold underline");
+  });
+
+  it("should include definition and compound modifier coverage", () => {
+    const palette = derivePalette(testSeed, "Balanced");
+    const tokens = deriveSemanticTokenColors(palette);
+
+    expect(tokens["function.definition"]).toBe(palette.harmony.functions);
+    expect(tokens["method.definition"]).toBe(palette.harmony.functions);
+    expect(tokens["variable.definition"]).toBe(palette.harmony.variables);
+    expect(tokens["property.definition"]).toBe(palette.fg0);
+    expect(typeof tokens["variable.readonly.defaultLibrary"]).toBe("object");
+    expect(typeof tokens["property.readonly.defaultLibrary"]).toBe("object");
+    expect(tokens.modifier).toBe(palette.harmony.keywords);
   });
 
   it("should use different colors for triadic harmony mode", () => {

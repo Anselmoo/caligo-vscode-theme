@@ -1,6 +1,9 @@
-import { formatHex } from "culori";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
+import { oklch } from "../../lib/color.js";
+import type { Seed } from "../../lib/constraints.js";
+import { derivePalette } from "../../lib/palette.js";
+import type { HarmonyMode } from "../../types/harmony.js";
 import type { PreviewHarmonyMode, PreviewPalette, PreviewThemeSeed } from "../../types/preview.js";
 
 /**
@@ -78,7 +81,7 @@ export const useThemeStore = defineStore("theme", () => {
       seed: selectedSeed.value,
       harmony: selectedHarmony.value,
       hues,
-      colors: generateColorPalette(hues),
+      colors: generateColorPalette(hues, selectedHarmony.value.id),
     };
   });
 
@@ -93,58 +96,45 @@ export const useThemeStore = defineStore("theme", () => {
     if (harmony) selectedHarmony.value = harmony;
   }
 
-  function generateColorPalette(hues: number[]) {
-    const palette: Record<string, string> = {};
+  function toHarmonyMode(harmonyId: string): HarmonyMode {
+    if (
+      harmonyId === "analogous" ||
+      harmonyId === "monochromatic" ||
+      harmonyId === "triadic" ||
+      harmonyId === "split-complementary"
+    ) {
+      return harmonyId;
+    }
+    return "none";
+  }
 
-    // Use primary hue for base colors
+  function generateColorPalette(hues: number[], harmonyId: string) {
     const primaryHue = hues[0];
+    const seed: Seed = {
+      id: selectedSeed.value.name,
+      displayName: selectedSeed.value.description,
+      background: oklch(0.1, 0.02, primaryHue),
+      accent: oklch(0.65, 0.15, primaryHue),
+      harmony: toHarmonyMode(harmonyId),
+    };
+    const palette = derivePalette(seed, "Balanced");
 
-    // Background layers (low lightness, subtle hue tint)
-    palette.bg0 = formatHex({ mode: "oklch", l: 0.1, c: 0.02, h: primaryHue }) || "#000000";
-    palette.bg1 = formatHex({ mode: "oklch", l: 0.15, c: 0.025, h: primaryHue }) || "#0f0f0f";
-    palette.bg2 = formatHex({ mode: "oklch", l: 0.2, c: 0.03, h: primaryHue }) || "#1a1a1a";
-
-    // Foreground layers (high lightness, subtle hue tint)
-    palette.fg0 = formatHex({ mode: "oklch", l: 0.85, c: 0.05, h: primaryHue }) || "#d9d9d9";
-    palette.fgMuted = formatHex({ mode: "oklch", l: 0.6, c: 0.04, h: primaryHue }) || "#999999";
-    palette.fgDisabled = formatHex({ mode: "oklch", l: 0.35, c: 0.03, h: primaryHue }) || "#595959";
-
-    // Accent colors - use primary and secondary hues from harmony
-    palette.accent = formatHex({ mode: "oklch", l: 0.65, c: 0.15, h: primaryHue }) || "#8080ff";
-    palette.accentAlt =
-      formatHex({ mode: "oklch", l: 0.65, c: 0.15, h: hues[1] || primaryHue }) || "#ff8080";
-
-    // Semantic tokens - map to harmony hues for visual variety
-    // For Balanced (1 hue): use offset hues for variety
-    // For Analogous (3 hues): distribute across the 3 hues
-    // For Triadic (3 hues): distribute across the 3 hues
-    // For monochromatic: use same hue with different offsets
-    const semanticHues =
-      hues.length === 1
-        ? [
-            primaryHue,
-            (primaryHue + 30) % 360,
-            (primaryHue + 60) % 360,
-            (primaryHue + 90) % 360,
-            (primaryHue + 120) % 360,
-            (primaryHue + 150) % 360,
-          ]
-        : hues.length === 3
-          ? [hues[0], hues[1], hues[2], hues[0], hues[1], hues[2]]
-          : hues;
-
-    palette.declaration =
-      formatHex({ mode: "oklch", l: 0.65, c: 0.13, h: semanticHues[0] }) || "#9580ff";
-    palette.mutation =
-      formatHex({ mode: "oklch", l: 0.68, c: 0.12, h: semanticHues[1] }) || "#ff9580";
-    palette.usage = formatHex({ mode: "oklch", l: 0.7, c: 0.14, h: semanticHues[2] }) || "#80d4ff";
-    palette.control =
-      formatHex({ mode: "oklch", l: 0.65, c: 0.14, h: semanticHues[3] }) || "#8095ff";
-    palette.data = formatHex({ mode: "oklch", l: 0.68, c: 0.12, h: semanticHues[4] }) || "#ff80d4";
-    palette.literal =
-      formatHex({ mode: "oklch", l: 0.7, c: 0.13, h: semanticHues[5] }) || "#80ffaa";
-
-    return palette;
+    return {
+      bg0: palette.bg0,
+      bg1: palette.bg1,
+      bg2: palette.bg2,
+      fg0: palette.fg0,
+      fgMuted: palette.fgMuted,
+      fgDisabled: palette.fgMuted,
+      accent: palette.accent,
+      accentAlt: palette.accentSoft,
+      declaration: palette.harmony.types,
+      mutation: palette.harmony.keywords,
+      usage: palette.harmony.variables,
+      control: palette.harmony.keywords,
+      data: palette.harmony.numbers,
+      literal: palette.harmony.strings,
+    };
   }
 
   return {

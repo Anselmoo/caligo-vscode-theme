@@ -21,8 +21,21 @@ export interface OKLCHColor {
   inP3: boolean;
 }
 
+export interface ModeOverlapCell {
+  from: string;
+  to: string;
+  overlap: number;
+  distance: number;
+}
+
+export interface ModeOverlapHeatmap {
+  seedId: string;
+  modes: string[];
+  cells: ModeOverlapCell[];
+}
+
 export function useThemeAnalysis() {
-  const { currentTheme } = useTheme();
+  const { currentTheme, themes, harmonies } = useTheme();
 
   // Color converters - directly imported functions (not converter("mode") which gets tree-shaken)
   const toOKLCH = oklch;
@@ -106,6 +119,49 @@ export function useThemeAnalysis() {
     return theme?.harmonyLabel ?? "";
   });
 
+  const modeOverlapHeatmap = computed<ModeOverlapHeatmap | null>(() => {
+    const theme = currentTheme.value;
+    if (!theme) return null;
+
+    const sameSeed = themes.value.filter(t => t.seedId === theme.seedId);
+    const orderedModes = harmonies.value.map(h => h.id);
+    const availableModes = orderedModes.filter(mode => sameSeed.some(t => t.harmonyId === mode));
+    const probeKeys = ["accent", "keywords", "types", "functions", "strings", "decorator"] as const;
+
+    const themeByMode = new Map(sameSeed.map(t => [t.harmonyId, t]));
+    const cells: ModeOverlapCell[] = [];
+
+    for (const from of availableModes) {
+      for (const to of availableModes) {
+        if (from === to) {
+          cells.push({ from, to, overlap: 1, distance: 0 });
+          continue;
+        }
+
+        const a = themeByMode.get(from);
+        const b = themeByMode.get(to);
+        if (!a || !b) {
+          cells.push({ from, to, overlap: 0, distance: 1 });
+          continue;
+        }
+
+        const distances = probeKeys.map(key => deltaE(a.colors[key], b.colors[key]));
+        const avgDistance =
+          distances.length > 0
+            ? distances.reduce((sum, value) => sum + value, 0) / distances.length
+            : 0;
+        const overlap = Math.max(0, Math.min(1, 1 - avgDistance / 0.08));
+        cells.push({ from, to, overlap, distance: avgDistance });
+      }
+    }
+
+    return {
+      seedId: theme.seedId,
+      modes: availableModes,
+      cells,
+    };
+  });
+
   /**
    * Calculate deltaE (perceptual color difference in OKLCH)
    */
@@ -138,7 +194,7 @@ export function useThemeAnalysis() {
    * TODO: Implement mapping from theme schema once structure is known
    */
   function getSemanticRole(key: string, _hex: string): string {
-    // Deterministic mapping for the preview palette schema (themeStore.generateColorPalette).
+    // Deterministic mapping for manifest color keys used by the analysis UI.
     // This yields stable categories used by the analysis UI.
     if (key.startsWith("bg")) return "Background";
     if (key.startsWith("fg")) return "Foreground";
@@ -161,6 +217,7 @@ export function useThemeAnalysis() {
   return {
     oklchColors,
     harmonyMode,
+    modeOverlapHeatmap,
     deltaE,
     getAPCAContrast,
     getSemanticRole,

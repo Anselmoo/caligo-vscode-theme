@@ -2,7 +2,7 @@
   "name": "caligo-vscode-theme",
   "displayName": "Caligo Dark+ Theme",
   "description": "Perceptual dark themes with OKLCH-based harmony variants — 50 professionally crafted color schemes",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "publisher": "AnselmHahn",
   "author": {
     "name": "Anselm Hahn",
@@ -52,6 +52,7 @@
     "test:integration": "vitest run tests/integration",
     "test:coverage": "vitest run --coverage && tsx scripts/test-contrast.ts",
     "test:e2e": "NODE_OPTIONS=\"--require ./scripts/block-vitest-expect.cjs\" playwright test",
+    "test:semantic-snapshots": "NODE_OPTIONS=\"--require ./scripts/block-vitest-expect.cjs\" playwright test tests/preview-visual.spec.ts",
     "test:e2e:all": "ALL_BROWSERS=1 playwright test",
     "test:e2e:ui": "playwright test --ui",
     "build": "tsc -p .",

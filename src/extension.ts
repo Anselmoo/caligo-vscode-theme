@@ -1,7 +1,16 @@
 // Use vscode types directly in the extension host.
 import * as vscode from "vscode";
 
-export function activate(context: any) {
+function hasContentArg(arg: unknown): arg is { content: string } {
+  return (
+    typeof arg === "object" &&
+    arg !== null &&
+    "content" in arg &&
+    typeof (arg as Record<string, unknown>).content === "string"
+  );
+}
+
+export function activate(context: vscode.ExtensionContext) {
   console.log("Caligo test helper extension activated");
 
   const openFile = vscode.commands.registerCommand("caligo-test.openFile", async (arg: unknown) => {
@@ -14,8 +23,8 @@ export function activate(context: any) {
         return true;
       }
 
-      if (typeof arg === "object" && arg !== null && (arg as any).content) {
-        const content = (arg as any).content as string;
+      if (hasContentArg(arg)) {
+        const { content } = arg;
         const doc = await vscode.workspace.openTextDocument({ content, language: "typescript" });
         await vscode.window.showTextDocument(doc, { preview: false });
         return true;
