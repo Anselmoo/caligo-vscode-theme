@@ -19,9 +19,38 @@ const {
 const selectedToken = ref<string>("");
 const copyStatus = ref<"idle" | "success" | "error">("idle");
 const MAX_MAPPING_LINES = 6;
+const MAX_WHEEL_COLORS = 48;
+
+type ExportPaletteColor = {
+  key: string;
+  hex: string;
+};
+
+const exportedPaletteColors = computed<ExportPaletteColor[]>(() => {
+  const content = currentResult.value?.content ?? "";
+  const lines = content.split("\n");
+  const entries: ExportPaletteColor[] = [];
+  const seen = new Set<string>();
+
+  for (const line of lines) {
+    const hexMatch = line.match(/#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{8})/);
+    if (!hexMatch) continue;
+    const keyMatch = line.match(/["']?([a-zA-Z0-9._-]+)["']?\s*[:=]/);
+    const key = keyMatch?.[1] ?? `color-${entries.length + 1}`;
+    const hex = hexMatch[0];
+    const dedupeKey = `${key}|${hex.toLowerCase()}`;
+    if (seen.has(dedupeKey)) continue;
+    seen.add(dedupeKey);
+    entries.push({ key, hex });
+  }
+
+  if (entries.length) return entries.slice(0, MAX_WHEEL_COLORS);
+
+  return oklchColors.value.map(color => ({ key: color.key, hex: color.hex }));
+});
 
 watch(
-  oklchColors,
+  exportedPaletteColors,
   colors => {
     if (!colors.length) {
       selectedToken.value = "";
@@ -35,7 +64,7 @@ watch(
 );
 
 const selectedColor = computed(() =>
-  oklchColors.value.find(color => color.key === selectedToken.value)
+  exportedPaletteColors.value.find(color => color.key === selectedToken.value)
 );
 
 const selectedExportLines = computed(() => {
@@ -60,7 +89,8 @@ function lineMatchesToken(line: string, token: string): boolean {
 }
 
 function wheelDotStyle(index: number, hex: string): Record<string, string> {
-  const angle = (index / Math.max(oklchColors.value.length, 1)) * Math.PI * 2 - Math.PI / 2;
+  const angle =
+    (index / Math.max(exportedPaletteColors.value.length, 1)) * Math.PI * 2 - Math.PI / 2;
   const radius = 42;
   const x = 50 + Math.cos(angle) * radius;
   const y = 50 + Math.sin(angle) * radius;
@@ -70,6 +100,32 @@ function wheelDotStyle(index: number, hex: string): Record<string, string> {
     backgroundColor: hex,
   };
 }
+
+const wheelBackground = computed(() => {
+  const colors = exportedPaletteColors.value;
+  if (!colors.length) return "conic-gradient(#666, #999)";
+  return `conic-gradient(${colors
+    .map((color, index) => {
+      const start = (index / colors.length) * 100;
+      const end = ((index + 1) / colors.length) * 100;
+      return `${color.hex} ${start}% ${end}%`;
+    })
+    .join(", ")})`;
+});
+
+const selectedDetails = computed(() => {
+  const selected = selectedColor.value;
+  if (!selected) return null;
+  const matchingAnalysisColor = oklchColors.value.find(
+    color => color.key === selected.key || color.hex.toLowerCase() === selected.hex.toLowerCase()
+  );
+  return {
+    ...selected,
+    l: matchingAnalysisColor?.l,
+    c: matchingAnalysisColor?.c,
+    h: matchingAnalysisColor?.h,
+  };
+});
 
 async function copy() {
   copyStatus.value = (await copyCurrent()) ? "success" : "error";
@@ -89,10 +145,14 @@ void downloadCurrent;
 void copy;
 void copyStatus;
 void MAX_MAPPING_LINES;
+void MAX_WHEEL_COLORS;
 void selectedToken;
 void selectedColor;
+void selectedDetails;
+void exportedPaletteColors;
 void selectedExportLines;
 void wheelDotStyle;
+void wheelBackground;
 </script>
 
 <template>
@@ -107,9 +167,9 @@ void wheelDotStyle;
         <div class="export-top-grid">
           <article class="export-card">
             <h2>Color wheel</h2>
-            <div class="color-wheel" aria-label="Current theme colors">
+            <div class="color-wheel" aria-label="Current theme colors" :style="{ '--wheel-spectrum': wheelBackground }">
               <button
-                v-for="(color, index) in oklchColors"
+                v-for="(color, index) in exportedPaletteColors"
                 :key="color.key"
                 type="button"
                 class="color-wheel__dot"
@@ -119,27 +179,42 @@ void wheelDotStyle;
                 @click="selectedToken = color.key"
               />
               <div class="color-wheel__center">
-                <span>{{ selectedColor?.label ?? selectedColor?.key ?? "—" }}</span>
+                <span>{{ selectedDetails?.key ?? "—" }}</span>
               </div>
+            </div>
+            <div class="color-stars" aria-label="Full exported palette">
+              <button
+                v-for="color in exportedPaletteColors"
+                :key="`star-${color.key}-${color.hex}`"
+                type="button"
+                class="color-stars__item"
+                :class="{ 'color-stars__item--active': color.key === selectedToken }"
+                :style="{ color: color.hex }"
+                :aria-label="`Select ${color.key} (${color.hex})`"
+                @click="selectedToken = color.key"
+              >
+                ★
+              </button>
             </div>
           </article>
 
           <article class="export-card">
             <h2>Selected color</h2>
-            <template v-if="selectedColor">
+            <template v-if="selectedDetails">
               <div class="selected-color">
-                <div class="selected-color__swatch" :style="{ background: selectedColor.hex }" />
+                <div class="selected-color__swatch" :style="{ background: selectedDetails.hex }" />
                 <div>
-                  <div class="selected-color__token">{{ selectedColor.key }}</div>
-                  <div class="selected-color__hex">{{ selectedColor.hex }}</div>
+                  <div class="selected-color__token">{{ selectedDetails.key }}</div>
+                  <div class="selected-color__hex">{{ selectedDetails.hex }}</div>
                 </div>
               </div>
               <dl class="details-grid">
                 <dt>OKLCH</dt>
-                <dd>
-                  L {{ selectedColor.l.toFixed(3) }} · C {{ selectedColor.c.toFixed(3) }} · H
-                  {{ selectedColor.h.toFixed(1) }}
+                <dd v-if="typeof selectedDetails.l === 'number'">
+                  L {{ selectedDetails.l.toFixed(3) }} · C {{ (selectedDetails.c ?? 0).toFixed(3) }} ·
+                  H {{ (selectedDetails.h ?? 0).toFixed(1) }}
                 </dd>
+                <dd v-else>Not available for this export-only token.</dd>
                 <dt>Export mapping</dt>
                 <dd>
                   <code v-if="selectedExportLines.length">{{ selectedExportLines[0] }}</code>
@@ -173,6 +248,7 @@ void wheelDotStyle;
           <ExportPreview
             :content="currentResult?.content || ''"
             :highlight-token="selectedColor?.key ?? ''"
+            :is-json="selectedFormat.includes('json')"
           />
         </article>
       </div>
@@ -230,7 +306,9 @@ void wheelDotStyle;
   margin: 0 auto;
   border: 1px solid var(--border-color);
   border-radius: 50%;
-  background: radial-gradient(circle, rgb(var(--bg0-rgb) / 0.85), rgb(var(--bg1-rgb) / 0.55));
+  background:
+    radial-gradient(circle at center, rgb(var(--bg0-rgb) / 0.7) 0%, rgb(var(--bg0-rgb) / 0.88) 58%, rgb(var(--bg1-rgb) / 0.8) 100%),
+    var(--wheel-spectrum);
 }
 
 .color-wheel__dot {
@@ -258,6 +336,28 @@ void wheelDotStyle;
   color: var(--fg0);
   font-size: var(--text-sm);
   font-weight: 600;
+}
+
+.color-stars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  align-items: center;
+}
+
+.color-stars__item {
+  border: 0;
+  background: transparent;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.85;
+}
+
+.color-stars__item--active {
+  transform: scale(1.2);
+  opacity: 1;
+  text-shadow: 0 0 8px currentcolor;
 }
 
 .selected-color {
