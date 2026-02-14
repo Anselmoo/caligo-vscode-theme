@@ -119,6 +119,14 @@ body {
   background: var(--interactive-hover-strong);
 }
 
+.preview-control {
+  border: 1px solid var(--border-base);
+  border-radius: var(--radius-sm);
+  background: var(--interactive-hover);
+  color: var(--text-primary);
+  padding: var(--space-xs) var(--space-sm);
+}
+
 /* Fade transitions */
 .fade-enter-active,
 .fade-leave-active {

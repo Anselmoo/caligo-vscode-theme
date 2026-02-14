@@ -20,11 +20,12 @@ vi.mock("@/composables/useTheme", () => {
 });
 
 describe("ExportAllColors", () => {
-  it("renders all current theme colors and marks this panel as an export augment", () => {
+  it("renders all current theme colors and marks this panel as a secondary reference", () => {
     const wrapper = mount(ExportAllColors);
 
-    expect(wrapper.text()).toContain("All colors export");
-    expect(wrapper.text()).toContain("Augments Export palette");
+    expect(wrapper.text()).toContain("All color tokens (reference)");
+    expect(wrapper.text()).toContain("Secondary panel");
+    expect(wrapper.text()).toContain("Primary export lives inside the Core palette panel.");
     expect(wrapper.findAll(".export-all-colors__item")).toHaveLength(3);
     expect(wrapper.text()).toContain("#5eb3f6");
   });

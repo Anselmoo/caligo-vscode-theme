@@ -1,25 +1,106 @@
 <script setup lang="ts">
-// No props needed - colors come from CSS variables applied by useTheme
+import { computed, ref } from "vue";
+
+type Segment = { text: string; cls: string };
+
+const DEFAULT_SAMPLE = `@sealed
+
+export class Palette {
+  constructor(private readonly name: string) {}
+
+  render(): string {
+    return "Caligo: " + this.name;
+  }
+}
+
+// error throw new Error("Forbidden black");`;
+
+const isEditable = ref(false);
+const sampleSource = ref(DEFAULT_SAMPLE);
+
+function lineToSegments(line: string): Segment[] {
+  if (line.trim().startsWith("//")) {
+    return [{ text: line, cls: "tok-muted" }];
+  }
+
+  return line.split(/(\s+)/).map(chunk => {
+    if (!chunk || /^\s+$/.test(chunk)) return { text: chunk, cls: "" };
+    if (/^@\w+/.test(chunk)) return { text: chunk, cls: "tok-decorator" };
+    if (/^(export|class|constructor|private|readonly|return|this|new|throw)\b/.test(chunk)) {
+      return { text: chunk, cls: "tok-keyword" };
+    }
+    if (/^(Palette|string|Error)\b/.test(chunk)) return { text: chunk, cls: "tok-type" };
+    if (/^(render|name|sealed)\b/.test(chunk)) return { text: chunk, cls: "tok-fn" };
+    if (/^["'`].*["'`]$/.test(chunk) || chunk.includes('"') || chunk.includes("'")) {
+      return { text: chunk, cls: "tok-string" };
+    }
+    if (/^[{}()[\].;:+-]+$/.test(chunk)) return { text: chunk, cls: "tok-punct" };
+    return { text: chunk, cls: "" };
+  });
+}
+
+const highlightedLines = computed(() => sampleSource.value.split("\n").map(lineToSegments));
+
+function onToggleEditable() {
+  isEditable.value = !isEditable.value;
+}
+
+function onResetSample() {
+  sampleSource.value = DEFAULT_SAMPLE;
+}
+void highlightedLines;
+void onToggleEditable;
+void onResetSample;
 </script>
 
 <template>
   <div class="live-token-sample preview-panel">
     <div class="live-token-header">
-      <h3 class="live-token-title">Live token sample</h3>
-      <p class="live-token-subtitle">This snippet is colored by the currently selected theme.</p>
+      <div>
+        <h3 class="live-token-title">Live token sample</h3>
+        <p class="live-token-subtitle">Switch to editable mode to adjust code and preview token styling live.</p>
+      </div>
+      <div class="live-token-actions">
+        <button
+          class="preview-action-button"
+          type="button"
+          :aria-label="isEditable ? 'Switch to read-only mode' : 'Switch to editable mode'"
+          :aria-pressed="isEditable"
+          @click="onToggleEditable"
+        >
+          {{ isEditable ? 'Read-only mode' : 'Editable mode' }}
+        </button>
+        <button
+          v-if="isEditable"
+          class="preview-action-button"
+          type="button"
+          aria-label="Reset sample"
+          @click="onResetSample"
+        >
+          Reset sample
+        </button>
+      </div>
     </div>
-    
-    <pre class="sample-code"><span class="tok-decorator">@</span><span class="tok-fn">sealed</span>
 
-<span class="tok-keyword">export class</span> <span class="tok-type">Palette</span> <span class="tok-punct">{</span>
-  <span class="tok-keyword">constructor</span><span class="tok-punct">(</span><span class="tok-keyword">private readonly</span> <span class="tok-fn">name</span><span class="tok-punct">:</span> <span class="tok-type">string</span><span class="tok-punct">)</span> <span class="tok-punct">{}</span>
+    <textarea
+      v-if="isEditable"
+      v-model="sampleSource"
+      class="live-token-editor preview-control"
+      rows="8"
+      aria-label="Editable token sample code"
+      spellcheck="false"
+    ></textarea>
 
-  <span class="tok-fn">render</span><span class="tok-punct">():</span> <span class="tok-type">string</span> <span class="tok-punct">{</span>
-    <span class="tok-keyword">return</span> <span class="tok-string">"Caligo: "</span> <span class="tok-punct">+</span> <span class="tok-keyword">this</span><span class="tok-punct">.</span><span class="tok-fn">name</span><span class="tok-punct">;</span>
-  <span class="tok-punct">}</span>
-<span class="tok-punct">}</span>
-
-<span class="tok-muted">// error throw new Error("Forbidden black");</span></pre>
+    <pre class="sample-code"><code>
+<span
+  v-for="(line, lineIndex) in highlightedLines"
+  :key="`line-${lineIndex}`"
+  class="sample-line"
+><span
+  v-for="(segment, segmentIndex) in line"
+  :key="`segment-${lineIndex}-${segmentIndex}`"
+  :class="segment.cls"
+>{{ segment.text }}</span></span></code></pre>
   </div>
 </template>
 
@@ -30,6 +111,10 @@
 
 .live-token-header {
   margin-bottom: var(--space-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-md);
 }
 
 .live-token-title {
@@ -45,6 +130,23 @@
   margin: 0;
 }
 
+.live-token-actions {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.live-token-editor {
+  box-sizing: border-box;
+  font-family: var(--font-mono, 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  margin: 0 0 var(--space-md);
+  min-height: 180px;
+  resize: vertical;
+  width: 100%;
+}
+
 .sample-code {
   background: var(--bg0);
   padding: var(--space-lg);
@@ -53,12 +155,18 @@
   font-family: var(--font-mono, 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace);
   font-size: var(--text-sm);
   line-height: 1.6;
-  overflow-x: auto;
-  /* Keep the base “plain text” chromatic to avoid gray/white/black-looking output */
+  overflow: auto;
+  max-height: 420px;
   color: var(--syntax-types);
+  margin: 0;
+  white-space: pre-wrap;
 }
 
-/* Syntax highlighting using theme CSS variables */
+.sample-line {
+  display: block;
+  min-height: 1.6em;
+}
+
 .tok-keyword {
   color: var(--syntax-keywords);
   font-weight: 600;
@@ -80,10 +188,6 @@
   color: var(--syntax-decorator);
 }
 
-.tok-error {
-  color: var(--syntax-error);
-}
-
 .tok-muted {
   color: var(--syntax-decorator);
   font-style: italic;
@@ -91,5 +195,11 @@
 
 .tok-punct {
   color: var(--syntax-types);
+}
+
+@media (max-width: 640px) {
+  .live-token-header {
+    flex-direction: column;
+  }
 }
 </style>

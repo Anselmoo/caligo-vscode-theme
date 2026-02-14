@@ -5,6 +5,19 @@ import CopyDownload from "./CopyDownload.vue";
 import ExportPreview from "./ExportPreview.vue";
 import FormatSelector from "./FormatSelector.vue";
 
+withDefaults(
+  defineProps<{
+    embedded?: boolean;
+    title?: string;
+    subtitle?: string;
+  }>(),
+  {
+    embedded: false,
+    title: "Primary export",
+    subtitle: "Source of truth for palette export format and output.",
+  }
+);
+
 const {
   selectedFormat,
   availableFormats,
@@ -34,9 +47,12 @@ void copyStatus;
 </script>
 
 <template>
-  <div class="export-panel preview-panel">
+  <div :class="['export-panel', { 'preview-panel': !embedded, 'export-panel--embedded': embedded }]">
     <div class="export-panel__header">
-      <h3>Export palette</h3>
+      <div>
+        <h3>{{ title }}</h3>
+        <p class="export-panel__subtitle">{{ subtitle }}</p>
+      </div>
       <FormatSelector v-model="selectedFormat" :options="availableFormats" :labels="formatLabels" />
     </div>
     <ExportPreview :content="currentResult?.content || ''" />
@@ -55,6 +71,13 @@ void copyStatus;
   padding: var(--space-xl);
 }
 
+.export-panel--embedded {
+  padding: var(--space-lg);
+  border: 1px solid rgb(var(--fg0-rgb, 255 255 255) / 0.1);
+  border-radius: var(--radius-md);
+  background: rgb(var(--bg1-rgb, 0 0 0) / 0.35);
+}
+
 .export-panel__header {
   display: flex;
   justify-content: space-between;
@@ -64,6 +87,12 @@ void copyStatus;
 
 h3 {
   margin: 0;
+}
+
+.export-panel__subtitle {
+  margin: var(--space-xs) 0 0;
+  font-size: var(--text-xs);
+  color: var(--text-subtle);
 }
 
 .copy-status {

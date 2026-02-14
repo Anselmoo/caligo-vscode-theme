@@ -1,51 +1,24 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import { useTheme } from "@/composables/useTheme";
 
 const { currentTheme } = useTheme();
-const copyStatus = ref<"idle" | "success" | "error">("idle");
 
 const colors = computed(() => {
   if (!currentTheme.value?.colors) return [];
   return Object.entries(currentTheme.value.colors);
 });
-
-const exportedColors = computed(() => JSON.stringify(Object.fromEntries(colors.value), null, 2));
-
-async function copyAll() {
-  try {
-    await navigator.clipboard.writeText(exportedColors.value);
-    copyStatus.value = "success";
-  } catch {
-    copyStatus.value = "error";
-  }
-
-  setTimeout(() => {
-    copyStatus.value = "idle";
-  }, 2000);
-}
-
-function downloadAll() {
-  const blob = new Blob([exportedColors.value], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = `${currentTheme.value?.key ?? "theme"}-all-colors.json`;
-  anchor.click();
-  URL.revokeObjectURL(url);
-}
-void copyAll;
-void downloadAll;
+void colors;
 </script>
 
 <template>
   <div class="export-all-colors preview-panel">
     <div class="export-all-colors__header">
-      <h3>All colors export</h3>
-      <span class="export-all-colors__badge">Augments Export palette</span>
+      <h3>All color tokens (reference)</h3>
+      <span class="export-all-colors__badge">Secondary panel</span>
     </div>
     <p class="export-all-colors__subtitle">
-      Alternative UX option: preview all current theme colors in one place before export.
+      Inspect every token in one place. Primary export lives inside the Core palette panel.
     </p>
     <div class="export-all-colors__grid">
       <div
@@ -59,18 +32,6 @@ void downloadAll;
         </div>
         <code>{{ value }}</code>
       </div>
-    </div>
-    <p v-if="copyStatus === 'success'" class="copy-status copy-status--success">Copied to clipboard</p>
-    <p v-else-if="copyStatus === 'error'" class="copy-status copy-status--error">
-      Clipboard copy failed
-    </p>
-    <div class="export-all-colors__actions">
-      <button class="preview-action-button" type="button" :disabled="colors.length === 0" @click="copyAll">
-        Copy all
-      </button>
-      <button class="preview-action-button" type="button" :disabled="colors.length === 0" @click="downloadAll">
-        Download JSON
-      </button>
     </div>
   </div>
 </template>
@@ -142,23 +103,5 @@ h3 {
 code {
   color: var(--text-subtle);
   font-size: var(--text-xs);
-}
-
-.export-all-colors__actions {
-  display: flex;
-  gap: var(--space-sm);
-}
-
-.copy-status {
-  margin: 0;
-  font-size: var(--text-sm);
-}
-
-.copy-status--success {
-  color: var(--color-success);
-}
-
-.copy-status--error {
-  color: var(--color-error);
 }
 </style>

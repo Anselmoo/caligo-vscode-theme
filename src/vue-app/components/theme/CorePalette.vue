@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useTheme } from "@/composables/useTheme";
+import ExportPanel from "../export/ExportPanel.vue";
 
 const { currentTheme } = useTheme();
 
@@ -14,6 +15,7 @@ const themeName = computed(() => {
   return currentTheme.value?.displayName || "Theme";
 });
 void themeName;
+void ExportPanel;
 </script>
 
 <template>
@@ -43,6 +45,10 @@ void themeName;
         </div>
         <div class="core-hex">{{ color.hex.toLowerCase() }}</div>
       </div>
+    </div>
+
+    <div class="core-palette__export">
+      <ExportPanel embedded />
     </div>
   </div>
 </template>
@@ -90,6 +96,10 @@ void themeName;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: var(--space-md);
+}
+
+.core-palette__export {
+  margin-top: var(--space-lg);
 }
 
 .core-item {

@@ -20,7 +20,7 @@ void onChange;
 <template>
   <label class="format-selector">
     <span>Format</span>
-    <select :value="modelValue" @change="onChange">
+    <select class="preview-control" :value="modelValue" @change="onChange">
       <option v-for="option in options" :key="option" :value="option">
         {{ labels?.[option] ?? option }}
       </option>
@@ -34,11 +34,4 @@ void onChange;
   gap: var(--space-xs);
 }
 
-select {
-  background: var(--bg1);
-  color: var(--fg0);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  padding: var(--space-xs) var(--space-sm);
-}
 </style>
