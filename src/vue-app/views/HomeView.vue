@@ -59,7 +59,7 @@ void stats;
             <!-- CTA Buttons -->
             <div class="btn-row">
               <a
-                href="https://marketplace.visualstudio.com/items?itemName=anselmh.caligo-vscode-theme"
+                href="https://marketplace.visualstudio.com/items?itemName=AnselmHahn.caligo-vscode-theme"
                 class="btn btn--primary"
                 target="_blank"
                 rel="noopener noreferrer"
