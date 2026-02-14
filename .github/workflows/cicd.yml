@@ -598,7 +598,7 @@ jobs:
     needs: release-gate
     runs-on: ubuntu-latest
     environment:
-      name: github-pages
+      name: github-pages-release
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v6
