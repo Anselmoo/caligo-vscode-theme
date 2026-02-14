@@ -7,12 +7,8 @@ import {
   INTENT_EMPHASIS_MODES,
   INTENT_LAYERS,
   type IntentEmphasis,
-  validateIntentPaletteDistances,
-} from "../intent-layers.js";
-import {
-  deriveIntentPalette,
-  deriveIntentSemanticTokenColors,
   inferFallbackIntent,
+  validateIntentPaletteDistances,
 } from "../intent-layers.js";
 
 describe("intent-layers", () => {

@@ -6,6 +6,7 @@ import {
   HARMONY_MODES,
   HARMONY_OFFSETS,
   type HarmonyMode,
+  midpointHue,
   SYNTAX_LC_DEFAULTS,
 } from "../harmony-colors.js";
 
@@ -257,9 +258,6 @@ describe("harmony-colors", () => {
     });
   });
 });
-
-import { describe, expect, it } from "vitest";
-import { midpointHue } from "../harmony-colors.js";
 
 describe("midpointHue", () => {
   it("returns the midpoint between two hues", () => {
