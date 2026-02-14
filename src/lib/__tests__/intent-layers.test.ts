@@ -336,4 +336,24 @@ describe("inferFallbackIntent", () => {
   it("treats definition selectors as declarations", () => {
     expect(inferFallbackIntent("function.definition")).toBe("declaration");
   });
+
+  it("maps fallback mutation tokens", () => {
+    expect(inferFallbackIntent("macro")).toBe("mutation");
+  });
+
+  it("maps fallback control-flow tokens", () => {
+    expect(inferFallbackIntent("label")).toBe("controlFlow");
+    expect(inferFallbackIntent("event")).toBe("controlFlow");
+  });
+
+  it("maps fallback data and documentation tokens", () => {
+    expect(inferFallbackIntent("comment.documentation")).toBe("data");
+    expect(inferFallbackIntent("token.documentation.extra")).toBe("documentation");
+  });
+
+  it("maps fallback meta tokens and defaults unknown tokens to usage", () => {
+    expect(inferFallbackIntent("annotation")).toBe("meta");
+    expect(inferFallbackIntent("attribute.custom")).toBe("meta");
+    expect(inferFallbackIntent("unknown.custom.token")).toBe("usage");
+  });
 });
