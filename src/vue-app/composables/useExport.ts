@@ -1,11 +1,12 @@
 import { computed, ref } from "vue";
 import { derivePalette } from "../../core/palette.js";
-import { getFormatter } from "../../export/formatter-registry.js";
+import { EXPORT_FORMATTERS, getFormatter } from "../../export/formatter-registry.js";
 import type { ExportFormat, ExportResult } from "../../export/types.js";
 import type { HarmonyMode } from "../../types/harmony.js";
 import { useTheme } from "./useTheme.js";
 
 function toHarmonyMode(harmonyId: string): HarmonyMode {
+  if (harmonyId === "balanced") return "none";
   if (harmonyId === "analogous") return "analogous";
   if (harmonyId === "monochromatic") return "monochromatic";
   if (harmonyId === "triadic") return "triadic";
@@ -17,15 +18,16 @@ export function useExport() {
   const { currentTheme } = useTheme();
   const selectedFormat = ref<ExportFormat>("css-custom-properties");
 
-  const availableFormats = computed<ExportFormat[]>(() => [
-    "css-custom-properties",
-    "css-oklch",
-    "scss-variables",
-    "tailwind-config",
-    "design-tokens-w3c",
-    "json-flat",
-    "json-grouped",
-  ]);
+  const availableFormats = computed<ExportFormat[]>(() =>
+    EXPORT_FORMATTERS.map(formatter => formatter.format)
+  );
+
+  const formatLabels = computed<Record<ExportFormat, string>>(
+    () =>
+      Object.fromEntries(
+        EXPORT_FORMATTERS.map(formatter => [formatter.format, formatter.label])
+      ) as Record<ExportFormat, string>
+  );
 
   const currentResult = computed<ExportResult | null>(() => {
     if (!currentTheme.value) return null;
@@ -75,6 +77,7 @@ export function useExport() {
   return {
     selectedFormat,
     availableFormats,
+    formatLabels,
     currentResult,
     copyCurrent,
     downloadCurrent,

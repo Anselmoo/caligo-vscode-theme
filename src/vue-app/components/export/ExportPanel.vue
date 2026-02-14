@@ -1,32 +1,49 @@
 <script setup lang="ts">
+import { ref } from "vue";
 import { useExport } from "../../composables/useExport.js";
 import CopyDownload from "./CopyDownload.vue";
 import ExportPreview from "./ExportPreview.vue";
 import FormatSelector from "./FormatSelector.vue";
 
-const { selectedFormat, availableFormats, currentResult, copyCurrent, downloadCurrent } =
-  useExport();
+const {
+  selectedFormat,
+  availableFormats,
+  formatLabels,
+  currentResult,
+  copyCurrent,
+  downloadCurrent,
+} = useExport();
+const copyStatus = ref<"idle" | "success" | "error">("idle");
 
 async function copy() {
-  await copyCurrent();
+  copyStatus.value = (await copyCurrent()) ? "success" : "error";
+  setTimeout(() => {
+    copyStatus.value = "idle";
+  }, 2000);
 }
 void CopyDownload;
 void ExportPreview;
 void FormatSelector;
 void selectedFormat;
 void availableFormats;
+void formatLabels;
 void currentResult;
 void downloadCurrent;
 void copy;
+void copyStatus;
 </script>
 
 <template>
   <div class="export-panel">
     <div class="export-panel__header">
       <h3>Export palette</h3>
-      <FormatSelector v-model="selectedFormat" :options="availableFormats" />
+      <FormatSelector v-model="selectedFormat" :options="availableFormats" :labels="formatLabels" />
     </div>
     <ExportPreview :content="currentResult?.content || ''" />
+    <p v-if="copyStatus === 'success'" class="copy-status copy-status--success">Copied to clipboard</p>
+    <p v-else-if="copyStatus === 'error'" class="copy-status copy-status--error">
+      Clipboard copy failed
+    </p>
     <CopyDownload :disabled="!currentResult" @copy="copy" @download="downloadCurrent" />
   </div>
 </template>
@@ -50,5 +67,18 @@ void copy;
 
 h3 {
   margin: 0;
+}
+
+.copy-status {
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.copy-status--success {
+  color: var(--color-success);
+}
+
+.copy-status--error {
+  color: var(--color-error);
 }
 </style>

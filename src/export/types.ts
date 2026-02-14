@@ -10,10 +10,10 @@ export type ExportFormat =
   | "json-grouped";
 
 export interface ExportOptions {
+  /**
+   * Optional prefix applied to exported token names.
+   */
   prefix?: string;
-  includeRgb?: boolean;
-  includeOklchComments?: boolean;
-  groupBy?: "role" | "flat";
 }
 
 export interface ExportResult {

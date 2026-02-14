@@ -35,9 +35,10 @@ describe("export formatters", () => {
   it("generates W3C design tokens with color metadata", () => {
     const result = getFormatter("design-tokens-w3c").generate(palette);
     const parsed = JSON.parse(result.content) as {
-      caligo: { background: { base: { $value: { hex: string } } } };
+      caligo: { background: { base: { $value: { colorSpace: string; channels: number[] } } } };
     };
-    expect(parsed.caligo.background.base.$value.hex).toMatch(/^#[0-9a-f]{6}$/i);
+    expect(parsed.caligo.background.base.$value.colorSpace).toBe("srgb");
+    expect(parsed.caligo.background.base.$value.channels).toHaveLength(3);
   });
 
   it("generates grouped and flat json variants", () => {

@@ -4,6 +4,7 @@ import type { ExportFormat } from "../../../export/types.js";
 defineProps<{
   modelValue: ExportFormat;
   options: ExportFormat[];
+  labels?: Record<ExportFormat, string>;
 }>();
 
 const emit = defineEmits<{
@@ -20,7 +21,9 @@ void onChange;
   <label class="format-selector">
     <span>Format</span>
     <select :value="modelValue" @change="onChange">
-      <option v-for="option in options" :key="option" :value="option">{{ option }}</option>
+      <option v-for="option in options" :key="option" :value="option">
+        {{ labels?.[option] ?? option }}
+      </option>
     </select>
   </label>
 </template>
