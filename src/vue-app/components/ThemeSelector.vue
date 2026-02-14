@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useThemeStore } from "../stores/themeStore";
 
-// biome-ignore lint/correctness/noUnusedVariables: used in Vue template
 const themeStore = useThemeStore();
+void themeStore;
 </script>
 
 <template>

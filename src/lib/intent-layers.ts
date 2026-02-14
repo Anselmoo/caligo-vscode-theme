@@ -384,68 +384,68 @@ export function deriveIntentPaletteWithHarmony(
  * This replaces the syntax-based approach with intent-based coloring.
  * Now with language-specific intelligence via language mappers.
  */
+export function inferFallbackIntent(token: string): IntentLayer {
+  const selector = token.split(":", 1)[0];
+
+  if (
+    selector.includes(".declaration") ||
+    selector.includes(".definition") ||
+    /^(class|interface|type|enum|namespace|module|struct|typeParameter)$/.test(selector)
+  ) {
+    return "declaration";
+  }
+
+  if (
+    selector.includes(".modification") ||
+    selector === "operator" ||
+    selector === "decorator" ||
+    selector === "macro"
+  ) {
+    return "mutation";
+  }
+
+  if (
+    selector === "keyword" ||
+    selector.startsWith("keyword.") ||
+    selector === "label" ||
+    selector === "event"
+  ) {
+    return "controlFlow";
+  }
+
+  if (
+    selector === "string" ||
+    selector === "number" ||
+    selector === "regexp" ||
+    selector === "comment" ||
+    selector === "comment.documentation"
+  ) {
+    return "data";
+  }
+
+  if (selector.includes("documentation")) {
+    return "documentation";
+  }
+
+  if (selector.startsWith("parameter") || selector.startsWith("variable")) {
+    return "usage";
+  }
+
+  if (selector.startsWith("property") || selector.startsWith("method")) {
+    return "usage";
+  }
+
+  if (selector.startsWith("attribute") || selector.startsWith("annotation")) {
+    return "meta";
+  }
+
+  return "usage";
+}
+
 export function deriveIntentSemanticTokenColors(
   palette: DerivedIntentPalette,
   fgMuted: string
 ): Record<string, string | { foreground?: string; fontStyle?: string }> {
-  const inferFallbackIntent = (token: string): IntentLayer => {
-    const selector = token.split(":", 1)[0];
-
-    if (
-      selector.includes(".declaration") ||
-      selector.includes(".definition") ||
-      /^(class|interface|type|enum|namespace|module|struct|typeParameter)$/.test(selector)
-    ) {
-      return "declaration";
-    }
-
-    if (
-      selector.includes(".modification") ||
-      selector === "operator" ||
-      selector === "decorator" ||
-      selector === "macro"
-    ) {
-      return "mutation";
-    }
-
-    if (
-      selector === "keyword" ||
-      selector.startsWith("keyword.") ||
-      selector === "label" ||
-      selector === "event"
-    ) {
-      return "controlFlow";
-    }
-
-    if (
-      selector === "string" ||
-      selector === "number" ||
-      selector === "regexp" ||
-      selector === "comment" ||
-      selector === "comment.documentation"
-    ) {
-      return "data";
-    }
-
-    if (selector.includes("documentation")) {
-      return "documentation";
-    }
-
-    if (selector.startsWith("parameter") || selector.startsWith("variable")) {
-      return "usage";
-    }
-
-    if (selector.startsWith("property") || selector.startsWith("method")) {
-      return "usage";
-    }
-
-    if (selector.startsWith("attribute") || selector.startsWith("annotation")) {
-      return "meta";
-    }
-
-    return "usage";
-  };
-
   const getIntentColor = (token: string): string => {
     const intent = SEMANTIC_TOKEN_TO_INTENT[token] ?? inferFallbackIntent(token);
     return palette[intent];

@@ -6,6 +6,7 @@ import {
   HARMONY_MODES,
   HARMONY_OFFSETS,
   type HarmonyMode,
+  midpointHue,
   SYNTAX_LC_DEFAULTS,
 } from "../harmony-colors.js";
 
@@ -255,5 +256,16 @@ describe("harmony-colors", () => {
       expect(HARMONY_MODES).toContain("split-complementary");
       expect(HARMONY_MODES).toContain("monochromatic");
     });
+  });
+});
+
+describe("midpointHue", () => {
+  it("returns the midpoint between two hues", () => {
+    expect(midpointHue(0, 60)).toBe(30);
+  });
+
+  it("handles wrap-around across 360 degrees", () => {
+    expect(midpointHue(350, 10)).toBe(0);
+    expect(midpointHue(10, 350)).toBe(0);
   });
 });

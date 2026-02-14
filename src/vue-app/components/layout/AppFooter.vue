@@ -1,6 +1,6 @@
 <script setup lang="ts">
-// biome-ignore lint/correctness/noUnusedVariables: used in Vue template
 const currentYear = new Date().getFullYear();
+void currentYear;
 </script>
 
 <template>
@@ -17,7 +17,7 @@ const currentYear = new Date().getFullYear();
         </div>
         <div class="footer-links">
           <a 
-            href="https://marketplace.visualstudio.com/items?itemName=anselmh.caligo-vscode-theme"
+            href="https://marketplace.visualstudio.com/items?itemName=AnselmHahn.caligo-vscode-theme"
             target="_blank"
             rel="noopener noreferrer"
             class="footer-link"

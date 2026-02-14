@@ -105,6 +105,7 @@ export const useThemeStore = defineStore("theme", () => {
     ) {
       return harmonyId;
     }
+    // The preview palette generator uses HarmonyMode="none" to represent the balanced base.
     return "none";
   }
 

@@ -36,6 +36,8 @@ export interface ModeOverlapHeatmap {
 
 export function useThemeAnalysis() {
   const { currentTheme, themes, harmonies } = useTheme();
+  // Calibrated normalization factor for mapping deltaE distances to overlap percentages.
+  const MODE_OVERLAP_MAX_DISTANCE = 0.08;
 
   // Color converters - directly imported functions (not converter("mode") which gets tree-shaken)
   const toOKLCH = oklch;
@@ -150,7 +152,7 @@ export function useThemeAnalysis() {
           distances.length > 0
             ? distances.reduce((sum, value) => sum + value, 0) / distances.length
             : 0;
-        const overlap = Math.max(0, Math.min(1, 1 - avgDistance / 0.08));
+        const overlap = Math.max(0, Math.min(1, 1 - avgDistance / MODE_OVERLAP_MAX_DISTANCE));
         cells.push({ from, to, overlap, distance: avgDistance });
       }
     }

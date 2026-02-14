@@ -7,6 +7,7 @@ import {
   INTENT_EMPHASIS_MODES,
   INTENT_LAYERS,
   type IntentEmphasis,
+  inferFallbackIntent,
   validateIntentPaletteDistances,
 } from "../intent-layers.js";
 
@@ -323,5 +324,36 @@ describe("intent-layers", () => {
       expect(balanced.meta).toBe(1.0);
       expect(balanced.documentation).toBe(1.0);
     });
+  });
+});
+
+describe("inferFallbackIntent", () => {
+  it("handles compound modifiers and language-specific selectors", () => {
+    expect(inferFallbackIntent("variable.readonly.defaultLibrary")).toBe("usage");
+    expect(inferFallbackIntent("property:css")).toBe("usage");
+  });
+
+  it("treats definition selectors as declarations", () => {
+    expect(inferFallbackIntent("function.definition")).toBe("declaration");
+  });
+
+  it("maps fallback mutation tokens", () => {
+    expect(inferFallbackIntent("macro")).toBe("mutation");
+  });
+
+  it("maps fallback control-flow tokens", () => {
+    expect(inferFallbackIntent("label")).toBe("controlFlow");
+    expect(inferFallbackIntent("event")).toBe("controlFlow");
+  });
+
+  it("maps fallback data and documentation tokens", () => {
+    expect(inferFallbackIntent("comment.documentation")).toBe("data");
+    expect(inferFallbackIntent("token.documentation.extra")).toBe("documentation");
+  });
+
+  it("maps fallback meta tokens and defaults unknown tokens to usage", () => {
+    expect(inferFallbackIntent("annotation")).toBe("meta");
+    expect(inferFallbackIntent("attribute.custom")).toBe("meta");
+    expect(inferFallbackIntent("unknown.custom.token")).toBe("usage");
   });
 });
