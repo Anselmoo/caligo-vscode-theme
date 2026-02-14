@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <div class="live-token-sample">
+  <div class="live-token-sample preview-panel">
     <div class="live-token-header">
       <h3 class="live-token-title">Live token sample</h3>
       <p class="live-token-subtitle">This snippet is colored by the currently selected theme.</p>
@@ -25,9 +25,6 @@
 
 <style scoped>
 .live-token-sample {
-  background: var(--bg1);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
   padding: var(--space-xl);
 }
 

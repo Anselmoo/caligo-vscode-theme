@@ -17,7 +17,7 @@ void themeName;
 </script>
 
 <template>
-  <div class="core-palette">
+  <div class="core-palette preview-panel">
     <div class="core-palette__header">
       <div>
         <div class="core-palette__title">Core palette</div>
@@ -49,9 +49,6 @@ void themeName;
 
 <style scoped>
 .core-palette {
-  background: rgba(var(--bg2-rgb, 255, 255, 255), 0.3);
-  border: 1px solid rgba(var(--fg0-rgb, 255, 255, 255), 0.1);
-  border-radius: var(--radius-lg);
   padding: var(--space-xl);
 }
 

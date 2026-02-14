@@ -12,8 +12,8 @@ void emit;
 
 <template>
   <div class="copy-download">
-    <button type="button" :disabled="disabled" @click="emit('copy')">Copy</button>
-    <button type="button" :disabled="disabled" @click="emit('download')">Download</button>
+    <button class="preview-action-button" type="button" :disabled="disabled" @click="emit('copy')">Copy</button>
+    <button class="preview-action-button" type="button" :disabled="disabled" @click="emit('download')">Download</button>
   </div>
 </template>
 
@@ -21,15 +21,6 @@ void emit;
 .copy-download {
   display: flex;
   gap: var(--space-sm);
-}
-
-button {
-  background: var(--bg1);
-  color: var(--fg0);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  padding: var(--space-xs) var(--space-sm);
-  cursor: pointer;
 }
 
 button:disabled {

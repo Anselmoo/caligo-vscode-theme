@@ -98,6 +98,27 @@ body {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+.preview-panel {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: rgb(var(--bg2-rgb, 255 255 255) / 0.3);
+  box-shadow: 0 8px 24px var(--shadow-sm);
+}
+
+.preview-action-button {
+  border: 1px solid var(--border-base);
+  border-radius: var(--radius-sm);
+  background: var(--interactive-hover);
+  color: var(--text-primary);
+  padding: var(--space-xs) var(--space-sm);
+  cursor: pointer;
+}
+
+.preview-action-button:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--interactive-hover-strong);
+}
+
 /* Fade transitions */
 .fade-enter-active,
 .fade-leave-active {

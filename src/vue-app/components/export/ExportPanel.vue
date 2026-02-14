@@ -34,7 +34,7 @@ void copyStatus;
 </script>
 
 <template>
-  <div class="export-panel">
+  <div class="export-panel preview-panel">
     <div class="export-panel__header">
       <h3>Export palette</h3>
       <FormatSelector v-model="selectedFormat" :options="availableFormats" :labels="formatLabels" />
@@ -53,9 +53,6 @@ void copyStatus;
   display: grid;
   gap: var(--space-md);
   padding: var(--space-xl);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  background: rgb(var(--bg2-rgb, 255 255 255) / 0.3);
 }
 
 .export-panel__header {

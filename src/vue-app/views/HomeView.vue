@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import ExportAllColors from "../components/export/ExportAllColors.vue";
 import ExportPanel from "../components/export/ExportPanel.vue";
 import CorePalette from "../components/theme/CorePalette.vue";
 import LiveTokenSample from "../components/theme/LiveTokenSample.vue";
@@ -18,6 +19,7 @@ const stats = computed(() => ({
 // Some TS configurations (and editor diagnostics) don't account for template usage
 // when reporting noUnusedLocals in <script setup>.
 void CorePalette;
+void ExportAllColors;
 void ExportPanel;
 void LiveTokenSample;
 void ThemeSpectrum;
@@ -108,6 +110,7 @@ void stats;
           <CorePalette />
           <LiveTokenSample />
           <ExportPanel />
+          <ExportAllColors />
         </div>
       </div>
     </section>
