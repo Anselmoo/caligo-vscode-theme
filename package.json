@@ -85,7 +85,7 @@
   "dependencies": {
     "apca-w3": "^0.1.9",
     "chart.js": "^4.5.1",
-    "culori": "^2.1.1",
+    "culori": "^4.0.2",
     "d3-scale": "^4.0.2",
     "pinia": "^3.0.4",
     "primeicons": "^7.0.0",
