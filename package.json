@@ -31,7 +31,7 @@
   "type": "module",
   "main": "./build/extension.js",
   "engines": {
-    "vscode": "^1.108.0"
+    "vscode": "^1.999.0"
   },
   "icon": "images/icon.png",
   "galleryBanner": {
@@ -98,7 +98,7 @@
     "@playwright/test": "^1.57.0",
     "@types/d3-scale": "^3.3.5",
     "@types/node": "^20.3.1",
-    "@types/vscode": "^1.108.1",
+    "@types/vscode": "^1.109.0",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vitest/coverage-v8": "^4.0.18",
     "@vscode/test-cli": "^0.0.11",
