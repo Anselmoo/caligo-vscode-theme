@@ -1,7 +1,7 @@
 import { computed, ref } from "vue";
+import { derivePalette } from "../../core/palette.js";
 import { getFormatter } from "../../export/formatter-registry.js";
 import type { ExportFormat, ExportResult } from "../../export/types.js";
-import { derivePalette } from "../../lib/palette.js";
 import type { HarmonyMode } from "../../types/harmony.js";
 import { useTheme } from "./useTheme.js";
 
