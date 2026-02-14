@@ -38,6 +38,16 @@ const routes: RouteRecordRaw[] = [
     },
   },
   {
+    path: "/export",
+    name: "export",
+    component: () => import(/* webpackChunkName: "export" */ "../views/ExportView.vue"),
+    meta: {
+      title: "Export — Caligo Themes",
+      description: "Export current Caligo colors in standards-based formats",
+      transition: "slide-left",
+    },
+  },
+  {
     path: "/:pathMatch(.*)*",
     name: "not-found",
     component: () => import(/* webpackChunkName: "not-found" */ "../views/NotFoundView.vue"),
