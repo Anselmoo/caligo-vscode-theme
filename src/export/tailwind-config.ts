@@ -16,7 +16,17 @@ export const tailwindConfigFormatter: ExportFormatter = {
         Object.fromEntries(Object.entries(group).map(([key, token]) => [key, token.hex])),
       ])
     );
-    const content = `export default {\n  theme: {\n    extend: {\n      colors: ${JSON.stringify(colors, null, 8)},\n    },\n  },\n};\n`;
+    const content = `export default ${JSON.stringify(
+      {
+        theme: {
+          extend: {
+            colors,
+          },
+        },
+      },
+      null,
+      2
+    )};\n`;
 
     return {
       format: "tailwind-config",

@@ -29,8 +29,8 @@ function hexToRgb(hex: string): [number, number, number] {
           .map(ch => `${ch}${ch}`)
           .join("")
       : clean;
-  const value = Number.parseInt(normalized, 16);
-  return [(value >> 16) & 255, (value >> 8) & 255, value & 255];
+  const rgbInt = Number.parseInt(normalized, 16);
+  return [(rgbInt >> 16) & 255, (rgbInt >> 8) & 255, rgbInt & 255];
 }
 
 export function toSrgbComponents(hex: string): [number, number, number] {

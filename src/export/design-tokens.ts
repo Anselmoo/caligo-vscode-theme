@@ -6,7 +6,7 @@ function toTokenValue(hex: string) {
   const components = toSrgbComponents(hex);
   return {
     colorSpace: "srgb",
-    components: components.map(value => Number(value.toFixed(3))),
+    components: components.map(component => Number(component.toFixed(3))),
     hex,
   };
 }

@@ -38,7 +38,7 @@ void copy;
   padding: var(--space-xl);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  background: rgba(var(--bg2-rgb, 255, 255, 255), 0.3);
+  background: rgb(var(--bg2-rgb, 255 255 255) / 0.3);
 }
 
 .export-panel__header {
