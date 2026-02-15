@@ -25,12 +25,12 @@ if (outputDirRaw.includes("..")) {
 
 // Resolve and validate the final path is within the repository
 const packageDir = path.join(repoRoot, outputDirRaw);
-const normalizedPackageDir = path.normalize(packageDir);
-const normalizedRepoRoot = path.normalize(repoRoot);
+const relativePath = path.relative(repoRoot, packageDir);
 
-if (!normalizedPackageDir.startsWith(normalizedRepoRoot + path.sep)) {
+// Check if relative path escapes the repository (starts with .. or is absolute)
+if (relativePath.startsWith("..") || path.isAbsolute(relativePath)) {
   throw new Error(
-    `CALIGO_THEME_DATA_OUTPUT_DIR must resolve to a subdirectory within the repository. Got: ${normalizedPackageDir}`
+    `CALIGO_THEME_DATA_OUTPUT_DIR must resolve to a subdirectory within the repository. Got: ${packageDir}`
   );
 }
 

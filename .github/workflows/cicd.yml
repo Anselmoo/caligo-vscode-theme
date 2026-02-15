@@ -639,7 +639,7 @@ jobs:
         if: always()
         run: |
           echo "### GHCR Docker Image" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.build-push.outcome }}" == "success" ]; then
+          if [[ "${{ steps.build-push.outcome }}" == "success" ]]; then
             echo "✅ Docker image pushed for ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
             echo "🔗 ghcr.io/${{ steps.image.outputs.owner_lc }}/caligo-vscode-playwright:${{ steps.image.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           else
@@ -686,7 +686,7 @@ jobs:
         if: always()
         run: |
           echo "### GitHub Packages (npm)" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.npm-publish.outcome }}" == "success" ]; then
+          if [[ "${{ steps.npm-publish.outcome }}" == "success" ]]; then
             echo "✅ @anselmoo/caligo-theme-data published for ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ @anselmoo/caligo-theme-data publish failed for ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
