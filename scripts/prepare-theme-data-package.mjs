@@ -6,10 +6,34 @@ const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(scriptDir, "..");
 const rootPackagePath = path.join(repoRoot, "package.json");
 const sourceThemesDir = path.join(repoRoot, "themes");
-const packageDir = path.join(
-  repoRoot,
-  process.env.CALIGO_THEME_DATA_OUTPUT_DIR ?? "build/github-packages/caligo-theme-data"
-);
+
+// Validate CALIGO_THEME_DATA_OUTPUT_DIR to prevent directory traversal attacks
+const outputDirRaw =
+  process.env.CALIGO_THEME_DATA_OUTPUT_DIR ?? "build/github-packages/caligo-theme-data";
+
+// Reject absolute paths
+if (path.isAbsolute(outputDirRaw)) {
+  throw new Error(`CALIGO_THEME_DATA_OUTPUT_DIR must be a relative path, got: ${outputDirRaw}`);
+}
+
+// Reject parent directory traversal
+if (outputDirRaw.includes("..")) {
+  throw new Error(
+    `CALIGO_THEME_DATA_OUTPUT_DIR must not contain parent directory references (..), got: ${outputDirRaw}`
+  );
+}
+
+// Resolve and validate the final path is within the repository
+const packageDir = path.join(repoRoot, outputDirRaw);
+const normalizedPackageDir = path.normalize(packageDir);
+const normalizedRepoRoot = path.normalize(repoRoot);
+
+if (!normalizedPackageDir.startsWith(normalizedRepoRoot + path.sep)) {
+  throw new Error(
+    `CALIGO_THEME_DATA_OUTPUT_DIR must resolve to a subdirectory within the repository. Got: ${normalizedPackageDir}`
+  );
+}
+
 const distDir = path.join(packageDir, "dist");
 const distThemesDir = path.join(distDir, "themes");
 const manifestPath = path.join(distDir, "manifest.json");
