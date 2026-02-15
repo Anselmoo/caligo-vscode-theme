@@ -178,12 +178,12 @@ void tokenizeStructuredLine;
 }
 
 .export-preview__token--key {
-  color: var(--syntax-keywords, var(--caligo-syntax-keywords, #8db4d0));
+  color: var(--syntax-keywords, var(--caligo-syntax-keywords, var(--accent)));
   font-weight: 600;
 }
 
 .export-preview__token--string {
-  color: var(--syntax-strings, var(--caligo-syntax-strings, #ffa659));
+  color: var(--syntax-strings, var(--caligo-syntax-strings, var(--accent)));
 }
 
 .export-preview__token--comment {
@@ -192,19 +192,19 @@ void tokenizeStructuredLine;
 }
 
 .export-preview__token--variable {
-  color: var(--syntax-keywords, var(--caligo-syntax-keywords, #8db4d0));
+  color: var(--syntax-keywords, var(--caligo-syntax-keywords, var(--accent)));
 }
 
 .export-preview__token--function {
-  color: var(--syntax-functions, var(--caligo-syntax-functions, #ff96a9));
+  color: var(--syntax-functions, var(--caligo-syntax-functions, var(--accent)));
 }
 
 .export-preview__token--hex {
-  color: var(--accent, var(--caligo-accent, #ff9a69));
+  color: var(--accent, var(--caligo-accent, var(--fg0)));
 }
 
 .export-preview__token--number,
 .export-preview__token--keyword {
-  color: var(--syntax-types, var(--caligo-syntax-types, #8db4d0));
+  color: var(--syntax-types, var(--caligo-syntax-types, var(--accent)));
 }
 </style>

@@ -69,13 +69,17 @@ void emit;
 }
 
 .copy-download__button--copy {
-  color: var(--syntax-keywords, var(--caligo-syntax-keywords, #8db4d0));
-  border-color: color-mix(in oklab, var(--syntax-keywords, var(--caligo-syntax-keywords, #8db4d0)) 35%, var(--border-color));
+  color: var(--syntax-keywords, var(--caligo-syntax-keywords, var(--accent)));
+  border-color: color-mix(
+    in oklab,
+    var(--syntax-keywords, var(--caligo-syntax-keywords, var(--accent))) 35%,
+    var(--border-color)
+  );
 }
 
 .copy-download__button--download {
-  color: var(--accent, var(--caligo-accent, #ff9a69));
-  border-color: color-mix(in oklab, var(--accent, var(--caligo-accent, #ff9a69)) 35%, var(--border-color));
+  color: var(--accent, var(--caligo-accent, var(--fg0)));
+  border-color: color-mix(in oklab, var(--accent, var(--caligo-accent, var(--fg0))) 35%, var(--border-color));
 }
 
 .copy-download__button--disabled,
