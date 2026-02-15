@@ -126,12 +126,29 @@ Everything else (Vue app, reports, screenshots, social cards, SVG sources, tests
 
 ## Publication Checklist
 
-- [ ] All changes are in `src/` (no generated artifacts tracked)
+- [ ] Source changes are in `src/`/`scripts/` with no generated artifacts tracked
 - [ ] `npm run build` completed successfully
 - [ ] `npm run generate` completed successfully
 - [ ] `npm test` completed successfully
 - [ ] No `build/*` or `themes/*` files are staged
 - [ ] Local commits squashed to a single `Initial Commit`
+
+## Release Pipeline (tags)
+
+Pushing a semantic tag (`v*.*.*`) triggers release jobs for:
+
+- GitHub Release + VSIX upload
+- VS Code Marketplace publish
+- GitHub Pages release deploy (intentionally independent from GHCR/npm publish jobs)
+- GHCR Docker image publish (`ghcr.io/<owner>/caligo-vscode-playwright`)
+- GitHub Packages npm publish (`@anselmoo/caligo-theme-data`)
+
+Notes:
+
+- Root `package.json` is the only version source for release artifacts.
+- GitHub Packages publish uses a generated temporary workspace under `build/github-packages/caligo-theme-data`.
+- Its generated content is release-only and must not be committed.
+- Ensure `VSCE_PAT` is configured in repository secrets for Marketplace publishing.
 
 ## What NOT to Commit
 

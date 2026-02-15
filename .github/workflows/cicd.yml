@@ -523,6 +523,9 @@ jobs:
     if: ${{ needs.release-gate.outputs.ready == 'true' }}
     needs: release-gate
     runs-on: ubuntu-latest
+    environment:
+      name: github-release
+      url: https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}
     permissions:
       contents: write
     steps:
@@ -571,6 +574,9 @@ jobs:
     if: ${{ needs.release-gate.outputs.ready == 'true' }}
     needs: release-gate
     runs-on: ubuntu-latest
+    environment:
+      name: vscode-marketplace-release
+      url: https://marketplace.visualstudio.com/items?itemName=AnselmHahn.caligo-vscode-theme
     steps:
       - name: Download VSIX artifact
         uses: actions/download-artifact@v7
@@ -592,6 +598,102 @@ jobs:
           echo "✅ Version ${{ github.ref_name }} published to Marketplace" >> $GITHUB_STEP_SUMMARY
           echo "🔗 https://marketplace.visualstudio.com/items?itemName=AnselmHahn.caligo-vscode-theme" >> $GITHUB_STEP_SUMMARY
 
+  release-ghcr:
+    name: Release - GHCR Docker Image
+    if: ${{ needs.release-gate.outputs.ready == 'true' }}
+    needs: release-gate
+    runs-on: ubuntu-latest
+    environment:
+      name: ghcr-release
+      url: https://github.com/${{ github.repository_owner }}?tab=packages&repo_name=${{ github.event.repository.name }}
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.ref }}
+      - name: Compute image coordinates
+        id: image
+        run: |
+          echo "owner_lc=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
+          echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push image
+        id: build-push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: tools/docker/vscode-playwright.Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ steps.image.outputs.owner_lc }}/caligo-vscode-playwright:${{ github.ref_name }}
+            ghcr.io/${{ steps.image.outputs.owner_lc }}/caligo-vscode-playwright:${{ steps.image.outputs.version }}
+            ghcr.io/${{ steps.image.outputs.owner_lc }}/caligo-vscode-playwright:latest
+      - name: GHCR release summary
+        if: always()
+        run: |
+          echo "### GHCR Docker Image" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ steps.build-push.outcome }}" == "success" ]]; then
+            echo "✅ Docker image pushed for ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+            echo "🔗 ghcr.io/${{ steps.image.outputs.owner_lc }}/caligo-vscode-playwright:${{ steps.image.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Docker image push failed for ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  release-github-packages:
+    name: Release - GitHub Packages (npm)
+    if: ${{ needs.release-gate.outputs.ready == 'true' }}
+    needs: release-gate
+    runs-on: ubuntu-latest
+    environment:
+      name: github-packages-release
+      url: https://github.com/${{ github.repository_owner }}?tab=packages&repo_name=${{ github.event.repository.name }}
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.ref }}
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.13.1
+          cache: npm
+          registry-url: https://npm.pkg.github.com
+          scope: '@anselmoo'
+      - run: npm ci
+      - name: Build and generate themes
+        run: |
+          npm run build
+          npm run generate
+      - name: Prepare temporary npm publish workspace
+        run: npm run package:theme-data:prepare
+        env:
+          CALIGO_THEME_DATA_VERSION: ${{ github.ref_name }}
+      - name: Publish package
+        id: npm-publish
+        run: npm publish ./build/github-packages/caligo-theme-data
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: GitHub Packages release summary
+        if: always()
+        run: |
+          echo "### GitHub Packages (npm)" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ steps.npm-publish.outcome }}" == "success" ]]; then
+            echo "✅ @anselmoo/caligo-theme-data published for ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ @anselmoo/caligo-theme-data publish failed for ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  # Keep Pages independent from package/image publishing:
+  # release-pages must run from release-gate even if release-ghcr or release-github-packages fails.
   release-pages:
     name: Release - Deploy Pages
     if: ${{ needs.release-gate.outputs.ready == 'true' }}
@@ -640,6 +742,7 @@ jobs:
         run: |
           echo "### Release Pages" >> $GITHUB_STEP_SUMMARY
           echo "✅ Pages release deployment completed for ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "ℹ️ Pages deployment is intentionally independent from GHCR/npm publish jobs" >> $GITHUB_STEP_SUMMARY
           echo "🔗 https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/" >> $GITHUB_STEP_SUMMARY
 
   release-sbom:
