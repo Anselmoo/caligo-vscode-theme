@@ -76,6 +76,7 @@
     "screenshots:placeholders": "npx tsx scripts/fill-screenshot-placeholders.ts",
     "marketplace:package": "vsce package --no-dependencies",
     "marketplace:publish": "vsce publish --no-dependencies",
+    "package:theme-data:prepare": "node ./scripts/prepare-theme-data-package.mjs",
     "vscode:prepublish": "npm run build && npm run generate && npm run test",
     "ci": "npm run lint && npm run lint:colors && npm run check:underscores && npm run test && npm run generate",
     "release": "standard-version",

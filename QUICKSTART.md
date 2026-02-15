@@ -60,6 +60,24 @@ npm run lint               # Lint check
 | `npm test`         | Run unit tests                   |
 | `npm run lint`     | Run Biome linter                 |
 
+## Release Automation (Tag-based)
+
+Release jobs run when you push a `v*.*.*` tag.
+
+- GitHub Release (VSIX attachment)
+- VS Code Marketplace publish
+- GitHub Pages release deployment (independent from GHCR/npm publish jobs)
+- GHCR image publish: `ghcr.io/<owner>/caligo-vscode-playwright`
+- GitHub Packages npm publish: `@anselmoo/caligo-theme-data`
+
+Required repository secret:
+
+- `VSCE_PAT` for Marketplace publish
+
+Versioning note:
+
+- Root `package.json` is the only version source; GitHub Packages publish uses a generated temporary manifest during release workflow.
+
 ## Project Structure
 
 ```
