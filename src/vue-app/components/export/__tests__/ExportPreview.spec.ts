@@ -29,4 +29,42 @@ describe("ExportPreview", () => {
     expect(wrapper.find(".export-preview__token--hex").text()).toContain("#ffaa33");
     expect(wrapper.find(".export-preview__token--keyword").text()).toContain("true");
   });
+
+  it("auto-detects JSON content for syntax coloring when isJson is omitted", () => {
+    const wrapper = mount(ExportPreview, {
+      props: {
+        content: '{\n  "accent": "#ffaa33",\n  "enabled": true\n}',
+      },
+    });
+
+    expect(wrapper.find(".export-preview__token--key").exists()).toBe(true);
+    expect(wrapper.find(".export-preview__token--hex").text()).toContain("#ffaa33");
+    expect(wrapper.find(".export-preview__token--keyword").text()).toContain("true");
+  });
+
+  it("enables JSON tokenization for known JSON export formats", () => {
+    const wrapper = mount(ExportPreview, {
+      props: {
+        content: '{\n  "accent": "#ffaa33",\n  "enabled": true\n}',
+        exportFormat: "design-tokens-w3c",
+      },
+    });
+
+    expect(wrapper.find(".export-preview__token--key").exists()).toBe(true);
+    expect(wrapper.find(".export-preview__token--hex").text()).toContain("#ffaa33");
+    expect(wrapper.find(".export-preview__token--keyword").text()).toContain("true");
+  });
+
+  it("applies semantic token coloring for non-JSON export formats", () => {
+    const wrapper = mount(ExportPreview, {
+      props: {
+        content: "$caligo-bg-base: #100f20; // core background",
+        exportFormat: "scss-variables",
+      },
+    });
+
+    expect(wrapper.find(".export-preview__token--variable").text()).toContain("$caligo-bg-base");
+    expect(wrapper.find(".export-preview__token--hex").text()).toContain("#100f20");
+    expect(wrapper.find(".export-preview__token--comment").text()).toContain("// core background");
+  });
 });

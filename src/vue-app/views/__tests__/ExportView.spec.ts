@@ -39,11 +39,26 @@ vi.mock("../../composables/useExport.js", () => {
 });
 
 describe("ExportView", () => {
-  it("renders wheel and star palette from exported content colors", () => {
+  it("renders semantic matrix swatches from exported content colors", () => {
     const wrapper = mount(ExportView);
 
-    expect(wrapper.findAll(".color-wheel__dot")).toHaveLength(3);
-    expect(wrapper.findAll(".color-stars__item")).toHaveLength(3);
+    expect(wrapper.findAll(".semantic-matrix__swatch")).toHaveLength(3);
+    expect(wrapper.text()).toContain("Accent");
+    expect(wrapper.text()).toContain("Other");
     expect(wrapper.text()).toContain("caligo-bg-base");
+  });
+
+  it("updates selected token details when a matrix swatch is chosen", async () => {
+    const wrapper = mount(ExportView);
+
+    const swatches = wrapper.findAll(".semantic-matrix__swatch");
+    expect(swatches).toHaveLength(3);
+
+    expect(wrapper.text()).toContain("caligo-bg-base");
+
+    await swatches[2].trigger("click");
+
+    expect(wrapper.text()).toContain("caligo-accent");
+    expect(wrapper.text()).toContain("#ffaa33");
   });
 });

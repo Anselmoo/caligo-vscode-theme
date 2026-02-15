@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
+import type { ExportFormat } from "../../export/types.js";
 import CopyDownload from "../components/export/CopyDownload.vue";
 import ExportPreview from "../components/export/ExportPreview.vue";
 import FormatSelector from "../components/export/FormatSelector.vue";
@@ -20,6 +21,32 @@ const selectedToken = ref<string>("");
 const copyStatus = ref<"idle" | "success" | "error">("idle");
 const MAX_MAPPING_LINES = 6;
 const MAX_WHEEL_COLORS = 48;
+
+const JSON_EXPORT_FORMATS = new Set<ExportFormat>([
+  "design-tokens-w3c",
+  "json-flat",
+  "json-grouped",
+]);
+
+type TokenGroup = "background" | "foreground" | "syntax" | "semantic" | "accent" | "other";
+
+const SEMANTIC_GROUP_ORDER: TokenGroup[] = [
+  "background",
+  "foreground",
+  "syntax",
+  "semantic",
+  "accent",
+  "other",
+];
+
+const SEMANTIC_GROUP_LABELS: Record<TokenGroup, string> = {
+  background: "Background",
+  foreground: "Foreground",
+  syntax: "Syntax",
+  semantic: "Status",
+  accent: "Accent",
+  other: "Other",
+};
 
 type ExportPaletteColor = {
   key: string;
@@ -67,6 +94,61 @@ const selectedColor = computed(() =>
   exportedPaletteColors.value.find(color => color.key === selectedToken.value)
 );
 
+type MatrixDisplayColor = ExportPaletteColor & {
+  hue: number | null;
+  group: TokenGroup;
+};
+
+const matrixColors = computed<MatrixDisplayColor[]>(() => {
+  const enriched = exportedPaletteColors.value.map(color => {
+    const matchingAnalysisColor = oklchColors.value.find(
+      analysisColor =>
+        analysisColor.key === color.key ||
+        analysisColor.hex.toLowerCase() === color.hex.toLowerCase()
+    );
+    const hue = typeof matchingAnalysisColor?.h === "number" ? matchingAnalysisColor.h : null;
+    const group = classifyTokenGroup(color.key);
+
+    return {
+      ...color,
+      hue,
+      group,
+    };
+  });
+
+  return enriched.sort((a, b) => {
+    if (a.group !== b.group) {
+      return SEMANTIC_GROUP_ORDER.indexOf(a.group) - SEMANTIC_GROUP_ORDER.indexOf(b.group);
+    }
+    if (typeof a.hue === "number" && typeof b.hue === "number" && a.hue !== b.hue) {
+      return a.hue - b.hue;
+    }
+    return a.key.localeCompare(b.key);
+  });
+});
+
+const semanticMatrixSections = computed(() =>
+  SEMANTIC_GROUP_ORDER.map(group => ({
+    group,
+    label: SEMANTIC_GROUP_LABELS[group],
+    tokens: matrixColors.value.filter(color => color.group === group),
+  })).filter(section => section.tokens.length > 0)
+);
+
+const isJsonLikeExport = computed(() => {
+  const result = currentResult.value;
+  if (!result) return false;
+
+  const mimeType = result.mimeType.toLowerCase();
+  const filename = result.filename.toLowerCase();
+
+  return (
+    JSON_EXPORT_FORMATS.has(result.format) ||
+    mimeType.includes("json") ||
+    filename.endsWith(".json")
+  );
+});
+
 const selectedExportLines = computed(() => {
   if (!selectedColor.value || !currentResult.value?.content) return [];
   return currentResult.value.content
@@ -88,30 +170,17 @@ function lineMatchesToken(line: string, token: string): boolean {
   );
 }
 
-function wheelDotStyle(index: number, hex: string): Record<string, string> {
-  const angle =
-    (index / Math.max(exportedPaletteColors.value.length, 1)) * Math.PI * 2 - Math.PI / 2;
-  const radius = 42;
-  const x = 50 + Math.cos(angle) * radius;
-  const y = 50 + Math.sin(angle) * radius;
-  return {
-    left: `${x}%`,
-    top: `${y}%`,
-    backgroundColor: hex,
-  };
+function classifyTokenGroup(rawKey: string): TokenGroup {
+  const normalized = rawKey.replace(/^--?caligo-/, "").toLowerCase();
+  if (normalized.startsWith("bg-")) return "background";
+  if (normalized.startsWith("fg-")) return "foreground";
+  if (normalized.startsWith("syntax-")) return "syntax";
+  if (["error", "warning", "success", "info"].some(prefix => normalized.startsWith(prefix))) {
+    return "semantic";
+  }
+  if (normalized.includes("accent")) return "accent";
+  return "other";
 }
-
-const wheelBackground = computed(() => {
-  const colors = exportedPaletteColors.value;
-  if (!colors.length) return "conic-gradient(#666, #999)";
-  return `conic-gradient(${colors
-    .map((color, index) => {
-      const start = (index / colors.length) * 100;
-      const end = ((index + 1) / colors.length) * 100;
-      return `${color.hex} ${start}% ${end}%`;
-    })
-    .join(", ")})`;
-});
 
 const selectedDetails = computed(() => {
   const selected = selectedColor.value;
@@ -146,13 +215,17 @@ void copy;
 void copyStatus;
 void MAX_MAPPING_LINES;
 void MAX_WHEEL_COLORS;
+void SEMANTIC_GROUP_ORDER;
+void SEMANTIC_GROUP_LABELS;
 void selectedToken;
 void selectedColor;
 void selectedDetails;
 void exportedPaletteColors;
+void matrixColors;
+void semanticMatrixSections;
 void selectedExportLines;
-void wheelDotStyle;
-void wheelBackground;
+void isJsonLikeExport;
+void classifyTokenGroup;
 </script>
 
 <template>
@@ -161,40 +234,35 @@ void wheelBackground;
       <div class="container">
         <h1 class="section-title">Export</h1>
         <p class="section-subtitle text-subtle">
-          Select a token from the wheel to inspect details and highlight matching entries in the
+          Select a token from the matrix to inspect details and highlight matching entries in the
           exported payload.
         </p>
         <div class="export-top-grid">
           <article class="export-card">
-            <h2>Color wheel</h2>
-            <div class="color-wheel" aria-label="Current theme colors" :style="{ '--wheel-spectrum': wheelBackground }">
-              <button
-                v-for="(color, index) in exportedPaletteColors"
-                :key="color.key"
-                type="button"
-                class="color-wheel__dot"
-                :class="{ 'color-wheel__dot--active': color.key === selectedToken }"
-                :style="wheelDotStyle(index, color.hex)"
-                :aria-label="`Select ${color.label ?? color.key} (${color.hex})`"
-                @click="selectedToken = color.key"
-              />
-              <div class="color-wheel__center">
-                <span>{{ selectedDetails?.key ?? "—" }}</span>
+            <h2>Semantic token matrix</h2>
+            <p class="text-subtle semantic-matrix__hint">
+              Tokens are grouped by role. Pick a swatch to inspect details and export mappings.
+            </p>
+            <div class="semantic-matrix" aria-label="Theme tokens grouped by semantics">
+              <div v-for="section in semanticMatrixSections" :key="section.group" class="semantic-matrix__row">
+                <div class="semantic-matrix__header">
+                  <strong>{{ section.label }}</strong>
+                  <span class="semantic-matrix__count">{{ section.tokens.length }}</span>
+                </div>
+                <div class="semantic-matrix__swatches">
+                  <button
+                    v-for="token in section.tokens"
+                    :key="token.key"
+                    type="button"
+                    class="semantic-matrix__swatch"
+                    :class="{ 'semantic-matrix__swatch--active': token.key === selectedToken }"
+                    :style="{ backgroundColor: token.hex }"
+                    :title="`${token.key} · ${token.hex}`"
+                    :aria-label="`Select ${token.key} (${token.hex})`"
+                    @click="selectedToken = token.key"
+                  />
+                </div>
               </div>
-            </div>
-            <div class="color-stars" aria-label="Full exported palette">
-              <button
-                v-for="color in exportedPaletteColors"
-                :key="`star-${color.key}-${color.hex}`"
-                type="button"
-                class="color-stars__item"
-                :class="{ 'color-stars__item--active': color.key === selectedToken }"
-                :style="{ color: color.hex }"
-                :aria-label="`Select ${color.key} (${color.hex})`"
-                @click="selectedToken = color.key"
-              >
-                ★
-              </button>
             </div>
           </article>
 
@@ -217,7 +285,15 @@ void wheelBackground;
                 <dd v-else>Not available for this export-only token.</dd>
                 <dt>Export mapping</dt>
                 <dd>
-                  <code v-if="selectedExportLines.length">{{ selectedExportLines[0] }}</code>
+                  <template v-if="selectedExportLines.length">
+                    <code
+                      v-for="line in selectedExportLines"
+                      :key="line"
+                      class="details-grid__code"
+                    >
+                      {{ line }}
+                    </code>
+                  </template>
                   <span v-else class="text-subtle">No direct token match in this formatter.</span>
                 </dd>
               </dl>
@@ -227,7 +303,7 @@ void wheelBackground;
       </div>
     </section>
 
-    <section class="section">
+    <section class="section section--tight">
       <div class="container">
         <article class="export-card export-card--payload">
           <div class="export-actions">
@@ -248,7 +324,8 @@ void wheelBackground;
           <ExportPreview
             :content="currentResult?.content || ''"
             :highlight-token="selectedColor?.key ?? ''"
-            :is-json="selectedFormat.includes('json')"
+            :is-json="isJsonLikeExport"
+            :export-format="currentResult?.format"
           />
         </article>
       </div>
@@ -263,6 +340,10 @@ void wheelBackground;
 
 .section {
   padding: var(--space-3xl) 0;
+}
+
+.section--tight {
+  padding-top: var(--space-lg);
 }
 
 .section-title {
@@ -291,7 +372,7 @@ void wheelBackground;
   padding: var(--space-xl);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  background: rgb(var(--bg2-rgb, 255 255 255) / 0.3);
+  background: rgba(var(--bg2-rgb, 255, 255, 255), 0.3);
 }
 
 .export-card h2 {
@@ -299,65 +380,54 @@ void wheelBackground;
   font-size: var(--text-xl);
 }
 
-.color-wheel {
-  position: relative;
-  width: min(100%, 420px);
-  aspect-ratio: 1;
-  margin: 0 auto;
-  border: 1px solid var(--border-color);
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at center, rgb(var(--bg0-rgb) / 0.7) 0%, rgb(var(--bg0-rgb) / 0.88) 58%, rgb(var(--bg1-rgb) / 0.8) 100%),
-    var(--wheel-spectrum);
+.semantic-matrix {
+  display: grid;
+  gap: var(--space-md);
 }
 
-.color-wheel__dot {
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  border: 2px solid var(--bg0);
-  transform: translate(-50%, -50%);
-  cursor: pointer;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+.semantic-matrix__hint {
+  margin: 0;
 }
 
-.color-wheel__dot:hover,
-.color-wheel__dot--active {
-  transform: translate(-50%, -50%) scale(1.3);
-  box-shadow: 0 0 0 2px var(--fg0);
+.semantic-matrix__row {
+  display: grid;
+  gap: var(--space-xs);
 }
 
-.color-wheel__center {
-  position: absolute;
-  inset: 50% auto auto 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  color: var(--fg0);
+.semantic-matrix__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-size: var(--text-sm);
-  font-weight: 600;
 }
 
-.color-stars {
+.semantic-matrix__count {
+  color: var(--fg-muted);
+  font-family: var(--font-mono);
+}
+
+.semantic-matrix__swatches {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-xs);
-  align-items: center;
+  gap: 8px;
 }
 
-.color-stars__item {
-  border: 0;
-  background: transparent;
-  font-size: 18px;
-  line-height: 1;
+.semantic-matrix__swatch {
+  width: 24px;
+  height: 24px;
+  box-sizing: border-box;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(var(--bg0-rgb), 0.45);
   cursor: pointer;
-  opacity: 0.85;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-.color-stars__item--active {
-  transform: scale(1.2);
-  opacity: 1;
-  text-shadow: 0 0 8px currentcolor;
+.semantic-matrix__swatch:hover,
+.semantic-matrix__swatch--active {
+  border-color: color-mix(in oklab, var(--accent) 78%, var(--bg0));
+  box-shadow:
+    0 0 0 2px color-mix(in oklab, var(--accent) 70%, transparent),
+    inset 0 0 0 1px rgba(var(--bg0-rgb), 0.6);
 }
 
 .selected-color {
@@ -398,6 +468,15 @@ void wheelBackground;
   font-family: var(--font-mono);
   font-size: var(--text-sm);
   overflow-wrap: anywhere;
+}
+
+.details-grid__code {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.details-grid__code:last-child {
+  margin-bottom: 0;
 }
 
 .export-card--payload {
