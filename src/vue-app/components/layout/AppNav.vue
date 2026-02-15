@@ -10,6 +10,7 @@ const navItems = [
   { path: "/", label: "Home", name: "home" },
   { path: "/gallery", label: "Gallery", name: "gallery" },
   { path: "/analysis", label: "Analysis", name: "analysis" },
+  { path: "/export", label: "Export", name: "export" },
 ];
 
 const isActive = (name: string) => {
