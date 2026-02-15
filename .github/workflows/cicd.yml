@@ -625,6 +625,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push image
+        id: build-push
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -638,8 +639,12 @@ jobs:
         if: always()
         run: |
           echo "### GHCR Docker Image" >> $GITHUB_STEP_SUMMARY
-          echo "✅ Docker image pushed for ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "🔗 ghcr.io/${{ steps.image.outputs.owner_lc }}/caligo-vscode-playwright:${{ steps.image.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ steps.build-push.outcome }}" == "success" ]]; then
+            echo "✅ Docker image pushed for ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+            echo "🔗 ghcr.io/${{ steps.image.outputs.owner_lc }}/caligo-vscode-playwright:${{ steps.image.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Docker image push failed for ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          fi
 
   release-github-packages:
     name: Release - GitHub Packages (npm)
@@ -664,11 +669,16 @@ jobs:
           registry-url: https://npm.pkg.github.com
           scope: '@anselmoo'
       - run: npm ci
+      - name: Build and generate themes
+        run: |
+          npm run build
+          npm run generate
       - name: Prepare temporary npm publish workspace
         run: npm run package:theme-data:prepare
         env:
           CALIGO_THEME_DATA_VERSION: ${{ github.ref_name }}
       - name: Publish package
+        id: npm-publish
         run: npm publish ./build/github-packages/caligo-theme-data
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -676,7 +686,11 @@ jobs:
         if: always()
         run: |
           echo "### GitHub Packages (npm)" >> $GITHUB_STEP_SUMMARY
-          echo "✅ @anselmoo/caligo-theme-data published for ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ steps.npm-publish.outcome }}" == "success" ]]; then
+            echo "✅ @anselmoo/caligo-theme-data published for ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ @anselmoo/caligo-theme-data publish failed for ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          fi
 
   # Keep Pages independent from package/image publishing:
   # release-pages must run from release-gate even if release-ghcr or release-github-packages fails.
