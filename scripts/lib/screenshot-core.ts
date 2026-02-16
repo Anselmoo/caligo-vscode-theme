@@ -423,10 +423,9 @@ export async function captureThemeInOpenApp(params: {
         .catch(() => null);
 
       if (appliedThemeName) {
-        const applied = String(appliedThemeName).toLowerCase().trim();
-        const requested = String(themeName).toLowerCase().trim();
-        const requestedSeedName = requested.split("—")[0].trim();
-        const matched = applied === requested || applied.includes(requestedSeedName);
+        const matched = String(appliedThemeName)
+          .toLowerCase()
+          .includes(String(themeName).toLowerCase().split("—")[0].trim());
         if (matched) {
           themeApplied = true;
           console.log(
@@ -436,19 +435,77 @@ export async function captureThemeInOpenApp(params: {
         }
       }
 
-      const storedTheme = readUserSettingsTheme(params.userDataDir);
-      if (storedTheme) {
-        const stored = storedTheme.toLowerCase().trim();
-        const requested = String(themeName).toLowerCase().trim();
-        const requestedSeedName = requested.split("—")[0].trim();
-        if (stored === requested || stored.includes(requestedSeedName)) {
-          appliedThemeName = storedTheme;
-          themeApplied = true;
-          console.log(
-            `   🔎 Theme verification succeeded via user settings (attempt ${attempt}): ${storedTheme}`
-          );
-          return true;
-        }
+      const bg = await page
+        .evaluate(() => {
+          try {
+            const el =
+              document.querySelector(".monaco-editor .view-lines") ||
+              document.querySelector(".monaco-workbench");
+            if (!el) return null;
+            const style = window.getComputedStyle(el as Element);
+            return style.backgroundColor || null;
+          } catch {
+            return null;
+          }
+        })
+        .catch(() => null);
+      if (bg && bg !== "rgba(0, 0, 0, 0)") {
+        themeApplied = true;
+        console.log(
+          `   🔎 Theme verification succeeded via background (attempt ${attempt}): ${bg}`
+        );
+        return true;
+      }
+
+      const cssVar = await page
+        .evaluate(() => {
+          try {
+            const doc = document.documentElement;
+            const cs = window.getComputedStyle(doc as Element);
+            const keys = [
+              "--vscode-editor-background",
+              "--vscode-editor-foreground",
+              "--vscode-sideBar-background",
+            ];
+            for (const k of keys) {
+              const v = cs.getPropertyValue(k);
+              const trimmed = v?.trim?.();
+              if (trimmed) return `${k}:${trimmed}`;
+            }
+            return null;
+          } catch {
+            return null;
+          }
+        })
+        .catch(() => null);
+      if (cssVar) {
+        appliedThemeName = String(cssVar);
+        themeApplied = true;
+        console.log(
+          `   🔎 Theme verification succeeded via CSS var (attempt ${attempt}): ${cssVar}`
+        );
+        return true;
+      }
+
+      const tokenColor = await page
+        .evaluate(() => {
+          try {
+            const span = document.querySelector(".monaco-editor .view-lines span");
+            if (!span) return null;
+            const style = window.getComputedStyle(span as Element);
+            return style.color || null;
+          } catch {
+            return null;
+          }
+        })
+        .catch(() => null);
+      if (tokenColor && tokenColor !== "rgba(0, 0, 0, 0)") {
+        appliedThemeName = String(tokenColor);
+        themeApplied = true;
+        console.log(
+          `   🔎 Theme verification succeeded via token color (attempt ${attempt}): ${tokenColor}`
+        );
+        return true;
       }
 
       await page.waitForTimeout(400);
@@ -550,7 +607,7 @@ export async function captureThemeInOpenApp(params: {
                     "function"
                 ) {
                   (cfg as unknown as { update: (...args: unknown[]) => unknown }).update(
-                    "colorTheme",
+                    "workbench.colorTheme",
                     t,
                     true // global
                   );
