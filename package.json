@@ -102,7 +102,7 @@
     "@vitejs/plugin-vue": "^6.0.4",
     "@types/node": "^24.10.13",
     "@vitest/coverage-v8": "^4.0.18",
-    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2",
     "@vscode/vsce": "^3.2.1",
     "@vue/test-utils": "^2.4.6",
