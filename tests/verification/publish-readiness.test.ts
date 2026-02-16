@@ -42,6 +42,17 @@ test("publish workflow exists and uses vsce", () => {
   ).toBe(true);
 });
 
+test("release workflow uploads source/themes archives and themes sbom", () => {
+  const workflowPath = resolve(process.cwd(), ".github", "workflows", "cicd.yml");
+  const workflow = readFileSync(workflowPath, "utf-8");
+  const sourceArchivePattern = /caligo-vscode-theme-\$\{\{ github\.ref_name \}\}-source\.tar\.gz/;
+  const themesArchivePattern = /caligo-vscode-theme-\$\{\{ github\.ref_name \}\}-themes\.tar\.gz/;
+  expect(sourceArchivePattern.test(workflow)).toBe(true);
+  expect(themesArchivePattern.test(workflow)).toBe(true);
+  expect(workflow.includes("Generate themes SBOM")).toBe(true);
+  expect(workflow.includes("sbom-themes-spdx.json")).toBe(true);
+});
+
 test("LICENSE exists and is non-empty", () => {
   const lic = readFileSync(resolve(process.cwd(), "LICENSE"), "utf-8");
   expect(lic.trim().length).toBeGreaterThan(0);
