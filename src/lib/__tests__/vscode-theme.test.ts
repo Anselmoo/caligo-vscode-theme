@@ -122,4 +122,63 @@ describe("buildVscodeThemeJson", () => {
       }
     }
   });
+
+  it("should enforce schema-safe theme keys and token settings", () => {
+    const seed: Seed = {
+      id: "TestSeed",
+      displayName: "Test Seed",
+      background: { mode: "oklch", l: 0.18, c: 0.03, h: 220 },
+      accent: { mode: "oklch", l: 0.7, c: 0.15, h: 215 },
+    };
+
+    const palette = derivePalette(seed, "Balanced");
+    const theme = buildVscodeThemeJson(palette);
+
+    expect(theme.colors["editorInlayHint.parameterBackground"]).toBeTruthy();
+    expect(theme.colors["editorInlayHint.parameterForeground"]).toBeTruthy();
+    expect(theme.colors["editorInlayHint.paramBackground"]).toBeUndefined();
+    expect(theme.colors["editorInlayHint.paramForeground"]).toBeUndefined();
+
+    for (const token of theme.tokenColors) {
+      expect((token.settings as { background?: string }).background).toBeUndefined();
+    }
+
+    const requiredColorIds = [
+      "disabledForeground",
+      "icon.foreground",
+      "widget.shadow",
+      "selection.background",
+      "sash.hoverBorder",
+      "statusBar.border",
+      "activityBar.activeBorder",
+      "sideBar.border",
+      "editorStickyScroll.background",
+      "editorStickyScroll.border",
+      "editorStickyScroll.shadow",
+      "editorStickyScrollGutter.background",
+      "editorStickyScrollHover.background",
+      "editorBracketPairGuide.activeBackground1",
+      "editorBracketPairGuide.activeBackground2",
+      "editorBracketPairGuide.activeBackground3",
+      "editorBracketPairGuide.activeBackground4",
+      "editorBracketPairGuide.activeBackground5",
+      "editorBracketPairGuide.activeBackground6",
+      "editorBracketPairGuide.background1",
+      "editorBracketPairGuide.background2",
+      "editorBracketPairGuide.background3",
+      "editorBracketPairGuide.background4",
+      "editorBracketPairGuide.background5",
+      "editorBracketPairGuide.background6",
+      "terminal.findMatchBackground",
+      "terminal.findMatchBorder",
+      "terminal.findMatchHighlightBackground",
+      "terminal.findMatchHighlightBorder",
+      "list.focusOutline",
+      "list.focusAndSelectionOutline",
+    ];
+
+    for (const colorId of requiredColorIds) {
+      expect(theme.colors[colorId], `Missing color ID ${colorId}`).toBeTruthy();
+    }
+  });
 });
