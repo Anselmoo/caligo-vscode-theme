@@ -541,6 +541,7 @@ jobs:
         run: |
           SOURCE_BASENAME="caligo-vscode-theme-${{ github.ref_name }}-source"
           THEMES_BASENAME="caligo-vscode-theme-${{ github.ref_name }}-themes"
+          if [ ! -d themes ]; then echo "themes directory not found" && exit 1; fi
           git archive --format=tar.gz --output "${SOURCE_BASENAME}.tar.gz" "${{ github.ref }}"
           git archive --format=zip --output "${SOURCE_BASENAME}.zip" "${{ github.ref }}"
           tar -czf "${THEMES_BASENAME}.tar.gz" themes
