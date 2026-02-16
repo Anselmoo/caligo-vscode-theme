@@ -529,11 +529,22 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.ref }}
       - name: Download VSIX artifact
         uses: actions/download-artifact@v7
         with:
           name: vsix
           path: artifacts/vsix
+      - name: Build source and themes release archives
+        run: |
+          SOURCE_BASENAME="caligo-vscode-theme-${{ github.ref_name }}-source"
+          THEMES_BASENAME="caligo-vscode-theme-${{ github.ref_name }}-themes"
+          git archive --format=tar.gz --output "${SOURCE_BASENAME}.tar.gz" "${{ github.ref }}"
+          git archive --format=zip --output "${SOURCE_BASENAME}.zip" "${{ github.ref }}"
+          tar -czf "${THEMES_BASENAME}.tar.gz" themes
+          zip -r "${THEMES_BASENAME}.zip" themes
       - name: Create GitHub Release (gh)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -561,6 +572,17 @@ jobs:
           VSIX_FILE=$(find artifacts/vsix -maxdepth 1 -type f -name '*.vsix' -print -quit)
           if [ -z "$VSIX_FILE" ]; then echo "No VSIX file found" && exit 1; fi
           gh release upload "${{ github.ref_name }}" "$VSIX_FILE" \
+            --repo "${{ github.repository }}" \
+            --clobber
+      - name: Upload source and themes archives to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ github.ref_name }}" \
+            caligo-vscode-theme-${{ github.ref_name }}-source.tar.gz \
+            caligo-vscode-theme-${{ github.ref_name }}-source.zip \
+            caligo-vscode-theme-${{ github.ref_name }}-themes.tar.gz \
+            caligo-vscode-theme-${{ github.ref_name }}-themes.zip \
             --repo "${{ github.repository }}" \
             --clobber
       - name: Release summary
@@ -773,11 +795,18 @@ jobs:
           artifact-name: sbom-spdx.json
           output-file: sbom-spdx.json
           format: spdx-json
+      - name: Generate themes SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          path: themes
+          artifact-name: sbom-themes-spdx.json
+          output-file: sbom-themes-spdx.json
+          format: spdx-json
       - name: Upload SBOM to GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload "${{ github.ref_name }}" sbom-spdx.json \
+          gh release upload "${{ github.ref_name }}" sbom-spdx.json sbom-themes-spdx.json \
             --repo "${{ github.repository }}" \
             --clobber
       - name: SBOM summary
