@@ -840,7 +840,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     {
       name: "Carriage Return",
       scope: ["carriage-return"],
-      settings: { foreground: p.semantic.error, fontStyle: "underline" },
+      settings: { foreground: p.semantic.error, fontStyle: "bold underline" },
     },
   ];
 
