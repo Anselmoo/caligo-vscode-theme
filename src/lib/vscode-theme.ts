@@ -67,8 +67,8 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     "editorInlayHint.foreground": p.fgMuted,
     "editorInlayHint.typeBackground": withAlpha(p.fgMuted, 0.2),
     "editorInlayHint.typeForeground": p.fgMuted,
-    "editorInlayHint.paramBackground": withAlpha(p.fgMuted, 0.2),
-    "editorInlayHint.paramForeground": p.fgMuted,
+    "editorInlayHint.parameterBackground": withAlpha(p.fgMuted, 0.2),
+    "editorInlayHint.parameterForeground": p.fgMuted,
 
     "editorIndentGuide.background": withAlpha(p.border, 0.35),
     "editorIndentGuide.activeBackground": withAlpha(p.border, 0.65),
@@ -187,6 +187,8 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     "list.focusForeground": p.fg0,
     "list.focusBackground": withAlpha(p.accent, 0.15),
     "list.inactiveFocusBackground": withAlpha(p.accent, 0.15),
+    "list.focusOutline": p.accent,
+    "list.focusAndSelectionOutline": p.accent,
     "list.highlightForeground": p.accent,
     "list.hoverForeground": p.fg0,
     "tree.indentGuidesStroke": p.border,
@@ -231,6 +233,10 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     "terminal.ansiBrightMagenta": p.huePurple,
     "terminal.ansiBrightCyan": p.hueCyan,
     "terminal.ansiBrightWhite": p.fg0,
+    "terminal.findMatchBackground": withAlpha(p.accentMuted, 0.5),
+    "terminal.findMatchBorder": p.accent,
+    "terminal.findMatchHighlightBackground": withAlpha(p.accentSubtle, 0.35),
+    "terminal.findMatchHighlightBorder": withAlpha(p.accent, 0.65),
 
     // Bracket pair colorization - use decorative hue wheel for visual distinction
     "editorBracketHighlight.foreground1": p.hueCyan,
@@ -240,6 +246,18 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     "editorBracketHighlight.foreground5": p.huePurple,
     "editorBracketHighlight.foreground6": p.hueBlue,
     "editorBracketHighlight.unexpectedBracket.foreground": p.fgMuted,
+    "editorBracketPairGuide.activeBackground1": withAlpha(p.hueCyan, 0.55),
+    "editorBracketPairGuide.activeBackground2": withAlpha(p.hueGreen, 0.55),
+    "editorBracketPairGuide.activeBackground3": withAlpha(p.hueYellow, 0.55),
+    "editorBracketPairGuide.activeBackground4": withAlpha(p.hueRed, 0.55),
+    "editorBracketPairGuide.activeBackground5": withAlpha(p.huePurple, 0.55),
+    "editorBracketPairGuide.activeBackground6": withAlpha(p.hueBlue, 0.55),
+    "editorBracketPairGuide.background1": withAlpha(p.hueCyan, 0.3),
+    "editorBracketPairGuide.background2": withAlpha(p.hueGreen, 0.3),
+    "editorBracketPairGuide.background3": withAlpha(p.hueYellow, 0.3),
+    "editorBracketPairGuide.background4": withAlpha(p.hueRed, 0.3),
+    "editorBracketPairGuide.background5": withAlpha(p.huePurple, 0.3),
+    "editorBracketPairGuide.background6": withAlpha(p.hueBlue, 0.3),
 
     // Symbol icons - map to harmony palette for consistent theming
     "symbolIcon.arrayForeground": p.harmony.types,
@@ -275,6 +293,19 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     "symbolIcon.typeParameterForeground": p.harmony.types,
     "symbolIcon.unitForeground": p.harmony.constants,
     "symbolIcon.variableForeground": p.harmony.variables,
+    disabledForeground: withAlpha(p.fgMuted, 0.65),
+    "icon.foreground": p.fg1,
+    "widget.shadow": withAlpha(p.bg0, 0.35),
+    "selection.background": withAlpha(p.accentMuted, 0.35),
+    "sash.hoverBorder": p.accent,
+    "statusBar.border": p.border,
+    "activityBar.activeBorder": p.accent,
+    "sideBar.border": p.border,
+    "editorStickyScroll.background": p.bg1,
+    "editorStickyScroll.border": p.border,
+    "editorStickyScroll.shadow": withAlpha(p.bg0, 0.35),
+    "editorStickyScrollGutter.background": p.bg1,
+    "editorStickyScrollHover.background": withAlpha(p.bg2, 0.8),
   };
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -729,26 +760,17 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     {
       name: "Markup Inserted",
       scope: ["markup.inserted", "markup.inserted.diff", "markup.inserted.git_gutter"],
-      settings: {
-        foreground: p.hueGreen,
-        background: withAlpha(p.hueGreen, 0.15),
-      },
+      settings: { foreground: p.hueGreen },
     },
     {
       name: "Markup Deleted",
       scope: ["markup.deleted", "markup.deleted.diff", "markup.deleted.git_gutter"],
-      settings: {
-        foreground: p.hueRed,
-        background: withAlpha(p.hueRed, 0.15),
-      },
+      settings: { foreground: p.hueRed },
     },
     {
       name: "Markup Changed",
       scope: ["markup.changed", "markup.changed.diff", "markup.changed.git_gutter"],
-      settings: {
-        foreground: p.hueOrange,
-        background: withAlpha(p.hueOrange, 0.15),
-      },
+      settings: { foreground: p.hueOrange },
     },
     {
       name: "Markup Ignored",
@@ -818,7 +840,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     {
       name: "Carriage Return",
       scope: ["carriage-return"],
-      settings: { foreground: p.fg0, background: p.semantic.error },
+      settings: { foreground: p.semantic.error, fontStyle: "bold underline" },
     },
   ];
 
