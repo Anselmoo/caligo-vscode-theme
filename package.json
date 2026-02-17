@@ -98,7 +98,7 @@
     "@biomejs/biome": "^2.4.1",
     "@playwright/test": "^1.58.2",
     "@types/d3-scale": "^4.0.9",
-    "@types/vscode": "^1.109.0",
+    "@types/vscode": "^1.108.0",
     "@vitejs/plugin-vue": "^6.0.4",
     "@types/node": "^24.10.13",
     "@vitest/coverage-v8": "^4.0.18",
