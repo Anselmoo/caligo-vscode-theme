@@ -784,6 +784,8 @@ jobs:
           node-version: 24.13.1
           cache: npm
       - run: npm ci
+      - name: Generate themes
+        run: npm run generate
       - name: Download VSIX artifact
         uses: actions/download-artifact@v7
         with:
