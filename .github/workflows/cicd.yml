@@ -771,7 +771,7 @@ jobs:
   release-sbom:
     name: Release - SBOM
     if: ${{ needs.release-gate.outputs.ready == 'true' }}
-    needs: release-gate
+    needs: [release-gate, release-github]
     runs-on: ubuntu-latest
     permissions:
       contents: write
