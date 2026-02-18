@@ -521,7 +521,7 @@ jobs:
   release-github:
     name: Release - GitHub
     if: ${{ needs.release-gate.outputs.ready == 'true' }}
-    needs: release-gate
+    needs: [release-gate, build-sbom]
     runs-on: ubuntu-latest
     environment:
       name: github-release
@@ -575,7 +575,12 @@ jobs:
           gh release upload "${{ github.ref_name }}" "$VSIX_FILE" \
             --repo "${{ github.repository }}" \
             --clobber
-      - name: Upload source and themes archives to release
+      - name: Download SBOM artifacts
+        uses: actions/download-artifact@v7
+        with:
+          name: sbom
+          path: .
+      - name: Upload source, themes archives, and SBOMs to release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -584,6 +589,8 @@ jobs:
             caligo-vscode-theme-${{ github.ref_name }}-source.zip \
             caligo-vscode-theme-${{ github.ref_name }}-themes.tar.gz \
             caligo-vscode-theme-${{ github.ref_name }}-themes.zip \
+            sbom-spdx.json \
+            sbom-themes-spdx.json \
             --repo "${{ github.repository }}" \
             --clobber
       - name: Release summary
@@ -768,13 +775,11 @@ jobs:
           echo "ℹ️ Pages deployment is intentionally independent from GHCR/npm publish jobs" >> $GITHUB_STEP_SUMMARY
           echo "🔗 https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/" >> $GITHUB_STEP_SUMMARY
 
-  release-sbom:
-    name: Release - SBOM
-    if: ${{ needs.release-gate.outputs.ready == 'true' }}
-    needs: release-gate
+  build-sbom:
+    name: Build - SBOM
+    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    needs: [unit-tests]
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v6
       - name: Mark workspace as a safe git directory
@@ -784,12 +789,7 @@ jobs:
           node-version: 24.13.1
           cache: npm
       - run: npm ci
-      - name: Download VSIX artifact
-        uses: actions/download-artifact@v7
-        with:
-          name: vsix
-          path: artifacts/vsix
-      - name: Generate SBOM
+      - name: Generate SBOM (src)
         uses: anchore/sbom-action@v0
         with:
           path: .
@@ -805,15 +805,17 @@ jobs:
           artifact-name: sbom-themes-spdx.json
           output-file: sbom-themes-spdx.json
           format: spdx-json
-      - name: Upload SBOM to GitHub Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release upload "${{ github.ref_name }}" sbom-spdx.json sbom-themes-spdx.json \
-            --repo "${{ github.repository }}" \
-            --clobber
+      - name: Upload SBOM workflow artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: sbom
+          path: |
+            sbom-spdx.json
+            sbom-themes-spdx.json
+          retention-days: 30
       - name: SBOM summary
         if: always()
         run: |
           echo "### SBOM" >> $GITHUB_STEP_SUMMARY
-          echo "✅ SBOM generated and attached to release ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "✅ SBOMs generated and uploaded as workflow artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "ℹ️ SBOMs will be attached to the release by the release-github job" >> $GITHUB_STEP_SUMMARY
