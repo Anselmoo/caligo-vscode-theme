@@ -796,6 +796,8 @@ jobs:
           artifact-name: sbom-spdx.json
           output-file: sbom-spdx.json
           format: spdx-json
+      - name: Generate themes
+        run: npm run generate
       - name: Generate themes SBOM
         uses: anchore/sbom-action@v0
         with:
