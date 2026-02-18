@@ -602,7 +602,7 @@ jobs:
   release-marketplace:
     name: Release - VS Code Marketplace
     if: ${{ needs.release-gate.outputs.ready == 'true' }}
-    needs: release-gate
+    needs: [release-gate, build-sbom]
     runs-on: ubuntu-latest
     environment:
       name: vscode-marketplace-release
@@ -631,7 +631,7 @@ jobs:
   release-ghcr:
     name: Release - GHCR Docker Image
     if: ${{ needs.release-gate.outputs.ready == 'true' }}
-    needs: release-gate
+    needs: [release-gate, build-sbom]
     runs-on: ubuntu-latest
     environment:
       name: ghcr-release
@@ -679,7 +679,7 @@ jobs:
   release-github-packages:
     name: Release - GitHub Packages (npm)
     if: ${{ needs.release-gate.outputs.ready == 'true' }}
-    needs: release-gate
+    needs: [release-gate, build-sbom]
     runs-on: ubuntu-latest
     environment:
       name: github-packages-release
@@ -727,7 +727,7 @@ jobs:
   release-pages:
     name: Release - Deploy Pages
     if: ${{ needs.release-gate.outputs.ready == 'true' }}
-    needs: release-gate
+    needs: [release-gate, build-sbom]
     runs-on: ubuntu-latest
     environment:
       name: github-pages-release
@@ -780,6 +780,8 @@ jobs:
     if: ${{ startsWith(github.ref, 'refs/tags/') }}
     needs: [unit-tests]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v6
       - name: Mark workspace as a safe git directory
@@ -812,6 +814,7 @@ jobs:
           path: |
             sbom-spdx.json
             sbom-themes-spdx.json
+          if-no-files-found: error
           retention-days: 30
       - name: SBOM summary
         if: always()
