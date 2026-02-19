@@ -532,6 +532,13 @@ jobs:
       - uses: actions/checkout@v6
         with:
           ref: ${{ github.ref }}
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.13.1
+          cache: npm
+      - run: npm ci
+      - name: Generate themes
+        run: npm run generate
       - name: Download VSIX artifact
         uses: actions/download-artifact@v7
         with:
@@ -707,8 +714,21 @@ jobs:
         run: npm run package:theme-data:prepare
         env:
           CALIGO_THEME_DATA_VERSION: ${{ github.ref_name }}
+      - name: Check if package version already exists
+        id: package-version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          if npm view "@anselmoo/caligo-theme-data@${VERSION}" version --registry=https://npm.pkg.github.com >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Package version ${VERSION} already exists on GitHub Packages; skipping publish."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish package
         id: npm-publish
+        if: steps.package-version.outputs.exists != 'true'
         run: npm publish ./build/github-packages/caligo-theme-data
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -716,7 +736,9 @@ jobs:
         if: always()
         run: |
           echo "### GitHub Packages (npm)" >> $GITHUB_STEP_SUMMARY
-          if [[ "${{ steps.npm-publish.outcome }}" == "success" ]]; then
+          if [[ "${{ steps.package-version.outputs.exists }}" == "true" ]]; then
+            echo "ℹ️ @anselmoo/caligo-theme-data already published for ${{ github.ref_name }}; skipped publish" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ steps.npm-publish.outcome }}" == "success" ]]; then
             echo "✅ @anselmoo/caligo-theme-data published for ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ @anselmoo/caligo-theme-data publish failed for ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
