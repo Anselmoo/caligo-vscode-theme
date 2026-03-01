@@ -116,7 +116,7 @@ function selectThemes(
   if (opts.useBalancedDemo)
     return allThemes
       .reduce<string[]>((acc, theme) => {
-        if (/\bbalanced\)/i.test(theme)) acc.push(theme);
+        if (/balanced\)$/i.test(theme)) acc.push(theme);
         return acc;
       }, [])
       .slice(0, 10);
