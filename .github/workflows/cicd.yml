@@ -163,6 +163,14 @@ jobs:
           path: public/screenshots/
           if-no-files-found: warn
           retention-days: 7
+      - name: Upload balanced smoke screenshots
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: screenshots-smoke-balanced
+          path: tmp-screenshots-reuse-balanced/
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Debug smoke artifacts
         if: always()
         run: |
@@ -170,6 +178,8 @@ jobs:
           ls -la build || true
           echo "--- tmp-screenshots-reuse ---"
           ls -la tmp-screenshots-reuse || true
+          echo "--- tmp-screenshots-reuse-balanced ---"
+          ls -la tmp-screenshots-reuse-balanced || true
           echo "--- report search ---"
           find . -maxdepth 6 -name "screenshots-report.json" -print || true
 
