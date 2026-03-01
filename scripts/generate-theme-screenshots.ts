@@ -8,7 +8,8 @@
 
 import { existsSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { chromium } from "playwright";
+import { fileURLToPath } from "node:url";
+import { resolveTokenColor } from "../src/lib/screenshot-token-colors";
 
 const PROJECT_ROOT = resolve(import.meta.dirname, "..");
 const THEMES_DIR = join(PROJECT_ROOT, "themes");
@@ -83,38 +84,29 @@ interface ThemeColors {
   [key: string]: string | undefined;
 }
 
-interface ThemeTokenColor {
-  scope?: string | string[];
-  settings?: {
-    foreground?: string;
-    fontStyle?: string;
-  };
-}
-
 interface ThemeJson {
   name: string;
   colors: ThemeColors;
-  tokenColors?: ThemeTokenColor[];
+  tokenColors?: {
+    scope?: string | string[];
+    settings?: {
+      foreground?: string;
+      fontStyle?: string;
+    };
+  }[];
+  semanticHighlighting?: boolean;
+  semanticTokenColors?: Record<
+    string,
+    | string
+    | {
+        foreground?: string;
+      }
+  >;
 }
 
 function loadTheme(themePath: string): ThemeJson {
   const content = readFileSync(themePath, "utf-8");
   return JSON.parse(content);
-}
-
-function getTokenColor(theme: ThemeJson, scopes: string[]): string | undefined {
-  if (!theme.tokenColors) return undefined;
-
-  for (const tc of theme.tokenColors) {
-    if (!tc.scope || !tc.settings?.foreground) continue;
-    const tcScopes = Array.isArray(tc.scope) ? tc.scope : [tc.scope];
-    for (const scope of scopes) {
-      if (tcScopes.some(s => s === scope || s.startsWith(`${scope}.`))) {
-        return tc.settings.foreground;
-      }
-    }
-  }
-  return undefined;
 }
 
 function escapeHtml(text: string): string {
@@ -183,12 +175,27 @@ function generateHTML(theme: ThemeJson): string {
   const lineNum = colors["editorLineNumber.foreground"] || "#858585";
 
   // Extract token colors
-  const keyword = getTokenColor(theme, ["keyword", "storage.type"]) || "#569cd6";
-  const string = getTokenColor(theme, ["string"]) || "#ce9178";
-  const comment = getTokenColor(theme, ["comment"]) || "#6a9955";
-  const type = getTokenColor(theme, ["entity.name.type", "support.type"]) || "#4ec9b0";
-  const func = getTokenColor(theme, ["entity.name.function", "support.function"]) || "#dcdcaa";
-  const decorator = getTokenColor(theme, ["entity.name.decorator", "meta.decorator"]) || "#c586c0";
+  const keyword = resolveTokenColor(theme, ["keyword"], ["keyword", "storage.type"], "#569cd6");
+  const string = resolveTokenColor(theme, ["string"], ["string"], "#ce9178");
+  const comment = resolveTokenColor(theme, ["comment"], ["comment"], "#6a9955");
+  const type = resolveTokenColor(
+    theme,
+    ["type", "class", "interface", "enum", "struct", "typeParameter"],
+    ["entity.name.type", "support.type"],
+    "#4ec9b0"
+  );
+  const func = resolveTokenColor(
+    theme,
+    ["function", "method"],
+    ["entity.name.function", "support.function"],
+    "#dcdcaa"
+  );
+  const decorator = resolveTokenColor(
+    theme,
+    ["decorator"],
+    ["entity.name.decorator", "meta.decorator"],
+    "#c586c0"
+  );
 
   // Syntax highlight the code
   const highlightedCode = highlightTypeScript(SAMPLE_CODE, {
@@ -295,6 +302,7 @@ function slugifyThemeName(name: string): string {
 
 async function generateScreenshots() {
   console.log("📸 Starting theme screenshot generation...\n");
+  const { chromium } = await import("playwright");
 
   // Ensure output directory exists
   if (!existsSync(OUTPUT_DIR)) {
@@ -359,8 +367,15 @@ async function generateScreenshots() {
   console.log(`   Output: ${OUTPUT_DIR}`);
 }
 
-// Run
-generateScreenshots().catch(err => {
-  console.error("Fatal error:", err);
-  process.exit(1);
-});
+const isEntry = (() => {
+  const self = fileURLToPath(import.meta.url);
+  const argv1 = process.argv[1] ? resolve(process.argv[1]) : "";
+  return argv1 !== "" && resolve(self) === argv1;
+})();
+
+if (isEntry) {
+  generateScreenshots().catch(err => {
+    console.error("Fatal error:", err);
+    process.exit(1);
+  });
+}
