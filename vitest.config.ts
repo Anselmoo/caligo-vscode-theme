@@ -20,7 +20,7 @@ export default defineConfig({
     fileParallelism: true,
     coverage: {
       provider: "v8",
-      reporter: ["text", "json", "html", "lcov"],
+      reporter: ["text", "json", "json-summary", "html", "lcov"],
       reportsDirectory: "./coverage",
       include: ["src/lib/**/*.ts", "src/vue-app/**/*.ts", "src/schema/**/*.ts"],
       exclude: [
