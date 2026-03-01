@@ -9,7 +9,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { chromium } from "playwright";
+import { resolveTokenColor } from "../src/lib/screenshot-token-colors";
 
 const PROJECT_ROOT = resolve(import.meta.dirname, "..");
 const THEMES_DIR = join(PROJECT_ROOT, "themes");
@@ -84,18 +84,16 @@ interface ThemeColors {
   [key: string]: string | undefined;
 }
 
-interface ThemeTokenColor {
-  scope?: string | string[];
-  settings?: {
-    foreground?: string;
-    fontStyle?: string;
-  };
-}
-
 interface ThemeJson {
   name: string;
   colors: ThemeColors;
-  tokenColors?: ThemeTokenColor[];
+  tokenColors?: {
+    scope?: string | string[];
+    settings?: {
+      foreground?: string;
+      fontStyle?: string;
+    };
+  }[];
   semanticHighlighting?: boolean;
   semanticTokenColors?: Record<
     string,
@@ -109,46 +107,6 @@ interface ThemeJson {
 function loadTheme(themePath: string): ThemeJson {
   const content = readFileSync(themePath, "utf-8");
   return JSON.parse(content);
-}
-
-function getTokenColor(theme: ThemeJson, scopes: string[]): string | undefined {
-  if (!theme.tokenColors) return undefined;
-
-  for (const tc of theme.tokenColors) {
-    if (!tc.scope || !tc.settings?.foreground) continue;
-    const tcScopes = Array.isArray(tc.scope) ? tc.scope : [tc.scope];
-    for (const scope of scopes) {
-      if (tcScopes.some(s => s === scope || s.startsWith(`${scope}.`))) {
-        return tc.settings.foreground;
-      }
-    }
-  }
-  return undefined;
-}
-
-function getSemanticTokenColor(theme: ThemeJson, selectors: string[]): string | undefined {
-  if (!theme.semanticHighlighting || !theme.semanticTokenColors) return undefined;
-
-  for (const selector of selectors) {
-    const match = theme.semanticTokenColors[selector];
-    if (!match) continue;
-    if (typeof match === "string") return match;
-    if (match.foreground) return match.foreground;
-  }
-  return undefined;
-}
-
-export function resolveTokenColor(
-  theme: ThemeJson,
-  semanticSelectors: string[],
-  textmateScopes: string[],
-  fallback: string
-): string {
-  return (
-    getSemanticTokenColor(theme, semanticSelectors) ||
-    getTokenColor(theme, textmateScopes) ||
-    fallback
-  );
 }
 
 function escapeHtml(text: string): string {
@@ -344,6 +302,7 @@ function slugifyThemeName(name: string): string {
 
 async function generateScreenshots() {
   console.log("📸 Starting theme screenshot generation...\n");
+  const { chromium } = await import("playwright");
 
   // Ensure output directory exists
   if (!existsSync(OUTPUT_DIR)) {

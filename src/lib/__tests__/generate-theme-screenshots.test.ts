@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { resolveTokenColor } from "../../../scripts/generate-theme-screenshots";
+import { resolveTokenColor } from "../screenshot-token-colors";
 
 describe("generate-theme-screenshots: resolveTokenColor", () => {
   it("prefers semantic token colors when semantic highlighting is enabled", () => {
