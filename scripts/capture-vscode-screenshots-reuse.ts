@@ -6,7 +6,7 @@
  * instrumentation JSON at `build/screenshots-report.json` to validate that
  * a single Electron instance was used and to capture per-theme timings.
  *
- * CLI: run with `npx tsx scripts/capture-vscode-screenshots-reuse.ts [--full|--aurora-demo] --lang typescript`
+ * CLI: run with `npx tsx scripts/capture-vscode-screenshots-reuse.ts [--full|--aurora-demo|--balanced-demo] --lang typescript`
  * Defaults: reuse-window = true (opt-out with --no-reuse-window)
  */
 
@@ -95,7 +95,12 @@ function readContributedThemes(): string[] {
 
 function selectThemes(
   allThemes: string[],
-  opts: { useFull: boolean; useAuroraDemo: boolean; useMandarianDemo: boolean }
+  opts: {
+    useFull: boolean;
+    useAuroraDemo: boolean;
+    useMandarianDemo: boolean;
+    useBalancedDemo: boolean;
+  }
 ): string[] {
   const demoThemes = allThemes.slice(0, 4);
   if (opts.useAuroraDemo)
@@ -108,6 +113,13 @@ function selectThemes(
       if (theme.toLowerCase().includes("mandarian")) acc.push(theme);
       return acc;
     }, []);
+  if (opts.useBalancedDemo)
+    return allThemes
+      .reduce<string[]>((acc, theme) => {
+        if (/\bbalanced\)/i.test(theme)) acc.push(theme);
+        return acc;
+      }, [])
+      .slice(0, 10);
   return opts.useFull ? allThemes : demoThemes;
 }
 
@@ -716,11 +728,17 @@ async function main() {
   const useFull = args.includes("--full") || args.includes("--all");
   const useAuroraDemo = args.includes("--aurora-demo");
   const useMandarianDemo = args.includes("--mandarian-demo");
+  const useBalancedDemo = args.includes("--balanced-demo");
   const reuseWindow = !args.includes("--no-reuse-window");
   const customOutputDir = _readArgValue(args, "--output");
 
   const allThemes = readContributedThemes();
-  const selectedThemes = selectThemes(allThemes, { useFull, useAuroraDemo, useMandarianDemo });
+  const selectedThemes = selectThemes(allThemes, {
+    useFull,
+    useAuroraDemo,
+    useMandarianDemo,
+    useBalancedDemo,
+  });
 
   const languages = ["typescript"];
   const outputDir = customOutputDir || path.join(process.cwd(), "tmp-screenshots-reuse");
