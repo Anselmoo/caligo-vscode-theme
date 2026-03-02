@@ -214,5 +214,3 @@ tests/e2e/aurora-visual.spec.ts-snapshots/aurora-background-home-chromium-darwin
 tests/e2e/aurora-visual.spec.ts-snapshots/aurora-background-theme-switched-chromium-darwin.png
 tests/e2e/theme-gallery-screenshots.spec.ts-snapshots/caligo-*.png
 
-# Serena
-.serena/
