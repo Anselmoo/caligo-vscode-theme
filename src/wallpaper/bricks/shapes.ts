@@ -4,6 +4,28 @@
  */
 import type { BrickOutput, BrickParams } from "../types.js";
 
+// ─── Seeded PRNG (mirrors landscape.ts helpers) ───────────────────────────────
+
+function seedRng(seed: number) {
+  let s = seed;
+  return () => {
+    s += 0x6d2b79f5;
+    let t = s;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 0x100000000;
+  };
+}
+
+function hashStr(str: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h;
+}
+
 // ─── Ring / Arc ───────────────────────────────────────────────────────────────
 
 export interface RingBrickOptions {
@@ -235,9 +257,10 @@ export function brushStrokeBrick(
   const py1 = y1 * vh;
   const px2 = x2 * vw;
   const py2 = y2 * vh;
-  // Control points with slight roughness
-  const cpx = ((x1 + x2) / 2) * vw + roughness * scale * (Math.random() - 0.5);
-  const cpy = ((y1 + y2) / 2) * vh + roughness * scale * (Math.random() - 0.5);
+  // Control points with slight roughness — seeded PRNG for reproducibility
+  const rng = seedRng(hashStr(`brush-${id}`));
+  const cpx = ((x1 + x2) / 2) * vw + roughness * scale * (rng() - 0.5);
+  const cpy = ((y1 + y2) / 2) * vh + roughness * scale * (rng() - 0.5);
   const sw = strokeWidth * scale;
   return {
     elements: `<path id="${id}" d="M ${px1.toFixed(1)} ${py1.toFixed(1)} Q ${cpx.toFixed(1)} ${cpy.toFixed(1)} ${px2.toFixed(1)} ${py2.toFixed(1)}" fill="none" stroke="${color}" stroke-width="${sw.toFixed(1)}" stroke-linecap="round" opacity="${opacity}"/>`,

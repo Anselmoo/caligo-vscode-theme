@@ -174,14 +174,14 @@ function cinderDrift(p: BrickParams): ComposedWallpaper {
     cy: 0.55,
     bandHeight: 0.12,
     color: colors.bgMid,
-    opacity: 0.18,
+    opacity: 0.07,
   });
   const smoke2 = cloudBandBrick(p, {
     id: "ci-d-sm2",
     cy: 0.68,
     bandHeight: 0.08,
     color: colors.bgSoft,
-    opacity: 0.12,
+    opacity: 0.07,
   });
 
   const vignette = vignetteBrick(p, { id: "ci-d-vig", opacity: 0.5 });
@@ -224,9 +224,9 @@ function cinderBreak(p: BrickParams): ComposedWallpaper {
   const clouds = cloudBandBrick(p, {
     id: "ci-b-cl",
     cy: 0.25,
-    bandHeight: 0.3,
+    bandHeight: 0.12,
     color: colors.bgMid,
-    opacity: 0.25,
+    opacity: 0.06,
     frequency: 0.006,
   });
 

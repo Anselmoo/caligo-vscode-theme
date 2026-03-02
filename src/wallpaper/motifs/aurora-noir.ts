@@ -74,7 +74,7 @@ function auroraStillness(p: BrickParams): ComposedWallpaper {
   // Fjord walls — steep terrain on both sides leaving a narrow water gap
   const leftWall = terrainBrick(p, {
     id: "an-s-lw",
-    baseY: 0.35,
+    baseY: 0.5,
     roughness: 0.1,
     points: 16,
     color: colors.bgMid,
@@ -82,7 +82,7 @@ function auroraStillness(p: BrickParams): ComposedWallpaper {
   });
   const rightWall = terrainBrick(p, {
     id: "an-s-rw",
-    baseY: 0.38,
+    baseY: 0.52,
     roughness: 0.08,
     points: 16,
     color: colors.bgSoft,
@@ -101,7 +101,7 @@ function auroraStillness(p: BrickParams): ComposedWallpaper {
   // Foreground terrain (closest mountains, darkest)
   const foreground = terrainBrick(p, {
     id: "an-s-fg",
-    baseY: 0.48,
+    baseY: 0.6,
     roughness: 0.12,
     points: 20,
     color: colors.bg,
@@ -113,7 +113,7 @@ function auroraStillness(p: BrickParams): ComposedWallpaper {
     cy: 0.5,
     bandHeight: 0.08,
     color: colors.bgSoft,
-    opacity: 0.15,
+    opacity: 0.07,
   });
 
   const vignette = vignetteBrick(p, { id: "an-s-vig", opacity: 0.5 });
@@ -185,7 +185,7 @@ function auroraDrift(p: BrickParams): ComposedWallpaper {
     cy: 0.58,
     bandHeight: 0.1,
     color: colors.bgSoft,
-    opacity: 0.12,
+    opacity: 0.07,
   });
 
   const vignette = vignetteBrick(p, { id: "an-d-vig", opacity: 0.55 });
@@ -351,7 +351,7 @@ function auroraPulse(p: BrickParams): ComposedWallpaper {
     id: "an-p-pk",
     points: 28,
     layers: [
-      { baseY: 0.45, roughness: 0.12, color: colors.bgMid, opacity: 0.4, edgeBlur: 4 },
+      { baseY: 0.5, roughness: 0.12, color: colors.bgMid, opacity: 0.4, edgeBlur: 4 },
       { baseY: 0.55, roughness: 0.1, color: colors.bgMid, opacity: 0.6 },
       { baseY: 0.65, roughness: 0.08, color: colors.bgSoft, opacity: 0.8 },
       { baseY: 0.78, roughness: 0.06, color: colors.bg, opacity: 0.95 },

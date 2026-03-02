@@ -11,6 +11,7 @@ import {
   backgroundBrick,
   celestialBrick,
   cloudBandBrick,
+  horizonGlowBrick,
   nebulaGlowBrick,
   noiseBrick,
   shootingStarBrick,
@@ -97,7 +98,27 @@ function nebulaStillness(p: BrickParams): ComposedWallpaper {
 
   const vignette = vignetteBrick(p, { id: "nn-s-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "nn-s-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, emission, dust, stars, pillar1, pillar2, vignette, noise]);
+
+  const horizGlow = horizonGlowBrick(p, {
+    id: "nn-s-hg",
+    y: 0.44,
+    color: colors.accentSoft,
+    opacity: 0.15,
+    height: 0.1,
+  });
+
+  return mergeBricks([
+    bg,
+    sky,
+    emission,
+    dust,
+    stars,
+    horizGlow,
+    pillar1,
+    pillar2,
+    vignette,
+    noise,
+  ]);
 }
 
 /* ── Drift: Spiral galaxy arm — sweeping nebula band ──────────────────────── */
@@ -141,7 +162,7 @@ function nebulaDrift(p: BrickParams): ComposedWallpaper {
     cy: 0.5,
     bandHeight: 0.08,
     color: colors.bg,
-    opacity: 0.3,
+    opacity: 0.12,
     frequency: 0.005,
     seed: 19,
   });
@@ -213,7 +234,7 @@ function nebulaBreak(p: BrickParams): ComposedWallpaper {
     r: 0.02,
     color: "#ffffff",
     glowColor: colors.hueBlue,
-    glowSize: 0.08,
+    glowSize: 4.0,
   });
 
   // Expanding shockwave rings — concentric nebula blobs
@@ -266,6 +287,15 @@ function nebulaBreak(p: BrickParams): ComposedWallpaper {
 
   const vignette = vignetteBrick(p, { id: "nn-b-vig", opacity: 0.6 });
   const noise = noiseBrick(p, { id: "nn-b-n", opacity: 0.04 });
+
+  const horizGlow = horizonGlowBrick(p, {
+    id: "nn-b-hg",
+    y: 0.62,
+    color: colors.hueBlue,
+    opacity: 0.14,
+    height: 0.1,
+  });
+
   return mergeBricks([
     bg,
     sky,
@@ -274,6 +304,7 @@ function nebulaBreak(p: BrickParams): ComposedWallpaper {
     ejecta,
     bgStars,
     debris,
+    horizGlow,
     asteroidTerrain,
     vignette,
     noise,
@@ -309,7 +340,7 @@ function nebulaVoid(p: BrickParams): ComposedWallpaper {
     id: "nn-v-dc",
     points: 20,
     layers: [
-      { baseY: 0.3, roughness: 0.15, color: colors.bg, opacity: 0.88 },
+      { baseY: 0.3, roughness: 0.15, color: colors.bgMid, opacity: 0.88 },
       { baseY: 0.45, roughness: 0.1, color: colors.bg, opacity: 0.75 },
     ],
   });
@@ -327,7 +358,16 @@ function nebulaVoid(p: BrickParams): ComposedWallpaper {
 
   const vignette = vignetteBrick(p, { id: "nn-v-vig", opacity: 0.7 });
   const noise = noiseBrick(p, { id: "nn-v-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, bgStars, edgeGlow, darkCloud, vignette, noise]);
+
+  const horizGlow = horizonGlowBrick(p, {
+    id: "nn-v-hg",
+    y: 0.5,
+    color: colors.huePurple,
+    opacity: 0.12,
+    height: 0.12,
+  });
+
+  return mergeBricks([bg, sky, bgStars, edgeGlow, darkCloud, horizGlow, vignette, noise]);
 }
 
 /* ── Pulse: Galactic core — dense star cloud ──────────────────────────────── */
@@ -361,7 +401,7 @@ function nebulaPulse(p: BrickParams): ComposedWallpaper {
     cy: 0.48,
     bandHeight: 0.06,
     color: colors.bg,
-    opacity: 0.25,
+    opacity: 0.12,
     frequency: 0.006,
     seed: 7,
   });
@@ -370,7 +410,7 @@ function nebulaPulse(p: BrickParams): ComposedWallpaper {
     cy: 0.55,
     bandHeight: 0.04,
     color: colors.bg,
-    opacity: 0.15,
+    opacity: 0.08,
     frequency: 0.008,
     seed: 13,
   });

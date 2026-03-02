@@ -60,7 +60,7 @@ function mandarianStillness(p: BrickParams): ComposedWallpaper {
     r: 0.04,
     color: colors.hueYellow,
     glowColor: colors.hueOrange,
-    glowSize: 0.1,
+    glowSize: 2.5,
   });
 
   const dune1 = duneBrick(p, {

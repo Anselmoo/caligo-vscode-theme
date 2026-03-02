@@ -90,7 +90,7 @@ function deepStillness(p: BrickParams): ComposedWallpaper {
     count: 60,
     brightCount: 8,
     color: colors.hueCyan,
-    distribution: "full",
+    distribution: "upper",
     opacity: 0.5,
   });
 

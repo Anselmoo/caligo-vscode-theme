@@ -59,7 +59,7 @@ function eclipseStillness(p: BrickParams): ComposedWallpaper {
     r: 0.065,
     color: colors.bg,
     glowColor: colors.hueOrange,
-    glowSize: 0.14,
+    glowSize: 2.15,
   });
 
   const corona = nebulaGlowBrick(p, {
@@ -125,7 +125,7 @@ function eclipseDrift(p: BrickParams): ComposedWallpaper {
     r: 0.06,
     color: colors.bg,
     glowColor: colors.hueYellow,
-    glowSize: 0.1,
+    glowSize: 1.67,
   });
 
   const diamond = nebulaGlowBrick(p, {
@@ -159,9 +159,9 @@ function eclipseDrift(p: BrickParams): ComposedWallpaper {
   const hills = terrainStackBrick(p, {
     id: "ec-d-hl",
     layers: [
-      { baseY: 0.8, roughness: 0.04, color: colors.bgMid, opacity: 0.35 },
-      { baseY: 0.88, roughness: 0.03, color: colors.bgSoft, opacity: 0.55 },
-      { baseY: 0.94, roughness: 0.025, color: colors.bg, opacity: 0.8 },
+      { baseY: 0.8, roughness: 0.06, color: colors.bgMid, opacity: 0.35 },
+      { baseY: 0.88, roughness: 0.05, color: colors.bgSoft, opacity: 0.55 },
+      { baseY: 0.94, roughness: 0.04, color: colors.bg, opacity: 0.8 },
     ],
   });
 
@@ -191,7 +191,7 @@ function eclipseBreak(p: BrickParams): ComposedWallpaper {
     r: 0.07,
     color: colors.hueRed,
     glowColor: colors.hueRed,
-    glowSize: 0.16,
+    glowSize: 2.29,
   });
 
   const redHaze = nebulaGlowBrick(p, {
@@ -248,7 +248,7 @@ function eclipseVoid(p: BrickParams): ComposedWallpaper {
     r: 0.05,
     color: colors.bg,
     glowColor: colors.bgSoft,
-    glowSize: 0.08,
+    glowSize: 1.6,
   });
 
   const whisper = nebulaGlowBrick(p, {
@@ -261,8 +261,8 @@ function eclipseVoid(p: BrickParams): ComposedWallpaper {
   const horizon = terrainStackBrick(p, {
     id: "ec-v-hz",
     layers: [
-      { baseY: 0.88, roughness: 0.02, color: colors.bgSoft, opacity: 0.2 },
-      { baseY: 0.94, roughness: 0.015, color: colors.bgMid, opacity: 0.3 },
+      { baseY: 0.88, roughness: 0.04, color: colors.bgSoft, opacity: 0.2 },
+      { baseY: 0.94, roughness: 0.03, color: colors.bgMid, opacity: 0.3 },
     ],
   });
 
@@ -294,7 +294,7 @@ function eclipsePulse(p: BrickParams): ComposedWallpaper {
     r: 0.055,
     color: colors.bg,
     glowColor: colors.hueOrange,
-    glowSize: 0.12,
+    glowSize: 2.18,
   });
 
   const corona = nebulaGlowBrick(p, {
@@ -339,7 +339,7 @@ function eclipsePulse(p: BrickParams): ComposedWallpaper {
     cy: 0.65,
     bandHeight: 0.1,
     color: colors.bgSoft,
-    opacity: 0.15,
+    opacity: 0.07,
     frequency: 0.005,
     seed: 13,
   });

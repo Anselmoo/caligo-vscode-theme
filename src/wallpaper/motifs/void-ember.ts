@@ -69,7 +69,7 @@ function voidEmberStillness(p: BrickParams): ComposedWallpaper {
     r: 0.008,
     color: colors.hueOrange,
     glowColor: colors.hueYellow,
-    glowSize: 0.03,
+    glowSize: 4.44,
   });
 
   // Desert horizon — ember suspended over night landscape
@@ -164,7 +164,7 @@ function voidEmberBreak(p: BrickParams): ComposedWallpaper {
     r: 0.015,
     color: "#ffffff",
     glowColor: colors.hueYellow,
-    glowSize: 0.06,
+    glowSize: 4.0,
   });
 
   // Expanding shockwave rings

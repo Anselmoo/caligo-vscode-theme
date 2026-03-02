@@ -60,9 +60,9 @@ function obsidianStillness(p: BrickParams): ComposedWallpaper {
     cx: 0.5,
     cy: 0.25,
     r: 0.055,
-    color: colors.bgSoft,
+    color: "#c8d0e0",
     glowColor: colors.hueCyan,
-    glowSize: 0.12,
+    glowSize: 2.18,
   });
 
   // Volcanic plain terrain
@@ -126,10 +126,10 @@ function obsidianDrift(p: BrickParams): ComposedWallpaper {
     id: "og-d-ice",
     points: 20,
     layers: [
-      { baseY: 0.35, roughness: 0.03, color: colors.hueCyan, opacity: 0.1 },
-      { baseY: 0.42, roughness: 0.025, color: colors.hueBlue, opacity: 0.08 },
-      { baseY: 0.5, roughness: 0.03, color: colors.hueCyan, opacity: 0.06 },
-      { baseY: 0.58, roughness: 0.02, color: colors.hueBlue, opacity: 0.05 },
+      { baseY: 0.52, roughness: 0.03, color: colors.hueCyan, opacity: 0.1 },
+      { baseY: 0.6, roughness: 0.025, color: colors.hueBlue, opacity: 0.08 },
+      { baseY: 0.68, roughness: 0.03, color: colors.hueCyan, opacity: 0.06 },
+      { baseY: 0.76, roughness: 0.02, color: colors.hueBlue, opacity: 0.05 },
     ],
   });
 
@@ -207,7 +207,7 @@ function obsidianBreak(p: BrickParams): ComposedWallpaper {
     cy: 0.2,
     bandHeight: 0.2,
     color: colors.bgSoft,
-    opacity: 0.12,
+    opacity: 0.07,
     frequency: 0.006,
     seed: 13,
   });
@@ -311,9 +311,9 @@ function obsidianPulse(p: BrickParams): ComposedWallpaper {
     cx: 0.5,
     cy: 0.15,
     r: 0.04,
-    color: colors.bgSoft,
+    color: "#c8d0e0",
     glowColor: colors.hueCyan,
-    glowSize: 0.08,
+    glowSize: 2.0,
   });
 
   // Lake reflection — water surface with ripple
