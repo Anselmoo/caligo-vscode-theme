@@ -7,6 +7,7 @@
  * Void      : Ash haze — desolation scene with near-invisible horizon
  * Pulse     : Night campfire — warm glow illuminating sparse trees and sparks
  */
+/* --- re-export under the same public name -------------------------------- */
 import {
   backgroundBrick,
   celestialBrick,
@@ -17,7 +18,9 @@ import {
   lightningBrick,
   nebulaGlowBrick,
   noiseBrick,
+  radialGradientBrick,
   skyGradientBrick,
+  sparksBrick,
   starFieldBrick,
   terrainBrick,
   terrainStackBrick,
@@ -27,9 +30,6 @@ import {
 } from "../bricks/index.js";
 import { mergeBricks } from "../composer.js";
 import type { BrickParams, ComposedWallpaper } from "../types.js";
-
-/* --- re-export under the same public name -------------------------------- */
-import { sparksBrick, radialGradientBrick } from "../bricks/index.js";
 
 export function cinder(params: BrickParams): ComposedWallpaper {
   switch (params.harmonyMode) {
@@ -355,6 +355,26 @@ function cinderVoid(p: BrickParams): ComposedWallpaper {
     ],
   });
 
+  // Stratified ash cloud layers — atmosphere smothered by desolation
+  const ashLayer1 = cloudBandBrick(p, {
+    id: "ci-v-a1",
+    cy: 0.2,
+    bandHeight: 0.2,
+    color: colors.bgMid,
+    opacity: 0.1,
+    frequency: 0.004,
+    seed: 17,
+  });
+  const ashLayer2 = cloudBandBrick(p, {
+    id: "ci-v-a2",
+    cy: 0.55,
+    bandHeight: 0.25,
+    color: colors.bgSoft,
+    opacity: 0.08,
+    frequency: 0.005,
+    seed: 31,
+  });
+
   // Ash haze — smothering fog wisps
   const ashFog = fogWispBrick(p, {
     id: "ci-v-fog",
@@ -366,14 +386,15 @@ function cinderVoid(p: BrickParams): ComposedWallpaper {
     wispOpacity: 0.04,
   });
 
-  // Barely visible terrain
-  const desolation = terrainBrick(p, {
+  // Multi-layer desolation terrain — barely visible through the ash
+  const desolation = terrainStackBrick(p, {
     id: "ci-v-ds",
-    baseY: 0.72,
-    roughness: 0.03,
     points: 14,
-    color: colors.bgMid,
-    opacity: 0.2,
+    layers: [
+      { baseY: 0.62, roughness: 0.04, color: colors.bgMid, opacity: 0.12 },
+      { baseY: 0.72, roughness: 0.03, color: colors.bgSoft, opacity: 0.2 },
+      { baseY: 0.82, roughness: 0.02, color: colors.bg, opacity: 0.4 },
+    ],
   });
 
   // Single ember glow — barely alive fire source
@@ -383,9 +404,31 @@ function cinderVoid(p: BrickParams): ComposedWallpaper {
     blobs: [{ cx: 0.5, cy: 0.68, rx: 0.03, ry: 0.02, color: colors.hueRed, opacity: 0.15 }],
   });
 
+  // Stars extremely faint — barely visible through dense ash layer
+  const stars = starFieldBrick(p, {
+    id: "ci-v-st",
+    count: 20,
+    brightCount: 2,
+    color: "#ffffff",
+    distribution: "upper",
+    opacity: 0.08,
+    featureCount: 1,
+  });
+
   const vignette = vignetteBrick(p, { id: "ci-v-vig", opacity: 0.85 });
   const noise = noiseBrick(p, { id: "ci-v-n", opacity: 0.03 });
-  return mergeBricks([bg, sky, ashFog, ember, desolation, vignette, noise]);
+  return mergeBricks([
+    bg,
+    sky,
+    ashLayer1,
+    ashLayer2,
+    stars,
+    ashFog,
+    ember,
+    desolation,
+    vignette,
+    noise,
+  ]);
 }
 
 /* ── Pulse: Night campfire — warm glow with sparks and trees ──────────────── */

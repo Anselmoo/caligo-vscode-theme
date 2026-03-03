@@ -3,23 +3,44 @@ import type { WallpaperColors } from "../../types.js";
 import { buildDesertNightVars } from "../desert-vars.js";
 
 const REQUIRED_TOKENS = [
-  "skyTop", "skyMid", "skyBottom",
-  "starWhite", "starFaint", "starBlue",
-  "moonSurface", "moonGlow",
-  "hazeColor", "hazeOpacity",
-  "duneFar", "duneMidFar", "duneMidNear", "duneFront",
-  "vignetteColor", "vignetteOpacity",
+  "skyTop",
+  "skyMid",
+  "skyBottom",
+  "starWhite",
+  "starFaint",
+  "starBlue",
+  "moonSurface",
+  "moonGlow",
+  "hazeColor",
+  "hazeOpacity",
+  "duneFar",
+  "duneMidFar",
+  "duneMidNear",
+  "duneFront",
+  "vignetteColor",
+  "vignetteOpacity",
 ] as const;
 
 function makeColors(): WallpaperColors {
   return {
-    bg: "#0a0508", bgSoft: "#2a1208", bgMid: "#1a0d06",
-    accent: "#ff6600", accentSoft: "#cc4400", accentMuted: "#441100",
-    hueRed: "#ff2200", hueOrange: "#ff8800", hueYellow: "#ffcc00",
-    hueGreen: "#88cc00", hueCyan: "#00cccc", hueBlue: "#0066cc",
+    bg: "#0a0508",
+    bgSoft: "#2a1208",
+    bgMid: "#1a0d06",
+    accent: "#ff6600",
+    accentSoft: "#cc4400",
+    accentMuted: "#441100",
+    hueRed: "#ff2200",
+    hueOrange: "#ff8800",
+    hueYellow: "#ffcc00",
+    hueGreen: "#88cc00",
+    hueCyan: "#00cccc",
+    hueBlue: "#0066cc",
     huePurple: "#8844cc",
-    strings: "#ff8800", keywords: "#ff6600", functions: "#ffcc00",
-    types: "#cc8800", variables: "#ccaa88",
+    strings: "#ff8800",
+    keywords: "#ff6600",
+    functions: "#ffcc00",
+    types: "#cc8800",
+    variables: "#ccaa88",
   };
 }
 

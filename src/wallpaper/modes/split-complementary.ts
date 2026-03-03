@@ -4,10 +4,10 @@
  * A dramatic diagonal split divides the canvas into two contrasting visual zones.
  * One half belongs to the motif; the other to its complement.
  */
-import { linearGradientBrick, vignetteBrick } from "../bricks/index.js";
+import { fogWispBrick, linearGradientBrick, vignetteBrick } from "../bricks/index.js";
+import { fmtCoord, fmtStroke } from "../bricks/svg-format.js";
 import { mergeBricks } from "../composer.js";
 import type { BrickParams, ComposedWallpaper } from "../types.js";
-import { fmtCoord, fmtStroke } from "../bricks/svg-format.js";
 
 export function splitComplementaryMode(
   motif: ComposedWallpaper,
@@ -38,9 +38,20 @@ export function splitComplementaryMode(
     elements: `<line x1="${lineX1}" y1="${fmtCoord(lineY1)}" x2="${lineX2}" y2="${fmtCoord(lineY2)}" stroke="${colors.accentMuted}" stroke-width="${fmtStroke(Math.max(width, height) / 2160)}" opacity="0.25"/>`,
   };
 
-  const vignette = vignetteBrick(params, { opacity: 0.5, innerRadius: 0.25 });
+  // Atmospheric fog — softens the hard rupture boundary
+  const fog = fogWispBrick(params, {
+    id: "mode-rup-fg",
+    cy: 0.5,
+    hazeCount: 2,
+    wispCount: 3,
+    color: colors.bgSoft,
+    hazeOpacity: 0.04,
+    wispOpacity: 0.025,
+  });
 
-  const extra = mergeBricks([splitGrad, vignette]);
+  const vignette = vignetteBrick(params, { id: "mode-rup-vig", opacity: 0.5, innerRadius: 0.25 });
+
+  const extra = mergeBricks([splitGrad, fog, vignette]);
   return {
     defs: [motif.defs, extra.defs].filter(Boolean).join("\n"),
     elements: [motif.elements, divLine.elements, extra.elements].filter(Boolean).join("\n"),

@@ -100,9 +100,9 @@ export function buildEclipseCoronaVars(
     eclipseCore: BLACK,
 
     // ── Mountain silhouettes ──────────────────────────────────────────────────
-    mountainFar: lerp(colors.bg, colors.bgSoft, 0.30),
+    mountainFar: lerp(colors.bg, colors.bgSoft, 0.3),
     mountainMid: lerp(colors.bg, colors.bgSoft, 0.15),
-    mountainNear: darken(colors.bg, 0.20),
+    mountainNear: darken(colors.bg, 0.2),
 
     // ── Horizon haze (subtle corona-tinted atmospheric glow) ──────────────────
     hazeColor: lerp(colors.bgSoft, coronaInner, 0.14),

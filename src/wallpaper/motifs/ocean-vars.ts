@@ -55,10 +55,7 @@ function oceanTriple(colors: WallpaperColors, mode: string): [string, string] {
  * Build the complete token map for the ocean-night scene.
  * All 19 tokens are always present.
  */
-export function buildOceanNightVars(
-  colors: WallpaperColors,
-  mode: string
-): Record<string, string> {
+export function buildOceanNightVars(colors: WallpaperColors, mode: string): Record<string, string> {
   const [horizonTint, moonTint] = oceanTriple(colors, mode);
 
   return {
@@ -78,8 +75,8 @@ export function buildOceanNightVars(
     moonGlow: lerp(moonTint, horizonTint, 0.22),
 
     // ── Ocean surface ─────────────────────────────────────────────────────────
-    seaDeep: darken(colors.bg, 0.40),
-    seaMid: lerp(colors.bg, colors.bgSoft, 0.30),
+    seaDeep: darken(colors.bg, 0.4),
+    seaMid: lerp(colors.bg, colors.bgSoft, 0.3),
     moonReflection: moonTint,
     waveEdge: lerp(colors.bgSoft, "#c0d8ff", 0.38),
 

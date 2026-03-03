@@ -55,10 +55,17 @@ export function loadFragment(name: string): string {
  * Comments (<!-- ... -->) and the XML declaration are removed from output.
  */
 export function parseBrickOutput(svg: string): BrickOutput {
-  // Strip XML declaration and comments
-  const cleaned = svg
-    .replace(/<\?xml[^?]*\?>\s*/g, "")
-    .replace(/<!--[\s\S]*?-->/g, "");
+  // Strip XML declaration
+  let cleaned = svg.replace(/<\?xml[^?]*\?>\s*/g, "");
+
+  // Strip SVG comments iteratively to prevent any comment content from surviving.
+  // SVG comments cannot be nested in well-formed XML, but we loop to handle
+  // any edge cases where a single pass might leave residual comment markers.
+  let prev: string;
+  do {
+    prev = cleaned;
+    cleaned = cleaned.replace(/<!--[\s\S]*?-->/g, "");
+  } while (cleaned !== prev && cleaned.includes("<!--"));
 
   // Extract <defs>...</defs> inner content
   const defsMatch = cleaned.match(/<defs[^>]*>([\s\S]*?)<\/defs>/);
@@ -117,10 +124,7 @@ export function loadSceneManifest(sceneId: string): SceneManifest {
  * @param sceneId - matches a <sceneId>.scene.json file in scenes/
  * @param vars    - complete token map for all fragments in the scene
  */
-export function assembleScene(
-  sceneId: string,
-  vars: Record<string, string>
-): BrickOutput {
+export function assembleScene(sceneId: string, vars: Record<string, string>): BrickOutput {
   const manifest = loadSceneManifest(sceneId);
   const layers = [...manifest.layers].sort((a, b) => a.z - b.z);
   let allDefs = "";

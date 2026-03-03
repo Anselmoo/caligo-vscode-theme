@@ -83,7 +83,7 @@ export function buildDesertNightVars(
     // ── Dune silhouettes (warmly dark, layered depth) ─────────────────────────
     duneFar: lerp(colors.bg, colors.bgSoft, 0.48),
     duneMidFar: lerp(colors.bg, colors.bgSoft, 0.24),
-    duneMidNear: lerp(colors.bg, colors.bgSoft, 0.10),
+    duneMidNear: lerp(colors.bg, colors.bgSoft, 0.1),
     duneFront: darken(colors.bg, 0.18),
 
     // ── Vignette (pure black edge darkening) ──────────────────────────────────

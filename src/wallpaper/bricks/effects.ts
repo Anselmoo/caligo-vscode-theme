@@ -1,5 +1,5 @@
-import type { BrickOutput, BrickParams } from "../types.js";
 import { renderTemplate } from "../templates/engine.js";
+import type { BrickOutput, BrickParams } from "../types.js";
 import { fmtCoord, fmtLength, fmtOpacity } from "./svg-format.js";
 
 export interface BloomEllipseBrickOptions {

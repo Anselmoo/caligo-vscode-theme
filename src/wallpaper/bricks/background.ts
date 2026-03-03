@@ -2,8 +2,9 @@
  * Background brick — solid fill + soft atmospheric radial gradient.
  * Every wallpaper starts here.
  */
-import type { BrickOutput, BrickParams } from "../types.js";
+
 import { renderTemplate } from "../templates/engine.js";
+import type { BrickOutput, BrickParams } from "../types.js";
 import { fmtCoord, fmtLength } from "./svg-format.js";
 
 export function backgroundBrick(params: BrickParams, id = "bg-atm"): BrickOutput {

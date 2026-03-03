@@ -158,12 +158,22 @@ describe("renderTemplate", () => {
 /** Minimal token set covering all desert-night fragments. */
 function desertVars(): Record<string, string> {
   return {
-    skyTop: "#020105", skyMid: "#0a0815", skyBottom: "#0f0c1a",
-    starWhite: "#ffffff", starFaint: "#ddeeff", starBlue: "#bbccff",
-    moonSurface: "#f0e8d8", moonGlow: "#ffe8c0",
-    hazeColor: "#2a1a0a", hazeOpacity: "0.18",
-    duneFar: "#1a1408", duneMidFar: "#120e05", duneMidNear: "#0a0803", duneFront: "#050401",
-    vignetteColor: "#000000", vignetteOpacity: "0.55",
+    skyTop: "#020105",
+    skyMid: "#0a0815",
+    skyBottom: "#0f0c1a",
+    starWhite: "#ffffff",
+    starFaint: "#ddeeff",
+    starBlue: "#bbccff",
+    moonSurface: "#f0e8d8",
+    moonGlow: "#ffe8c0",
+    hazeColor: "#2a1a0a",
+    hazeOpacity: "0.18",
+    duneFar: "#1a1408",
+    duneMidFar: "#120e05",
+    duneMidNear: "#0a0803",
+    duneFront: "#050401",
+    vignetteColor: "#000000",
+    vignetteOpacity: "0.55",
   };
 }
 

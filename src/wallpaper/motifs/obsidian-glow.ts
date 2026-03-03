@@ -358,6 +358,18 @@ function obsidianVoid(p: BrickParams): ComposedWallpaper {
     ],
   });
 
+  // Faint stars barely visible through cave opening
+  const stars = starFieldBrick(p, {
+    id: "og-v-st",
+    count: 25,
+    brightCount: 2,
+    color: "#ffffff",
+    color2: colors.hueCyan,
+    distribution: "upper",
+    opacity: 0.12,
+    featureCount: 1,
+  });
+
   // Cave walls — converging terrain layers from sides
   const wallL = terrainStackBrick(p, {
     id: "og-v-wl",
@@ -370,6 +382,24 @@ function obsidianVoid(p: BrickParams): ComposedWallpaper {
     layers: [{ baseY: 0.3, roughness: 0.06, color: colors.bgMid, opacity: 0.35 }],
   });
 
+  // Cave floor — multi-layer rock formation for depth
+  const floor = terrainStackBrick(p, {
+    id: "og-v-fl",
+    points: 16,
+    layers: [
+      {
+        baseY: 0.8,
+        roughness: 0.05,
+        color: colors.bgMid,
+        opacity: 0.3,
+        ridgeHighlight: true,
+        ridgeHighlightColor: colors.hueCyan,
+      },
+      { baseY: 0.88, roughness: 0.04, color: colors.bgSoft, opacity: 0.5 },
+      { baseY: 0.94, roughness: 0.03, color: colors.bg, opacity: 0.7 },
+    ],
+  });
+
   // Single distant light point
   const light = nebulaGlowBrick(p, {
     id: "og-v-li",
@@ -380,9 +410,43 @@ function obsidianVoid(p: BrickParams): ComposedWallpaper {
     ],
   });
 
+  // Crystal texture — refraction bands across cave interior
+  const crystals = cloudBandBrick(p, {
+    id: "og-v-cr",
+    cy: 0.5,
+    bandHeight: 0.4,
+    color: colors.hueCyan,
+    opacity: 0.04,
+    frequency: 0.008,
+    seed: 53,
+  });
+
+  // Atmospheric cave mist drifting around the light source
+  const mist = fogWispBrick(p, {
+    id: "og-v-fg",
+    cy: 0.5,
+    hazeCount: 2,
+    wispCount: 3,
+    color: colors.bgSoft,
+    hazeOpacity: 0.04,
+    wispOpacity: 0.025,
+  });
+
   const vignette = vignetteBrick(p, { id: "og-v-vig", opacity: 0.88 });
   const noise = noiseBrick(p, { id: "og-v-n", opacity: 0.04 });
-  return mergeBricks([bg, dark, wallL, wallR, light, vignette, noise]);
+  return mergeBricks([
+    bg,
+    dark,
+    stars,
+    crystals,
+    wallL,
+    wallR,
+    light,
+    mist,
+    floor,
+    vignette,
+    noise,
+  ]);
 }
 
 /* ── Pulse: Mountain peak mirrored in obsidian lake ───────────────────────── */

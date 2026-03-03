@@ -296,11 +296,33 @@ function midnightVoid(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  // Single emerging form — soft terrain ridge barely visible
+  // Barely visible moon through charcoal haze — single dim presence
+  const moon = celestialBrick(p, {
+    id: "mi-v-mn",
+    cx: 0.5,
+    cy: 0.22,
+    r: 0.02,
+    color: colors.bgSoft,
+    glowColor: colors.accentSoft,
+    glowSize: 0.04,
+  });
+
+  // Single emerging form — multi-layer terrain for depth
   const form = terrainStackBrick(p, {
     id: "mi-v-fm",
     points: 14,
-    layers: [{ baseY: 0.55, roughness: 0.06, color: colors.bgMid, opacity: 0.15 }],
+    layers: [
+      {
+        baseY: 0.45,
+        roughness: 0.06,
+        color: colors.bgMid,
+        opacity: 0.08,
+        ridgeHighlight: true,
+        ridgeHighlightColor: colors.accentSoft,
+      },
+      { baseY: 0.55, roughness: 0.06, color: colors.bgMid, opacity: 0.15 },
+      { baseY: 0.65, roughness: 0.04, color: colors.bgSoft, opacity: 0.25 },
+    ],
   });
 
   // Faint haze
@@ -325,9 +347,20 @@ function midnightVoid(p: BrickParams): ComposedWallpaper {
     wispOpacity: 0.02,
   });
 
+  // Upper charcoal dust — atmospheric depth in darkness
+  const dust = fogWispBrick(p, {
+    id: "mi-v-du",
+    cy: 0.25,
+    hazeCount: 2,
+    wispCount: 2,
+    color: colors.bgMid,
+    hazeOpacity: 0.02,
+    wispOpacity: 0.015,
+  });
+
   const vignette = vignetteBrick(p, { id: "mi-v-vig", opacity: 0.85 });
   const noise = noiseBrick(p, { id: "mi-v-n", opacity: 0.04 });
-  return mergeBricks([bg, dark, haze, form, fog, vignette, noise]);
+  return mergeBricks([bg, dark, moon, haze, form, dust, fog, vignette, noise]);
 }
 
 /* ── Pulse: Stained glass — moonlight through cathedral ───────────────────── */

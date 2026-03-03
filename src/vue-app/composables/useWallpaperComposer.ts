@@ -41,7 +41,12 @@ function modeDir(mode: HarmonyMode): string {
   return mode === "none" ? "balanced" : mode;
 }
 
-function buildSvgUrl(seedId: string, mode: HarmonyMode, platform: Platform, textVariant: TextVariant): string {
+function buildSvgUrl(
+  seedId: string,
+  mode: HarmonyMode,
+  platform: Platform,
+  textVariant: TextVariant
+): string {
   const suffix = textVariant === "text" ? "-text" : "";
   return `./wallpapers/${seedId}/${modeDir(mode)}/${platform}${suffix}.svg`;
 }
@@ -79,20 +84,23 @@ export function useWallpaperComposer() {
 
   // ── Derived ──────────────────────────────────────────────────────────────
   const svgUrl = computed(() =>
-    buildSvgUrl(selectedSeed.value, selectedMode.value, selectedPlatform.value, selectedTextVariant.value)
+    buildSvgUrl(
+      selectedSeed.value,
+      selectedMode.value,
+      selectedPlatform.value,
+      selectedTextVariant.value
+    )
   );
 
-  const currentMode = computed(() =>
-    HARMONY_MODES.find(m => m.id === selectedMode.value) ?? HARMONY_MODES[0]
+  const currentMode = computed(
+    () => HARMONY_MODES.find(m => m.id === selectedMode.value) ?? HARMONY_MODES[0]
   );
 
-  const currentPlatform = computed(() =>
-    PLATFORMS.find(p => p.id === selectedPlatform.value) ?? PLATFORMS[0]
+  const currentPlatform = computed(
+    () => PLATFORMS.find(p => p.id === selectedPlatform.value) ?? PLATFORMS[0]
   );
 
-  const currentSeed = computed(() =>
-    seeds.value.find(s => s.id === selectedSeed.value)
-  );
+  const currentSeed = computed(() => seeds.value.find(s => s.id === selectedSeed.value));
 
   return {
     // Seed list

@@ -15,7 +15,7 @@
  */
 
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join, resolve, dirname } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -62,9 +62,6 @@ function detectElements(svg: string): ElementPresence {
   // Count SVG elements
   const circleCount = (svg.match(/<circle/g) || []).length;
   const pathCount = (svg.match(/<path/g) || []).length;
-  const ellipseCount = (svg.match(/<ellipse/g) || []).length;
-  const lineCount = (svg.match(/<line/g) || []).length;
-  const filterCount = (svg.match(/<filter/g) || []).length;
 
   // ID-based detection
   const ids = (svg.match(/id="([^"]*)"/g) || []).map(m => m.replace(/id="|"/g, ""));
@@ -290,7 +287,7 @@ function verifySeedCoverage(results: AuditResult[]): string[] {
 
   for (const r of results) {
     if (!seedModes.has(r.seed)) seedModes.set(r.seed, new Map());
-    seedModes.get(r.seed)!.set(r.mode, r);
+    seedModes.get(r.seed)?.set(r.mode, r);
   }
 
   for (const [seed, modes] of seedModes) {
@@ -325,8 +322,8 @@ function verifySeedCoverage(results: AuditResult[]): string[] {
   ];
   for (const key of thematicKeys) {
     globalPresence[key] = [...seedModes.keys()].filter(seed => {
-      const modes = seedModes.get(seed)!;
-      return [...modes.values()].some(r => r.elements[key]);
+      const modes = seedModes.get(seed);
+      return modes !== undefined && [...modes.values()].some(r => r.elements[key]);
     }).length;
   }
 

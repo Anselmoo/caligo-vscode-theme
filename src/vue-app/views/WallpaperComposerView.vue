@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 // biome-ignore lint/correctness/noUnusedImports: used in template
+import type { Platform, TextVariant } from "../../wallpaper/types";
+// biome-ignore lint/correctness/noUnusedImports: used in template
 import type { HarmonyMode } from "../composables/useWallpaperComposer";
 import { useWallpaperComposer } from "../composables/useWallpaperComposer";
-import type { Platform, TextVariant } from "../../wallpaper/types";
 
 const {
   seeds,

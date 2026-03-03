@@ -60,7 +60,8 @@ const routes: RouteRecordRaw[] = [
   {
     path: "/wallpapers/composer",
     name: "wallpapers-composer",
-    component: () => import(/* webpackChunkName: "wallpapers-composer" */ "../views/WallpaperComposerView.vue"),
+    component: () =>
+      import(/* webpackChunkName: "wallpapers-composer" */ "../views/WallpaperComposerView.vue"),
     meta: {
       title: "Wallpaper Composer — Caligo Themes",
       description: "Interactively explore wallpaper seeds, harmony modes, and platforms",
