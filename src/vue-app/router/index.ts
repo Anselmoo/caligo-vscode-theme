@@ -48,6 +48,27 @@ const routes: RouteRecordRaw[] = [
     },
   },
   {
+    path: "/wallpapers",
+    name: "wallpapers",
+    component: () => import(/* webpackChunkName: "wallpapers" */ "../views/WallpapersView.vue"),
+    meta: {
+      title: "Wallpapers — Caligo Themes",
+      description: "50 unique wallpapers for monitor, tablet, and mobile",
+      transition: "slide-left",
+    },
+  },
+  {
+    path: "/wallpapers/composer",
+    name: "wallpapers-composer",
+    component: () =>
+      import(/* webpackChunkName: "wallpapers-composer" */ "../views/WallpaperComposerView.vue"),
+    meta: {
+      title: "Wallpaper Composer — Caligo Themes",
+      description: "Interactively explore wallpaper seeds, harmony modes, and platforms",
+      transition: "slide-left",
+    },
+  },
+  {
     path: "/:pathMatch(.*)*",
     name: "not-found",
     component: () => import(/* webpackChunkName: "not-found" */ "../views/NotFoundView.vue"),

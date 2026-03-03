@@ -1,0 +1,11 @@
+{
+  "id": "desert-night",
+  "layers": [
+    { "fragment": "sky-gradient", "z": 0 },
+    { "fragment": "star-field-sparse", "z": 1 },
+    { "fragment": "moon-crescent", "z": 2 },
+    { "fragment": "horizon-haze", "z": 3 },
+    { "fragment": "dunes-4layer", "z": 4 },
+    { "fragment": "vignette-overlay", "z": 5 }
+  ]
+}

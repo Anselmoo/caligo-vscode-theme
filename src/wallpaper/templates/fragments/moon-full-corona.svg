@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <defs>
+    <radialGradient id="mfc-corona" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="{{moonCorona}}" stop-opacity="0.32"/>
+      <stop offset="100%" stop-color="{{moonCorona}}" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="mfc-glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+  </defs>
+  <circle cx="1245" cy="148" r="168" fill="url(#mfc-corona)"/>
+  <circle cx="1245" cy="148" r="98" fill="{{moonGlow}}" opacity="0.28" filter="url(#mfc-glow)"/>
+  <circle cx="1245" cy="148" r="72" fill="{{moonSurface}}"/>
+</svg>

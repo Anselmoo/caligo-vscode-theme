@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <path d="M0,835 Q200,818 400,828 Q600,812 800,825 Q1000,810 1200,822 Q1400,806 1600,815 L1600,900 L0,900 Z"
+    fill="{{waveColor}}" opacity="0.44"/>
+  <path d="M82,838 Q142,830 202,836" stroke="{{foamColor}}" stroke-width="1.5" fill="none" opacity="0.40"/>
+  <path d="M482,828 Q562,820 642,826" stroke="{{foamColor}}" stroke-width="1.5" fill="none" opacity="0.36"/>
+  <path d="M882,824 Q962,815 1042,821" stroke="{{foamColor}}" stroke-width="1.5" fill="none" opacity="0.40"/>
+  <path d="M1282,818 Q1362,809 1442,815" stroke="{{foamColor}}" stroke-width="1.5" fill="none" opacity="0.36"/>
+</svg>

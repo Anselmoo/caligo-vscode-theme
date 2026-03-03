@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Bloom ellipse template — reusable glow/bloom primitive.
+
+  Template variables:
+  - filterId : unique SVG filter ID (e.g. "bloom-001")
+  - blur     : feGaussianBlur stdDeviation value
+  - cx       : ellipse center x coordinate (canvas units)
+  - cy       : ellipse center y coordinate (canvas units)
+  - rx       : ellipse horizontal radius (canvas units)
+  - ry       : ellipse vertical radius (canvas units)
+  - color    : fill color (hex, oklch, etc.)
+  - opacity  : fill opacity (0–1)
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3840 2160">
+  <defs>
+    <filter id="{{filterId}}" x="-100%" y="-100%" width="300%" height="300%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="{{blur}}" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <ellipse
+    cx="{{cx}}"
+    cy="{{cy}}"
+    rx="{{rx}}"
+    ry="{{ry}}"
+    fill="{{color}}"
+    opacity="{{opacity}}"
+    filter="url(#{{filterId}})"
+  />
+</svg>

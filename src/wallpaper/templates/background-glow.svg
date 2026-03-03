@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Background glow template — solid fill with off-center atmospheric radial gradient.
+  Every wallpaper starts here as its base layer.
+
+  Template variables:
+  - gradId     : unique radialGradient ID (e.g. "bg-atm")
+  - cx         : gradient center x coordinate (canvas units)
+  - cy         : gradient center y coordinate (canvas units, typically ~35% from top)
+  - r          : radial gradient radius (canvas units)
+  - bgColor    : solid background fill color
+  - softColor  : soft glow color at the gradient center
+  - width      : canvas width
+  - height     : canvas height
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3840 2160">
+  <defs>
+    <radialGradient id="{{gradId}}" cx="{{cx}}" cy="{{cy}}" r="{{r}}" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="{{softColor}}" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="{{bgColor}}" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="{{width}}" height="{{height}}" fill="{{bgColor}}"/>
+  <rect width="{{width}}" height="{{height}}" fill="url(#{{gradId}})"/>
+</svg>

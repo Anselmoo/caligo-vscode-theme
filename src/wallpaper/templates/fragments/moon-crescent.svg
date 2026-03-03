@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <defs>
+    <filter id="mc-glow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="18" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <mask id="mc-mask">
+      <rect width="1600" height="900" fill="black"/>
+      <circle cx="1250" cy="165" r="65" fill="white"/>
+      <circle cx="1215" cy="152" r="60" fill="black"/>
+    </mask>
+  </defs>
+  <circle cx="1250" cy="165" r="98" fill="{{moonGlow}}" opacity="0.22" filter="url(#mc-glow)"/>
+  <circle cx="1250" cy="165" r="65" fill="{{moonSurface}}" mask="url(#mc-mask)"/>
+</svg>

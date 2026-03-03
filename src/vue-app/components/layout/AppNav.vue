@@ -11,6 +11,8 @@ const navItems = [
   { path: "/gallery", label: "Gallery", name: "gallery" },
   { path: "/analysis", label: "Analysis", name: "analysis" },
   { path: "/export", label: "Export", name: "export" },
+  { path: "/wallpapers", label: "Wallpapers", name: "wallpapers" },
+  { path: "/wallpapers/composer", label: "Composer", name: "wallpapers-composer" },
 ];
 
 const isActive = (name: string) => {
