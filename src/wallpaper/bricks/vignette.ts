@@ -2,6 +2,8 @@
  * Vignette brick — edge darkening overlay for depth and focus.
  */
 import type { BrickOutput, BrickParams } from "../types.js";
+import { renderTemplate } from "../templates/engine.js";
+import { fmtCoord, fmtLength, fmtOpacity, fmtPercent } from "./svg-format.js";
 
 export interface VignetteBrickOptions {
   id?: string;
@@ -21,11 +23,15 @@ export function vignetteBrick(
   const cx = width / 2;
   const cy = height / 2;
   const r = Math.max(width, height) * 0.75;
-  return {
-    defs: `<radialGradient id="${id}" cx="${cx.toFixed(0)}" cy="${cy.toFixed(0)}" r="${r.toFixed(0)}" gradientUnits="userSpaceOnUse">
-  <stop offset="${(innerRadius * 100).toFixed(0)}%" stop-color="${color}" stop-opacity="0"/>
-  <stop offset="100%" stop-color="${color}" stop-opacity="${opacity}"/>
-</radialGradient>`,
-    elements: `<rect width="${width}" height="${height}" fill="url(#${id})"/>`,
-  };
+  return renderTemplate("vignette.svg", {
+    gradId: id,
+    cx: fmtCoord(cx),
+    cy: fmtCoord(cy),
+    r: fmtLength(r),
+    color,
+    innerStop: `${fmtPercent(innerRadius * 100)}%`,
+    opacity: fmtOpacity(opacity),
+    width,
+    height,
+  });
 }

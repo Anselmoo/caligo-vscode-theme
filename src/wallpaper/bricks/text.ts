@@ -3,6 +3,7 @@
  * Positioned at the bottom-left by default (developer-tool aesthetic).
  */
 import type { BrickOutput, BrickParams } from "../types.js";
+import { fmtCoord } from "./svg-format.js";
 
 export interface TextBrickOptions {
   line1: string;
@@ -54,9 +55,9 @@ export function textBrick(params: BrickParams, options: TextBrickOptions): Brick
 
   return {
     elements: `<g id="${id}">
-  <rect x="${x.toFixed(0)}" y="${y.toFixed(0)}" width="${pillW}" height="${pillH}" rx="${pillRadius}" ry="${pillRadius}" fill="${colors.bg}" opacity="0.65"/>
-  <text x="${textX.toFixed(0)}" y="${text1Y.toFixed(0)}" font-family="'JetBrains Mono','SF Mono','Fira Code','Cascadia Code',monospace" font-size="${fontSize1}" fill="${colors.accentMuted}" opacity="0.9" letter-spacing="3">${escSvg(line1.toUpperCase())}</text>
-  <text x="${textX.toFixed(0)}" y="${text2Y.toFixed(0)}" font-family="'JetBrains Mono','SF Mono','Fira Code','Cascadia Code',monospace" font-size="${fontSize2}" font-weight="600" fill="${colors.accentSoft}" opacity="0.95">${escSvg(line2)}</text>
+  <rect x="${fmtCoord(x)}" y="${fmtCoord(y)}" width="${pillW}" height="${pillH}" rx="${pillRadius}" ry="${pillRadius}" fill="${colors.bg}" opacity="0.65"/>
+  <text x="${fmtCoord(textX)}" y="${fmtCoord(text1Y)}" font-family="'JetBrains Mono','SF Mono','Fira Code','Cascadia Code',monospace" font-size="${fontSize1}" fill="${colors.accentMuted}" opacity="0.9" letter-spacing="3">${escSvg(line1.toUpperCase())}</text>
+  <text x="${fmtCoord(textX)}" y="${fmtCoord(text2Y)}" font-family="'JetBrains Mono','SF Mono','Fira Code','Cascadia Code',monospace" font-size="${fontSize2}" font-weight="600" fill="${colors.accentSoft}" opacity="0.95">${escSvg(line2)}</text>
 </g>`,
   };
 }

@@ -1,26 +1,35 @@
 /**
- * Cinder motif — 5 fire & ash night scenes.
+ * Cinder motif — 5 fire / ash night scenes, one per harmony mode.
  *
- * Stillness : Forest embers — glowing treeline embers under starfield
- * Drift     : Smoke drift — lava rivers down volcanic slope with smoke layers
- * Break     : Fire ridge — lightning strike splits storm clouds over burning ridge
- * Void      : Ash void — white ash drifting over extinguished landscape
- * Pulse     : Campfire — warm lanterns and sparks ascending over mountain camp
+ * Stillness : Smouldering treeline — embers drift from a silent, burnt forest
+ * Drift     : Volcanic ridge — lava veins glowing below a dark terrain
+ * Break     : Lightning strike — electric fork over a burning ridge
+ * Void      : Ash haze — desolation scene with near-invisible horizon
+ * Pulse     : Night campfire — warm glow illuminating sparse trees and sparks
  */
 import {
   backgroundBrick,
+  celestialBrick,
   cloudBandBrick,
+  constellationBrick,
+  fogWispBrick,
+  horizonGlowBrick,
+  lightningBrick,
+  nebulaGlowBrick,
   noiseBrick,
-  radialGradientBrick,
   skyGradientBrick,
-  sparksBrick,
   starFieldBrick,
   terrainBrick,
   terrainStackBrick,
+  toneCurveBrick,
+  treelineBrick,
   vignetteBrick,
 } from "../bricks/index.js";
 import { mergeBricks } from "../composer.js";
 import type { BrickParams, ComposedWallpaper } from "../types.js";
+
+/* --- re-export under the same public name -------------------------------- */
+import { sparksBrick, radialGradientBrick } from "../bricks/index.js";
 
 export function cinder(params: BrickParams): ComposedWallpaper {
   switch (params.harmonyMode) {
@@ -37,405 +46,456 @@ export function cinder(params: BrickParams): ComposedWallpaper {
   }
 }
 
-/* ── Stillness: Forest embers — glowing treeline under starfield ──────────── */
+/* ── Stillness: Smouldering treeline — embers from burnt forest ───────────── */
 function cinderStillness(p: BrickParams): ComposedWallpaper {
   const { colors } = p;
-
   const bg = backgroundBrick(p);
+
   const sky = skyGradientBrick(p, {
     id: "ci-s-sky",
     stops: [
-      { offset: "0%", color: colors.bg, opacity: 1 },
-      { offset: "60%", color: colors.bgSoft, opacity: 1 },
-      { offset: "85%", color: colors.hueOrange, opacity: 0.1 },
-      { offset: "100%", color: colors.bg, opacity: 1 },
+      { offset: "0%", color: colors.bg },
+      { offset: "35%", color: colors.bgSoft },
+      { offset: "60%", color: colors.hueRed, opacity: 0.06 },
+      { offset: "100%", color: colors.bg },
     ],
   });
 
-  const stars = starFieldBrick(p, {
-    id: "ci-s-st",
-    count: 180,
-    brightCount: 5,
-    distribution: "upper",
-    opacity: 0.7,
+  // Crescent moon with craters in smoky sky
+  const moon = celestialBrick(p, {
+    id: "ci-s-mn",
+    cx: 0.22,
+    cy: 0.15,
+    r: 0.028,
+    color: "#c8a880",
+    glowColor: colors.hueOrange,
+    glowSize: 2.5,
+    glowOpacity: 0.1,
+    crescent: { offsetX: -0.006, offsetY: -0.003, color: colors.bg },
+    texture: true,
+    craterCount: 3,
   });
 
-  // Warm ground glow from embers
+  // Stars with warm color tints
+  const stars = starFieldBrick(p, {
+    id: "ci-s-st",
+    count: 60,
+    brightCount: 3,
+    featureCount: 2,
+    color: "#ffffff",
+    color2: "#ffe8d0",
+    distribution: "upper",
+    opacity: 0.4,
+  });
+
+  // Sparks rising from the treeline
+  const sparks = sparksBrick(p, {
+    id: "ci-s-sp",
+    count: 60,
+    color: colors.hueOrange,
+    opacity: 0.6,
+    sourceCx: 0.5,
+    sourceSpread: 0.4,
+  });
+
+  // Background fire glow — radial gradient behind treeline
   const fireGlow = radialGradientBrick(p, {
     id: "ci-s-fg",
     cx: 0.5,
-    cy: 0.88,
-    r: 0.35,
+    cy: 0.55,
+    r: 0.25,
     stops: [
-      { offset: "0%", color: colors.hueOrange, opacity: 0.5 },
-      { offset: "50%", color: colors.hueRed, opacity: 0.15 },
-      { offset: "100%", color: colors.bg, opacity: 0 },
+      { offset: "0%", color: colors.hueOrange, opacity: 0.12 },
+      { offset: "100%", color: colors.hueOrange, opacity: 0 },
     ],
+    opacity: 0.12,
   });
 
-  // Treeline silhouette (jagged for tree tops)
-  const treeline = terrainBrick(p, {
-    id: "ci-s-tr",
-    baseY: 0.68,
-    roughness: 0.12,
-    points: 40,
-    color: colors.bgMid,
+  // Pine tree silhouettes — using treelineBrick for detailed trees
+  const trees = treelineBrick(p, {
+    id: "ci-s-tree",
+    baseY: 0.58,
+    count: 18,
+    minHeight: 0.08,
+    maxHeight: 0.18,
+    color: colors.bg,
     opacity: 0.9,
+    minTiers: 2,
+    maxTiers: 4,
   });
+
+  // Foreground burnt terrain
   const ground = terrainBrick(p, {
     id: "ci-s-gr",
-    baseY: 0.82,
-    roughness: 0.03,
-    points: 16,
-    color: colors.bg,
-    opacity: 0.95,
-  });
-
-  // Rising sparks
-  const sparks = sparksBrick(p, {
-    id: "ci-s-sp",
-    count: 35,
-    color: colors.hueYellow,
-    opacity: 0.7,
-    direction: 1,
-    sourceCx: 0.5,
-    sourceSpread: 0.2,
-  });
-
-  const vignette = vignetteBrick(p, { id: "ci-s-vig", opacity: 0.55 });
-  const noise = noiseBrick(p, { id: "ci-s-n", opacity: 0.04 });
-
-  return mergeBricks([bg, sky, stars, fireGlow, treeline, ground, sparks, vignette, noise]);
-}
-
-/* ── Drift: Smoke drift — lava rivers with smoke and volcanic terrain ──────── */
-function cinderDrift(p: BrickParams): ComposedWallpaper {
-  const { colors } = p;
-
-  const bg = backgroundBrick(p);
-  const sky = skyGradientBrick(p, {
-    id: "ci-d-sky",
-    stops: [
-      { offset: "0%", color: colors.bg, opacity: 1 },
-      { offset: "45%", color: colors.bgSoft, opacity: 1 },
-      { offset: "75%", color: colors.hueOrange, opacity: 0.2 },
-      { offset: "100%", color: colors.hueRed, opacity: 0.15 },
-    ],
-  });
-
-  const stars = starFieldBrick(p, {
-    id: "ci-d-st",
-    count: 80,
-    brightCount: 3,
-    distribution: "upper",
-    opacity: 0.45,
-  });
-
-  // Volcanic terrain — steep, dark, with lava glow between layers
-  const lavaGlow = radialGradientBrick(p, {
-    id: "ci-d-lg",
-    cx: 0.4,
-    cy: 0.7,
-    r: 0.4,
-    stops: [
-      { offset: "0%", color: colors.hueOrange, opacity: 0.4 },
-      { offset: "100%", color: colors.bg, opacity: 0 },
-    ],
-  });
-
-  const volcanicBack = terrainBrick(p, {
-    id: "ci-d-vb",
-    baseY: 0.5,
-    roughness: 0.12,
-    points: 20,
-    color: colors.bgMid,
-    opacity: 0.6,
-  });
-  const volcanicMid = terrainBrick(p, {
-    id: "ci-d-vm",
-    baseY: 0.62,
-    roughness: 0.1,
-    points: 22,
-    color: colors.bgSoft,
-    opacity: 0.75,
-  });
-  const volcanicFront = terrainBrick(p, {
-    id: "ci-d-vf",
-    baseY: 0.75,
-    roughness: 0.08,
+    baseY: 0.8,
+    roughness: 0.04,
     points: 18,
     color: colors.bg,
     opacity: 0.95,
   });
 
-  // Smoke layers drifting over the lava
-  const smoke1 = cloudBandBrick(p, {
-    id: "ci-d-sm1",
-    cy: 0.55,
-    bandHeight: 0.12,
+  // Smoke wisps drifting from treeline
+  const smoke = fogWispBrick(p, {
+    id: "ci-s-smoke",
+    cy: 0.5,
+    hazeCount: 3,
+    wispCount: 4,
     color: colors.bgMid,
-    opacity: 0.18,
-  });
-  const smoke2 = cloudBandBrick(p, {
-    id: "ci-d-sm2",
-    cy: 0.68,
-    bandHeight: 0.08,
-    color: colors.bgSoft,
-    opacity: 0.12,
+    hazeOpacity: 0.06,
+    wispOpacity: 0.04,
   });
 
-  const vignette = vignetteBrick(p, { id: "ci-d-vig", opacity: 0.5 });
-  const noise = noiseBrick(p, { id: "ci-d-n", opacity: 0.05 });
+  const tone = toneCurveBrick(p, {
+    id: "ci-s-tone",
+    preset: "cinematic",
+    opacity: 0.15,
+  });
 
+  const vignette = vignetteBrick(p, { id: "ci-s-vig", opacity: 0.55 });
+  const noise = noiseBrick(p, { id: "ci-s-n", opacity: 0.04 });
   return mergeBricks([
     bg,
     sky,
+    moon,
     stars,
-    lavaGlow,
-    volcanicBack,
-    smoke1,
-    volcanicMid,
-    smoke2,
-    volcanicFront,
+    fireGlow,
+    trees,
+    sparks,
+    smoke,
+    ground,
+    tone,
     vignette,
     noise,
   ]);
 }
 
-/* ── Break: Fire ridge — lightning over burning mountain ridge ─────────────── */
-function cinderBreak(p: BrickParams): ComposedWallpaper {
-  const {
-    colors,
-    viewBox: { width, height },
-  } = p;
-  const scale = Math.max(width, height);
-
+/* ── Drift: Volcanic ridge — lava veins below dark terrain ────────────────── */
+function cinderDrift(p: BrickParams): ComposedWallpaper {
+  const { colors } = p;
   const bg = backgroundBrick(p);
+
+  const sky = skyGradientBrick(p, {
+    id: "ci-d-sky",
+    stops: [
+      { offset: "0%", color: colors.bg },
+      { offset: "30%", color: colors.bgSoft },
+      { offset: "50%", color: colors.hueRed, opacity: 0.08 },
+      { offset: "100%", color: colors.bg },
+    ],
+  });
+
+  // Stars with features
+  const stars = starFieldBrick(p, {
+    id: "ci-d-st",
+    count: 55,
+    brightCount: 3,
+    featureCount: 2,
+    color: "#ffffff",
+    color2: "#ffe8d0",
+    distribution: "upper",
+    opacity: 0.35,
+  });
+
+  // Lava glow along horizon
+  const lavaGlow = horizonGlowBrick(p, {
+    id: "ci-d-lg",
+    y: 0.5,
+    color: colors.hueOrange,
+    opacity: 0.2,
+    height: 0.12,
+  });
+
+  // Terrain with ridge highlight for lava glow effect
+  const terrain = terrainStackBrick(p, {
+    id: "ci-d-tr",
+    points: 22,
+    layers: [
+      {
+        baseY: 0.45,
+        roughness: 0.1,
+        color: colors.bgMid,
+        opacity: 0.5,
+        gradient: { topColor: colors.bgMid, bottomColor: colors.bg },
+        ridgeHighlight: true,
+        ridgeHighlightColor: colors.hueOrange,
+      },
+      {
+        baseY: 0.55,
+        roughness: 0.08,
+        color: colors.bgSoft,
+        opacity: 0.7,
+        ridgeHighlight: true,
+        ridgeHighlightColor: colors.hueRed,
+      },
+      { baseY: 0.68, roughness: 0.06, color: colors.bg, opacity: 0.95 },
+    ],
+  });
+
+  // Smoke/ash wisps
+  const smoke = fogWispBrick(p, {
+    id: "ci-d-smoke",
+    cy: 0.42,
+    hazeCount: 3,
+    wispCount: 3,
+    color: colors.bgSoft,
+    hazeOpacity: 0.05,
+    wispOpacity: 0.03,
+  });
+
+  const ashCloud = cloudBandBrick(p, {
+    id: "ci-d-ash",
+    cy: 0.2,
+    bandHeight: 0.15,
+    color: colors.bgMid,
+    opacity: 0.08,
+    frequency: 0.005,
+    seed: 7,
+  });
+
+  const vignette = vignetteBrick(p, { id: "ci-d-vig", opacity: 0.55 });
+  const noise = noiseBrick(p, { id: "ci-d-n", opacity: 0.04 });
+  return mergeBricks([bg, sky, stars, ashCloud, lavaGlow, terrain, smoke, vignette, noise]);
+}
+
+/* ── Break: Lightning strike — electric fork over burning ridge ────────────── */
+function cinderBreak(p: BrickParams): ComposedWallpaper {
+  const { colors } = p;
+  const bg = backgroundBrick(p);
+
   const sky = skyGradientBrick(p, {
     id: "ci-b-sky",
     stops: [
-      { offset: "0%", color: colors.bgMid, opacity: 1 },
-      { offset: "40%", color: colors.bgSoft, opacity: 1 },
-      { offset: "100%", color: colors.bg, opacity: 1 },
+      { offset: "0%", color: colors.bg },
+      { offset: "40%", color: colors.bgSoft },
+      { offset: "100%", color: colors.bg },
     ],
   });
 
-  // Storm cloud layer
-  const clouds = cloudBandBrick(p, {
-    id: "ci-b-cl",
-    cy: 0.25,
-    bandHeight: 0.3,
-    color: colors.bgMid,
-    opacity: 0.25,
-    frequency: 0.006,
-  });
-
-  // Lightning bolt with glow
-  const boltGlow = radialGradientBrick(p, {
-    id: "ci-b-bg",
-    cx: 0.5,
-    cy: 0.3,
-    r: 0.35,
-    stops: [
-      { offset: "0%", color: colors.hueYellow, opacity: 0.3 },
-      { offset: "100%", color: colors.bg, opacity: 0 },
-    ],
-  });
-  const bolt = {
-    defs: `<filter id="ci-b-bf" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="${(scale * 0.004).toFixed(0)}"/></filter>`,
-    elements: `<line x1="${(width * 0.48).toFixed(0)}" y1="${(height * 0.05).toFixed(0)}" x2="${(width * 0.52).toFixed(0)}" y2="${(height * 0.55).toFixed(0)}" stroke="${colors.hueYellow}" stroke-width="${(scale * 0.003).toFixed(1)}" opacity="0.85"/>
-<line x1="${(width * 0.48).toFixed(0)}" y1="${(height * 0.05).toFixed(0)}" x2="${(width * 0.52).toFixed(0)}" y2="${(height * 0.55).toFixed(0)}" stroke="${colors.accent}" stroke-width="${(scale * 0.01).toFixed(1)}" opacity="0.2" filter="url(#ci-b-bf)"/>`,
-  };
-
-  // Burning mountain ridge
-  const ridge = terrainStackBrick(p, {
-    id: "ci-b-rd",
-    points: 26,
-    layers: [
-      { baseY: 0.55, roughness: 0.12, color: colors.hueRed, opacity: 0.15 },
-      { baseY: 0.6, roughness: 0.1, color: colors.bgMid, opacity: 0.7 },
-      { baseY: 0.75, roughness: 0.06, color: colors.bg, opacity: 0.95 },
-    ],
-  });
-
-  // Fire glow behind the ridge
-  const fireGlow = radialGradientBrick(p, {
-    id: "ci-b-fr",
-    cx: 0.5,
-    cy: 0.62,
-    r: 0.35,
-    stops: [
-      { offset: "0%", color: colors.hueOrange, opacity: 0.35 },
-      { offset: "100%", color: colors.bg, opacity: 0 },
-    ],
-  });
-
+  // Stars with feature
   const stars = starFieldBrick(p, {
     id: "ci-b-st",
-    count: 40,
-    brightCount: 1,
+    count: 45,
+    brightCount: 2,
+    featureCount: 1,
+    color: "#ffffff",
+    color2: "#ddeeff",
     distribution: "upper",
-    opacity: 0.3,
+    opacity: 0.35,
   });
 
-  const vignette = vignetteBrick(p, { id: "ci-b-vig", opacity: 0.6 });
-  const noise = noiseBrick(p, { id: "ci-b-n", opacity: 0.05 });
+  // Lightning bolt
+  const bolt = lightningBrick(p, {
+    id: "ci-b-lt",
+    startX: 0.45,
+    startY: 0.05,
+    color: colors.hueCyan,
+    branches: 3,
+  });
 
-  return mergeBricks([bg, sky, stars, clouds, boltGlow, bolt, fireGlow, ridge, vignette, noise]);
+  // Flash illumination
+  const flash = nebulaGlowBrick(p, {
+    id: "ci-b-fl",
+    blur: 0.08,
+    blobs: [{ cx: 0.45, cy: 0.3, rx: 0.25, ry: 0.15, color: colors.hueCyan, opacity: 0.06 }],
+  });
+
+  // Fire glow along the ridge
+  const fireGlow = horizonGlowBrick(p, {
+    id: "ci-b-fg",
+    y: 0.52,
+    color: colors.hueOrange,
+    opacity: 0.15,
+    height: 0.1,
+  });
+
+  // Burning ridge terrain with ridge highlight
+  const ridge = terrainStackBrick(p, {
+    id: "ci-b-rd",
+    points: 20,
+    layers: [
+      {
+        baseY: 0.48,
+        roughness: 0.1,
+        color: colors.bgMid,
+        opacity: 0.6,
+        ridgeHighlight: true,
+        ridgeHighlightColor: colors.hueOrange,
+      },
+      { baseY: 0.58, roughness: 0.06, color: colors.bg, opacity: 0.9 },
+    ],
+  });
+
+  // Storm clouds
+  const clouds = cloudBandBrick(p, {
+    id: "ci-b-cl",
+    cy: 0.12,
+    bandHeight: 0.2,
+    color: colors.bgMid,
+    opacity: 0.15,
+    frequency: 0.005,
+    seed: 11,
+  });
+
+  const vignette = vignetteBrick(p, { id: "ci-b-vig", opacity: 0.55 });
+  const noise = noiseBrick(p, { id: "ci-b-n", opacity: 0.04 });
+  return mergeBricks([bg, sky, stars, clouds, flash, bolt, fireGlow, ridge, vignette, noise]);
 }
 
-/* ── Void: Ash void — white ash over extinguished landscape ───────────────── */
+/* ── Void: Ash haze — desolation with near-invisible horizon ──────────────── */
 function cinderVoid(p: BrickParams): ComposedWallpaper {
   const { colors } = p;
-
   const bg = backgroundBrick(p);
+
   const sky = skyGradientBrick(p, {
     id: "ci-v-sky",
     stops: [
-      { offset: "0%", color: colors.bg, opacity: 1 },
-      { offset: "100%", color: colors.bgSoft, opacity: 0.6 },
+      { offset: "0%", color: colors.bg },
+      { offset: "50%", color: colors.bgSoft, opacity: 0.2 },
+      { offset: "100%", color: colors.bg },
     ],
   });
 
-  // Barely visible stars through ash haze
-  const stars = starFieldBrick(p, {
-    id: "ci-v-st",
-    count: 30,
-    brightCount: 1,
-    distribution: "upper",
-    opacity: 0.25,
+  // Ash haze — smothering fog wisps
+  const ashFog = fogWispBrick(p, {
+    id: "ci-v-fog",
+    cy: 0.5,
+    hazeCount: 5,
+    wispCount: 3,
+    color: colors.bgMid,
+    hazeOpacity: 0.08,
+    wispOpacity: 0.04,
   });
 
-  // Last ember glow
-  const glow = radialGradientBrick(p, {
-    id: "ci-v-g",
+  // Barely visible terrain
+  const desolation = terrainBrick(p, {
+    id: "ci-v-ds",
+    baseY: 0.72,
+    roughness: 0.03,
+    points: 14,
+    color: colors.bgMid,
+    opacity: 0.2,
+  });
+
+  // Single ember glow — barely alive fire source
+  const ember = nebulaGlowBrick(p, {
+    id: "ci-v-em",
+    blur: 0.04,
+    blobs: [{ cx: 0.5, cy: 0.68, rx: 0.03, ry: 0.02, color: colors.hueRed, opacity: 0.15 }],
+  });
+
+  const vignette = vignetteBrick(p, { id: "ci-v-vig", opacity: 0.85 });
+  const noise = noiseBrick(p, { id: "ci-v-n", opacity: 0.03 });
+  return mergeBricks([bg, sky, ashFog, ember, desolation, vignette, noise]);
+}
+
+/* ── Pulse: Night campfire — warm glow with sparks and trees ──────────────── */
+function cinderPulse(p: BrickParams): ComposedWallpaper {
+  const { colors } = p;
+  const bg = backgroundBrick(p);
+
+  const sky = skyGradientBrick(p, {
+    id: "ci-p-sky",
+    stops: [
+      { offset: "0%", color: colors.bg },
+      { offset: "30%", color: colors.bgSoft },
+      { offset: "55%", color: colors.hueOrange, opacity: 0.05 },
+      { offset: "100%", color: colors.bg },
+    ],
+  });
+
+  // Multi-color stars with features
+  const stars = starFieldBrick(p, {
+    id: "ci-p-st",
+    count: 90,
+    brightCount: 5,
+    featureCount: 3,
+    color: "#ffffff",
+    color2: "#ffe8d0",
+    color3: "#ddeeff",
+    distribution: "upper",
+    opacity: 0.55,
+  });
+
+  // Constellations above the campfire scene
+  const constellations = constellationBrick(p, {
+    id: "ci-p-cst",
+    count: 4,
+    color: "#ffffff",
+    starRadius: 1.5,
+    lineOpacity: 0.08,
+    starOpacity: 0.45,
+  });
+
+  // Campfire glow — warm radial
+  const campfire = radialGradientBrick(p, {
+    id: "ci-p-cf",
     cx: 0.5,
     cy: 0.72,
     r: 0.2,
     stops: [
-      { offset: "0%", color: colors.hueOrange, opacity: 0.4 },
-      { offset: "100%", color: colors.bg, opacity: 0 },
+      { offset: "0%", color: colors.hueOrange, opacity: 0.2 },
+      { offset: "100%", color: colors.hueOrange, opacity: 0 },
     ],
+    opacity: 0.2,
   });
 
-  // Desolate burnt landscape
-  const terrain = terrainBrick(p, {
-    id: "ci-v-t",
-    baseY: 0.72,
-    roughness: 0.04,
-    points: 16,
-    color: colors.bgMid,
-    opacity: 0.5,
-  });
-  const ground = terrainBrick(p, {
-    id: "ci-v-gr",
-    baseY: 0.78,
-    roughness: 0.02,
-    points: 12,
+  // Tree silhouettes around campfire — detailed trunks and tiers
+  const trees = treelineBrick(p, {
+    id: "ci-p-tree",
+    baseY: 0.6,
+    count: 14,
+    minHeight: 0.1,
+    maxHeight: 0.22,
     color: colors.bg,
     opacity: 0.9,
+    minTiers: 2,
+    maxTiers: 4,
   });
 
-  // Ash haze
-  const ashHaze = cloudBandBrick(p, {
-    id: "ci-v-ah",
-    cy: 0.5,
-    bandHeight: 0.6,
-    color: colors.bgMid,
-    opacity: 0.08,
-    frequency: 0.004,
-  });
-
-  const vignette = vignetteBrick(p, { id: "ci-v-vig", opacity: 0.75 });
-  const noise = noiseBrick(p, { id: "ci-v-n", opacity: 0.04 });
-
-  return mergeBricks([bg, sky, stars, glow, ashHaze, terrain, ground, vignette, noise]);
-}
-
-/* ── Pulse: Campfire — warm sparks ascending over mountain camp ────────────── */
-function cinderPulse(p: BrickParams): ComposedWallpaper {
-  const {
-    colors,
-    viewBox: { width, height },
-  } = p;
-  const scale = Math.max(width, height);
-
-  const bg = backgroundBrick(p);
-  const sky = skyGradientBrick(p, {
-    id: "ci-p-sky",
-    stops: [
-      { offset: "0%", color: colors.bg, opacity: 1 },
-      { offset: "55%", color: colors.bgSoft, opacity: 1 },
-      { offset: "80%", color: colors.hueOrange, opacity: 0.08 },
-      { offset: "100%", color: colors.bg, opacity: 1 },
-    ],
-  });
-
-  const stars = starFieldBrick(p, {
-    id: "ci-p-st",
-    count: 150,
-    brightCount: 6,
-    distribution: "upper",
-    opacity: 0.6,
-  });
-
-  // Campfire radial warmth
-  const campfire = radialGradientBrick(p, {
-    id: "ci-p-cf",
-    cx: 0.5,
-    cy: 0.82,
-    r: 0.25,
-    stops: [
-      { offset: "0%", color: colors.hueOrange, opacity: 0.65 },
-      { offset: "40%", color: colors.hueRed, opacity: 0.2 },
-      { offset: "100%", color: colors.bg, opacity: 0 },
-    ],
-  });
-
-  // Warm lantern glows ascending
-  const lanterns: string[] = [];
-  const positions = [
-    [0.5, 0.72],
-    [0.38, 0.58],
-    [0.62, 0.52],
-    [0.28, 0.4],
-    [0.72, 0.36],
-    [0.5, 0.24],
-  ];
-  positions.forEach(([cx, cy], i) => {
-    const r = (scale * 0.012 * (1 - cy * 0.3)).toFixed(1);
-    lanterns.push(
-      `<circle cx="${(cx * width).toFixed(0)}" cy="${(cy * height).toFixed(0)}" r="${r}" fill="${colors.hueOrange}" opacity="${(0.3 + i * 0.05).toFixed(2)}"/>`
-    );
-  });
-  const lanternElems = {
-    defs: `<filter id="ci-p-lg" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="${(scale * 0.008).toFixed(0)}"/></filter>`,
-    elements: `<g filter="url(#ci-p-lg)">${lanterns.join("\n")}</g>`,
-  };
-
-  // Mountain backdrop
-  const mountains = terrainStackBrick(p, {
-    id: "ci-p-mt",
-    points: 22,
-    layers: [
-      { baseY: 0.55, roughness: 0.1, color: colors.bgMid, opacity: 0.5 },
-      { baseY: 0.65, roughness: 0.08, color: colors.bgSoft, opacity: 0.7 },
-      { baseY: 0.78, roughness: 0.05, color: colors.bg, opacity: 0.95 },
-    ],
-  });
-
+  // Sparks rising from fire
   const sparks = sparksBrick(p, {
     id: "ci-p-sp",
     count: 50,
-    color: colors.hueYellow,
+    color: colors.hueOrange,
     opacity: 0.55,
-    direction: 1,
     sourceCx: 0.5,
-    sourceSpread: 0.15,
+    sourceSpread: 0.2,
+  });
+
+  // Smoke wisps drifting up from fire
+  const smoke = fogWispBrick(p, {
+    id: "ci-p-smoke",
+    cy: 0.55,
+    hazeCount: 2,
+    wispCount: 3,
+    color: colors.bgMid,
+    hazeOpacity: 0.04,
+    wispOpacity: 0.03,
+  });
+
+  // Landing / terrain
+  const ground = terrainBrick(p, {
+    id: "ci-p-gr",
+    baseY: 0.78,
+    roughness: 0.03,
+    points: 18,
+    color: colors.bg,
+    opacity: 0.95,
   });
 
   const vignette = vignetteBrick(p, { id: "ci-p-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "ci-p-n", opacity: 0.04 });
-
-  return mergeBricks([bg, sky, stars, campfire, mountains, lanternElems, sparks, vignette, noise]);
+  return mergeBricks([
+    bg,
+    sky,
+    constellations,
+    stars,
+    campfire,
+    trees,
+    sparks,
+    smoke,
+    ground,
+    vignette,
+    noise,
+  ]);
 }

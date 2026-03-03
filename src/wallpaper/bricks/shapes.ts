@@ -3,6 +3,7 @@
  * Rings, arcs, bands, rays, bezier curtains, and brush strokes.
  */
 import type { BrickOutput, BrickParams } from "../types.js";
+import { fmtCoord, fmtLength, fmtOpacity, fmtStroke } from "./svg-format.js";
 
 // ─── Ring / Arc ───────────────────────────────────────────────────────────────
 
@@ -20,11 +21,11 @@ export function ringBrick(params: BrickParams, options: RingBrickOptions): Brick
   const { viewBox } = params;
   const { width, height } = viewBox;
   const { cx = 0.5, cy = 0.5, r, strokeWidth = 2, color, opacity = 0.8, id = "ring" } = options;
-  const pcx = (cx * width).toFixed(1);
-  const pcy = (cy * height).toFixed(1);
+  const pcx = fmtCoord(cx * width);
+  const pcy = fmtCoord(cy * height);
   const scale = Math.max(width, height);
   return {
-    elements: `<circle id="${id}" cx="${pcx}" cy="${pcy}" r="${(r * scale).toFixed(1)}" fill="none" stroke="${color}" stroke-width="${((strokeWidth * scale) / 2160).toFixed(1)}" opacity="${opacity}"/>`,
+    elements: `<circle id="${id}" cx="${pcx}" cy="${pcy}" r="${fmtLength(r * scale)}" fill="none" stroke="${color}" stroke-width="${fmtStroke((strokeWidth * scale) / 2160)}" opacity="${fmtOpacity(opacity)}"/>`,
   };
 }
 
@@ -66,7 +67,7 @@ export function arcBrick(params: BrickParams, options: ArcBrickOptions): BrickOu
   const large = endDeg - startDeg > 180 ? 1 : 0;
   const sw = (strokeWidth * scale) / 2160;
   return {
-    elements: `<path id="${id}" d="M ${x1.toFixed(1)} ${y1.toFixed(1)} A ${pr.toFixed(1)} ${pr.toFixed(1)} 0 ${large} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}" fill="none" stroke="${color}" stroke-width="${sw.toFixed(1)}" opacity="${opacity}"/>`,
+    elements: `<path id="${id}" d="M ${fmtCoord(x1)} ${fmtCoord(y1)} A ${fmtLength(pr)} ${fmtLength(pr)} 0 ${large} 1 ${fmtCoord(x2)} ${fmtCoord(y2)}" fill="none" stroke="${color}" stroke-width="${fmtStroke(sw)}" opacity="${fmtOpacity(opacity)}"/>`,
   };
 }
 
@@ -111,7 +112,7 @@ export function raysBrick(params: BrickParams, options: RaysBrickOptions): Brick
     const y2 = pcy + Math.sin(rad) * pl;
     const alpha = opacity * (0.5 + 0.5 * Math.cos((i * Math.PI * 2) / count));
     lines.push(
-      `  <line x1="${pcx.toFixed(1)}" y1="${pcy.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${color}" stroke-width="${((scale / 2160) * 2).toFixed(1)}" opacity="${alpha.toFixed(3)}"/>`
+      `  <line x1="${fmtCoord(pcx)}" y1="${fmtCoord(pcy)}" x2="${fmtCoord(x2)}" y2="${fmtCoord(y2)}" stroke="${color}" stroke-width="${fmtStroke((scale / 2160) * 2)}" opacity="${fmtOpacity(alpha)}"/>`
     );
   }
   return {
@@ -138,8 +139,8 @@ export function bandBrick(params: BrickParams, options: BandBrickOptions): Brick
   const { width, height } = viewBox;
   const { y = 0.5, bandHeight = 0.1, color, opacity = 0.4, blur, id = "band" } = options;
 
-  const py = (y * height).toFixed(1);
-  const ph = (bandHeight * height).toFixed(1);
+  const py = fmtCoord(y * height);
+  const ph = fmtLength(bandHeight * height);
   const filterId = `${id}-blur`;
 
   const defs = blur
@@ -190,12 +191,12 @@ export function curtainBrick(params: BrickParams, options: CurtainBrickOptions):
   for (let i = 0; i <= steps; i++) {
     const x = (i / steps) * vw;
     const y = pcy + Math.sin((i / steps) * Math.PI * 2 + phaseRad) * amp;
-    pts.push(`${i === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`);
+    pts.push(`${i === 0 ? "M" : "L"} ${fmtCoord(x)} ${fmtCoord(y)}`);
   }
 
   const sw = (strokeWidth * vw) / 3840;
   return {
-    elements: `<path id="${id}" d="${pts.join(" ")}" fill="none" stroke="${color}" stroke-width="${sw.toFixed(1)}" stroke-linecap="round" opacity="${opacity}"/>`,
+    elements: `<path id="${id}" d="${pts.join(" ")}" fill="none" stroke="${color}" stroke-width="${fmtStroke(sw)}" stroke-linecap="round" opacity="${fmtOpacity(opacity)}"/>`,
   };
 }
 
@@ -240,6 +241,6 @@ export function brushStrokeBrick(
   const cpy = ((y1 + y2) / 2) * vh + roughness * scale * (Math.random() - 0.5);
   const sw = strokeWidth * scale;
   return {
-    elements: `<path id="${id}" d="M ${px1.toFixed(1)} ${py1.toFixed(1)} Q ${cpx.toFixed(1)} ${cpy.toFixed(1)} ${px2.toFixed(1)} ${py2.toFixed(1)}" fill="none" stroke="${color}" stroke-width="${sw.toFixed(1)}" stroke-linecap="round" opacity="${opacity}"/>`,
+    elements: `<path id="${id}" d="M ${fmtCoord(px1)} ${fmtCoord(py1)} Q ${fmtCoord(cpx)} ${fmtCoord(cpy)} ${fmtCoord(px2)} ${fmtCoord(py2)}" fill="none" stroke="${color}" stroke-width="${fmtStroke(sw)}" stroke-linecap="round" opacity="${fmtOpacity(opacity)}"/>`,
   };
 }

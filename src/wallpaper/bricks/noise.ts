@@ -3,6 +3,7 @@
  * Adds organic grain or fluid turbulence to wallpapers.
  */
 import type { BrickOutput, BrickParams } from "../types.js";
+import { fmtCoord, fmtLength } from "./svg-format.js";
 
 export interface NoiseBrickOptions {
   id?: string;
@@ -55,9 +56,9 @@ export function turbulenceBrick(params: BrickParams, options: TurbulenceBrickOpt
   } = options;
 
   const gid = `${id}-g`;
-  const gcx = (cx * width).toFixed(0);
-  const gcy = (cy * height).toFixed(0);
-  const gr = (r * Math.max(width, height)).toFixed(0);
+  const gcx = fmtCoord(cx * width);
+  const gcy = fmtCoord(cy * height);
+  const gr = fmtLength(r * Math.max(width, height));
 
   return {
     defs: `<filter id="${id}" x="-50%" y="-50%" width="200%" height="200%">

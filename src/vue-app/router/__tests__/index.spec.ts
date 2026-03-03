@@ -72,6 +72,7 @@ describe("router/index", () => {
       "analysis",
       "export",
       "wallpapers",
+      "wallpapers-composer",
       "not-found",
     ]);
   });
@@ -83,7 +84,7 @@ describe("router/index", () => {
       .filter((component): component is () => Promise<unknown> => typeof component === "function");
 
     const loaded = await Promise.all(lazyComponents.map(component => component()));
-    expect(loaded).toHaveLength(6);
+    expect(loaded).toHaveLength(7);
   });
 
   it("uses saved scroll position and defaults to top when absent", () => {

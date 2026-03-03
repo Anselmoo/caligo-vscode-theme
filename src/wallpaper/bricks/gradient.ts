@@ -3,6 +3,7 @@
  * Used by motifs and mode composers for decorative colour washes.
  */
 import type { BrickOutput, BrickParams } from "../types.js";
+import { fmtCoord, fmtLength, fmtPercent } from "./svg-format.js";
 
 export interface LinearGradientOptions {
   id?: string;
@@ -21,10 +22,10 @@ export function linearGradientBrick(
   const { id = "lg", angle = 180, stops, opacity = 1 } = options;
 
   const rad = ((angle - 90) * Math.PI) / 180;
-  const x1 = (50 - 50 * Math.cos(rad)).toFixed(2);
-  const y1 = (50 - 50 * Math.sin(rad)).toFixed(2);
-  const x2 = (50 + 50 * Math.cos(rad)).toFixed(2);
-  const y2 = (50 + 50 * Math.sin(rad)).toFixed(2);
+  const x1 = fmtPercent(50 - 50 * Math.cos(rad));
+  const y1 = fmtPercent(50 - 50 * Math.sin(rad));
+  const x2 = fmtPercent(50 + 50 * Math.cos(rad));
+  const y2 = fmtPercent(50 + 50 * Math.sin(rad));
 
   const stopMarkup = stops
     .map(
@@ -66,7 +67,7 @@ export function radialGradientBrick(
     .join("\n");
 
   return {
-    defs: `<radialGradient id="${id}" cx="${(cx * width).toFixed(0)}" cy="${(cy * height).toFixed(0)}" r="${(r * Math.max(width, height)).toFixed(0)}" gradientUnits="userSpaceOnUse">
+    defs: `<radialGradient id="${id}" cx="${fmtCoord(cx * width)}" cy="${fmtCoord(cy * height)}" r="${fmtLength(r * Math.max(width, height))}" gradientUnits="userSpaceOnUse">
 ${stopMarkup}
 </radialGradient>`,
     elements: `<rect width="${width}" height="${height}" fill="url(#${id})" opacity="${opacity}"/>`,

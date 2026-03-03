@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="os-seaGrad" x1="0" y1="520" x2="0" y2="900" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="{{seaMid}}"/>
+      <stop offset="100%" stop-color="{{seaDeep}}"/>
+    </linearGradient>
+    <linearGradient id="os-reflGrad" x1="0" y1="520" x2="0" y2="900" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="{{moonReflection}}" stop-opacity="0.45"/>
+      <stop offset="80%" stop-color="{{moonReflection}}" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="{{moonReflection}}" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="520" width="1600" height="380" fill="url(#os-seaGrad)"/>
+  <line x1="0" y1="520" x2="1600" y2="520" stroke="{{seaMid}}" stroke-width="1" opacity="0.35"/>
+  <rect x="1168" y="520" width="154" height="380" fill="url(#os-reflGrad)"/>
+  <line x1="320" y1="575" x2="482" y2="572" stroke="{{waveEdge}}" stroke-width="1" opacity="0.25"/>
+  <line x1="420" y1="612" x2="645" y2="608" stroke="{{waveEdge}}" stroke-width="0.8" opacity="0.18"/>
+  <line x1="585" y1="650" x2="825" y2="645" stroke="{{waveEdge}}" stroke-width="1" opacity="0.20"/>
+  <line x1="682" y1="698" x2="942" y2="692" stroke="{{waveEdge}}" stroke-width="0.8" opacity="0.15"/>
+  <line x1="198" y1="742" x2="542" y2="736" stroke="{{waveEdge}}" stroke-width="0.7" opacity="0.12"/>
+  <line x1="852" y1="728" x2="1185" y2="722" stroke="{{waveEdge}}" stroke-width="0.8" opacity="0.15"/>
+  <line x1="1052" y1="770" x2="1352" y2="764" stroke="{{waveEdge}}" stroke-width="0.7" opacity="0.12"/>
+</svg>

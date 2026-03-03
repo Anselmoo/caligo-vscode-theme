@@ -11,7 +11,11 @@ import {
   backgroundBrick,
   celestialBrick,
   cloudBandBrick,
+  constellationBrick,
+  fogWispBrick,
+  milkyWayBrick,
   nebulaGlowBrick,
+  nebulaOrganicBrick,
   noiseBrick,
   shootingStarBrick,
   skyGradientBrick,
@@ -52,10 +56,13 @@ function nebulaStillness(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  // Nebula emission glow — warm region behind pillars
-  const emission = nebulaGlowBrick(p, {
+  // Nebula emission glow — warm region behind pillars, organic edges
+  const emission = nebulaOrganicBrick(p, {
     id: "nn-s-em",
     blur: 0.06,
+    turbulence: true,
+    turbulenceFreq: 0.004,
+    displacement: 0.02,
     blobs: [
       { cx: 0.5, cy: 0.7, rx: 0.3, ry: 0.25, color: colors.accent, opacity: 0.18 },
       { cx: 0.35, cy: 0.6, rx: 0.15, ry: 0.2, color: colors.huePurple, opacity: 0.1 },
@@ -67,7 +74,16 @@ function nebulaStillness(p: BrickParams): ComposedWallpaper {
   const pillar1 = terrainStackBrick(p, {
     id: "nn-s-p1",
     points: 10,
-    layers: [{ baseY: 0.15, roughness: 0.04, color: colors.bgMid, opacity: 0.85 }],
+    layers: [
+      {
+        baseY: 0.15,
+        roughness: 0.04,
+        color: colors.bgMid,
+        opacity: 0.85,
+        ridgeHighlight: true,
+        ridgeHighlightColor: colors.accent,
+      },
+    ],
   });
   const pillar2 = terrainStackBrick(p, {
     id: "nn-s-p2",
@@ -91,13 +107,49 @@ function nebulaStillness(p: BrickParams): ComposedWallpaper {
     count: 90,
     brightCount: 8,
     color: "#ffffff",
+    color2: "#ddeeff",
+    color3: "#ffe8d0",
     distribution: "full",
     opacity: 0.55,
+    featureCount: 5,
+  });
+
+  // Constellation patterns among the pillars
+  const constellations = constellationBrick(p, {
+    id: "nn-s-cns",
+    count: 3,
+    color: "#ffffff",
+    starRadius: 1.8,
+    lineOpacity: 0.12,
+    starOpacity: 0.5,
+  });
+
+  // Cosmic dust wisps drifting between pillars
+  const cosmicDust = fogWispBrick(p, {
+    id: "nn-s-cd",
+    cy: 0.45,
+    hazeCount: 3,
+    wispCount: 4,
+    color: colors.huePurple,
+    hazeOpacity: 0.03,
+    wispOpacity: 0.02,
   });
 
   const vignette = vignetteBrick(p, { id: "nn-s-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "nn-s-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, emission, dust, stars, pillar1, pillar2, vignette, noise]);
+  return mergeBricks([
+    bg,
+    sky,
+    emission,
+    dust,
+    stars,
+    constellations,
+    cosmicDust,
+    pillar1,
+    pillar2,
+    vignette,
+    noise,
+  ]);
 }
 
 /* ── Drift: Spiral galaxy arm — sweeping nebula band ──────────────────────── */
@@ -122,6 +174,17 @@ function nebulaDrift(p: BrickParams): ComposedWallpaper {
       { cx: 0.15, cy: 0.8, rx: 0.2, ry: 0.15, color: colors.hueYellow, opacity: 0.2 },
       { cx: 0.2, cy: 0.75, rx: 0.12, ry: 0.1, color: colors.hueOrange, opacity: 0.12 },
     ],
+  });
+
+  // Milky Way band — main galactic arm across the sky
+  const milkyWay = milkyWayBrick(p, {
+    id: "nn-d-mw",
+    cy: 0.45,
+    bandHeight: 0.22,
+    angle: -25,
+    color: colors.bgSoft,
+    edgeColor: colors.bgMid,
+    opacity: 0.1,
   });
 
   // Galaxy arm band — diagonal nebula strip
@@ -152,8 +215,11 @@ function nebulaDrift(p: BrickParams): ComposedWallpaper {
     count: 120,
     brightCount: 10,
     color: "#ffffff",
+    color2: "#ddeeff",
+    color3: "#ffe8d0",
     distribution: "full",
     opacity: 0.5,
+    featureCount: 5,
   });
 
   // Background dim stars
@@ -164,13 +230,21 @@ function nebulaDrift(p: BrickParams): ComposedWallpaper {
     color: colors.accentSoft,
     distribution: "full",
     opacity: 0.25,
+    featureCount: 1,
   });
 
   // Distant planetary terrain — viewing the galaxy from surface
   const terrain = terrainStackBrick(p, {
     id: "nn-d-tr",
     layers: [
-      { baseY: 0.82, roughness: 0.03, color: colors.bgMid, opacity: 0.3 },
+      {
+        baseY: 0.82,
+        roughness: 0.03,
+        color: colors.bgMid,
+        opacity: 0.3,
+        ridgeHighlight: true,
+        ridgeHighlightColor: colors.accent,
+      },
       { baseY: 0.9, roughness: 0.04, color: colors.bg, opacity: 0.6 },
     ],
   });
@@ -180,6 +254,7 @@ function nebulaDrift(p: BrickParams): ComposedWallpaper {
   return mergeBricks([
     bg,
     sky,
+    milkyWay,
     core,
     armGlow,
     dustLane,
@@ -214,6 +289,7 @@ function nebulaBreak(p: BrickParams): ComposedWallpaper {
     color: "#ffffff",
     glowColor: colors.hueBlue,
     glowSize: 0.08,
+    texture: true,
   });
 
   // Expanding shockwave rings — concentric nebula blobs
@@ -234,8 +310,10 @@ function nebulaBreak(p: BrickParams): ComposedWallpaper {
     count: 50,
     brightCount: 8,
     color: colors.hueCyan,
+    color2: colors.hueBlue,
     distribution: "full",
     opacity: 0.5,
+    featureCount: 4,
   });
 
   // Shooting stars — ejecta trails
@@ -244,6 +322,7 @@ function nebulaBreak(p: BrickParams): ComposedWallpaper {
     count: 3,
     color: colors.hueBlue,
     opacity: 0.4,
+    trailColor: colors.hueCyan,
   });
 
   const bgStars = starFieldBrick(p, {
@@ -251,17 +330,37 @@ function nebulaBreak(p: BrickParams): ComposedWallpaper {
     count: 60,
     brightCount: 3,
     color: "#ffffff",
+    color2: "#ddeeff",
     distribution: "full",
     opacity: 0.35,
+    featureCount: 2,
   });
 
   // Rocky asteroid terrain in foreground
   const asteroidTerrain = terrainStackBrick(p, {
     id: "nn-b-at",
     layers: [
-      { baseY: 0.85, roughness: 0.05, color: colors.bgMid, opacity: 0.35 },
+      {
+        baseY: 0.85,
+        roughness: 0.05,
+        color: colors.bgMid,
+        opacity: 0.35,
+        ridgeHighlight: true,
+        ridgeHighlightColor: colors.hueCyan,
+      },
       { baseY: 0.92, roughness: 0.04, color: colors.bg, opacity: 0.65 },
     ],
+  });
+
+  // Supernova debris fog
+  const debrisFog = fogWispBrick(p, {
+    id: "nn-b-fg",
+    cy: 0.5,
+    hazeCount: 2,
+    wispCount: 3,
+    color: colors.huePurple,
+    hazeOpacity: 0.03,
+    wispOpacity: 0.02,
   });
 
   const vignette = vignetteBrick(p, { id: "nn-b-vig", opacity: 0.6 });
@@ -274,6 +373,7 @@ function nebulaBreak(p: BrickParams): ComposedWallpaper {
     ejecta,
     bgStars,
     debris,
+    debrisFog,
     asteroidTerrain,
     vignette,
     noise,
@@ -300,8 +400,10 @@ function nebulaVoid(p: BrickParams): ComposedWallpaper {
     count: 80,
     brightCount: 4,
     color: "#ffffff",
+    color2: "#ddeeff",
     distribution: "full",
     opacity: 0.3,
+    featureCount: 2,
   });
 
   // Dark nebula mass — terrain-like silhouette absorbing stars
@@ -381,8 +483,11 @@ function nebulaPulse(p: BrickParams): ComposedWallpaper {
     count: 150,
     brightCount: 15,
     color: "#ffffff",
+    color2: "#ddeeff",
+    color3: "#ffe8d0",
     distribution: "full",
     opacity: 0.6,
+    featureCount: 6,
   });
 
   // Secondary warm stars
@@ -391,18 +496,38 @@ function nebulaPulse(p: BrickParams): ComposedWallpaper {
     count: 40,
     brightCount: 5,
     color: colors.hueYellow,
+    color2: colors.hueOrange,
     distribution: "full",
     opacity: 0.4,
+    featureCount: 3,
   });
 
   // Cratered landscape beneath the galactic core
   const craters = terrainStackBrick(p, {
     id: "nn-p-cr",
     layers: [
-      { baseY: 0.78, roughness: 0.04, color: colors.bgMid, opacity: 0.3 },
+      {
+        baseY: 0.78,
+        roughness: 0.04,
+        color: colors.bgMid,
+        opacity: 0.3,
+        ridgeHighlight: true,
+        ridgeHighlightColor: colors.hueYellow,
+      },
       { baseY: 0.85, roughness: 0.05, color: colors.bgSoft, opacity: 0.5 },
       { baseY: 0.93, roughness: 0.035, color: colors.bg, opacity: 0.75 },
     ],
+  });
+
+  // Cosmic fog wisps near galactic core
+  const coreFog = fogWispBrick(p, {
+    id: "nn-p-fg",
+    cy: 0.5,
+    hazeCount: 2,
+    wispCount: 3,
+    color: colors.hueOrange,
+    hazeOpacity: 0.02,
+    wispOpacity: 0.02,
   });
 
   const vignette = vignetteBrick(p, { id: "nn-p-vig", opacity: 0.5 });
@@ -415,6 +540,7 @@ function nebulaPulse(p: BrickParams): ComposedWallpaper {
     dust2,
     warmStars,
     denseStars,
+    coreFog,
     craters,
     vignette,
     noise,

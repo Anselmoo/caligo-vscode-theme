@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Vignette template — radial gradient edge darkening overlay for depth and focus.
+
+  Template variables:
+  - gradId     : unique radialGradient ID (e.g. "vignette-001")
+  - cx         : gradient center x coordinate (canvas units)
+  - cy         : gradient center y coordinate (canvas units)
+  - r          : outer radius (canvas units)
+  - color      : shadow/vignette color
+  - innerStop  : inner transparent stop offset as percentage string (e.g. "35%")
+  - opacity    : outer stop opacity (0–1)
+  - width      : canvas width
+  - height     : canvas height
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3840 2160">
+  <defs>
+    <radialGradient id="{{gradId}}" cx="{{cx}}" cy="{{cy}}" r="{{r}}" gradientUnits="userSpaceOnUse">
+      <stop offset="{{innerStop}}" stop-color="{{color}}" stop-opacity="0"/>
+      <stop offset="100%" stop-color="{{color}}" stop-opacity="{{opacity}}"/>
+    </radialGradient>
+  </defs>
+  <rect width="{{width}}" height="{{height}}" fill="url(#{{gradId}})"/>
+</svg>

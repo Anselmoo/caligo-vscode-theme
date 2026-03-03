@@ -11,12 +11,15 @@ import {
   backgroundBrick,
   celestialBrick,
   cloudBandBrick,
+  constellationBrick,
+  fogWispBrick,
   horizonGlowBrick,
   nebulaGlowBrick,
   noiseBrick,
   skyGradientBrick,
   starFieldBrick,
   terrainStackBrick,
+  toneCurveBrick,
   vignetteBrick,
   volcanoBrick,
   waterReflectionBrick,
@@ -54,7 +57,7 @@ function obsidianStillness(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  // Full moon
+  // Full moon with craters and texture
   const moon = celestialBrick(p, {
     id: "og-s-mn",
     cx: 0.5,
@@ -63,6 +66,8 @@ function obsidianStillness(p: BrickParams): ComposedWallpaper {
     color: colors.bgSoft,
     glowColor: colors.hueCyan,
     glowSize: 0.12,
+    craterCount: 6,
+    texture: true,
   });
 
   // Volcanic plain terrain
@@ -70,7 +75,14 @@ function obsidianStillness(p: BrickParams): ComposedWallpaper {
     id: "og-s-tr",
     points: 22,
     layers: [
-      { baseY: 0.55, roughness: 0.08, color: colors.bgMid, opacity: 0.6 },
+      {
+        baseY: 0.55,
+        roughness: 0.08,
+        color: colors.bgMid,
+        opacity: 0.6,
+        ridgeHighlight: true,
+        ridgeHighlightColor: colors.hueCyan,
+      },
       { baseY: 0.62, roughness: 0.06, color: colors.bgSoft, opacity: 0.7 },
       { baseY: 0.72, roughness: 0.04, color: colors.bg, opacity: 0.9 },
     ],
@@ -97,13 +109,48 @@ function obsidianStillness(p: BrickParams): ComposedWallpaper {
     count: 80,
     brightCount: 5,
     color: "#ffffff",
+    color2: "#ddeeff",
+    color3: "#cce0ff",
     distribution: "upper",
     opacity: 0.5,
+    featureCount: 3,
+  });
+
+  // Constellations above volcanic plain
+  const constellations = constellationBrick(p, {
+    id: "og-s-cst",
+    count: 3,
+    lineOpacity: 0.1,
+    starRadius: 1.5,
+    color: "#ffffff",
+  });
+
+  // Volcanic haze drifting across plain
+  const haze = fogWispBrick(p, {
+    id: "og-s-hz",
+    cy: 0.58,
+    hazeCount: 2,
+    wispCount: 3,
+    color: colors.bgMid,
+    hazeOpacity: 0.03,
+    wispOpacity: 0.02,
   });
 
   const vignette = vignetteBrick(p, { id: "og-s-vig", opacity: 0.55 });
   const noise = noiseBrick(p, { id: "og-s-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, stars, moon, hGlow, terrain, reflection, vignette, noise]);
+  return mergeBricks([
+    bg,
+    sky,
+    constellations,
+    stars,
+    moon,
+    hGlow,
+    haze,
+    terrain,
+    reflection,
+    vignette,
+    noise,
+  ]);
 }
 
 /* ── Drift: Glacial ice strata ────────────────────────────────────────────── */
@@ -126,9 +173,23 @@ function obsidianDrift(p: BrickParams): ComposedWallpaper {
     id: "og-d-ice",
     points: 20,
     layers: [
-      { baseY: 0.35, roughness: 0.03, color: colors.hueCyan, opacity: 0.1 },
+      {
+        baseY: 0.35,
+        roughness: 0.03,
+        color: colors.hueCyan,
+        opacity: 0.1,
+        ridgeHighlight: true,
+        ridgeHighlightColor: "#ffffff",
+      },
       { baseY: 0.42, roughness: 0.025, color: colors.hueBlue, opacity: 0.08 },
-      { baseY: 0.5, roughness: 0.03, color: colors.hueCyan, opacity: 0.06 },
+      {
+        baseY: 0.5,
+        roughness: 0.03,
+        color: colors.hueCyan,
+        opacity: 0.06,
+        ridgeHighlight: true,
+        ridgeHighlightColor: colors.hueCyan,
+      },
       { baseY: 0.58, roughness: 0.02, color: colors.hueBlue, opacity: 0.05 },
     ],
   });
@@ -156,13 +217,26 @@ function obsidianDrift(p: BrickParams): ComposedWallpaper {
     count: 60,
     brightCount: 4,
     color: "#ffffff",
+    color2: "#ddeeff",
     distribution: "upper",
     opacity: 0.4,
+    featureCount: 2,
+  });
+
+  // Glacial fog wisps
+  const glacialFog = fogWispBrick(p, {
+    id: "og-d-fg",
+    cy: 0.4,
+    hazeCount: 3,
+    wispCount: 3,
+    color: colors.hueCyan,
+    hazeOpacity: 0.03,
+    wispOpacity: 0.02,
   });
 
   const vignette = vignetteBrick(p, { id: "og-d-vig", opacity: 0.55 });
   const noise = noiseBrick(p, { id: "og-d-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, crystals, ice, stars, moraine, vignette, noise]);
+  return mergeBricks([bg, sky, crystals, ice, stars, glacialFog, moraine, vignette, noise]);
 }
 
 /* ── Break: Geothermal vent erupting ──────────────────────────────────────── */
@@ -218,8 +292,10 @@ function obsidianBreak(p: BrickParams): ComposedWallpaper {
     count: 35,
     brightCount: 10,
     color: colors.hueOrange,
+    color2: colors.hueYellow,
     distribution: "full",
     opacity: 0.5,
+    featureCount: 3,
   });
 
   const stars = starFieldBrick(p, {
@@ -227,13 +303,45 @@ function obsidianBreak(p: BrickParams): ComposedWallpaper {
     count: 50,
     brightCount: 3,
     color: "#ffffff",
+    color2: "#ddeeff",
     distribution: "upper",
     opacity: 0.35,
+    featureCount: 2,
+  });
+
+  // Cinematic lava tone grading
+  const tone = toneCurveBrick(p, {
+    id: "og-b-tc",
+    preset: "cinematic",
+    opacity: 0.06,
+  });
+
+  // Volcanic steam wisps
+  const steamWisps = fogWispBrick(p, {
+    id: "og-b-fg",
+    cy: 0.35,
+    hazeCount: 3,
+    wispCount: 4,
+    color: colors.bgSoft,
+    hazeOpacity: 0.04,
+    wispOpacity: 0.03,
   });
 
   const vignette = vignetteBrick(p, { id: "og-b-vig", opacity: 0.55 });
   const noise = noiseBrick(p, { id: "og-b-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, stars, lavaGlow, steam, volcano, embers, vignette, noise]);
+  return mergeBricks([
+    bg,
+    sky,
+    stars,
+    lavaGlow,
+    steam,
+    steamWisps,
+    volcano,
+    embers,
+    tone,
+    vignette,
+    noise,
+  ]);
 }
 
 /* ── Void: Crystal cave — single distant light ────────────────────────────── */
@@ -294,18 +402,33 @@ function obsidianPulse(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  // Mountain peaks above waterline
+  // Mountain peaks above waterline with snow caps
   const peaks = terrainStackBrick(p, {
     id: "og-p-pk",
     points: 18,
     layers: [
-      { baseY: 0.35, roughness: 0.1, color: colors.bgMid, opacity: 0.5 },
-      { baseY: 0.42, roughness: 0.08, color: colors.bgSoft, opacity: 0.65 },
+      {
+        baseY: 0.35,
+        roughness: 0.1,
+        color: colors.bgMid,
+        opacity: 0.5,
+        snowCaps: true,
+        snowColor: "#e0e4e8",
+        ridgeHighlight: true,
+        ridgeHighlightColor: colors.hueCyan,
+      },
+      {
+        baseY: 0.42,
+        roughness: 0.08,
+        color: colors.bgSoft,
+        opacity: 0.65,
+        gradient: { topColor: colors.bgSoft, bottomColor: colors.bgMid },
+      },
       { baseY: 0.48, roughness: 0.05, color: colors.bg, opacity: 0.85 },
     ],
   });
 
-  // Moon above peaks
+  // Moon above peaks with craters
   const moon = celestialBrick(p, {
     id: "og-p-mn",
     cx: 0.5,
@@ -314,9 +437,11 @@ function obsidianPulse(p: BrickParams): ComposedWallpaper {
     color: colors.bgSoft,
     glowColor: colors.hueCyan,
     glowSize: 0.08,
+    craterCount: 4,
+    texture: true,
   });
 
-  // Lake reflection — water surface with ripple
+  // Lake reflection — water surface with ripple, moon reflection, shore edge
   const lake = waterReflectionBrick(p, {
     id: "og-p-lk",
     waterY: 0.5,
@@ -324,13 +449,12 @@ function obsidianPulse(p: BrickParams): ComposedWallpaper {
     opacity: 0.2,
     rippleScale: 6,
     rippleFrequency: 0.02,
-  });
-
-  // Moon reflection in water
-  const moonRefl = nebulaGlowBrick(p, {
-    id: "og-p-mr",
-    blur: 0.03,
-    blobs: [{ cx: 0.5, cy: 0.85, rx: 0.04, ry: 0.02, color: colors.bgSoft, opacity: 0.2 }],
+    rippleLines: 6,
+    shimmerColor: colors.hueCyan,
+    shimmerOpacity: 0.05,
+    moonReflection: { cx: 0.5, color: "#e8e4d8" },
+    shoreEdge: true,
+    shoreColor: colors.bgMid,
   });
 
   const stars = starFieldBrick(p, {
@@ -338,11 +462,45 @@ function obsidianPulse(p: BrickParams): ComposedWallpaper {
     count: 65,
     brightCount: 4,
     color: "#ffffff",
+    color2: "#ddeeff",
+    color3: "#cce0ff",
     distribution: "upper",
     opacity: 0.45,
+    featureCount: 3,
+  });
+
+  // Constellations above the obsidian lake
+  const constellations = constellationBrick(p, {
+    id: "og-p-cst",
+    count: 4,
+    lineOpacity: 0.1,
+    starRadius: 1.5,
+    color: "#ffffff",
+  });
+
+  // Mist rising off the obsidian lake
+  const lakeMist = fogWispBrick(p, {
+    id: "og-p-fg",
+    cy: 0.52,
+    hazeCount: 2,
+    wispCount: 4,
+    color: colors.bgSoft,
+    hazeOpacity: 0.03,
+    wispOpacity: 0.02,
   });
 
   const vignette = vignetteBrick(p, { id: "og-p-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "og-p-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, stars, moon, peaks, lake, moonRefl, vignette, noise]);
+  return mergeBricks([
+    bg,
+    sky,
+    constellations,
+    stars,
+    moon,
+    peaks,
+    lake,
+    lakeMist,
+    vignette,
+    noise,
+  ]);
 }

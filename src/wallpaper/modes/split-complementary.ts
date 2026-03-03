@@ -7,6 +7,7 @@
 import { linearGradientBrick, vignetteBrick } from "../bricks/index.js";
 import { mergeBricks } from "../composer.js";
 import type { BrickParams, ComposedWallpaper } from "../types.js";
+import { fmtCoord, fmtStroke } from "../bricks/svg-format.js";
 
 export function splitComplementaryMode(
   motif: ComposedWallpaper,
@@ -34,7 +35,7 @@ export function splitComplementaryMode(
   const lineX2 = width;
   const lineY2 = height * 0.4;
   const divLine: { defs?: string; elements: string } = {
-    elements: `<line x1="${lineX1}" y1="${lineY1.toFixed(0)}" x2="${lineX2}" y2="${lineY2.toFixed(0)}" stroke="${colors.accentMuted}" stroke-width="${(Math.max(width, height) / 2160).toFixed(1)}" opacity="0.25"/>`,
+    elements: `<line x1="${lineX1}" y1="${fmtCoord(lineY1)}" x2="${lineX2}" y2="${fmtCoord(lineY2)}" stroke="${colors.accentMuted}" stroke-width="${fmtStroke(Math.max(width, height) / 2160)}" opacity="0.25"/>`,
   };
 
   const vignette = vignetteBrick(params, { opacity: 0.5, innerRadius: 0.25 });

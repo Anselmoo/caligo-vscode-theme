@@ -11,7 +11,10 @@ import {
   backgroundBrick,
   celestialBrick,
   cloudBandBrick,
+  constellationBrick,
+  fogWispBrick,
   horizonGlowBrick,
+  milkyWayBrick,
   nebulaGlowBrick,
   noiseBrick,
   skyGradientBrick,
@@ -61,6 +64,8 @@ function midnightStillness(p: BrickParams): ComposedWallpaper {
     color: colors.bgSoft,
     glowColor: colors.hueYellow,
     glowSize: 0.08,
+    craterCount: 4,
+    texture: true,
   });
 
   // Warm interior glow — from a lamp
@@ -75,7 +80,14 @@ function midnightStillness(p: BrickParams): ComposedWallpaper {
     id: "mi-s-rt",
     points: 18,
     layers: [
-      { baseY: 0.62, roughness: 0.06, color: colors.bgMid, opacity: 0.5 },
+      {
+        baseY: 0.62,
+        roughness: 0.06,
+        color: colors.bgMid,
+        opacity: 0.5,
+        ridgeHighlight: true,
+        ridgeHighlightColor: colors.hueOrange,
+      },
       { baseY: 0.7, roughness: 0.04, color: colors.bgSoft, opacity: 0.65 },
       { baseY: 0.78, roughness: 0.03, color: colors.bg, opacity: 0.85 },
     ],
@@ -95,13 +107,47 @@ function midnightStillness(p: BrickParams): ComposedWallpaper {
     count: 45,
     brightCount: 3,
     color: "#ffffff",
+    color2: "#ddeeff",
     distribution: "upper",
     opacity: 0.4,
+    featureCount: 2,
+  });
+
+  // Constellations visible through the studio window
+  const constellations = constellationBrick(p, {
+    id: "mi-s-cst",
+    count: 2,
+    lineOpacity: 0.08,
+    starRadius: 1.2,
+    color: "#ffffff",
+  });
+
+  // Night fog drifting past rooftops
+  const fog = fogWispBrick(p, {
+    id: "mi-s-fg",
+    cy: 0.6,
+    hazeCount: 2,
+    wispCount: 3,
+    color: colors.bgMid,
+    hazeOpacity: 0.03,
+    wispOpacity: 0.02,
   });
 
   const vignette = vignetteBrick(p, { id: "mi-s-vig", opacity: 0.6 });
   const noise = noiseBrick(p, { id: "mi-s-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, stars, moon, lampGlow, hGlow, rooftops, vignette, noise]);
+  return mergeBricks([
+    bg,
+    sky,
+    constellations,
+    stars,
+    moon,
+    lampGlow,
+    hGlow,
+    fog,
+    rooftops,
+    vignette,
+    noise,
+  ]);
 }
 
 /* ── Drift: Ink wash — sweeping brushstroke on wet paper ──────────────────── */
@@ -124,7 +170,13 @@ function midnightDrift(p: BrickParams): ComposedWallpaper {
     id: "mi-d-str",
     points: 20,
     layers: [
-      { baseY: 0.35, roughness: 0.15, color: colors.accent, opacity: 0.3 },
+      {
+        baseY: 0.35,
+        roughness: 0.15,
+        color: colors.accent,
+        opacity: 0.3,
+        gradient: { topColor: colors.accent, bottomColor: colors.accentMuted },
+      },
       { baseY: 0.45, roughness: 0.12, color: colors.accentSoft, opacity: 0.2 },
       { baseY: 0.55, roughness: 0.1, color: colors.accentMuted, opacity: 0.12 },
     ],
@@ -145,6 +197,7 @@ function midnightDrift(p: BrickParams): ComposedWallpaper {
     color: colors.accentMuted,
     distribution: "full",
     opacity: 0.3,
+    featureCount: 2,
   });
 
   // Paper grain
@@ -182,7 +235,16 @@ function midnightBreak(p: BrickParams): ComposedWallpaper {
   const shard1 = terrainStackBrick(p, {
     id: "mi-b-sh1",
     points: 12,
-    layers: [{ baseY: 0.2, roughness: 0.18, color: colors.bgMid, opacity: 0.45 }],
+    layers: [
+      {
+        baseY: 0.2,
+        roughness: 0.18,
+        color: colors.bgMid,
+        opacity: 0.45,
+        ridgeHighlight: true,
+        ridgeHighlightColor: colors.accent,
+      },
+    ],
   });
   const shard2 = terrainStackBrick(p, {
     id: "mi-b-sh2",
@@ -192,7 +254,16 @@ function midnightBreak(p: BrickParams): ComposedWallpaper {
   const shard3 = terrainStackBrick(p, {
     id: "mi-b-sh3",
     points: 14,
-    layers: [{ baseY: 0.6, roughness: 0.15, color: colors.bgMid, opacity: 0.5 }],
+    layers: [
+      {
+        baseY: 0.6,
+        roughness: 0.15,
+        color: colors.bgMid,
+        opacity: 0.5,
+        ridgeHighlight: true,
+        ridgeHighlightColor: colors.accentSoft,
+      },
+    ],
   });
 
   // Light bleeding through cracks
@@ -243,9 +314,20 @@ function midnightVoid(p: BrickParams): ComposedWallpaper {
     seed: 47,
   });
 
+  // Fog wisps drifting through charcoal cave
+  const fog = fogWispBrick(p, {
+    id: "mi-v-fg",
+    cy: 0.5,
+    hazeCount: 2,
+    wispCount: 2,
+    color: colors.bgSoft,
+    hazeOpacity: 0.03,
+    wispOpacity: 0.02,
+  });
+
   const vignette = vignetteBrick(p, { id: "mi-v-vig", opacity: 0.85 });
   const noise = noiseBrick(p, { id: "mi-v-n", opacity: 0.04 });
-  return mergeBricks([bg, dark, haze, form, vignette, noise]);
+  return mergeBricks([bg, dark, haze, form, fog, vignette, noise]);
 }
 
 /* ── Pulse: Stained glass — moonlight through cathedral ───────────────────── */
@@ -284,6 +366,16 @@ function midnightPulse(p: BrickParams): ComposedWallpaper {
     blobs: [{ cx: 0.5, cy: 0.0, rx: 0.3, ry: 0.5, color: "#ffffff", opacity: 0.06 }],
   });
 
+  // Milky Way visible through cathedral window above
+  const milkyWay = milkyWayBrick(p, {
+    id: "mi-p-mw",
+    color: colors.bgSoft,
+    cy: 0.15,
+    bandHeight: 0.12,
+    angle: -15,
+    opacity: 0.08,
+  });
+
   // Floor silhouette
   const floor = terrainStackBrick(p, {
     id: "mi-p-fl",
@@ -293,5 +385,5 @@ function midnightPulse(p: BrickParams): ComposedWallpaper {
 
   const vignette = vignetteBrick(p, { id: "mi-p-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "mi-p-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, moonbeam, glass, floor, vignette, noise]);
+  return mergeBricks([bg, sky, milkyWay, moonbeam, glass, floor, vignette, noise]);
 }

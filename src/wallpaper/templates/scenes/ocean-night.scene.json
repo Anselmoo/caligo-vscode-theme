@@ -1,0 +1,12 @@
+{
+  "id": "ocean-night",
+  "layers": [
+    { "fragment": "sky-gradient",      "z": 0 },
+    { "fragment": "star-field-sparse", "z": 1 },
+    { "fragment": "moon-full-corona",  "z": 2 },
+    { "fragment": "ocean-surface",     "z": 3 },
+    { "fragment": "horizon-haze",      "z": 4 },
+    { "fragment": "wave-crest",        "z": 5 },
+    { "fragment": "vignette-overlay",  "z": 6 }
+  ]
+}

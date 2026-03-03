@@ -62,6 +62,7 @@
     "wallpapers:generate:svg-only": "npx tsx scripts/generate-wallpapers.ts --svg-only",
     "wallpapers:manifest": "npx tsx scripts/generate-wallpapers-manifest.ts",
     "wallpapers:bundle": "npx tsx scripts/bundle-wallpapers.ts",
+    "wallpapers:templates:preview": "npx tsx scripts/generate-template-previews.ts",
     "wallpapers:all": "npm run wallpapers:generate && npm run wallpapers:manifest && npm run wallpapers:bundle",
     "images:generate": "sips -s format png --resampleWidth 128 images/icon.svg --out images/icon.png && sips -s format png --resampleWidth 512 images/icon.svg --out images/icon-512.png && sips -s format png --resampleWidth 1200 images/banner.svg --out images/banner.png && sips -s format ico --resampleWidth 64 images/icon.svg --out images/favicon.ico",
     "images:social-card": "npx tsx scripts/generate-social-card.ts",

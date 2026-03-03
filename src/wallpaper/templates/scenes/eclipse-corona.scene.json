@@ -1,0 +1,11 @@
+{
+  "id": "eclipse-corona",
+  "layers": [
+    { "fragment": "sky-gradient",           "z": 0 },
+    { "fragment": "star-field-dense",       "z": 1 },
+    { "fragment": "corona-rings",           "z": 2 },
+    { "fragment": "mountain-ridge-3layer",  "z": 3 },
+    { "fragment": "horizon-haze",           "z": 4 },
+    { "fragment": "vignette-overlay",       "z": 5 }
+  ]
+}

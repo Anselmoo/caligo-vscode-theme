@@ -9,8 +9,11 @@
  */
 import {
   backgroundBrick,
+  celestialBrick,
   cloudBandBrick,
+  fogWispBrick,
   nebulaGlowBrick,
+  nebulaOrganicBrick,
   noiseBrick,
   skyGradientBrick,
   starFieldBrick,
@@ -19,9 +22,16 @@ import {
   waterReflectionBrick,
 } from "../bricks/index.js";
 import { mergeBricks } from "../composer.js";
+import { assembleScene } from "../templates/engine.js";
 import type { BrickParams, ComposedWallpaper } from "../types.js";
+import { buildOceanNightVars } from "./ocean-vars.js";
 
 export function deepSable(params: BrickParams): ComposedWallpaper {
+  // Use the modular ocean-night scene for landscape platforms.
+  // Mobile is portrait so falls back to the procedural brick composition.
+  if (params.platform !== "mobile") {
+    return deepSableTemplate(params);
+  }
   switch (params.harmonyMode) {
     case "analogous":
       return deepDrift(params);
@@ -34,6 +44,18 @@ export function deepSable(params: BrickParams): ComposedWallpaper {
     default:
       return deepStillness(params);
   }
+}
+
+/* ── Template: ocean night scene (monitor + tablet) ─────────────────────── */
+function deepSableTemplate(p: BrickParams): ComposedWallpaper {
+  const vars = buildOceanNightVars(p.colors, p.harmonyMode);
+  const assembled = assembleScene("ocean-night", vars);
+
+  const scaleX = (p.viewBox.width / 1600).toFixed(6);
+  const scaleY = (p.viewBox.height / 900).toFixed(6);
+  const scaledElements = `<g transform="scale(${scaleX}, ${scaleY})">\n${assembled.elements}\n</g>`;
+
+  return { defs: assembled.defs ?? "", elements: scaledElements };
 }
 
 /* ── Stillness: Bioluminescent jellyfish column ───────────────────────────── */
@@ -51,10 +73,13 @@ function deepStillness(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  // Jellyfish glow clusters — large soft blobs at varying depths
-  const jellies = nebulaGlowBrick(p, {
+  // Jellyfish glow clusters — organic turbulence-shaped bioluminescence
+  const jellies = nebulaOrganicBrick(p, {
     id: "ds-s-jel",
     blur: 0.05,
+    turbulence: true,
+    turbulenceFreq: 0.006,
+    displacement: 0.025,
     blobs: [
       { cx: 0.3, cy: 0.25, rx: 0.04, ry: 0.06, color: colors.hueCyan, opacity: 0.3 },
       { cx: 0.65, cy: 0.4, rx: 0.035, ry: 0.05, color: colors.hueCyan, opacity: 0.25 },
@@ -90,22 +115,53 @@ function deepStillness(p: BrickParams): ComposedWallpaper {
     count: 60,
     brightCount: 8,
     color: colors.hueCyan,
+    color2: colors.hueBlue,
     distribution: "full",
     opacity: 0.5,
+    featureCount: 3,
   });
 
   // Ocean floor terrain — jagged rock silhouettes
   const floor = terrainStackBrick(p, {
     id: "ds-s-fl",
     layers: [
-      { baseY: 0.82, roughness: 0.04, color: colors.bgMid, opacity: 0.4 },
+      {
+        baseY: 0.82,
+        roughness: 0.04,
+        color: colors.bgMid,
+        opacity: 0.4,
+        ridgeHighlight: true,
+        ridgeHighlightColor: colors.hueCyan,
+      },
       { baseY: 0.88, roughness: 0.05, color: colors.bg, opacity: 0.7 },
     ],
   });
 
+  // Underwater haze — drifting fog wisps
+  const haze = fogWispBrick(p, {
+    id: "ds-s-hz",
+    cy: 0.5,
+    hazeCount: 3,
+    wispCount: 4,
+    color: colors.hueBlue,
+    hazeOpacity: 0.03,
+    wispOpacity: 0.02,
+  });
+
   const vignette = vignetteBrick(p, { id: "ds-s-vig", opacity: 0.65 });
   const noise = noiseBrick(p, { id: "ds-s-n", opacity: 0.04 });
-  return mergeBricks([bg, abyss, current1, current2, jellies, biolum, floor, vignette, noise]);
+  return mergeBricks([
+    bg,
+    abyss,
+    current1,
+    current2,
+    jellies,
+    biolum,
+    haze,
+    floor,
+    vignette,
+    noise,
+  ]);
 }
 
 /* ── Drift: Deep current — pressure bands ─────────────────────────────────── */
@@ -177,18 +233,38 @@ function deepDrift(p: BrickParams): ComposedWallpaper {
     count: 50,
     brightCount: 4,
     color: colors.hueCyan,
+    color2: colors.accent,
     distribution: "full",
     opacity: 0.45,
+    featureCount: 2,
   });
 
   // Seafloor ridges at varying depths
   const ridges = terrainStackBrick(p, {
     id: "ds-d-rd",
     layers: [
-      { baseY: 0.78, roughness: 0.03, color: colors.bgMid, opacity: 0.3 },
+      {
+        baseY: 0.78,
+        roughness: 0.03,
+        color: colors.bgMid,
+        opacity: 0.3,
+        ridgeHighlight: true,
+        ridgeHighlightColor: colors.hueCyan,
+      },
       { baseY: 0.85, roughness: 0.04, color: colors.bgSoft, opacity: 0.5 },
       { baseY: 0.92, roughness: 0.05, color: colors.bg, opacity: 0.7 },
     ],
+  });
+
+  // Deep current fog wisps
+  const deepFog = fogWispBrick(p, {
+    id: "ds-d-fg",
+    cy: 0.45,
+    hazeCount: 2,
+    wispCount: 3,
+    color: colors.hueBlue,
+    hazeOpacity: 0.03,
+    wispOpacity: 0.02,
   });
 
   const vignette = vignetteBrick(p, { id: "ds-d-vig", opacity: 0.6 });
@@ -202,6 +278,7 @@ function deepDrift(p: BrickParams): ComposedWallpaper {
     band4,
     trail,
     particles,
+    deepFog,
     ridges,
     vignette,
     noise,
@@ -232,8 +309,24 @@ function deepBreak(p: BrickParams): ComposedWallpaper {
     count: 70,
     brightCount: 5,
     color: "#ffffff",
+    color2: "#ddeeff",
     distribution: "upper",
     opacity: 0.45,
+    featureCount: 3,
+  });
+
+  // Moon visible through the water surface above
+  const moon = celestialBrick(p, {
+    id: "ds-b-mn",
+    cx: 0.5,
+    cy: 0.15,
+    r: 0.035,
+    color: "#e0dcd0",
+    glowColor: colors.hueCyan,
+    glowSize: 3,
+    glowOpacity: 0.15,
+    texture: true,
+    craterCount: 4,
   });
 
   // Surface tension — water ripple effect at the boundary
@@ -244,6 +337,9 @@ function deepBreak(p: BrickParams): ComposedWallpaper {
     opacity: 0.2,
     rippleScale: 12,
     rippleFrequency: 0.02,
+    rippleLines: 5,
+    shimmerColor: colors.hueCyan,
+    shimmerOpacity: 0.06,
   });
 
   // Rising bubbles — small glow blobs below surface
@@ -272,7 +368,7 @@ function deepBreak(p: BrickParams): ComposedWallpaper {
 
   const vignette = vignetteBrick(p, { id: "ds-b-vig", opacity: 0.6 });
   const noise = noiseBrick(p, { id: "ds-b-n", opacity: 0.04 });
-  return mergeBricks([bg, split, stars, caustics, surface, bubbles, vignette, noise]);
+  return mergeBricks([bg, split, moon, stars, caustics, surface, bubbles, vignette, noise]);
 }
 
 /* ── Void: Total abyss — single faint light ───────────────────────────────── */
@@ -344,7 +440,14 @@ function deepPulse(p: BrickParams): ComposedWallpaper {
     id: "ds-p-rf",
     points: 16,
     layers: [
-      { baseY: 0.72, roughness: 0.06, color: colors.bgMid, opacity: 0.6 },
+      {
+        baseY: 0.72,
+        roughness: 0.06,
+        color: colors.bgMid,
+        opacity: 0.6,
+        ridgeHighlight: true,
+        ridgeHighlightColor: colors.hueGreen,
+      },
       { baseY: 0.78, roughness: 0.05, color: colors.bgSoft, opacity: 0.75 },
       { baseY: 0.84, roughness: 0.04, color: colors.bg, opacity: 0.9 },
     ],
@@ -370,11 +473,24 @@ function deepPulse(p: BrickParams): ComposedWallpaper {
     count: 45,
     brightCount: 6,
     color: colors.hueCyan,
+    color2: colors.accent,
     distribution: "full",
     opacity: 0.5,
+    featureCount: 2,
+  });
+
+  // Warm current fog near reef
+  const reefFog = fogWispBrick(p, {
+    id: "ds-p-fg",
+    cy: 0.7,
+    hazeCount: 2,
+    wispCount: 3,
+    color: colors.hueBlue,
+    hazeOpacity: 0.03,
+    wispOpacity: 0.02,
   });
 
   const vignette = vignetteBrick(p, { id: "ds-p-vig", opacity: 0.55 });
   const noise = noiseBrick(p, { id: "ds-p-n", opacity: 0.04 });
-  return mergeBricks([bg, ocean, glows, reef, particles, vignette, noise]);
+  return mergeBricks([bg, ocean, glows, reef, particles, reefFog, vignette, noise]);
 }

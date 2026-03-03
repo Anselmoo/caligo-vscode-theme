@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <defs>
+    <radialGradient id="cr-corona" cx="800" cy="352" r="425" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="{{coronaInner}}" stop-opacity="0.92"/>
+      <stop offset="22%" stop-color="{{coronaMid}}" stop-opacity="0.65"/>
+      <stop offset="52%" stop-color="{{coronaOuter}}" stop-opacity="0.30"/>
+      <stop offset="78%" stop-color="{{coronaBlood}}" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="{{coronaBlood}}" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="cr-innerRing" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="5"/>
+    </filter>
+  </defs>
+  <circle cx="800" cy="352" r="425" fill="url(#cr-corona)"/>
+  <circle cx="800" cy="352" r="104" fill="none" stroke="{{coronaInner}}" stroke-width="7"
+    opacity="0.52" filter="url(#cr-innerRing)"/>
+  <circle cx="800" cy="352" r="96" fill="{{eclipseCore}}"/>
+</svg>

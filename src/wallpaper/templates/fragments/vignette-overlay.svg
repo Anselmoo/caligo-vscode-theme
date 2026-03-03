@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <defs>
+    <radialGradient id="vo-grad" cx="800" cy="450" r="1105" gradientUnits="userSpaceOnUse">
+      <stop offset="38%" stop-color="{{vignetteColor}}" stop-opacity="0"/>
+      <stop offset="100%" stop-color="{{vignetteColor}}" stop-opacity="{{vignetteOpacity}}"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#vo-grad)"/>
+</svg>

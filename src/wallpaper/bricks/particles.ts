@@ -3,6 +3,7 @@
  * Uses a seeded pseudo-random generator so results are reproducible per seedId.
  */
 import type { BrickOutput, BrickParams } from "../types.js";
+import { fmtCoord, fmtLength, fmtOpacity, fmtStroke } from "./svg-format.js";
 
 /** Fast, deterministic hash-based PRNG (mulberry32). */
 function seedRng(seed: number) {
@@ -84,7 +85,7 @@ export function particlesBrick(params: BrickParams, options: ParticlesBrickOptio
     const r = minRadius + rng() * (maxRadius - minRadius);
     const alpha = (0.3 + rng() * 0.7) * opacity;
     circles.push(
-      `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${r.toFixed(2)}" fill="${color}" opacity="${alpha.toFixed(3)}"/>`
+      `<circle cx="${fmtCoord(px)}" cy="${fmtCoord(py)}" r="${fmtLength(r)}" fill="${color}" opacity="${fmtOpacity(alpha)}"/>`
     );
   }
 
@@ -130,7 +131,7 @@ export function sparksBrick(params: BrickParams, options: SparksBrickOptions): B
     const alpha = (0.3 + rng() * 0.7) * opacity;
     const sw = 0.5 + rng() * 1.5;
     lines.push(
-      `<line x1="${x.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${color}" stroke-width="${sw.toFixed(2)}" opacity="${alpha.toFixed(3)}"/>`
+      `<line x1="${fmtCoord(x)}" y1="${fmtCoord(y1)}" x2="${fmtCoord(x)}" y2="${fmtCoord(y2)}" stroke="${color}" stroke-width="${fmtStroke(sw)}" opacity="${fmtOpacity(alpha)}"/>`
     );
   }
 
