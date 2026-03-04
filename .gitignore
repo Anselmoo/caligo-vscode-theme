@@ -172,6 +172,9 @@ vite.config.ts.timestamp-*
 .vite/
 
 
+# Agent/tool operational notes (local-only, not for versioning)
+.serena/
+
 # Dynamic generated files
 test-results
 test-results/

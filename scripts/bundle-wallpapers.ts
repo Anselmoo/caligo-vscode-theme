@@ -41,8 +41,7 @@ async function main() {
 
   console.log(`  Found ${filtered.length} files to bundle`);
 
-  // Use a streaming zip approach without external dependencies
-  // We'll write a ZIP file using built-in Node.js streams and zlib
+  // Shell out to system `zip` (with `tar.gz` fallback) to create the archive
   await writeZip(filtered, OUTPUT_ZIP);
 
   const size = statSync(OUTPUT_ZIP).size;
