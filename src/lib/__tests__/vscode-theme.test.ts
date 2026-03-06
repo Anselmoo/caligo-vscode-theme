@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, expect, it } from "vitest";
 import type { Seed } from "../constraints.js";
+import { wcagContrastRatio } from "../contrast.js";
 import { derivePalette } from "../palette.js";
 import { buildVscodeThemeJson } from "../vscode-theme.js";
 
@@ -180,5 +181,70 @@ describe("buildVscodeThemeJson", () => {
     for (const colorId of requiredColorIds) {
       expect(theme.colors[colorId], `Missing color ID ${colorId}`).toBeTruthy();
     }
+  });
+
+  it("should produce WCAG AA contrast (≥4.5) for button foreground against button background", () => {
+    // Dark-theme seed with a bright accent (worst case: light accent on dark bg)
+    const brightAccentSeed: Seed = {
+      id: "BrightAccent",
+      displayName: "Bright Accent",
+      background: { mode: "oklch", l: 0.18, c: 0.02, h: 220 },
+      accent: { mode: "oklch", l: 0.82, c: 0.18, h: 90 }, // bright lime-yellow accent
+    };
+
+    const palette = derivePalette(brightAccentSeed, "Balanced");
+    const theme = buildVscodeThemeJson(palette);
+
+    const btnBg = theme.colors["button.background"];
+    const btnFg = theme.colors["button.foreground"];
+    const contrast = wcagContrastRatio(btnFg, btnBg);
+
+    expect(contrast).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("should always pick the higher-contrast foreground option for the primary button", () => {
+    // Mid-range accent: neither pure-light nor pure-dark may reach 4.5, but we
+    // must always choose whichever option gives the better ratio.
+    const seed: Seed = {
+      id: "MidAccent",
+      displayName: "Mid Accent",
+      background: { mode: "oklch", l: 0.18, c: 0.03, h: 220 },
+      accent: { mode: "oklch", l: 0.55, c: 0.15, h: 215 },
+    };
+
+    const palette = derivePalette(seed, "Balanced");
+    const theme = buildVscodeThemeJson(palette);
+
+    const btnBg = theme.colors["button.background"];
+    const btnFg = theme.colors["button.foreground"];
+
+    const contrastWithLight = wcagContrastRatio(palette.fg0, btnBg);
+    const contrastWithDark = wcagContrastRatio(palette.bg0, btnBg);
+    const chosenContrast = wcagContrastRatio(btnFg, btnBg);
+
+    // The chosen foreground must be at least as good as the better-of-two options.
+    // A tiny epsilon accounts for floating-point rounding in hex conversion.
+    const CONTRAST_EPSILON = 0.01;
+    expect(chosenContrast).toBeGreaterThanOrEqual(
+      Math.max(contrastWithLight, contrastWithDark) - CONTRAST_EPSILON
+    );
+  });
+
+  it("should produce WCAG AA contrast (≥4.5) for secondary button foreground against secondary button background", () => {
+    const seed: Seed = {
+      id: "TestSeed",
+      displayName: "Test Seed",
+      background: { mode: "oklch", l: 0.18, c: 0.03, h: 220 },
+      accent: { mode: "oklch", l: 0.7, c: 0.15, h: 215 },
+    };
+
+    const palette = derivePalette(seed, "Balanced");
+    const theme = buildVscodeThemeJson(palette);
+
+    const secBg = theme.colors["button.secondaryBackground"];
+    const secFg = theme.colors["button.secondaryForeground"];
+    const contrast = wcagContrastRatio(secFg, secBg);
+
+    expect(contrast).toBeGreaterThanOrEqual(4.5);
   });
 });

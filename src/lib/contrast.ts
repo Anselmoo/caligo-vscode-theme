@@ -32,3 +32,13 @@ export function wcagContrastRatio(foregroundHex: string, backgroundHex: string):
   const darker = Math.min(fg, bg);
   return (lighter + 0.05) / (darker + 0.05);
 }
+
+/**
+ * Returns whichever of `lightHex` or `darkHex` produces a higher WCAG contrast
+ * ratio against `bgHex`. Solid hex colors only — alpha channels are not composited.
+ */
+export function pickReadableForeground(bgHex: string, lightHex: string, darkHex: string): string {
+  const lightContrast = wcagContrastRatio(lightHex, bgHex);
+  const darkContrast = wcagContrastRatio(darkHex, bgHex);
+  return lightContrast >= darkContrast ? lightHex : darkHex;
+}

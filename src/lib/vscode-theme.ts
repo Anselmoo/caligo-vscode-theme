@@ -1,4 +1,5 @@
 import { withAlpha } from "./color.js";
+import { pickReadableForeground } from "./contrast.js";
 import { deriveIntentSemanticTokenColors } from "./intent-layers.js";
 import type { DerivedPalette } from "./palette.js";
 import { SEMANTIC_COLOR_KEYS } from "./semantic-colors.js";
@@ -100,12 +101,13 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     "statusBarItem.hoverBackground": withAlpha(p.bg2, 0.85),
 
     // Interactive elements
-    // Buttons
+    // Buttons — foreground is chosen dynamically so text is always readable
+    // regardless of how bright or dark the accent or secondary background is.
     "button.background": p.accent,
-    "button.foreground": p.fg0,
+    "button.foreground": pickReadableForeground(p.accent, p.fg0, p.bg0),
     "button.hoverBackground": p.accentSoft,
     "button.secondaryBackground": p.bg2,
-    "button.secondaryForeground": p.fg1,
+    "button.secondaryForeground": pickReadableForeground(p.bg2, p.fg1, p.bg0),
     "button.secondaryHoverBackground": withAlpha(p.bg2, 0.8),
 
     // Checkbox
