@@ -34,11 +34,19 @@ export function wcagContrastRatio(foregroundHex: string, backgroundHex: string):
 }
 
 /**
- * Returns whichever of `lightHex` or `darkHex` produces a higher WCAG contrast
- * ratio against `bgHex`. Solid hex colors only — alpha channels are not composited.
+ * Returns whichever of `primaryCandidateHex` or `fallbackHex` produces a higher WCAG contrast
+ * ratio against `bgHex`.
+ *
+ * Accepts hex colors in `#RRGGBB` or `#RRGGBBAA` form. If an alpha channel is
+ * provided, it is ignored (no compositing is performed; colors are treated
+ * as fully opaque).
  */
-export function pickReadableForeground(bgHex: string, lightHex: string, darkHex: string): string {
-  const lightContrast = wcagContrastRatio(lightHex, bgHex);
-  const darkContrast = wcagContrastRatio(darkHex, bgHex);
-  return lightContrast >= darkContrast ? lightHex : darkHex;
+export function pickReadableForeground(
+  bgHex: string,
+  primaryCandidateHex: string,
+  fallbackHex: string
+): string {
+  const primaryContrast = wcagContrastRatio(primaryCandidateHex, bgHex);
+  const fallbackContrast = wcagContrastRatio(fallbackHex, bgHex);
+  return primaryContrast >= fallbackContrast ? primaryCandidateHex : fallbackHex;
 }

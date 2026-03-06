@@ -101,8 +101,8 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     "statusBarItem.hoverBackground": withAlpha(p.bg2, 0.85),
 
     // Interactive elements
-    // Buttons — foreground is chosen dynamically so text is always readable
-    // regardless of how bright or dark the accent or secondary background is.
+    // Buttons — foreground is chosen dynamically to maximize contrast
+    // by picking the higher-contrast option against the accent or secondary background.
     "button.background": p.accent,
     "button.foreground": pickReadableForeground(p.accent, p.fg0, p.bg0),
     "button.hoverBackground": p.accentSoft,
