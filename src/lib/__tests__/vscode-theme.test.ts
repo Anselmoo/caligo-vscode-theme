@@ -202,9 +202,9 @@ describe("buildVscodeThemeJson", () => {
     expect(contrast).toBeGreaterThanOrEqual(4.5);
   });
 
-  it("should always pick the higher-contrast foreground option for the primary button", () => {
-    // Mid-range accent: neither pure-light nor pure-dark may reach 4.5, but we
-    // must always choose whichever option gives the better ratio.
+  it("should produce WCAG AA contrast (≥4.5) for button foreground on a mid-luminance accent via black/white fallback", () => {
+    // Mid-range accent (l=0.55): neither palette fg0 nor bg0 achieves WCAG AA
+    // against this background — the function must fall back to #000000 or #ffffff.
     const seed: Seed = {
       id: "MidAccent",
       displayName: "Mid Accent",
@@ -217,17 +217,11 @@ describe("buildVscodeThemeJson", () => {
 
     const btnBg = theme.colors["button.background"];
     const btnFg = theme.colors["button.foreground"];
-
-    const contrastWithLight = wcagContrastRatio(palette.fg0, btnBg);
-    const contrastWithDark = wcagContrastRatio(palette.bg0, btnBg);
     const chosenContrast = wcagContrastRatio(btnFg, btnBg);
 
-    // The chosen foreground must be at least as good as the better-of-two options.
-    // A tiny epsilon accounts for floating-point rounding in hex conversion.
-    const CONTRAST_EPSILON = 0.01;
-    expect(chosenContrast).toBeGreaterThanOrEqual(
-      Math.max(contrastWithLight, contrastWithDark) - CONTRAST_EPSILON
-    );
+    // Both palette candidates (fg0, bg0) fail WCAG AA for this accent; the
+    // fallback to #000000 / #ffffff must push the ratio to ≥4.5.
+    expect(chosenContrast).toBeGreaterThanOrEqual(4.5);
   });
 
   it("should produce WCAG AA contrast (≥4.5) for secondary button foreground against secondary button background", () => {

@@ -33,9 +33,17 @@ export function wcagContrastRatio(foregroundHex: string, backgroundHex: string):
   return (lighter + 0.05) / (darker + 0.05);
 }
 
+/** Minimum WCAG AA contrast ratio for normal-size text. */
+const WCAG_AA_RATIO = 4.5;
+
 /**
  * Returns whichever of `primaryCandidateHex` or `fallbackHex` produces a higher WCAG contrast
  * ratio against `bgHex`.
+ *
+ * When neither palette candidate achieves WCAG AA (≥4.5:1), the function falls back to
+ * whichever of pure black (`#000000`) or pure white (`#ffffff`) scores higher — guaranteeing
+ * maximum-contrast text in all cases including mid-luminance backgrounds where palette colors
+ * alone cannot reach the threshold.
  *
  * Accepts hex colors in `#RRGGBB` or `#RRGGBBAA` form. If an alpha channel is
  * provided, it is ignored (no compositing is performed; colors are treated
@@ -48,5 +56,18 @@ export function pickReadableForeground(
 ): string {
   const primaryContrast = wcagContrastRatio(primaryCandidateHex, bgHex);
   const fallbackContrast = wcagContrastRatio(fallbackHex, bgHex);
-  return primaryContrast >= fallbackContrast ? primaryCandidateHex : fallbackHex;
+  const [best, bestContrast] =
+    primaryContrast >= fallbackContrast
+      ? [primaryCandidateHex, primaryContrast]
+      : [fallbackHex, fallbackContrast];
+
+  if (bestContrast >= WCAG_AA_RATIO) {
+    return best;
+  }
+
+  // Neither palette color reaches WCAG AA — fall back to the absolute extreme
+  // (black or white) that gives the highest contrast against this background.
+  const whiteContrast = wcagContrastRatio("#ffffff", bgHex);
+  const blackContrast = wcagContrastRatio("#000000", bgHex);
+  return blackContrast >= whiteContrast ? "#000000" : "#ffffff";
 }
