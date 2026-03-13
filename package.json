@@ -107,7 +107,7 @@
     "@vscode/vsce": "^3.7.1",
     "@vue/test-utils": "^2.4.6",
     "axe-core": "^4.11.1",
-    "happy-dom": "^20.6.1",
+    "happy-dom": "^20.8.4",
     "lefthook": "^2.1.2",
     "jsdom": "^28.1.0",
     "playwright": "^1.58.2",
