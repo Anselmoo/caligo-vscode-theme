@@ -17,7 +17,7 @@ import {
   noiseBrick,
   skyGradientBrick,
   starFieldBrick,
-  terrainStackBrick,
+  terrainContourBrick,
   vignetteBrick,
 } from "../bricks/index.js";
 import { mergeBricks } from "../composer.js";
@@ -201,12 +201,12 @@ function mandarianBreak(p: BrickParams): ComposedWallpaper {
     height: 0.12,
   });
 
-  const ridge = terrainStackBrick(p, {
+  const ridge = terrainContourBrick(p, {
     id: "mn-b-rd",
-    points: 20,
+    horizonY: 0.45,
     layers: [
-      { baseY: 0.48, roughness: 0.12, color: colors.bgMid, opacity: 0.6 },
-      { baseY: 0.58, roughness: 0.08, color: colors.bg, opacity: 0.85 },
+      { color: colors.bgMid, opacity: 0.6 },
+      { color: colors.bg, opacity: 0.85 },
     ],
   });
 
@@ -275,7 +275,7 @@ function mandarianVoid(p: BrickParams): ComposedWallpaper {
     seed: 37,
   });
 
-  const vignette = vignetteBrick(p, { id: "mn-v-vig", opacity: 0.82 });
+  const vignette = vignetteBrick(p, { id: "mn-v-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "mn-v-n", opacity: 0.03 });
   return mergeBricks([bg, sky, haze, dunes, vignette, noise]);
 }

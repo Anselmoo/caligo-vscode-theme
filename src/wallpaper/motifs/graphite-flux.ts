@@ -9,6 +9,7 @@
  */
 import {
   backgroundBrick,
+  cityscapeBrick,
   cloudBandBrick,
   horizonGlowBrick,
   lightningBrick,
@@ -16,7 +17,6 @@ import {
   noiseBrick,
   skyGradientBrick,
   starFieldBrick,
-  terrainBrick,
   terrainStackBrick,
   vignetteBrick,
   waterReflectionBrick,
@@ -62,22 +62,24 @@ function graphiteStillness(p: BrickParams): ComposedWallpaper {
     height: 0.1,
   });
 
-  const skyline = terrainBrick(p, {
+  const skyline = cityscapeBrick(p, {
     id: "gf-s-sl",
     baseY: 0.58,
-    roughness: 0.12,
-    points: 32,
+    heightRange: [32 / 120, 32 / 60],
+    density: 32,
     color: colors.bgMid,
     opacity: 0.85,
+    hasWindows: true,
   });
 
-  const buildings = terrainBrick(p, {
+  const buildings = cityscapeBrick(p, {
     id: "gf-s-bld",
     baseY: 0.68,
-    roughness: 0.08,
-    points: 20,
+    heightRange: [20 / 120, 20 / 60],
+    density: 20,
     color: colors.bg,
     opacity: 0.95,
+    hasWindows: true,
   });
 
   const lights = starFieldBrick(p, {
@@ -118,13 +120,14 @@ function graphiteDrift(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  const skyline = terrainBrick(p, {
+  const skyline = cityscapeBrick(p, {
     id: "gf-d-sl",
     baseY: 0.48,
-    roughness: 0.1,
-    points: 24,
+    heightRange: [24 / 120, 24 / 60],
+    density: 24,
     color: colors.bgMid,
     opacity: 0.7,
+    hasWindows: true,
   });
 
   const neon = nebulaGlowBrick(p, {
@@ -265,13 +268,14 @@ function graphiteVoid(p: BrickParams): ComposedWallpaper {
     seed: 53,
   });
 
-  const ghost = terrainBrick(p, {
+  const ghost = cityscapeBrick(p, {
     id: "gf-v-gh",
     baseY: 0.55,
-    roughness: 0.06,
-    points: 16,
+    heightRange: [16 / 120, 16 / 60],
+    density: 16,
     color: colors.bgMid,
     opacity: 0.2,
+    hasWindows: true,
   });
 
   const light = nebulaGlowBrick(p, {

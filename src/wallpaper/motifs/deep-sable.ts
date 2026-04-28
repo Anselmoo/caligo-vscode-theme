@@ -54,13 +54,13 @@ function deepStillness(p: BrickParams): ComposedWallpaper {
   // Jellyfish glow clusters — large soft blobs at varying depths
   const jellies = nebulaGlowBrick(p, {
     id: "ds-s-jel",
-    blur: 0.05,
+    blur: 0.04,
     blobs: [
-      { cx: 0.3, cy: 0.25, rx: 0.04, ry: 0.06, color: colors.hueCyan, opacity: 0.3 },
-      { cx: 0.65, cy: 0.4, rx: 0.035, ry: 0.05, color: colors.hueCyan, opacity: 0.25 },
-      { cx: 0.15, cy: 0.55, rx: 0.025, ry: 0.04, color: colors.hueBlue, opacity: 0.2 },
-      { cx: 0.8, cy: 0.2, rx: 0.02, ry: 0.035, color: colors.hueCyan, opacity: 0.15 },
-      { cx: 0.45, cy: 0.65, rx: 0.03, ry: 0.045, color: colors.accent, opacity: 0.2 },
+      { cx: 0.3, cy: 0.25, rx: 0.05, ry: 0.07, color: colors.hueCyan, opacity: 0.5 },
+      { cx: 0.65, cy: 0.4, rx: 0.04, ry: 0.06, color: colors.hueCyan, opacity: 0.4 },
+      { cx: 0.15, cy: 0.55, rx: 0.03, ry: 0.05, color: colors.hueBlue, opacity: 0.35 },
+      { cx: 0.8, cy: 0.2, rx: 0.025, ry: 0.04, color: colors.hueCyan, opacity: 0.3 },
+      { cx: 0.45, cy: 0.65, rx: 0.035, ry: 0.05, color: colors.accent, opacity: 0.35 },
     ],
   });
 
@@ -68,18 +68,18 @@ function deepStillness(p: BrickParams): ComposedWallpaper {
   const current1 = cloudBandBrick(p, {
     id: "ds-s-c1",
     cy: 0.35,
-    bandHeight: 0.12,
+    bandHeight: 0.14,
     color: colors.hueCyan,
-    opacity: 0.08,
+    opacity: 0.18,
     frequency: 0.005,
     seed: 11,
   });
   const current2 = cloudBandBrick(p, {
     id: "ds-s-c2",
     cy: 0.6,
-    bandHeight: 0.1,
+    bandHeight: 0.12,
     color: colors.hueBlue,
-    opacity: 0.06,
+    opacity: 0.14,
     frequency: 0.007,
     seed: 23,
   });
@@ -87,19 +87,20 @@ function deepStillness(p: BrickParams): ComposedWallpaper {
   // Bioluminescent particles — sparse, scattered
   const biolum = starFieldBrick(p, {
     id: "ds-s-bl",
-    count: 60,
-    brightCount: 8,
+    count: 80,
+    brightCount: 12,
     color: colors.hueCyan,
     distribution: "upper",
-    opacity: 0.5,
+    opacity: 0.7,
   });
 
   // Ocean floor terrain — jagged rock silhouettes
   const floor = terrainStackBrick(p, {
     id: "ds-s-fl",
     layers: [
-      { baseY: 0.82, roughness: 0.04, color: colors.bgMid, opacity: 0.4 },
-      { baseY: 0.88, roughness: 0.05, color: colors.bg, opacity: 0.7 },
+      { baseY: 0.78, roughness: 0.06, color: colors.bgMid, opacity: 0.6 },
+      { baseY: 0.85, roughness: 0.05, color: colors.bgSoft, opacity: 0.78 },
+      { baseY: 0.92, roughness: 0.04, color: colors.bg, opacity: 0.92 },
     ],
   });
 
@@ -129,7 +130,7 @@ function deepDrift(p: BrickParams): ComposedWallpaper {
     cy: 0.2,
     bandHeight: 0.15,
     color: colors.hueCyan,
-    opacity: 0.1,
+    opacity: 0.2,
     frequency: 0.004,
     seed: 5,
   });
@@ -138,7 +139,7 @@ function deepDrift(p: BrickParams): ComposedWallpaper {
     cy: 0.4,
     bandHeight: 0.12,
     color: colors.hueBlue,
-    opacity: 0.12,
+    opacity: 0.22,
     frequency: 0.006,
     seed: 11,
   });
@@ -147,7 +148,7 @@ function deepDrift(p: BrickParams): ComposedWallpaper {
     cy: 0.6,
     bandHeight: 0.14,
     color: colors.hueCyan,
-    opacity: 0.08,
+    opacity: 0.17,
     frequency: 0.005,
     seed: 19,
   });
@@ -156,7 +157,7 @@ function deepDrift(p: BrickParams): ComposedWallpaper {
     cy: 0.8,
     bandHeight: 0.1,
     color: colors.hueBlue,
-    opacity: 0.06,
+    opacity: 0.14,
     frequency: 0.007,
     seed: 29,
   });
@@ -166,9 +167,9 @@ function deepDrift(p: BrickParams): ComposedWallpaper {
     id: "ds-d-tr",
     blur: 0.04,
     blobs: [
-      { cx: 0.2, cy: 0.3, rx: 0.08, ry: 0.02, color: colors.hueCyan, opacity: 0.15 },
-      { cx: 0.5, cy: 0.5, rx: 0.1, ry: 0.025, color: colors.accent, opacity: 0.12 },
-      { cx: 0.8, cy: 0.7, rx: 0.07, ry: 0.02, color: colors.hueCyan, opacity: 0.1 },
+      { cx: 0.2, cy: 0.3, rx: 0.08, ry: 0.02, color: colors.hueCyan, opacity: 0.3 },
+      { cx: 0.5, cy: 0.5, rx: 0.1, ry: 0.025, color: colors.accent, opacity: 0.25 },
+      { cx: 0.8, cy: 0.7, rx: 0.07, ry: 0.02, color: colors.hueCyan, opacity: 0.22 },
     ],
   });
 
@@ -185,9 +186,9 @@ function deepDrift(p: BrickParams): ComposedWallpaper {
   const ridges = terrainStackBrick(p, {
     id: "ds-d-rd",
     layers: [
-      { baseY: 0.78, roughness: 0.03, color: colors.bgMid, opacity: 0.3 },
-      { baseY: 0.85, roughness: 0.04, color: colors.bgSoft, opacity: 0.5 },
-      { baseY: 0.92, roughness: 0.05, color: colors.bg, opacity: 0.7 },
+      { baseY: 0.74, roughness: 0.06, color: colors.bgMid, opacity: 0.55 },
+      { baseY: 0.82, roughness: 0.05, color: colors.bgSoft, opacity: 0.72 },
+      { baseY: 0.9, roughness: 0.04, color: colors.bg, opacity: 0.88 },
     ],
   });
 
@@ -311,16 +312,17 @@ function deepVoid(p: BrickParams): ComposedWallpaper {
     seed: 41,
   });
 
-  // Distant trench walls — faint terrain silhouettes
+  // Distant trench walls — visible terrain silhouettes
   const trench = terrainStackBrick(p, {
     id: "ds-v-tr",
     layers: [
-      { baseY: 0.85, roughness: 0.03, color: colors.bgSoft, opacity: 0.15 },
-      { baseY: 0.92, roughness: 0.04, color: colors.bgMid, opacity: 0.3 },
+      { baseY: 0.8, roughness: 0.05, color: colors.bgMid, opacity: 0.45 },
+      { baseY: 0.88, roughness: 0.04, color: colors.bgSoft, opacity: 0.65 },
+      { baseY: 0.94, roughness: 0.03, color: colors.bg, opacity: 0.85 },
     ],
   });
 
-  const vignette = vignetteBrick(p, { id: "ds-v-vig", opacity: 0.85 });
+  const vignette = vignetteBrick(p, { id: "ds-v-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "ds-v-n", opacity: 0.03 });
   return mergeBricks([bg, abyss, current, light, trench, vignette, noise]);
 }

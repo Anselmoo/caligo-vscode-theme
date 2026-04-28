@@ -16,7 +16,7 @@ import {
   sparksBrick,
   starFieldBrick,
   terrainBrick,
-  terrainStackBrick,
+  terrainContourBrick,
   vignetteBrick,
 } from "../bricks/index.js";
 import { mergeBricks } from "../composer.js";
@@ -248,13 +248,13 @@ function cinderBreak(p: BrickParams): ComposedWallpaper {
   };
 
   // Burning mountain ridge
-  const ridge = terrainStackBrick(p, {
+  const ridge = terrainContourBrick(p, {
     id: "ci-b-rd",
-    points: 26,
+    horizonY: 0.52,
     layers: [
-      { baseY: 0.55, roughness: 0.12, color: colors.hueRed, opacity: 0.15 },
-      { baseY: 0.6, roughness: 0.1, color: colors.bgMid, opacity: 0.7 },
-      { baseY: 0.75, roughness: 0.06, color: colors.bg, opacity: 0.95 },
+      { color: colors.hueRed, opacity: 0.2 },
+      { color: colors.bgMid, opacity: 0.7 },
+      { color: colors.bg, opacity: 0.95 },
     ],
   });
 
@@ -346,7 +346,7 @@ function cinderVoid(p: BrickParams): ComposedWallpaper {
     frequency: 0.004,
   });
 
-  const vignette = vignetteBrick(p, { id: "ci-v-vig", opacity: 0.75 });
+  const vignette = vignetteBrick(p, { id: "ci-v-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "ci-v-n", opacity: 0.04 });
 
   return mergeBricks([bg, sky, stars, glow, ashHaze, terrain, ground, vignette, noise]);
@@ -414,13 +414,13 @@ function cinderPulse(p: BrickParams): ComposedWallpaper {
   };
 
   // Mountain backdrop
-  const mountains = terrainStackBrick(p, {
+  const mountains = terrainContourBrick(p, {
     id: "ci-p-mt",
-    points: 22,
+    horizonY: 0.5,
     layers: [
-      { baseY: 0.55, roughness: 0.1, color: colors.bgMid, opacity: 0.5 },
-      { baseY: 0.65, roughness: 0.08, color: colors.bgSoft, opacity: 0.7 },
-      { baseY: 0.78, roughness: 0.05, color: colors.bg, opacity: 0.95 },
+      { color: colors.bgMid, opacity: 0.5 },
+      { color: colors.bgSoft, opacity: 0.7 },
+      { color: colors.bg, opacity: 0.95 },
     ],
   });
 

@@ -356,7 +356,7 @@ function nebulaVoid(p: BrickParams): ComposedWallpaper {
     seed: 41,
   });
 
-  const vignette = vignetteBrick(p, { id: "nn-v-vig", opacity: 0.7 });
+  const vignette = vignetteBrick(p, { id: "nn-v-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "nn-v-n", opacity: 0.04 });
 
   const horizGlow = horizonGlowBrick(p, {

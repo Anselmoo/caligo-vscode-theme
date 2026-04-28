@@ -1,7 +1,11 @@
 /**
  * Bricks index — re-exports all brick functions for convenient import.
  */
+
+export { cityscapeBrick } from "./architecture.js";
+export { atmosphereBrick, blendLayerBrick, toneCurveBrick } from "./atmosphere.js";
 export { backgroundBrick } from "./background.js";
+export { voronoiBrick } from "./geometry.js";
 export { linearGradientBrick, radialGradientBrick } from "./gradient.js";
 export {
   auroraAdvancedBrick,
@@ -15,6 +19,7 @@ export {
   skyGradientBrick,
   starFieldBrick,
   terrainBrick,
+  terrainContourBrick,
   terrainStackBrick,
   treelineBrick,
   volcanoBrick,

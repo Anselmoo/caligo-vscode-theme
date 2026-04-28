@@ -16,6 +16,7 @@ import {
   noiseBrick,
   skyGradientBrick,
   starFieldBrick,
+  terrainContourBrick,
   terrainStackBrick,
   vignetteBrick,
   volcanoBrick,
@@ -65,14 +66,14 @@ function obsidianStillness(p: BrickParams): ComposedWallpaper {
     glowSize: 2.18,
   });
 
-  // Volcanic plain terrain
-  const terrain = terrainStackBrick(p, {
+  // Volcanic plain — natural contour terrain
+  const terrain = terrainContourBrick(p, {
     id: "og-s-tr",
-    points: 22,
+    horizonY: 0.29,
     layers: [
-      { baseY: 0.55, roughness: 0.08, color: colors.bgMid, opacity: 0.6 },
-      { baseY: 0.62, roughness: 0.06, color: colors.bgSoft, opacity: 0.7 },
-      { baseY: 0.72, roughness: 0.04, color: colors.bg, opacity: 0.9 },
+      { color: colors.bgMid, opacity: 0.62, edgeBlur: 3 },
+      { color: colors.bgSoft, opacity: 0.72 },
+      { color: colors.bg, opacity: 0.92 },
     ],
   });
 
@@ -272,7 +273,7 @@ function obsidianVoid(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  const vignette = vignetteBrick(p, { id: "og-v-vig", opacity: 0.88 });
+  const vignette = vignetteBrick(p, { id: "og-v-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "og-v-n", opacity: 0.04 });
   return mergeBricks([bg, dark, wallL, wallR, light, vignette, noise]);
 }
@@ -295,13 +296,13 @@ function obsidianPulse(p: BrickParams): ComposedWallpaper {
   });
 
   // Mountain peaks above waterline
-  const peaks = terrainStackBrick(p, {
+  const peaks = terrainContourBrick(p, {
     id: "og-p-pk",
-    points: 18,
+    horizonY: 0.04,
     layers: [
-      { baseY: 0.35, roughness: 0.1, color: colors.bgMid, opacity: 0.5 },
-      { baseY: 0.42, roughness: 0.08, color: colors.bgSoft, opacity: 0.65 },
-      { baseY: 0.48, roughness: 0.05, color: colors.bg, opacity: 0.85 },
+      { color: colors.bgMid, opacity: 0.52, edgeBlur: 3 },
+      { color: colors.bgSoft, opacity: 0.68 },
+      { color: colors.bg, opacity: 0.88 },
     ],
   });
 

@@ -10,6 +10,7 @@
 import {
   backgroundBrick,
   celestialBrick,
+  cityscapeBrick,
   cloudBandBrick,
   horizonGlowBrick,
   nebulaGlowBrick,
@@ -18,6 +19,7 @@ import {
   starFieldBrick,
   terrainStackBrick,
   vignetteBrick,
+  voronoiBrick,
 } from "../bricks/index.js";
 import { mergeBricks } from "../composer.js";
 import type { BrickParams, ComposedWallpaper } from "../types.js";
@@ -71,14 +73,16 @@ function midnightStillness(p: BrickParams): ComposedWallpaper {
   });
 
   // Rooftop silhouettes visible through window
-  const rooftops = terrainStackBrick(p, {
+  const rooftops = cityscapeBrick(p, {
     id: "mi-s-rt",
-    points: 18,
-    layers: [
-      { baseY: 0.62, roughness: 0.06, color: colors.bgMid, opacity: 0.5 },
-      { baseY: 0.7, roughness: 0.04, color: colors.bgSoft, opacity: 0.65 },
-      { baseY: 0.78, roughness: 0.03, color: colors.bg, opacity: 0.85 },
-    ],
+    baseY: 0.62,
+    heightRange: [0.1, 0.3],
+    density: 20,
+    color: colors.bg,
+    opacity: 0.85,
+    hasWindows: true,
+    windowProbability: 0.3,
+    windowColor: p.colors.bgSoft,
   });
 
   // City light glow at horizon
@@ -179,23 +183,16 @@ function midnightBreak(p: BrickParams): ComposedWallpaper {
   });
 
   // Shard layers — sharp angular terrain at different heights
-  const shard1 = terrainStackBrick(p, {
-    id: "mi-b-sh1",
-    points: 12,
-    layers: [{ baseY: 0.2, roughness: 0.18, color: colors.bgMid, opacity: 0.45 }],
-  });
-  const shard2 = terrainStackBrick(p, {
-    id: "mi-b-sh2",
-    points: 10,
-    layers: [{ baseY: 0.4, roughness: 0.2, color: colors.bgSoft, opacity: 0.35 }],
-  });
-  const shard3 = terrainStackBrick(p, {
-    id: "mi-b-sh3",
-    points: 14,
-    layers: [{ baseY: 0.6, roughness: 0.15, color: colors.bgMid, opacity: 0.5 }],
+  const shards = voronoiBrick(p, {
+    id: "mi-b-shards",
+    points: 15,
+    color: colors.bgSoft,
+    opacity: 0.25,
+    fillOpacity: 0.02,
+    mode: "voronoi",
+    relaxIterations: 1,
   });
 
-  // Light bleeding through cracks
   const crackLight = nebulaGlowBrick(p, {
     id: "mi-b-cl",
     blur: 0.03,
@@ -208,7 +205,7 @@ function midnightBreak(p: BrickParams): ComposedWallpaper {
 
   const vignette = vignetteBrick(p, { id: "mi-b-vig", opacity: 0.55 });
   const noise = noiseBrick(p, { id: "mi-b-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, shard1, shard2, crackLight, shard3, vignette, noise]);
+  return mergeBricks([bg, sky, shards, crackLight, vignette, noise]);
 }
 
 /* ── Void: Charcoal cave — single form in darkness ────────────────────────── */
@@ -243,7 +240,7 @@ function midnightVoid(p: BrickParams): ComposedWallpaper {
     seed: 47,
   });
 
-  const vignette = vignetteBrick(p, { id: "mi-v-vig", opacity: 0.85 });
+  const vignette = vignetteBrick(p, { id: "mi-v-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "mi-v-n", opacity: 0.04 });
   return mergeBricks([bg, dark, haze, form, vignette, noise]);
 }

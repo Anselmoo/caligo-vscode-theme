@@ -8,6 +8,7 @@
  * Pulse     : Pulse borealis — three aurora bands converge over layered peaks
  */
 import {
+  atmosphereBrick,
   auroraAdvancedBrick,
   backgroundBrick,
   cloudBandBrick,
@@ -15,12 +16,35 @@ import {
   skyGradientBrick,
   starFieldBrick,
   terrainBrick,
+  terrainContourBrick,
   terrainStackBrick,
+  toneCurveBrick,
   vignetteBrick,
   waterReflectionBrick,
 } from "../bricks/index.js";
 import { mergeBricks } from "../composer.js";
 import type { BrickParams, ComposedWallpaper } from "../types.js";
+import { PLATFORM_SCENE_TUNING } from "../types.js";
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
+}
+
+function getAuroraNoirTuning(p: BrickParams) {
+  return PLATFORM_SCENE_TUNING[p.platform];
+}
+
+function shiftDown(value: number, delta: number, min = 0.08, max = 0.92): number {
+  return clamp(value + delta, min, max);
+}
+
+function liftTerrain(value: number, delta: number, min = 0.14): number {
+  return Math.max(min, value - delta);
+}
+
+function scaleZone(value: number, factor: number, min = 0.06): number {
+  return Math.max(min, value * factor);
+}
 
 export function auroraNoir(params: BrickParams): ComposedWallpaper {
   switch (params.harmonyMode) {
@@ -40,6 +64,7 @@ export function auroraNoir(params: BrickParams): ComposedWallpaper {
 /* ── Stillness: Fjord aurora — aurora mirrored in still fjord water ────────── */
 function auroraStillness(p: BrickParams): ComposedWallpaper {
   const { colors } = p;
+  const tuning = getAuroraNoirTuning(p);
 
   const bg = backgroundBrick(p);
   const sky = skyGradientBrick(p, {
@@ -55,17 +80,17 @@ function auroraStillness(p: BrickParams): ComposedWallpaper {
 
   const stars = starFieldBrick(p, {
     id: "an-s-st",
-    count: 100,
-    brightCount: 5,
+    count: Math.round(100 * tuning.starDensity),
+    brightCount: Math.max(3, Math.round(5 * tuning.starDensity)),
     distribution: "upper",
     opacity: 0.7,
   });
 
   const aurora = auroraAdvancedBrick(p, {
     id: "an-s-au",
-    bands: 4,
-    cy: 0.22,
-    zoneHeight: 0.2,
+    bands: Math.max(3, Math.round(4 * tuning.auroraBandScale)),
+    cy: shiftDown(0.22, tuning.auroraYShift * 0.75),
+    zoneHeight: scaleZone(0.2, tuning.auroraZoneScale),
     color: colors.hueGreen,
     color2: colors.hueCyan,
     opacity: 0.5,
@@ -74,7 +99,7 @@ function auroraStillness(p: BrickParams): ComposedWallpaper {
   // Fjord walls — steep terrain on both sides leaving a narrow water gap
   const leftWall = terrainBrick(p, {
     id: "an-s-lw",
-    baseY: 0.5,
+    baseY: liftTerrain(0.5, tuning.terrainLift * 0.8),
     roughness: 0.1,
     points: 16,
     color: colors.bgMid,
@@ -82,7 +107,7 @@ function auroraStillness(p: BrickParams): ComposedWallpaper {
   });
   const rightWall = terrainBrick(p, {
     id: "an-s-rw",
-    baseY: 0.52,
+    baseY: liftTerrain(0.52, tuning.terrainLift * 0.7),
     roughness: 0.08,
     points: 16,
     color: colors.bgSoft,
@@ -92,7 +117,7 @@ function auroraStillness(p: BrickParams): ComposedWallpaper {
   // Water surface at 50%
   const water = waterReflectionBrick(p, {
     id: "an-s-w",
-    waterY: 0.5,
+    waterY: liftTerrain(0.5, tuning.terrainLift * 0.45, 0.18),
     color: colors.hueGreen,
     opacity: 0.15,
     rippleScale: 6,
@@ -101,7 +126,7 @@ function auroraStillness(p: BrickParams): ComposedWallpaper {
   // Foreground terrain (closest mountains, darkest)
   const foreground = terrainBrick(p, {
     id: "an-s-fg",
-    baseY: 0.6,
+    baseY: liftTerrain(0.6, tuning.terrainLift),
     roughness: 0.12,
     points: 20,
     color: colors.bg,
@@ -110,13 +135,23 @@ function auroraStillness(p: BrickParams): ComposedWallpaper {
 
   const mist = cloudBandBrick(p, {
     id: "an-s-mist",
-    cy: 0.5,
+    cy: liftTerrain(0.5, tuning.fogLift, 0.2),
     bandHeight: 0.08,
     color: colors.bgSoft,
     opacity: 0.07,
   });
 
+  const atmo = atmosphereBrick(p, {
+    id: "an-s-atmo",
+    color: colors.bgSoft,
+    highlightColor: colors.hueGreen,
+    opacity: 0.1 * tuning.atmosphereScale,
+    lightAzimuth: 210,
+    lightElevation: 30,
+    seed: 3,
+  });
   const vignette = vignetteBrick(p, { id: "an-s-vig", opacity: 0.5 });
+  const tone = toneCurveBrick(p, { id: "an-s-tone", preset: "cinematic", opacity: 0.35 });
   const noise = noiseBrick(p, { id: "an-s-n", opacity: 0.04 });
 
   return mergeBricks([
@@ -129,7 +164,9 @@ function auroraStillness(p: BrickParams): ComposedWallpaper {
     water,
     foreground,
     mist,
+    atmo,
     vignette,
+    tone,
     noise,
   ]);
 }
@@ -137,6 +174,7 @@ function auroraStillness(p: BrickParams): ComposedWallpaper {
 /* ── Drift: Ice shelf — aurora ribbons over snow-covered mountains ─────────── */
 function auroraDrift(p: BrickParams): ComposedWallpaper {
   const { colors } = p;
+  const tuning = getAuroraNoirTuning(p);
 
   const bg = backgroundBrick(p);
   const sky = skyGradientBrick(p, {
@@ -151,47 +189,57 @@ function auroraDrift(p: BrickParams): ComposedWallpaper {
 
   const stars = starFieldBrick(p, {
     id: "an-d-st",
-    count: 120,
-    brightCount: 4,
+    count: Math.round(120 * tuning.starDensity),
+    brightCount: Math.max(3, Math.round(4 * tuning.starDensity)),
     distribution: "upper",
     opacity: 0.6,
   });
 
   const aurora = auroraAdvancedBrick(p, {
     id: "an-d-au",
-    bands: 6,
-    cy: 0.2,
-    zoneHeight: 0.25,
+    bands: Math.max(4, Math.round(6 * tuning.auroraBandScale)),
+    cy: shiftDown(0.2, tuning.auroraYShift * 0.6),
+    zoneHeight: scaleZone(0.25, tuning.auroraZoneScale),
     color: colors.hueGreen,
     color2: colors.hueCyan,
     opacity: 0.45,
     displacement: true,
   });
 
-  // Layered mountain range — 3 layers with atmospheric perspective
-  const mountains = terrainStackBrick(p, {
+  // Layered mountain range — 3 contour levels with atmospheric perspective
+  const mountains = terrainContourBrick(p, {
     id: "an-d-mtn",
-    points: 24,
+    horizonY: Math.max(0.18, 0.3 - tuning.terrainLift),
     layers: [
-      { baseY: 0.52, roughness: 0.1, color: colors.bgMid, opacity: 0.5, edgeBlur: 3 },
-      { baseY: 0.6, roughness: 0.08, color: colors.bgSoft, opacity: 0.7 },
-      { baseY: 0.72, roughness: 0.06, color: colors.bg, opacity: 0.95 },
+      { color: colors.bgMid, opacity: 0.55, edgeBlur: 4 },
+      { color: colors.bgSoft, opacity: 0.72 },
+      { color: colors.bg, opacity: 0.95 },
     ],
   });
 
   // Snow/mist layer at the mountain bases
   const mist = cloudBandBrick(p, {
     id: "an-d-mist",
-    cy: 0.58,
+    cy: liftTerrain(0.58, tuning.fogLift + tuning.terrainLift * 0.2, 0.24),
     bandHeight: 0.1,
     color: colors.bgSoft,
     opacity: 0.07,
   });
 
+  const atmo = atmosphereBrick(p, {
+    id: "an-d-atmo",
+    color: colors.bgSoft,
+    highlightColor: colors.hueCyan,
+    opacity: 0.09 * tuning.atmosphereScale,
+    lightAzimuth: 190,
+    lightElevation: 25,
+    seed: 11,
+  });
   const vignette = vignetteBrick(p, { id: "an-d-vig", opacity: 0.55 });
+  const tone = toneCurveBrick(p, { id: "an-d-tone", preset: "cinematic", opacity: 0.35 });
   const noise = noiseBrick(p, { id: "an-d-n", opacity: 0.04 });
 
-  return mergeBricks([bg, sky, stars, aurora, mountains, mist, vignette, noise]);
+  return mergeBricks([bg, sky, stars, aurora, mountains, mist, atmo, vignette, tone, noise]);
 }
 
 /* ── Break: Cracking glacier — aurora shockwave over fractured ice ─────────── */
@@ -200,6 +248,7 @@ function auroraBreak(p: BrickParams): ComposedWallpaper {
     colors,
     viewBox: { width, height },
   } = p;
+  const tuning = getAuroraNoirTuning(p);
 
   const bg = backgroundBrick(p);
   const sky = skyGradientBrick(p, {
@@ -214,8 +263,8 @@ function auroraBreak(p: BrickParams): ComposedWallpaper {
 
   const stars = starFieldBrick(p, {
     id: "an-b-st",
-    count: 80,
-    brightCount: 3,
+    count: Math.round(80 * tuning.starDensity),
+    brightCount: Math.max(2, Math.round(3 * tuning.starDensity)),
     distribution: "upper",
     opacity: 0.6,
   });
@@ -223,9 +272,9 @@ function auroraBreak(p: BrickParams): ComposedWallpaper {
   // Dramatic vertical aurora tear
   const aurora = auroraAdvancedBrick(p, {
     id: "an-b-au",
-    bands: 3,
-    cy: 0.3,
-    zoneHeight: 0.4,
+    bands: Math.max(3, Math.round(3 * tuning.auroraBandScale)),
+    cy: shiftDown(0.3, tuning.auroraYShift),
+    zoneHeight: scaleZone(0.4, Math.max(0.78, tuning.auroraZoneScale)),
     color: colors.hueGreen,
     color2: colors.huePurple,
     opacity: 0.6,
@@ -233,9 +282,10 @@ function auroraBreak(p: BrickParams): ComposedWallpaper {
   });
 
   // Energy bloom at the rupture centre
+  const bloomCy = shiftDown(0.35, tuning.auroraYShift * 0.8, 0.16, 0.62);
   const bloom = {
     defs: `<filter id="an-b-bloom" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="${(Math.max(width, height) * 0.02).toFixed(0)}"/></filter>`,
-    elements: `<ellipse cx="${(width * 0.5).toFixed(0)}" cy="${(height * 0.35).toFixed(0)}" rx="${(width * 0.15).toFixed(0)}" ry="${(height * 0.25).toFixed(0)}" fill="${colors.accent}" opacity="0.12" filter="url(#an-b-bloom)"/>`,
+    elements: `<ellipse cx="${(width * 0.5).toFixed(0)}" cy="${(height * bloomCy).toFixed(0)}" rx="${(width * 0.15).toFixed(0)}" ry="${(height * 0.25).toFixed(0)}" fill="${colors.accent}" opacity="0.12" filter="url(#an-b-bloom)"/>`,
   };
 
   // Jagged ice terrain — high roughness for fractured look
@@ -243,21 +293,48 @@ function auroraBreak(p: BrickParams): ComposedWallpaper {
     id: "an-b-ice",
     points: 30,
     layers: [
-      { baseY: 0.6, roughness: 0.15, color: colors.bgMid, opacity: 0.6, edgeBlur: 2 },
-      { baseY: 0.72, roughness: 0.12, color: colors.bgSoft, opacity: 0.8 },
-      { baseY: 0.82, roughness: 0.1, color: colors.bg, opacity: 0.95 },
+      {
+        baseY: liftTerrain(0.6, tuning.terrainLift * 1.05),
+        roughness: 0.15,
+        color: colors.bgMid,
+        opacity: 0.6,
+        edgeBlur: 2,
+      },
+      {
+        baseY: liftTerrain(0.72, tuning.terrainLift * 0.85),
+        roughness: 0.12,
+        color: colors.bgSoft,
+        opacity: 0.8,
+      },
+      {
+        baseY: liftTerrain(0.82, tuning.terrainLift * 0.65),
+        roughness: 0.1,
+        color: colors.bg,
+        opacity: 0.95,
+      },
     ],
   });
 
+  const atmo = atmosphereBrick(p, {
+    id: "an-b-atmo",
+    color: colors.accent,
+    highlightColor: colors.huePurple,
+    opacity: 0.08 * tuning.atmosphereScale,
+    lightAzimuth: 230,
+    lightElevation: 40,
+    seed: 17,
+  });
   const vignette = vignetteBrick(p, { id: "an-b-vig", opacity: 0.6 });
+  const tone = toneCurveBrick(p, { id: "an-b-tone", preset: "cinematic", opacity: 0.4 });
   const noise = noiseBrick(p, { id: "an-b-n", opacity: 0.04 });
 
-  return mergeBricks([bg, sky, stars, aurora, bloom, ice, vignette, noise]);
+  return mergeBricks([bg, sky, stars, aurora, bloom, ice, atmo, vignette, tone, noise]);
 }
 
 /* ── Void: Polar void — single aurora breath across black tundra ──────────── */
 function auroraVoid(p: BrickParams): ComposedWallpaper {
   const { colors } = p;
+  const tuning = getAuroraNoirTuning(p);
 
   const bg = backgroundBrick(p);
   const sky = skyGradientBrick(p, {
@@ -270,8 +347,8 @@ function auroraVoid(p: BrickParams): ComposedWallpaper {
 
   const stars = starFieldBrick(p, {
     id: "an-v-st",
-    count: 50,
-    brightCount: 2,
+    count: Math.round(50 * tuning.starDensity),
+    brightCount: Math.max(2, Math.round(2 * tuning.starDensity)),
     distribution: "upper",
     opacity: 0.4,
   });
@@ -280,8 +357,8 @@ function auroraVoid(p: BrickParams): ComposedWallpaper {
   const aurora = auroraAdvancedBrick(p, {
     id: "an-v-au",
     bands: 2,
-    cy: 0.35,
-    zoneHeight: 0.08,
+    cy: shiftDown(0.35, tuning.auroraYShift * 0.65),
+    zoneHeight: scaleZone(0.08, Math.max(0.88, tuning.auroraZoneScale)),
     color: colors.hueGreen,
     opacity: 0.35,
     displacement: true,
@@ -290,7 +367,7 @@ function auroraVoid(p: BrickParams): ComposedWallpaper {
   // Flat, desolate tundra — low roughness, just a subtle ridge
   const tundra = terrainBrick(p, {
     id: "an-v-td",
-    baseY: 0.7,
+    baseY: liftTerrain(0.7, tuning.terrainLift),
     roughness: 0.03,
     points: 16,
     color: colors.bgMid,
@@ -298,22 +375,33 @@ function auroraVoid(p: BrickParams): ComposedWallpaper {
   });
   const ground = terrainBrick(p, {
     id: "an-v-gr",
-    baseY: 0.75,
+    baseY: liftTerrain(0.75, tuning.terrainLift * 0.9),
     roughness: 0.02,
     points: 12,
     color: colors.bg,
     opacity: 0.95,
   });
 
-  const vignette = vignetteBrick(p, { id: "an-v-vig", opacity: 0.75 });
+  const atmo = atmosphereBrick(p, {
+    id: "an-v-atmo",
+    color: colors.bgSoft,
+    highlightColor: colors.hueGreen,
+    opacity: 0.07 * tuning.atmosphereScale,
+    lightAzimuth: 200,
+    lightElevation: 20,
+    seed: 23,
+  });
+  const vignette = vignetteBrick(p, { id: "an-v-vig", opacity: 0.5 });
+  const tone = toneCurveBrick(p, { id: "an-v-tone", preset: "cinematic", opacity: 0.3 });
   const noise = noiseBrick(p, { id: "an-v-n", opacity: 0.03 });
 
-  return mergeBricks([bg, sky, stars, aurora, tundra, ground, vignette, noise]);
+  return mergeBricks([bg, sky, stars, aurora, tundra, ground, atmo, vignette, tone, noise]);
 }
 
 /* ── Pulse: Three aurora bands converge over layered peaks ─────────────────── */
 function auroraPulse(p: BrickParams): ComposedWallpaper {
   const { colors } = p;
+  const tuning = getAuroraNoirTuning(p);
 
   const bg = backgroundBrick(p);
   const sky = skyGradientBrick(p, {
@@ -328,8 +416,8 @@ function auroraPulse(p: BrickParams): ComposedWallpaper {
 
   const stars = starFieldBrick(p, {
     id: "an-p-st",
-    count: 140,
-    brightCount: 6,
+    count: Math.round(140 * tuning.starDensity),
+    brightCount: Math.max(4, Math.round(6 * tuning.starDensity)),
     distribution: "upper",
     opacity: 0.65,
   });
@@ -337,37 +425,47 @@ function auroraPulse(p: BrickParams): ComposedWallpaper {
   // Three converging aurora bands
   const aurora = auroraAdvancedBrick(p, {
     id: "an-p-au",
-    bands: 7,
-    cy: 0.2,
-    zoneHeight: 0.28,
+    bands: Math.max(5, Math.round(7 * tuning.auroraBandScale)),
+    cy: shiftDown(0.2, tuning.auroraYShift * 0.6),
+    zoneHeight: scaleZone(0.28, tuning.auroraZoneScale),
     color: colors.hueGreen,
     color2: colors.hueCyan,
     opacity: 0.5,
     displacement: true,
   });
 
-  // Layered peaks
-  const peaks = terrainStackBrick(p, {
+  // Layered peaks — 4 contour levels with atmospheric depth
+  const peaks = terrainContourBrick(p, {
     id: "an-p-pk",
-    points: 28,
+    horizonY: Math.max(0.17, 0.28 - tuning.terrainLift),
     layers: [
-      { baseY: 0.5, roughness: 0.12, color: colors.bgMid, opacity: 0.4, edgeBlur: 4 },
-      { baseY: 0.55, roughness: 0.1, color: colors.bgMid, opacity: 0.6 },
-      { baseY: 0.65, roughness: 0.08, color: colors.bgSoft, opacity: 0.8 },
-      { baseY: 0.78, roughness: 0.06, color: colors.bg, opacity: 0.95 },
+      { color: colors.bgMid, opacity: 0.45, edgeBlur: 5 },
+      { color: colors.bgMid, opacity: 0.62 },
+      { color: colors.bgSoft, opacity: 0.8 },
+      { color: colors.bg, opacity: 0.95 },
     ],
   });
 
   const mist = cloudBandBrick(p, {
     id: "an-p-mist",
-    cy: 0.55,
+    cy: liftTerrain(0.55, tuning.fogLift + tuning.terrainLift * 0.1, 0.2),
     bandHeight: 0.06,
     color: colors.hueGreen,
     opacity: 0.08,
   });
 
+  const atmo = atmosphereBrick(p, {
+    id: "an-p-atmo",
+    color: colors.bgSoft,
+    highlightColor: colors.hueGreen,
+    opacity: 0.11 * tuning.atmosphereScale,
+    lightAzimuth: 215,
+    lightElevation: 35,
+    seed: 29,
+  });
   const vignette = vignetteBrick(p, { id: "an-p-vig", opacity: 0.5 });
+  const tone = toneCurveBrick(p, { id: "an-p-tone", preset: "cinematic", opacity: 0.35 });
   const noise = noiseBrick(p, { id: "an-p-n", opacity: 0.04 });
 
-  return mergeBricks([bg, sky, stars, aurora, peaks, mist, vignette, noise]);
+  return mergeBricks([bg, sky, stars, aurora, peaks, mist, atmo, vignette, tone, noise]);
 }

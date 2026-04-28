@@ -1,9 +1,37 @@
 /**
  * Landscape bricks — high-level scene components for wallpaper-grade night scenes.
  * All curves use cubic Bézier paths (Catmull-Rom interpolation) for organic shapes.
- * Uses seeded PRNG for deterministic procedural generation.
+ * Uses seeded PRNG + simplex noise for deterministic, spatially-coherent generation.
+ * roughjs adds organic hand-drawn edges to terrain silhouettes (no DOM required —
+ * loaded via the self-contained CJS bundle using createRequire).
  */
+import { createRequire } from "node:module";
+import { contours } from "d3-contour";
+import { geoPath } from "d3-geo";
+import { createNoise2D } from "simplex-noise";
 import type { BrickOutput, BrickParams } from "../types.js";
+
+// ─── roughjs (CJS bundle — DOM-free generator API) ──────────────────────────
+const _req = createRequire(import.meta.url);
+const _roughCJS = _req("roughjs/bundled/rough.cjs.js") as {
+  default?: { generator(config?: Record<string, unknown>): RoughGen };
+  generator?(config?: Record<string, unknown>): RoughGen;
+};
+type RoughGen = {
+  path(d: string, opts: Record<string, unknown>): unknown;
+  toPaths(
+    drawable: unknown
+  ): Array<{ d: string; fill: string; stroke: string; strokeWidth: number; opacity: number }>;
+};
+const _roughApi =
+  _roughCJS.default ??
+  (_roughCJS as unknown as {
+    generator: RoughGen["path"] & { bind: (arg: unknown) => () => RoughGen };
+  });
+const _roughGenerator: () => RoughGen =
+  typeof (_roughCJS as { generator?: () => RoughGen }).generator === "function"
+    ? () => (_roughCJS as { generator: () => RoughGen }).generator()
+    : () => (_roughCJS.default as { generator: () => RoughGen }).generator();
 
 // ─── Seeded PRNG ────────────────────────────────────────────────────────────────
 
@@ -28,6 +56,14 @@ function hashStr(str: string): number {
 }
 
 type Pt = [number, number];
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
+}
+
+function organicCentered(rng: () => number): number {
+  return (rng() + rng() + rng()) / 3 - 0.5;
+}
 
 // ─── Catmull-Rom → Cubic Bézier Conversion ──────────────────────────────────────
 
@@ -57,16 +93,60 @@ function catmullRomToBezierPath(pts: Pt[], closed = false): string {
   return segments.join(" ");
 }
 
+// ─── roughjs Terrain Path Sketching ────────────────────────────────────────
+
 /**
- * Seeded fractal noise: 3-octave value noise for natural terrain variation.
+ * Applies roughjs sketching to a terrain polygon SVG path string.
+ * Produces organic, hand-drawn mountain ridgelines instead of smooth mathematical curves.
+ *
+ * @param d - SVG path data for the filled terrain polygon (Catmull-Rom output)
+ * @param seed - deterministic seed for roughjs ( use hashStr output )
+ * @param roughness - unscaled terrain roughness (0.04–0.18); mapped to roughjs pixel deviation
+ * @returns SVG path data string with jagged, organic edges
  */
-function fractalNoise(rng: () => number, count: number, amp: number): number[] {
+function roughifyTerrainPath(d: string, seed: number, roughness: number): string {
+  try {
+    const gen = _roughGenerator();
+    const rjsRoughness = Math.max(5, roughness * 130);
+    const drawable = gen.path(d, {
+      roughness: rjsRoughness,
+      fill: "#000",
+      fillStyle: "solid",
+      stroke: "none",
+      seed: seed & 0xffff,
+      disableMultiStroke: true,
+    });
+    const paths = gen.toPaths(drawable);
+    return paths[0]?.d ?? d;
+  } catch {
+    return d; // fallback to smooth path on any error
+  }
+}
+
+/**
+ * Spatially-coherent fractal terrain noise using simplex-noise.
+ * Returns `count` Y-offsets for evenly-spaced X positions in [0, width].
+ * Uses 6-octave fBm: macro shape → secondary ridges → detail → high-freq micro crag.
+ * Lacunarity 2.1, gain 0.52 — slightly more persistent than standard to preserve
+ * mid-frequency ridge detail that makes mountains look convincing.
+ */
+function terrainNoise(rng: () => number, count: number, amp: number): number[] {
+  const noise2D = createNoise2D(rng);
   const values: number[] = [];
   for (let i = 0; i < count; i++) {
-    const n1 = (rng() - 0.5) * 2 * amp;
-    const n2 = (rng() - 0.5) * amp * 0.5;
-    const n3 = (rng() - 0.5) * amp * 0.25;
-    values.push(n1 + n2 + n3);
+    const t = i / Math.max(1, count - 1);
+    // 6-octave fBm with lacunarity 2.1, gain 0.52
+    let n = 0;
+    let freq = 1.8;
+    let weight = 0.5;
+    let yOff = 0;
+    for (let oct = 0; oct < 6; oct++) {
+      n += noise2D(t * freq, yOff) * weight;
+      freq *= 2.1;
+      weight *= 0.52;
+      yOff += 3.7; // unique Y offset per octave to de-correlate
+    }
+    values.push(n * amp);
   }
   return values;
 }
@@ -114,7 +194,7 @@ export function terrainBrick(params: BrickParams, options: TerrainBrickOptions):
   const amp = roughness * height;
   const by = baseY * height;
 
-  const noise = fractalNoise(rng, points + 1, amp);
+  const noise = terrainNoise(rng, points + 1, amp);
   const ridgePts: Pt[] = [];
   for (let i = 0; i <= points; i++) {
     const x = (i / points) * width;
@@ -125,6 +205,10 @@ export function terrainBrick(params: BrickParams, options: TerrainBrickOptions):
   // Build smooth Bézier ridgeline then close polygon at bottom
   const curvePath = catmullRomToBezierPath(ridgePts);
   const polygon = `${curvePath} L ${width.toFixed(1)} ${height.toFixed(1)} L 0 ${height.toFixed(1)} Z`;
+
+  // Roughify for organic mountain edges — makes silhouettes look like real terrain
+  const roughSeed = hashStr(`${seedId}-${harmonyMode}-${seedSuffix}-rjs`);
+  const sketchPath = roughifyTerrainPath(polygon, roughSeed, roughness);
 
   const defs: string[] = [];
   let fillAttr = `fill="${color}"`;
@@ -148,7 +232,7 @@ export function terrainBrick(params: BrickParams, options: TerrainBrickOptions):
 
   return {
     defs: defs.length > 0 ? defs.join("\n") : undefined,
-    elements: `<path id="${id}" d="${polygon}" ${fillAttr} opacity="${opacity}"${filterAttr}/>`,
+    elements: `<path id="${id}" d="${sketchPath}" ${fillAttr} opacity="${opacity}"${filterAttr}/>`,
   };
 }
 
@@ -169,20 +253,27 @@ export interface TerrainStackBrickOptions {
 
 /**
  * Multiple layered terrain ridgelines with depth (atmospheric perspective).
+ * Per-layer roughness scales with depth index when not explicitly set:
+ *   far layers (i=0): smooth macro ridgelines (roughness 0.04)
+ *   mid layers (i=1): moderate (0.08)
+ *   close layers (i≥2): detailed crags (0.14+)
  */
 export function terrainStackBrick(
   params: BrickParams,
   options: TerrainStackBrickOptions
 ): BrickOutput {
-  const { layers, points = 20, id = "terrain-stack" } = options;
+  // More control points for crisper ridgeline detail
+  const { layers, points = 60, id = "terrain-stack" } = options;
   const allDefs: string[] = [];
   const allElems: string[] = [];
 
   layers.forEach((layer, i) => {
+    // Default roughness increases from far (smooth silhouette) → near (rugged crags)
+    const defaultRoughness = i === 0 ? 0.04 : i === 1 ? 0.08 : Math.min(0.06 + i * 0.04, 0.18);
     const t = terrainBrick(params, {
       id: `${id}-${i}`,
       baseY: layer.baseY,
-      roughness: layer.roughness ?? 0.06,
+      roughness: layer.roughness ?? defaultRoughness,
       points,
       color: layer.color,
       opacity: layer.opacity ?? 0.5 + i * 0.15,
@@ -377,6 +468,10 @@ export interface CloudBandBrickOptions {
 
 /**
  * Organic cloud/mist/fog band using feTurbulence with soft edges.
+ *
+ * Uses a full-viewport rect as SourceGraphic to avoid the rect-boundary clipping artifact.
+ * A gradient mask concentrates the visible band at the desired Y position with
+ * smooth fade-in/out transitions above and below — no hard rectangular border.
  */
 export function cloudBandBrick(params: BrickParams, options: CloudBandBrickOptions): BrickOutput {
   const { viewBox } = params;
@@ -392,19 +487,32 @@ export function cloudBandBrick(params: BrickParams, options: CloudBandBrickOptio
     id = "cloud",
   } = options;
 
-  const y1 = (cy - bandHeight / 2) * height;
   const h = bandHeight * height;
+  // Soft mask edges fade in/out over 1.5× band height above and below centre
+  const fadeTop = Math.max(0, cy - bandHeight * 1.2);
+  const bandTop = Math.max(0, cy - bandHeight * 0.45);
+  const bandBot = Math.min(1, cy + bandHeight * 0.45);
+  const fadeBot = Math.min(1, cy + bandHeight * 1.2);
 
-  const defs = `<filter id="${id}-turb" x="-10%" y="-10%" width="120%" height="120%">
+  const defs = `<linearGradient id="${id}-vmask" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+  <stop offset="${(fadeTop * 100).toFixed(1)}%" stop-color="white" stop-opacity="0"/>
+  <stop offset="${(bandTop * 100).toFixed(1)}%" stop-color="white" stop-opacity="1"/>
+  <stop offset="${(bandBot * 100).toFixed(1)}%" stop-color="white" stop-opacity="1"/>
+  <stop offset="${(fadeBot * 100).toFixed(1)}%" stop-color="white" stop-opacity="0"/>
+</linearGradient>
+<mask id="${id}-m">
+  <rect x="0" y="0" width="${width}" height="${height}" fill="url(#${id}-vmask)"/>
+</mask>
+<filter id="${id}-turb" x="-10%" y="-100%" width="120%" height="300%">
   <feTurbulence type="fractalNoise" baseFrequency="${frequency}" numOctaves="${octaves}" seed="${seed}" result="noise"/>
   <feColorMatrix type="matrix" values="0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0.7 0" in="noise" result="grey"/>
-  <feGaussianBlur in="grey" stdDeviation="${(h * 0.12).toFixed(1)}" result="blurred"/>
+  <feGaussianBlur in="grey" stdDeviation="${(h * 0.14).toFixed(1)}" result="blurred"/>
   <feComposite in="blurred" in2="SourceGraphic" operator="in"/>
 </filter>`;
 
   return {
     defs,
-    elements: `<rect id="${id}" x="0" y="${y1.toFixed(0)}" width="${width}" height="${h.toFixed(0)}" fill="${color}" opacity="${opacity}" filter="url(#${id}-turb)"/>`,
+    elements: `<rect id="${id}" x="0" y="0" width="${width}" height="${height}" fill="${color}" opacity="${opacity}" filter="url(#${id}-turb)" mask="url(#${id}-m)"/>`,
   };
 }
 
@@ -438,7 +546,7 @@ export function auroraAdvancedBrick(
     zoneHeight = 0.3,
     color,
     color2,
-    opacity = 0.4,
+    opacity = 0.62,
     displacement = true,
     id = "aurora",
   } = options;
@@ -447,21 +555,40 @@ export function auroraAdvancedBrick(
   const defs: string[] = [];
   const elems: string[] = [];
   const c2 = color2 ?? color;
+  const heroBand = rng();
+  const blurSd = Math.max(1.4, scale * 0.0018).toFixed(1);
+
+  // One spatially-coherent noise field shared across all bands
+  const auroraNoise = createNoise2D(rng);
+
+  defs.push(`<filter id="${id}-soft" x="-12%" y="-20%" width="124%" height="140%">
+  <feGaussianBlur stdDeviation="${blurSd}"/>
+</filter>`);
 
   for (let i = 0; i < bands; i++) {
-    const bandCy = (cy - zoneHeight / 2 + (i / Math.max(1, bands - 1)) * zoneHeight) * height;
-    const amp = (0.02 + rng() * 0.06) * height;
+    const bandProgress = bands === 1 ? 0.5 : i / Math.max(1, bands - 1);
+    const spread = bandProgress ** (1.05 + rng() * 0.22);
+    const bandJitter = organicCentered(rng) * (zoneHeight / Math.max(4, bands * 1.8));
+    const bandCy =
+      clamp(cy - zoneHeight / 2 + spread * zoneHeight + bandJitter, 0.06, 0.92) * height;
+    const focusWeight = Math.max(0.3, 1 - Math.abs(bandProgress - heroBand) * 1.45);
+    const amp = (0.03 + rng() * 0.05 + focusWeight * 0.03) * height;
     const bandColor = i % 2 === 0 ? color : c2;
-    const bandOpacity = opacity * (0.6 + rng() * 0.4);
-    const sw = (40 + rng() * 80) * (width / 3840);
+    const bandOpacity = opacity * Math.min(1, 0.42 + focusWeight * 0.38 + rng() * 0.14);
+    const sw = (36 + rng() * 100 + focusWeight * 65) * (width / 3840);
 
-    // Generate organic control points using seeded noise
+    // Generate organic control points using spatially-coherent simplex noise
     const ctrlCount = 12 + Math.floor(rng() * 8);
     const curvePts: Pt[] = [];
     for (let j = 0; j <= ctrlCount; j++) {
       const t = j / ctrlCount;
       const x = t * width;
-      const y = bandCy + (rng() - 0.5) * 2 * amp;
+      // sample noise along t-axis; i/bands separates bands in noise space
+      const ny =
+        auroraNoise(t * 3.5, i * 0.8) * 0.65 +
+        auroraNoise(t * 9.0, i * 0.8 + 5) * 0.25 +
+        auroraNoise(t * 20.0, i * 0.8 + 10) * 0.1;
+      const y = bandCy + ny * amp;
       curvePts.push([x, y]);
     }
 
@@ -469,10 +596,14 @@ export function auroraAdvancedBrick(
 
     // Gradient along the aurora band for depth
     const gradId = `${id}-g${i}`;
+    const leadEdge = (8 + rng() * 12).toFixed(1);
+    const coreStart = (24 + rng() * 10).toFixed(1);
+    const coreEnd = (68 + rng() * 10).toFixed(1);
     defs.push(`<linearGradient id="${gradId}" x1="0" y1="0" x2="1" y2="0">
   <stop offset="0%" stop-color="${bandColor}" stop-opacity="0"/>
-  <stop offset="20%" stop-color="${bandColor}" stop-opacity="1"/>
-  <stop offset="80%" stop-color="${bandColor}" stop-opacity="1"/>
+  <stop offset="${leadEdge}%" stop-color="${bandColor}" stop-opacity="${(0.22 + focusWeight * 0.16).toFixed(2)}"/>
+  <stop offset="${coreStart}%" stop-color="${bandColor}" stop-opacity="${(0.8 + focusWeight * 0.18).toFixed(2)}"/>
+  <stop offset="${coreEnd}%" stop-color="${bandColor}" stop-opacity="${(0.72 + focusWeight * 0.14).toFixed(2)}"/>
   <stop offset="100%" stop-color="${bandColor}" stop-opacity="0"/>
 </linearGradient>`);
 
@@ -489,11 +620,14 @@ export function auroraAdvancedBrick(
 </filter>`);
     return {
       defs: defs.join("\n"),
-      elements: `<g filter="url(#${id}-disp)">${elems.join("\n")}</g>`,
+      elements: `<g filter="url(#${id}-soft)"><g filter="url(#${id}-disp)">${elems.join("\n")}</g></g>`,
     };
   }
 
-  return { defs: defs.length > 0 ? defs.join("\n") : undefined, elements: elems.join("\n") };
+  return {
+    defs: defs.length > 0 ? defs.join("\n") : undefined,
+    elements: `<g filter="url(#${id}-soft)">${elems.join("\n")}</g>`,
+  };
 }
 
 // ─── Star Field Brick ───────────────────────────────────────────────────────────
@@ -518,7 +652,7 @@ export function starFieldBrick(params: BrickParams, options: StarFieldBrickOptio
   const scale = Math.max(width, height);
   const {
     count = 80,
-    brightCount = 5,
+    brightCount = 10,
     color = "#ffffff",
     distribution = "upper",
     bandCy = 0.3,
@@ -532,8 +666,9 @@ export function starFieldBrick(params: BrickParams, options: StarFieldBrickOptio
   const elems: string[] = [];
   const sc = scale / 2160;
 
+  // Fixed small stdDeviation — avoids scale-proportional blobs at high resolution
   defs.push(
-    `<filter id="${id}-glow" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="${(scale * 0.003).toFixed(1)}"/></filter>`
+    `<filter id="${id}-glow" x="-300%" y="-300%" width="700%" height="700%"><feGaussianBlur stdDeviation="3 3"/></filter>`
   );
 
   const getY = (): number => {
@@ -542,37 +677,60 @@ export function starFieldBrick(params: BrickParams, options: StarFieldBrickOptio
     return rng() * height;
   };
 
-  // Dim stars — varied tiny sizes
+  const clusterCount = distribution === "full" ? 2 : distribution === "band" ? 3 : 4;
+  const clusters = Array.from({ length: clusterCount }, () => ({
+    x: width * (0.12 + rng() * 0.76),
+    y: getY(),
+    rx: width * (0.05 + rng() * 0.12),
+    ry:
+      distribution === "band"
+        ? height * Math.max(0.035, bandHeight * 0.18)
+        : height * (0.03 + rng() * 0.09),
+  }));
+
+  const pickPosition = () => {
+    if (rng() < 0.68) {
+      const cluster = clusters[Math.floor(rng() * clusters.length)];
+      return {
+        x: clamp(cluster.x + organicCentered(rng) * cluster.rx * 2.4, 0, width),
+        y: clamp(cluster.y + organicCentered(rng) * cluster.ry * 2.2, 0, height),
+      };
+    }
+
+    return { x: rng() * width, y: getY() };
+  };
+
+  // Dim stars — sub-pixel to ~1px cores; no glow filter
   for (let i = 0; i < count; i++) {
-    const x = rng() * width;
-    const y = getY();
-    const r = (0.3 + rng() * 1.0) * sc;
-    const a = (0.15 + rng() * 0.5) * opacity;
+    const { x, y } = pickPosition();
+    const r = (0.15 + rng() * 0.55) * sc;
+    const a = (0.2 + rng() * 0.55) * opacity;
     elems.push(
-      `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${r.toFixed(1)}" fill="${color}" opacity="${a.toFixed(2)}"/>`
+      `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${r.toFixed(2)}" fill="${color}" opacity="${a.toFixed(2)}"/>`
     );
   }
 
-  // Bright stars — glow halo + optional cross twinkle
+  // Bright stars — sharp core + larger glow halo + cross twinkle
   for (let i = 0; i < brightCount; i++) {
-    const x = rng() * width;
-    const y = getY();
-    const r = (1.5 + rng() * 2.5) * sc;
-    const a = (0.6 + rng() * 0.4) * opacity;
-    const glowR = r * 5;
+    const { x, y } = pickPosition();
+    // Core radius: 0.8–1.5 device units (scale-relative but kept small)
+    const r = (0.8 + rng() * 0.7) * sc;
+    const a = (0.75 + rng() * 0.25) * opacity;
+    // Glow circle: wider halo for visibility at thumbnail scale
+    const glowR = (5.0 + rng() * 5.0) * sc;
     elems.push(
-      `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${glowR.toFixed(1)}" fill="${color}" opacity="${(a * 0.2).toFixed(2)}" filter="url(#${id}-glow)"/>`
+      `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${glowR.toFixed(1)}" fill="${color}" opacity="${(a * 0.18).toFixed(2)}" filter="url(#${id}-glow)"/>`
     );
-    // Cross twinkle
-    const armLen = r * 6;
+    // Cross twinkle arms — slightly longer for visibility at thumbnail
+    const armLen = r * 7;
     elems.push(
-      `<line x1="${(x - armLen).toFixed(0)}" y1="${y.toFixed(0)}" x2="${(x + armLen).toFixed(0)}" y2="${y.toFixed(0)}" stroke="${color}" stroke-width="${(r * 0.3).toFixed(1)}" opacity="${(a * 0.4).toFixed(2)}"/>`
-    );
-    elems.push(
-      `<line x1="${x.toFixed(0)}" y1="${(y - armLen).toFixed(0)}" x2="${x.toFixed(0)}" y2="${(y + armLen).toFixed(0)}" stroke="${color}" stroke-width="${(r * 0.3).toFixed(1)}" opacity="${(a * 0.4).toFixed(2)}"/>`
+      `<line x1="${(x - armLen).toFixed(0)}" y1="${y.toFixed(0)}" x2="${(x + armLen).toFixed(0)}" y2="${y.toFixed(0)}" stroke="${color}" stroke-width="${(r * 0.25).toFixed(1)}" opacity="${(a * 0.35).toFixed(2)}"/>`
     );
     elems.push(
-      `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${r.toFixed(1)}" fill="${color}" opacity="${a.toFixed(2)}"/>`
+      `<line x1="${x.toFixed(0)}" y1="${(y - armLen).toFixed(0)}" x2="${x.toFixed(0)}" y2="${(y + armLen).toFixed(0)}" stroke="${color}" stroke-width="${(r * 0.25).toFixed(1)}" opacity="${(a * 0.35).toFixed(2)}"/>`
+    );
+    elems.push(
+      `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${r.toFixed(2)}" fill="${color}" opacity="${a.toFixed(2)}"/>`
     );
   }
 
@@ -915,4 +1073,127 @@ export function volcanoBrick(params: BrickParams, options: VolcanoBrickOptions):
   }
 
   return { defs: defs.length > 0 ? defs.join("\n") : undefined, elements: elems.join("\n") };
+}
+
+// ─── Terrain Contour Brick (d3-contour topographic silhouettes) ──────────────
+
+export interface TerrainContourBrickOptions {
+  /** Element id prefix */
+  id?: string;
+  /** Noise grid width — lower = coarser terrain (default 64) */
+  gridW?: number;
+  /** Noise grid height — lower = coarser terrain (default 36) */
+  gridH?: number;
+  /** Normalized Y where terrain begins to emerge (0–1, default 0.32) */
+  horizonY?: number;
+  /** Override contour thresholds (one per layer, ascending). Auto-distributed if omitted. */
+  thresholds?: number[];
+  /** One entry per mountain layer, farthest (lowest threshold) → nearest (highest threshold) */
+  layers: Array<{
+    color: string;
+    opacity?: number;
+    edgeBlur?: number;
+  }>;
+}
+
+/**
+ * Generates realistic topographic mountain silhouettes via d3-contour marching squares.
+ *
+ * A 2D fBm noise heightfield is sampled at multiple elevation thresholds. Each threshold
+ * produces a GeoJSON MultiPolygon (the region ≥ that threshold) which is converted to a
+ * filled SVG path by d3.geoPath(). Layering farthest→nearest with lighter→darker colors
+ * creates convincing atmospheric depth that flat polygon terrain cannot achieve.
+ *
+ * Usage example (3-layer mountain range):
+ * ```ts
+ * terrainContourBrick(p, {
+ *   id: "mtn",
+ *   horizonY: 0.28,
+ *   layers: [
+ *     { color: colors.bgMid,  opacity: 0.50, edgeBlur: 4 },  // far
+ *     { color: colors.bgSoft, opacity: 0.72 },                // mid
+ *     { color: colors.bg,     opacity: 0.92 },                // near
+ *   ],
+ * });
+ * ```
+ */
+export function terrainContourBrick(
+  params: BrickParams,
+  options: TerrainContourBrickOptions
+): BrickOutput {
+  const { viewBox, seedId, harmonyMode } = params;
+  const { width, height } = viewBox;
+  const { id = "tc", gridW = 64, gridH = 36, horizonY = 0.32, layers } = options;
+
+  const numLayers = layers.length;
+  // Auto-distribute thresholds across [0.28, 0.90] unless caller provides them
+  const thresholds: number[] =
+    options.thresholds ??
+    Array.from({ length: numLayers }, (_, i) => 0.28 + (i + 1) * (0.62 / (numLayers + 1)));
+
+  // Seeded 2D fBm heightfield
+  const rng = seedRng(hashStr(`${seedId}-${harmonyMode}-contour`));
+  const noise2D = createNoise2D(rng);
+
+  const values: number[] = new Array(gridW * gridH);
+  const s = 2.8; // spatial frequency of macro features
+  for (let j = 0; j < gridH; j++) {
+    for (let i = 0; i < gridW; i++) {
+      const nx = i / gridW;
+      const ny = j / gridH;
+      // Vertical gravity: 0 at the horizon line, 1 at the bottom edge
+      const vertBias = Math.max(0, (ny - horizonY) / (1 - horizonY));
+      // 4-octave fBm (lacunarity 2, gain 0.5)
+      const n =
+        0.5 * noise2D(nx * s, ny * s) +
+        0.25 * noise2D(nx * s * 2, ny * s * 2) +
+        0.125 * noise2D(nx * s * 4, ny * s * 4) +
+        0.063 * noise2D(nx * s * 8, ny * s * 8);
+      // Remap fBm ≈[-0.938, 0.938] → [0, 1]
+      const normalized = (n / 0.938) * 0.5 + 0.5;
+      // Vertical bias dominates (0.78), noise adds organic ridge variation (0.22)
+      values[i + j * gridW] = Math.min(1, Math.max(0, vertBias * 0.78 + normalized * 0.22));
+    }
+  }
+
+  // d3-contour: marching squares → GeoJSON MultiPolygon per threshold
+  const contourGen = contours().size([gridW, gridH]).smooth(true);
+  const pathGen = geoPath(); // identity projection: grid-space → SVG path
+
+  const defParts: string[] = [];
+  const elemParts: string[] = [];
+
+  // Scale grid-space [0,gridW]×[0,gridH] → viewport [0,width]×[0,height]
+  const scaleX = (width / gridW).toFixed(4);
+  const scaleY = (height / gridH).toFixed(4);
+
+  for (let li = 0; li < numLayers; li++) {
+    const { color, opacity = 0.85, edgeBlur = 0 } = layers[li];
+    const threshold = thresholds[li];
+
+    const multiPoly = contourGen.contour(values, threshold);
+    const svgD = pathGen(multiPoly);
+    if (!svgD) continue;
+
+    const layerId = `${id}-l${li}`;
+    let filterAttr = "";
+    if (edgeBlur > 0) {
+      const blurId = `${layerId}-blur`;
+      // Blur radius in grid units so visual size is consistent regardless of gridW/H
+      const minScale = Math.min(width / gridW, height / gridH);
+      const stdDev = (edgeBlur / minScale).toFixed(1);
+      defParts.push(
+        `<filter id="${blurId}" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="${stdDev}"/></filter>`
+      );
+      filterAttr = ` filter="url(#${blurId})"`;
+    }
+    elemParts.push(`<path d="${svgD}" fill="${color}" opacity="${opacity}"${filterAttr}/>`);
+  }
+
+  const groupElem = `<g transform="scale(${scaleX} ${scaleY})">${elemParts.join("")}</g>`;
+
+  return {
+    defs: defParts.length > 0 ? defParts.join("\n") : undefined,
+    elements: groupElem,
+  };
 }

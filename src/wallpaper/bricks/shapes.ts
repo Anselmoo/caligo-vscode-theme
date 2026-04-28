@@ -2,6 +2,7 @@
  * Shapes bricks — reusable geometric SVG primitives.
  * Rings, arcs, bands, rays, bezier curtains, and brush strokes.
  */
+import { createNoise2D } from "simplex-noise";
 import type { BrickOutput, BrickParams } from "../types.js";
 
 // ─── Seeded PRNG (mirrors landscape.ts helpers) ───────────────────────────────
@@ -192,7 +193,7 @@ export interface CurtainBrickOptions {
 }
 
 export function curtainBrick(params: BrickParams, options: CurtainBrickOptions): BrickOutput {
-  const { viewBox } = params;
+  const { viewBox, seedId, harmonyMode } = params;
   const { width: vw, height: vh } = viewBox;
   const {
     color,
@@ -206,12 +207,18 @@ export function curtainBrick(params: BrickParams, options: CurtainBrickOptions):
 
   const pcy = cy * vh;
   const amp = amplitude * vh;
-  const phaseRad = (phase * Math.PI) / 180;
-  const steps = 64;
+  // Use phase as a spatial offset in noise domain so layered curtains stay distinct
+  const phaseOffset = phase / 360;
+  const rng = seedRng(hashStr(`${seedId}-${harmonyMode}-curtain-${id}`));
+  const noise2D = createNoise2D(rng);
+  const steps = 80;
   const pts: string[] = [];
   for (let i = 0; i <= steps; i++) {
-    const x = (i / steps) * vw;
-    const y = pcy + Math.sin((i / steps) * Math.PI * 2 + phaseRad) * amp;
+    const t = i / steps;
+    const x = t * vw;
+    // 2-octave fBm: primary swell + fine detail
+    const n = noise2D(t * 3.5 + phaseOffset, 0) * 0.7 + noise2D(t * 8.0 + phaseOffset, 1) * 0.3;
+    const y = pcy + n * amp;
     pts.push(`${i === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`);
   }
 

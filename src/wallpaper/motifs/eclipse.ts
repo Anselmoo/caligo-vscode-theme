@@ -16,6 +16,7 @@ import {
   noiseBrick,
   skyGradientBrick,
   starFieldBrick,
+  terrainContourBrick,
   terrainStackBrick,
   vignetteBrick,
 } from "../bricks/index.js";
@@ -90,12 +91,13 @@ function eclipseStillness(p: BrickParams): ComposedWallpaper {
   });
 
   // Distant mountain range silhouette
-  const mountains = terrainStackBrick(p, {
+  const mountains = terrainContourBrick(p, {
     id: "ec-s-mt",
+    horizonY: 0.4,
     layers: [
-      { baseY: 0.78, roughness: 0.06, color: colors.bgMid, opacity: 0.4 },
-      { baseY: 0.85, roughness: 0.05, color: colors.bgSoft, opacity: 0.6 },
-      { baseY: 0.92, roughness: 0.04, color: colors.bg, opacity: 0.85 },
+      { color: colors.bgMid, opacity: 0.45, edgeBlur: 3 },
+      { color: colors.bgSoft, opacity: 0.62 },
+      { color: colors.bg, opacity: 0.88 },
     ],
   });
 
@@ -266,7 +268,7 @@ function eclipseVoid(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  const vignette = vignetteBrick(p, { id: "ec-v-vig", opacity: 0.85 });
+  const vignette = vignetteBrick(p, { id: "ec-v-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "ec-v-n", opacity: 0.03 });
   return mergeBricks([bg, sky, whisper, eclipseBody, horizon, vignette, noise]);
 }
@@ -314,14 +316,14 @@ function eclipsePulse(p: BrickParams): ComposedWallpaper {
     height: 0.08,
   });
 
-  const ridge = terrainStackBrick(p, {
+  const ridge = terrainContourBrick(p, {
     id: "ec-p-rd",
-    points: 22,
+    horizonY: 0.28,
     layers: [
-      { baseY: 0.55, roughness: 0.1, color: colors.bgMid, opacity: 0.5 },
-      { baseY: 0.62, roughness: 0.08, color: colors.bgSoft, opacity: 0.65 },
-      { baseY: 0.7, roughness: 0.06, color: colors.bg, opacity: 0.85 },
-      { baseY: 0.8, roughness: 0.03, color: colors.bg, opacity: 0.95 },
+      { color: colors.bgMid, opacity: 0.52, edgeBlur: 3 },
+      { color: colors.bgSoft, opacity: 0.68 },
+      { color: colors.bg, opacity: 0.88 },
+      { color: colors.bg, opacity: 0.96 },
     ],
   });
 

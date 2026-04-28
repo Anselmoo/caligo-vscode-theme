@@ -19,6 +19,53 @@ export const PLATFORM_SIZES: Record<Platform, { width: number; height: number }>
 export const PLATFORMS: Platform[] = ["monitor", "tablet", "mobile"];
 export const TEXT_VARIANTS: TextVariant[] = ["text", "no-text"];
 
+export interface PlatformSceneTuning {
+  /** Multiplier for aurora band count and density */
+  auroraBandScale: number;
+  /** Positive values push the visual focal band further down the viewport */
+  auroraYShift: number;
+  /** Compresses or expands the active aurora zone */
+  auroraZoneScale: number;
+  /** Positive values lift landforms higher into the frame */
+  terrainLift: number;
+  /** Positive values lift mist/fog layers upward */
+  fogLift: number;
+  /** Density factor for sparse celestial details */
+  starDensity: number;
+  /** Scales broad haze so portrait scenes do not feel too empty */
+  atmosphereScale: number;
+}
+
+export const PLATFORM_SCENE_TUNING: Record<Platform, PlatformSceneTuning> = {
+  monitor: {
+    auroraBandScale: 1,
+    auroraYShift: 0,
+    auroraZoneScale: 1,
+    terrainLift: 0,
+    fogLift: 0,
+    starDensity: 1,
+    atmosphereScale: 1,
+  },
+  tablet: {
+    auroraBandScale: 0.94,
+    auroraYShift: 0.035,
+    auroraZoneScale: 0.93,
+    terrainLift: 0.04,
+    fogLift: 0.025,
+    starDensity: 0.92,
+    atmosphereScale: 1.04,
+  },
+  mobile: {
+    auroraBandScale: 0.82,
+    auroraYShift: 0.08,
+    auroraZoneScale: 0.8,
+    terrainLift: 0.075,
+    fogLift: 0.055,
+    starDensity: 0.78,
+    atmosphereScale: 1.12,
+  },
+};
+
 // ─── Mode → Topic ─────────────────────────────────────────────────────────────
 
 /** The five conceptual "topics" that make each harmony mode visually distinct. */

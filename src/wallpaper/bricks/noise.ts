@@ -16,11 +16,20 @@ export function noiseBrick(params: BrickParams, options: NoiseBrickOptions = {})
   const { viewBox } = params;
   const { width, height } = viewBox;
   const { id = "noise", opacity = 0.035, baseFrequency = 0.65, numOctaves = 4 } = options;
+  const microFreqX = (baseFrequency * 1.75).toFixed(2);
+  const microFreqY = (baseFrequency * 2.15).toFixed(2);
   return {
     defs: `<filter id="${id}" x="0" y="0" width="100%" height="100%" color-interpolation-filters="linearRGB">
-  <feTurbulence type="fractalNoise" baseFrequency="${baseFrequency}" numOctaves="${numOctaves}" stitchTiles="stitch" result="turbOut"/>
-  <feColorMatrix in="turbOut" type="saturate" values="0" result="grayNoise"/>
-  <feBlend in="SourceGraphic" in2="grayNoise" mode="screen" result="blend"/>
+  <feTurbulence type="fractalNoise" baseFrequency="${baseFrequency}" numOctaves="${numOctaves}" stitchTiles="stitch" seed="19" result="macro"/>
+  <feTurbulence type="fractalNoise" baseFrequency="${microFreqX} ${microFreqY}" numOctaves="${Math.max(2, numOctaves - 1)}" stitchTiles="stitch" seed="31" result="micro"/>
+  <feBlend in="macro" in2="micro" mode="multiply" result="grainMix"/>
+  <feColorMatrix in="grainMix" type="saturate" values="0" result="grayNoise"/>
+  <feComponentTransfer in="grayNoise" result="grain">
+    <feFuncR type="gamma" amplitude="0.55" exponent="1.35" offset="0.18"/>
+    <feFuncG type="gamma" amplitude="0.55" exponent="1.35" offset="0.18"/>
+    <feFuncB type="gamma" amplitude="0.55" exponent="1.35" offset="0.18"/>
+  </feComponentTransfer>
+  <feBlend in="SourceGraphic" in2="grain" mode="screen" result="blend"/>
   <feComposite in="blend" in2="SourceGraphic" operator="in"/>
 </filter>`,
     elements: `<rect width="${width}" height="${height}" opacity="${opacity}" filter="url(#${id})"/>`,

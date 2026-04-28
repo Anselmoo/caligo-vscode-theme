@@ -56,8 +56,9 @@ function voidEmberStillness(p: BrickParams): ComposedWallpaper {
     id: "ve-s-hc",
     blur: 0.06,
     blobs: [
-      { cx: 0.5, cy: 0.5, rx: 0.1, ry: 0.1, color: colors.hueOrange, opacity: 0.12 },
-      { cx: 0.5, cy: 0.5, rx: 0.05, ry: 0.05, color: colors.hueYellow, opacity: 0.2 },
+      { cx: 0.5, cy: 0.5, rx: 0.12, ry: 0.12, color: colors.hueOrange, opacity: 0.3 },
+      { cx: 0.5, cy: 0.5, rx: 0.06, ry: 0.06, color: colors.hueYellow, opacity: 0.45 },
+      { cx: 0.5, cy: 0.5, rx: 0.02, ry: 0.02, color: "#ffffff", opacity: 0.6 },
     ],
   });
 
@@ -76,12 +77,13 @@ function voidEmberStillness(p: BrickParams): ComposedWallpaper {
   const desert = terrainStackBrick(p, {
     id: "ve-s-ds",
     layers: [
-      { baseY: 0.82, roughness: 0.02, color: colors.bgMid, opacity: 0.2 },
-      { baseY: 0.9, roughness: 0.025, color: colors.bgSoft, opacity: 0.35 },
+      { baseY: 0.8, roughness: 0.04, color: colors.bgMid, opacity: 0.55 },
+      { baseY: 0.88, roughness: 0.03, color: colors.bgSoft, opacity: 0.75 },
+      { baseY: 0.94, roughness: 0.025, color: colors.bg, opacity: 0.9 },
     ],
   });
 
-  const vignette = vignetteBrick(p, { id: "ve-s-vig", opacity: 0.9 });
+  const vignette = vignetteBrick(p, { id: "ve-s-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "ve-s-n", opacity: 0.03 });
   return mergeBricks([bg, dark, heatCorona, ember, desert, vignette, noise]);
 }
@@ -103,41 +105,42 @@ function voidEmberDrift(p: BrickParams): ComposedWallpaper {
   // Faint horizon warm glow
   const hGlow = horizonGlowBrick(p, {
     id: "ve-d-hg",
-    y: 0.7,
+    y: 0.68,
     color: colors.hueRed,
-    opacity: 0.06,
-    height: 0.08,
+    opacity: 0.2,
+    height: 0.12,
   });
 
   // Terrain silhouette
   const terrain = terrainStackBrick(p, {
     id: "ve-d-tr",
-    points: 16,
+    points: 40,
     layers: [
-      { baseY: 0.65, roughness: 0.06, color: colors.bgMid, opacity: 0.4 },
-      { baseY: 0.75, roughness: 0.04, color: colors.bg, opacity: 0.8 },
+      { baseY: 0.62, roughness: 0.1, color: colors.bgMid, opacity: 0.6 },
+      { baseY: 0.72, roughness: 0.07, color: colors.bgSoft, opacity: 0.8 },
+      { baseY: 0.82, roughness: 0.04, color: colors.bg, opacity: 0.95 },
     ],
   });
 
   // Ember trail — shooting star-like streak
   const trail = shootingStarBrick(p, {
     id: "ve-d-tl",
-
+    count: 3,
     color: colors.hueOrange,
-    opacity: 0.35,
+    opacity: 0.65,
   });
 
   // Drifting cinder particles
   const cinders = starFieldBrick(p, {
     id: "ve-d-ci",
-    count: 35,
-    brightCount: 8,
+    count: 60,
+    brightCount: 12,
     color: colors.hueOrange,
     distribution: "full",
-    opacity: 0.45,
+    opacity: 0.7,
   });
 
-  const vignette = vignetteBrick(p, { id: "ve-d-vig", opacity: 0.75 });
+  const vignette = vignetteBrick(p, { id: "ve-d-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "ve-d-n", opacity: 0.03 });
   return mergeBricks([bg, sky, hGlow, terrain, trail, cinders, vignette, noise]);
 }
@@ -212,13 +215,13 @@ function voidEmberBreak(p: BrickParams): ComposedWallpaper {
   const volcanicGround = terrainStackBrick(p, {
     id: "ve-b-vg",
     layers: [
-      { baseY: 0.8, roughness: 0.05, color: colors.bgMid, opacity: 0.3 },
-      { baseY: 0.88, roughness: 0.04, color: colors.bgSoft, opacity: 0.5 },
-      { baseY: 0.94, roughness: 0.03, color: colors.bg, opacity: 0.7 },
+      { baseY: 0.78, roughness: 0.08, color: colors.bgMid, opacity: 0.55 },
+      { baseY: 0.86, roughness: 0.06, color: colors.bgSoft, opacity: 0.75 },
+      { baseY: 0.93, roughness: 0.04, color: colors.bg, opacity: 0.9 },
     ],
   });
 
-  const vignette = vignetteBrick(p, { id: "ve-b-vig", opacity: 0.7 });
+  const vignette = vignetteBrick(p, { id: "ve-b-vig", opacity: 0.45 });
   const noise = noiseBrick(p, { id: "ve-b-n", opacity: 0.03 });
   return mergeBricks([
     bg,
@@ -252,20 +255,24 @@ function voidEmberVoid(p: BrickParams): ComposedWallpaper {
   // Barely-visible dying ember
   const dyingEmber = nebulaGlowBrick(p, {
     id: "ve-v-de",
-    blur: 0.03,
-    blobs: [{ cx: 0.5, cy: 0.5, rx: 0.015, ry: 0.015, color: colors.hueRed, opacity: 0.15 }],
+    blur: 0.05,
+    blobs: [
+      { cx: 0.5, cy: 0.5, rx: 0.04, ry: 0.04, color: colors.hueRed, opacity: 0.35 },
+      { cx: 0.5, cy: 0.5, rx: 0.015, ry: 0.015, color: colors.hueOrange, opacity: 0.6 },
+    ],
   });
 
   // Barren terrain — desolate night landscape
   const barren = terrainStackBrick(p, {
     id: "ve-v-br",
     layers: [
-      { baseY: 0.88, roughness: 0.015, color: colors.bgSoft, opacity: 0.12 },
-      { baseY: 0.94, roughness: 0.02, color: colors.bgMid, opacity: 0.2 },
+      { baseY: 0.85, roughness: 0.04, color: colors.bgMid, opacity: 0.45 },
+      { baseY: 0.92, roughness: 0.025, color: colors.bgSoft, opacity: 0.65 },
+      { baseY: 0.97, roughness: 0.02, color: colors.bg, opacity: 0.85 },
     ],
   });
 
-  const vignette = vignetteBrick(p, { id: "ve-v-vig", opacity: 0.92 });
+  const vignette = vignetteBrick(p, { id: "ve-v-vig", opacity: 0.6 });
   const noise = noiseBrick(p, { id: "ve-v-n", opacity: 0.03 });
   return mergeBricks([bg, dark, dyingEmber, barren, vignette, noise]);
 }
