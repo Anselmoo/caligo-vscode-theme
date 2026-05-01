@@ -1119,19 +1119,32 @@ export function duneBrick(params: BrickParams, options: DuneBrickOptions): Brick
 
 export interface LightningBrickOptions {
   id?: string;
-  /** Start position as fraction */
+  /** Strike origin (fraction of canvas) */
   startX: number;
   startY: number;
+  /** Strike terminus (fraction). Defaults to near-ground directly below. */
+  endX?: number;
+  endY?: number;
   color?: string;
   opacity?: number;
-  /** Number of bolt segments */
+  /** Kept for API compatibility — fractal depth is derived automatically */
   segments?: number;
-  /** Number of branches */
+  /** Number of primary branch forks (default 3) */
   branches?: number;
 }
 
 /**
- * Forked lightning bolt with Bézier jitter for organic electrical discharge.
+ * Photorealistic lightning bolt — a full composition of:
+ * - Sky flash: large soft radial glow illuminating the surrounding atmosphere
+ * - Fractal bolt (midpoint displacement, depth 5 → 32 segments): angular jags,
+ *   not smooth curves — the characteristic electrical discharge look
+ * - 3–6 recursive branch forks (primary + tertiary), each at decreasing width/opacity
+ * - Multi-layer channel rendering:
+ *   · Outer atmospheric glow (thick stroke + heavy blur — ionized air column)
+ *   · Inner plasma glow (medium stroke + medium blur)
+ *   · Hot core channel (thin stroke, no blur — the actual arc)
+ *   · White-hot center (1px pure white)
+ * - Ground strike flash: intense radial burst at termination point
  */
 export function lightningBrick(params: BrickParams, options: LightningBrickOptions): BrickOutput {
   const { viewBox, seedId, harmonyMode } = params;
@@ -1140,54 +1153,191 @@ export function lightningBrick(params: BrickParams, options: LightningBrickOptio
   const {
     startX,
     startY,
-    color = "#e8e0ff",
-    opacity = 0.8,
-    segments = 8,
-    branches = 2,
+    color = "#c8d8ff",
+    opacity = 0.85,
+    branches = 3,
     id = "lightning",
   } = options;
 
   const rng = seedRng(hashStr(`${seedId}-${harmonyMode}-bolt`));
-  const sc = scale / 2160;
-  const defs = `<filter id="${id}-glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="${(8 * sc).toFixed(1)}"/></filter>`;
+  const sc = scale / 3840; // scale factor (1.0 at 4K)
 
-  function bolt(sx: number, sy: number, segs: number, _sw: number): string {
-    const pts: Pt[] = [[sx, sy]];
-    let x = sx,
-      y = sy;
-    for (let i = 0; i < segs; i++) {
-      x += (rng() - 0.5) * width * 0.1;
-      y += (0.04 + rng() * 0.08) * height;
-      pts.push([x, Math.min(height, y)]);
-    }
-    return catmullRomToBezierPath(pts);
-  }
-
-  const elems: string[] = [];
+  // Terminus defaults: ground strike near base, slightly offset from start
+  const ex = (options.endX ?? startX + (rng() - 0.5) * 0.18) * width;
+  const ey = (options.endY ?? 0.8 + rng() * 0.14) * height;
   const sx = startX * width;
   const sy = startY * height;
 
-  // Main bolt
-  const mainD = bolt(sx, sy, segments, 3 * sc);
-  elems.push(
-    `<path d="${mainD}" fill="none" stroke="${color}" stroke-width="${(4 * sc).toFixed(1)}" opacity="${opacity}" filter="url(#${id}-glow)"/>`
+  // ── Midpoint displacement fractal bolt ────────────────────────────────────
+  // Angular jags via recursive perpendicular midpoint perturbation.
+  // Jitter scales with segment length → self-similar fractal structure.
+  function fractalBolt(x1: number, y1: number, x2: number, y2: number, depth: number): Pt[] {
+    if (depth === 0)
+      return [
+        [x1, y1],
+        [x2, y2],
+      ];
+    const len = Math.hypot(x2 - x1, y2 - y1);
+    if (len < 2)
+      return [
+        [x1, y1],
+        [x2, y2],
+      ];
+    const mx = (x1 + x2) / 2;
+    const my = (y1 + y2) / 2;
+    const px = -(y2 - y1) / len; // perpendicular unit vector
+    const py = (x2 - x1) / len;
+    const jitter = (rng() - 0.5) * len * 0.55;
+    const jx = mx + px * jitter;
+    const jy = my + py * jitter;
+    const left = fractalBolt(x1, y1, jx, jy, depth - 1);
+    const right = fractalBolt(jx, jy, x2, y2, depth - 1);
+    return [...left, ...right.slice(1)];
+  }
+
+  function ptsToPath(pts: Pt[]): string {
+    return pts
+      .map((p, i) => `${i === 0 ? "M" : "L"}${p[0].toFixed(1)},${p[1].toFixed(1)}`)
+      .join(" ");
+  }
+
+  const defs: string[] = [];
+  const elems: string[] = [];
+
+  // ── 1. Sky flash — atmospheric cloud illumination ─────────────────────────
+  // The cloud base and surrounding atmosphere "lights up" white before thunder.
+  const flashCx = (sx + ex) / 2;
+  const flashCy = sy + (ey - sy) * 0.22;
+  const flashFId = `${id}-ff`;
+  const flashGId = `${id}-fg`;
+  defs.push(
+    `<filter id="${flashFId}" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="${(scale * 0.038).toFixed(0)}"/></filter>
+<radialGradient id="${flashGId}" cx="${flashCx.toFixed(0)}" cy="${flashCy.toFixed(0)}" r="${(scale * 0.2).toFixed(0)}" gradientUnits="userSpaceOnUse">
+  <stop offset="0%" stop-color="${color}" stop-opacity="${(opacity * 0.22).toFixed(2)}"/>
+  <stop offset="50%" stop-color="${color}" stop-opacity="${(opacity * 0.05).toFixed(2)}"/>
+  <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+</radialGradient>`
   );
   elems.push(
-    `<path d="${mainD}" fill="none" stroke="#ffffff" stroke-width="${(1.5 * sc).toFixed(1)}" opacity="${(opacity * 0.9).toFixed(2)}"/>`
+    `<ellipse cx="${flashCx.toFixed(0)}" cy="${flashCy.toFixed(0)}" rx="${(scale * 0.2).toFixed(0)}" ry="${(scale * 0.15).toFixed(0)}" fill="url(#${flashGId})" filter="url(#${flashFId})"/>`
   );
 
-  // Branch bolts
-  for (let b = 0; b < branches; b++) {
-    const branchStart = 2 + Math.floor(rng() * (segments - 3));
-    const bx = sx + (rng() - 0.5) * width * 0.05 * branchStart;
-    const by2 = sy + branchStart * height * 0.06;
-    const bD = bolt(bx, by2, 3 + Math.floor(rng() * 3), 1.5 * sc);
+  // ── 2. Generate fractal bolt paths ────────────────────────────────────────
+  const mainPts = fractalBolt(sx, sy, ex, ey, 5); // depth 5 → 32 angular segments
+  const mainD = ptsToPath(mainPts);
+
+  // Primary branches + tertiary sub-branches
+  interface BranchPath {
+    d: string;
+    wf: number;
+    of: number;
+  }
+  const branchPaths: BranchPath[] = [];
+  const parentAngle = Math.atan2(ey - sy, ex - sx);
+
+  for (let b = 0; b < Math.min(branches, 5); b++) {
+    // Fork from upper 60% of trunk — real lightning branches early
+    const bi = 2 + Math.floor(rng() * Math.floor(mainPts.length * 0.55));
+    const [bx, by] = mainPts[bi];
+    const deviate = (rng() > 0.5 ? 1 : -1) * (0.38 + rng() * 0.52);
+    const bAngle = parentAngle + deviate;
+    const remainLen = Math.hypot(ex - bx, ey - by);
+    const bLen = remainLen * (0.22 + rng() * 0.32);
+    const bPts = fractalBolt(bx, by, bx + Math.cos(bAngle) * bLen, by + Math.sin(bAngle) * bLen, 4);
+    const bwf = 0.5 + rng() * 0.28;
+    const bof = 0.45 + rng() * 0.3;
+    branchPaths.push({ d: ptsToPath(bPts), wf: bwf, of: bof });
+
+    // Tertiary branch (~35% chance per primary branch)
+    if (rng() < 0.35 && bPts.length > 4) {
+      const ti = 1 + Math.floor(rng() * Math.floor(bPts.length * 0.55));
+      const [tx, ty] = bPts[ti];
+      const tAngle = bAngle + (rng() > 0.5 ? 1 : -1) * (0.4 + rng() * 0.45);
+      const tLen = bLen * (0.25 + rng() * 0.2);
+      const tPts = fractalBolt(
+        tx,
+        ty,
+        tx + Math.cos(tAngle) * tLen,
+        ty + Math.sin(tAngle) * tLen,
+        3
+      );
+      branchPaths.push({ d: ptsToPath(tPts), wf: 0.28 + rng() * 0.18, of: 0.25 + rng() * 0.22 });
+    }
+  }
+
+  // ── 3. Multi-layer channel rendering ──────────────────────────────────────
+  // Three concentric glow layers simulate the ionized air column:
+  //   · Outer atmospheric glow: wide + heavy blur — diffuse sky illumination
+  //   · Inner plasma glow: medium + moderate blur — excited particle column
+  //   · Hot core: thin, no blur — the actual conductive arc
+  //   · White-hot center: 1px pure white — peak luminance
+
+  const ogId = `${id}-og`;
+  const igId = `${id}-ig`;
+  defs.push(
+    `<filter id="${ogId}" x="-40%" y="-10%" width="180%" height="120%"><feGaussianBlur stdDeviation="${(scale * 0.0048).toFixed(1)}"/></filter>
+<filter id="${igId}" x="-20%" y="-5%" width="140%" height="110%"><feGaussianBlur stdDeviation="${(scale * 0.0016).toFixed(1)}"/></filter>`
+  );
+
+  const swOut = (24 * sc).toFixed(1);
+  const swIn = (8 * sc).toFixed(1);
+  const swCore = (2.8 * sc).toFixed(1);
+  const swWhite = (1.3 * sc).toFixed(1);
+
+  // Outer atmospheric glow (main + branches)
+  elems.push(
+    `<path d="${mainD}" fill="none" stroke="${color}" stroke-width="${swOut}" opacity="${(opacity * 0.16).toFixed(2)}" filter="url(#${ogId})" stroke-linecap="round" stroke-linejoin="round"/>`
+  );
+  for (const bp of branchPaths) {
     elems.push(
-      `<path d="${bD}" fill="none" stroke="${color}" stroke-width="${(2 * sc).toFixed(1)}" opacity="${(opacity * 0.5).toFixed(2)}" filter="url(#${id}-glow)"/>`
+      `<path d="${bp.d}" fill="none" stroke="${color}" stroke-width="${(parseFloat(swOut) * bp.wf).toFixed(1)}" opacity="${(opacity * 0.09 * bp.of).toFixed(2)}" filter="url(#${ogId})" stroke-linecap="round"/>`
     );
   }
 
-  return { defs, elements: `<g id="${id}">${elems.join("\n")}</g>` };
+  // Inner plasma glow
+  elems.push(
+    `<path d="${mainD}" fill="none" stroke="${color}" stroke-width="${swIn}" opacity="${(opacity * 0.58).toFixed(2)}" filter="url(#${igId})" stroke-linecap="round" stroke-linejoin="round"/>`
+  );
+  for (const bp of branchPaths) {
+    elems.push(
+      `<path d="${bp.d}" fill="none" stroke="${color}" stroke-width="${(parseFloat(swIn) * bp.wf).toFixed(1)}" opacity="${(opacity * 0.38 * bp.of).toFixed(2)}" filter="url(#${igId})" stroke-linecap="round"/>`
+    );
+  }
+
+  // Hot core channel
+  elems.push(
+    `<path d="${mainD}" fill="none" stroke="${color}" stroke-width="${swCore}" opacity="${(opacity * 0.92).toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"/>`
+  );
+  for (const bp of branchPaths) {
+    elems.push(
+      `<path d="${bp.d}" fill="none" stroke="${color}" stroke-width="${(parseFloat(swCore) * bp.wf).toFixed(1)}" opacity="${(opacity * 0.72 * bp.of).toFixed(2)}" stroke-linecap="round"/>`
+    );
+  }
+
+  // White-hot center
+  elems.push(
+    `<path d="${mainD}" fill="none" stroke="#ffffff" stroke-width="${swWhite}" opacity="${(opacity * 0.9).toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"/>`
+  );
+
+  // ── 4. Ground strike flash ────────────────────────────────────────────────
+  const gsFId = `${id}-gsf`;
+  const gsGId = `${id}-gsg`;
+  defs.push(
+    `<filter id="${gsFId}" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="${(scale * 0.005).toFixed(0)}"/></filter>
+<radialGradient id="${gsGId}" cx="${ex.toFixed(0)}" cy="${ey.toFixed(0)}" r="${(scale * 0.038).toFixed(0)}" gradientUnits="userSpaceOnUse">
+  <stop offset="0%" stop-color="#ffffff" stop-opacity="${(opacity * 0.82).toFixed(2)}"/>
+  <stop offset="30%" stop-color="${color}" stop-opacity="${(opacity * 0.48).toFixed(2)}"/>
+  <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+</radialGradient>`
+  );
+  elems.push(
+    `<circle cx="${ex.toFixed(0)}" cy="${ey.toFixed(0)}" r="${(scale * 0.038).toFixed(0)}" fill="url(#${gsGId})" filter="url(#${gsFId})"/>`
+  );
+
+  return {
+    defs: defs.join("\n"),
+    elements: `<g id="${id}">${elems.join("\n")}</g>`,
+  };
 }
 
 // ─── Volcano Brick ──────────────────────────────────────────────────────────────
