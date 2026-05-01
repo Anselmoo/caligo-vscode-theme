@@ -8,10 +8,13 @@
  * Pulse     : Coral reef bioluminescence with rhythmic rings
  */
 import {
+  atmosphereBrick,
   backgroundBrick,
   cloudBandBrick,
   nebulaGlowBrick,
   noiseBrick,
+  ringBrick,
+  shootingStarBrick,
   skyGradientBrick,
   starFieldBrick,
   terrainStackBrick,
@@ -104,9 +107,41 @@ function deepStillness(p: BrickParams): ComposedWallpaper {
     ],
   });
 
+  // Bioluminescent pulse rings around main jellyfish
+  const jellyRing1 = ringBrick(p, {
+    id: "ds-s-jr1",
+    cx: 0.3,
+    cy: 0.25,
+    r: 0.06,
+    strokeWidth: 1,
+    color: colors.hueCyan,
+    opacity: 0.2,
+  });
+  const jellyRing2 = ringBrick(p, {
+    id: "ds-s-jr2",
+    cx: 0.65,
+    cy: 0.4,
+    r: 0.05,
+    strokeWidth: 1,
+    color: colors.hueCyan,
+    opacity: 0.15,
+  });
+
   const vignette = vignetteBrick(p, { id: "ds-s-vig", opacity: 0.65 });
   const noise = noiseBrick(p, { id: "ds-s-n", opacity: 0.04 });
-  return mergeBricks([bg, abyss, current1, current2, jellies, biolum, floor, vignette, noise]);
+  return mergeBricks([
+    bg,
+    abyss,
+    current1,
+    current2,
+    jellies,
+    jellyRing1,
+    jellyRing2,
+    biolum,
+    floor,
+    vignette,
+    noise,
+  ]);
 }
 
 /* ── Drift: Deep current — pressure bands ─────────────────────────────────── */
@@ -242,7 +277,7 @@ function deepBreak(p: BrickParams): ComposedWallpaper {
     id: "ds-b-sf",
     waterY: 0.5,
     color: colors.hueBlue,
-    opacity: 0.2,
+    opacity: 0.08,
     rippleScale: 12,
     rippleFrequency: 0.02,
   });
@@ -271,9 +306,27 @@ function deepBreak(p: BrickParams): ComposedWallpaper {
     seed: 7,
   });
 
+  // Meteor trail visible through water surface from below
+  const underwaterMeteor = shootingStarBrick(p, {
+    id: "ds-b-mt",
+    count: 2,
+    color: "#ffffff",
+    opacity: 0.3,
+  });
+
   const vignette = vignetteBrick(p, { id: "ds-b-vig", opacity: 0.6 });
   const noise = noiseBrick(p, { id: "ds-b-n", opacity: 0.04 });
-  return mergeBricks([bg, split, stars, caustics, surface, bubbles, vignette, noise]);
+  return mergeBricks([
+    bg,
+    split,
+    stars,
+    underwaterMeteor,
+    caustics,
+    surface,
+    bubbles,
+    vignette,
+    noise,
+  ]);
 }
 
 /* ── Void: Total abyss — single faint light ───────────────────────────────── */
@@ -322,9 +375,19 @@ function deepVoid(p: BrickParams): ComposedWallpaper {
     ],
   });
 
+  const deepAtmo = atmosphereBrick(p, {
+    id: "ds-v-atmo",
+    color: colors.bgSoft,
+    highlightColor: colors.accent,
+    opacity: 0.05,
+    lightAzimuth: 180,
+    lightElevation: 10,
+    seed: 61,
+  });
+
   const vignette = vignetteBrick(p, { id: "ds-v-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "ds-v-n", opacity: 0.03 });
-  return mergeBricks([bg, abyss, current, light, trench, vignette, noise]);
+  return mergeBricks([bg, abyss, current, light, trench, deepAtmo, vignette, noise]);
 }
 
 /* ── Pulse: Coral reef bioluminescence ────────────────────────────────────── */
@@ -376,7 +439,17 @@ function deepPulse(p: BrickParams): ComposedWallpaper {
     opacity: 0.5,
   });
 
+  const coralAtmo = atmosphereBrick(p, {
+    id: "ds-p-atmo",
+    color: colors.bgMid,
+    highlightColor: colors.hueCyan,
+    opacity: 0.07,
+    lightAzimuth: 200,
+    lightElevation: 20,
+    seed: 43,
+  });
+
   const vignette = vignetteBrick(p, { id: "ds-p-vig", opacity: 0.55 });
   const noise = noiseBrick(p, { id: "ds-p-n", opacity: 0.04 });
-  return mergeBricks([bg, ocean, glows, reef, particles, vignette, noise]);
+  return mergeBricks([bg, ocean, glows, reef, particles, coralAtmo, vignette, noise]);
 }

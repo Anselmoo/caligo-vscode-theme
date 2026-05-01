@@ -107,7 +107,7 @@ function catmullRomToBezierPath(pts: Pt[], closed = false): string {
 function roughifyTerrainPath(d: string, seed: number, roughness: number): string {
   try {
     const gen = _roughGenerator();
-    const rjsRoughness = Math.max(5, roughness * 130);
+    const rjsRoughness = Math.max(2, roughness * 38);
     const drawable = gen.path(d, {
       roughness: rjsRoughness,
       fill: "#000",
@@ -135,18 +135,23 @@ function terrainNoise(rng: () => number, count: number, amp: number): number[] {
   const values: number[] = [];
   for (let i = 0; i < count; i++) {
     const t = i / Math.max(1, count - 1);
-    // 6-octave fBm with lacunarity 2.1, gain 0.52
+    // 4-octave fBm — octaves 5-6 alias above Nyquist at typical control-point
+    // densities and produce zig-zag artefacts; roughjs handles micro-detail instead.
     let n = 0;
     let freq = 1.8;
     let weight = 0.5;
     let yOff = 0;
-    for (let oct = 0; oct < 6; oct++) {
+    for (let oct = 0; oct < 4; oct++) {
       n += noise2D(t * freq, yOff) * weight;
       freq *= 2.1;
       weight *= 0.52;
-      yOff += 3.7; // unique Y offset per octave to de-correlate
+      yOff += 3.7;
     }
     values.push(n * amp);
+  }
+  // 3-tap Gaussian smooth — removes rapid direction reversals that roughjs amplifies into zig-zags
+  for (let i = 1; i < values.length - 1; i++) {
+    values[i] = 0.25 * values[i - 1] + 0.5 * values[i] + 0.25 * values[i + 1];
   }
   return values;
 }
@@ -168,7 +173,7 @@ export interface TerrainBrickOptions {
   /** Seed suffix for this specific terrain layer */
   seedSuffix?: string;
   /** Optional gradient fill instead of flat color */
-  gradient?: { topColor: string; bottomColor: string };
+  gradient?: { topColor: string; bottomColor: string; topOpacity?: number; bottomOpacity?: number };
 }
 
 /**
@@ -181,7 +186,7 @@ export function terrainBrick(params: BrickParams, options: TerrainBrickOptions):
   const {
     baseY,
     roughness = 0.08,
-    points = 24,
+    points = 40,
     color,
     opacity = 0.9,
     edgeBlur = 0,
@@ -214,9 +219,12 @@ export function terrainBrick(params: BrickParams, options: TerrainBrickOptions):
   let fillAttr = `fill="${color}"`;
 
   if (gradient) {
+    const tOp = (gradient.topOpacity ?? 1).toFixed(2);
+    const bOp = (gradient.bottomOpacity ?? 1).toFixed(2);
     defs.push(`<linearGradient id="${id}-grd" x1="0" y1="0" x2="0" y2="1">
-  <stop offset="0%" stop-color="${gradient.topColor}"/>
-  <stop offset="100%" stop-color="${gradient.bottomColor}"/>
+  <stop offset="0%" stop-color="${gradient.topColor}" stop-opacity="${tOp}"/>
+  <stop offset="35%" stop-color="${gradient.bottomColor}" stop-opacity="${bOp}"/>
+  <stop offset="100%" stop-color="${gradient.bottomColor}" stop-opacity="${bOp}"/>
 </linearGradient>`);
     fillAttr = `fill="url(#${id}-grd)"`;
   }
@@ -291,6 +299,75 @@ export function terrainStackBrick(
   };
 }
 
+// ─── Ridge Highlight Brick ──────────────────────────────────────────────────────
+
+export interface RidgeHighlightBrickOptions {
+  id?: string;
+  /** Must match baseY and seedSuffix of the terrain layer being highlighted */
+  baseY: number;
+  roughness?: number;
+  points?: number;
+  color: string;
+  opacity?: number;
+  /** Glow stroke width in pixels at 4K reference resolution */
+  glowPx?: number;
+  seedSuffix?: string;
+}
+
+/**
+ * Glowing ridgeline that sits precisely on top of a matching terrainBrick layer.
+ * Re-generates the same ridgeline using identical seedSuffix, then renders it as a
+ * stroked path with anisotropic blur — aurora or moonlight catching the mountain tops.
+ *
+ * Pair with terrainBrick using the same baseY / roughness / seedSuffix values.
+ */
+export function ridgeHighlightBrick(
+  params: BrickParams,
+  options: RidgeHighlightBrickOptions
+): BrickOutput {
+  const { viewBox, seedId, harmonyMode } = params;
+  const { width, height } = viewBox;
+  const scale = Math.max(width, height);
+  const {
+    baseY,
+    roughness = 0.08,
+    points = 40,
+    color,
+    opacity = 0.2,
+    glowPx = 18,
+    seedSuffix = "terrain",
+    id = "ridge-hl",
+  } = options;
+
+  const rng = seedRng(hashStr(`${seedId}-${harmonyMode}-${seedSuffix}`));
+  const amp = roughness * height;
+  const by = baseY * height;
+  const noise = terrainNoise(rng, points + 1, amp);
+
+  const ridgePts: Pt[] = [];
+  for (let i = 0; i <= points; i++) {
+    const x = (i / points) * width;
+    const y = Math.max(0, Math.min(height, by + noise[i]));
+    ridgePts.push([x, y]);
+  }
+
+  const ridgePath = catmullRomToBezierPath(ridgePts);
+  const gw = (glowPx * scale) / 2160;
+
+  // Anisotropic blur — wide vertical spread mimics light spilling up and down from
+  // the ridge; minimal horizontal spread keeps the glow tight to the peak shape.
+  const defs = `<filter id="${id}-glow" x="-8%" y="-600%" width="116%" height="1300%">
+  <feGaussianBlur stdDeviation="${(gw * 0.3).toFixed(1)} ${(gw * 3.0).toFixed(1)}"/>
+</filter>`;
+
+  const elements = [
+    `<path d="${ridgePath}" fill="none" stroke="${color}" stroke-width="${(gw * 3.5).toFixed(1)}" opacity="${(opacity * 0.35).toFixed(2)}" filter="url(#${id}-glow)"/>`,
+    `<path d="${ridgePath}" fill="none" stroke="${color}" stroke-width="${(gw * 0.6).toFixed(1)}" opacity="${opacity.toFixed(2)}" stroke-linecap="round"/>`,
+  ].join("\n");
+
+  return { defs, elements: `<g id="${id}">${elements}</g>` };
+}
+
 // ─── Water Reflection Brick ─────────────────────────────────────────────────────
 
 export interface WaterReflectionBrickOptions {
@@ -315,7 +392,7 @@ export function waterReflectionBrick(
   const {
     waterY,
     color,
-    opacity = 0.25,
+    opacity = 0.12,
     rippleScale = 8,
     rippleFrequency = 0.015,
     id = "water",
@@ -325,13 +402,16 @@ export function waterReflectionBrick(
   const waterHeight = height - wy;
   const rs = rippleScale * (scale / 2160);
 
+  // Soft top-edge fade prevents the hard horizontal stripe at the waterline.
   const defs = `<filter id="${id}-ripple" x="-5%" y="-5%" width="110%" height="110%">
   <feTurbulence type="fractalNoise" baseFrequency="${rippleFrequency}" numOctaves="3" seed="42" result="noise"/>
   <feDisplacementMap in="SourceGraphic" in2="noise" scale="${rs.toFixed(0)}" xChannelSelector="R" yChannelSelector="G"/>
 </filter>
 <linearGradient id="${id}-fade" x1="0" y1="0" x2="0" y2="1">
-  <stop offset="0%" stop-color="${color}" stop-opacity="${opacity}"/>
-  <stop offset="100%" stop-color="${color}" stop-opacity="${(opacity * 0.3).toFixed(2)}"/>
+  <stop offset="0%" stop-color="${color}" stop-opacity="0"/>
+  <stop offset="14%" stop-color="${color}" stop-opacity="${(opacity * 0.6).toFixed(2)}"/>
+  <stop offset="38%" stop-color="${color}" stop-opacity="${opacity}"/>
+  <stop offset="100%" stop-color="${color}" stop-opacity="${(opacity * 0.2).toFixed(2)}"/>
 </linearGradient>`;
 
   const elements = `<rect id="${id}" x="0" y="${wy.toFixed(0)}" width="${width}" height="${waterHeight.toFixed(0)}" fill="url(#${id}-fade)" filter="url(#${id}-ripple)"/>`;
@@ -541,7 +621,7 @@ export function auroraAdvancedBrick(
   const { width, height } = viewBox;
   const scale = Math.max(width, height);
   const {
-    bands = 5,
+    bands: _bands = 5,
     cy = 0.25,
     zoneHeight = 0.3,
     color,
@@ -550,6 +630,9 @@ export function auroraAdvancedBrick(
     displacement = true,
     id = "aurora",
   } = options;
+
+  // Clamp band count: < 3 produces visible stripe gaps; > 4 causes corrugated banding.
+  const bands = Math.min(4, Math.max(3, _bands));
 
   const rng = seedRng(hashStr(`${seedId}-${harmonyMode}-aurora`));
   const defs: string[] = [];
@@ -561,8 +644,10 @@ export function auroraAdvancedBrick(
   // One spatially-coherent noise field shared across all bands
   const auroraNoise = createNoise2D(rng);
 
-  defs.push(`<filter id="${id}-soft" x="-12%" y="-20%" width="124%" height="140%">
-  <feGaussianBlur stdDeviation="${blurSd}"/>
+  // Anisotropic blur: tighter horizontal (preserves lateral structure), wider vertical
+  // (curtain light bleeds up/down) — matches how real aurora is photographed.
+  defs.push(`<filter id="${id}-soft" x="-12%" y="-40%" width="124%" height="180%">
+  <feGaussianBlur stdDeviation="${(Number(blurSd) * 0.5).toFixed(1)} ${blurSd}"/>
 </filter>`);
 
   for (let i = 0; i < bands; i++) {
@@ -577,17 +662,21 @@ export function auroraAdvancedBrick(
     const bandOpacity = opacity * Math.min(1, 0.42 + focusWeight * 0.38 + rng() * 0.14);
     const sw = (36 + rng() * 100 + focusWeight * 65) * (width / 3840);
 
-    // Generate organic control points using spatially-coherent simplex noise
-    const ctrlCount = 12 + Math.floor(rng() * 8);
+    // Higher base frequency (6.5 vs 3.5) and 4-octave breakdown prevents the
+    // dominant low-frequency component from appearing as a visible sine wave.
+    // Per-band noise offset (bandOff) keeps bands independent in noise space.
+    const ctrlCount = 22 + Math.floor(rng() * 10);
     const curvePts: Pt[] = [];
+    const bandOff = i * 2.1;
     for (let j = 0; j <= ctrlCount; j++) {
       const t = j / ctrlCount;
-      const x = t * width;
-      // sample noise along t-axis; i/bands separates bands in noise space
+      const xJitter = (rng() - 0.5) * (width / ctrlCount) * 0.22;
+      const x = Math.max(0, Math.min(width, t * width + xJitter));
       const ny =
-        auroraNoise(t * 3.5, i * 0.8) * 0.65 +
-        auroraNoise(t * 9.0, i * 0.8 + 5) * 0.25 +
-        auroraNoise(t * 20.0, i * 0.8 + 10) * 0.1;
+        auroraNoise(t * 6.5, bandOff) * 0.42 +
+        auroraNoise(t * 14.0, bandOff + 7.3) * 0.3 +
+        auroraNoise(t * 31.0, bandOff + 14.6) * 0.18 +
+        auroraNoise(t * 67.0, bandOff + 21.9) * 0.1;
       const y = bandCy + ny * amp;
       curvePts.push([x, y]);
     }
@@ -609,6 +698,20 @@ export function auroraAdvancedBrick(
 
     elems.push(
       `<path id="${id}-b${i}" d="${d}" fill="none" stroke="url(#${gradId})" stroke-width="${sw.toFixed(1)}" stroke-linecap="round" opacity="${bandOpacity.toFixed(2)}"/>`
+    );
+
+    // Vertical curtain skirt — large-radius stroke with userSpaceOnUse gradient anchored
+    // to band Y, creating the downward-hanging light column characteristic of aurora curtains.
+    const curtainH = (28 + focusWeight * 55) * (scale / 2160);
+    const curtainGradId = `${id}-cg${i}`;
+    defs.push(`<linearGradient id="${curtainGradId}" gradientUnits="userSpaceOnUse" x1="0" y1="${bandCy.toFixed(0)}" x2="0" y2="${(bandCy + curtainH).toFixed(0)}">
+  <stop offset="0%" stop-color="${bandColor}" stop-opacity="0"/>
+  <stop offset="28%" stop-color="${bandColor}" stop-opacity="${(bandOpacity * 0.55).toFixed(2)}"/>
+  <stop offset="68%" stop-color="${bandColor}" stop-opacity="${(bandOpacity * 0.32).toFixed(2)}"/>
+  <stop offset="100%" stop-color="${bandColor}" stop-opacity="0"/>
+</linearGradient>`);
+    elems.push(
+      `<path d="${d}" fill="none" stroke="url(#${curtainGradId})" stroke-width="${(curtainH * 1.7).toFixed(0)}" stroke-linecap="round" opacity="${(bandOpacity * 0.6).toFixed(2)}"/>`
     );
   }
 
@@ -704,7 +807,10 @@ export function starFieldBrick(params: BrickParams, options: StarFieldBrickOptio
   for (let i = 0; i < count; i++) {
     const { x, y } = pickPosition();
     const r = (0.15 + rng() * 0.55) * sc;
-    const a = (0.2 + rng() * 0.55) * opacity;
+    // Atmospheric extinction: stars near the horizon scatter through more atmosphere
+    const extinction =
+      distribution === "upper" ? Math.max(0.2, 1 - (y / (height * 0.55)) ** 1.3 * 0.7) : 1.0;
+    const a = (0.2 + rng() * 0.55) * opacity * extinction;
     elems.push(
       `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${r.toFixed(2)}" fill="${color}" opacity="${a.toFixed(2)}"/>`
     );
@@ -715,7 +821,9 @@ export function starFieldBrick(params: BrickParams, options: StarFieldBrickOptio
     const { x, y } = pickPosition();
     // Core radius: 0.8–1.5 device units (scale-relative but kept small)
     const r = (0.8 + rng() * 0.7) * sc;
-    const a = (0.75 + rng() * 0.25) * opacity;
+    const extinctBright =
+      distribution === "upper" ? Math.max(0.25, 1 - (y / (height * 0.55)) ** 1.3 * 0.6) : 1.0;
+    const a = (0.75 + rng() * 0.25) * opacity * extinctBright;
     // Glow circle: wider halo for visibility at thumbnail scale
     const glowR = (5.0 + rng() * 5.0) * sc;
     elems.push(
@@ -757,7 +865,9 @@ export function nebulaGlowBrick(params: BrickParams, options: NebulaGlowBrickOpt
   const { blobs, blur = 0.06, id = "nebula" } = options;
 
   const sd = (blur * scale).toFixed(0);
-  const defs = `<filter id="${id}-blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="${sd}"/></filter>`;
+  // Padding must be ≥ 3× stdDeviation relative to the ellipse's bounding box;
+  // insufficient padding clips the blur rectangle, producing square-edged glows.
+  const defs = `<filter id="${id}-blur" x="-150%" y="-150%" width="400%" height="400%"><feGaussianBlur stdDeviation="${sd}"/></filter>`;
 
   const elems = blobs
     .map(
@@ -1061,14 +1171,16 @@ export function volcanoBrick(params: BrickParams, options: VolcanoBrickOptions):
   const elems: string[] = [];
   elems.push(`<path id="${id}" d="${d}" fill="${color}" opacity="${opacity}"/>`);
 
-  // Lava glow at crater
+  // Lava glow — tall narrow column rising from crater, hot at base, fades upward.
   if (lavaColor) {
-    defs.push(`<radialGradient id="${id}-lava" cx="50%" cy="0%" r="80%">
-  <stop offset="0%" stop-color="${lavaColor}" stop-opacity="0.6"/>
+    const glowH = peakHeight * height * 0.55;
+    defs.push(`<radialGradient id="${id}-lava" cx="50%" cy="85%" r="55%">
+  <stop offset="0%" stop-color="${lavaColor}" stop-opacity="0.75"/>
+  <stop offset="60%" stop-color="${lavaColor}" stop-opacity="0.3"/>
   <stop offset="100%" stop-color="${lavaColor}" stop-opacity="0"/>
 </radialGradient>`);
     elems.push(
-      `<ellipse cx="${px.toFixed(0)}" cy="${peakY.toFixed(0)}" rx="${(cw * 3).toFixed(0)}" ry="${(peakHeight * height * 0.15).toFixed(0)}" fill="url(#${id}-lava)"/>`
+      `<ellipse cx="${px.toFixed(0)}" cy="${(peakY - glowH * 0.35).toFixed(0)}" rx="${(cw * 1.8).toFixed(0)}" ry="${glowH.toFixed(0)}" fill="url(#${id}-lava)"/>`
     );
   }
 

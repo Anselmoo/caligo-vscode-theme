@@ -8,16 +8,21 @@
  * Pulse     : Stained glass — moonlight through cathedral window
  */
 import {
+  atmosphereBrick,
   backgroundBrick,
+  brushStrokeBrick,
   celestialBrick,
   cityscapeBrick,
   cloudBandBrick,
   horizonGlowBrick,
   nebulaGlowBrick,
   noiseBrick,
+  raysBrick,
+  shootingStarBrick,
   skyGradientBrick,
   starFieldBrick,
   terrainStackBrick,
+  toneCurveBrick,
   vignetteBrick,
   voronoiBrick,
 } from "../bricks/index.js";
@@ -77,11 +82,11 @@ function midnightStillness(p: BrickParams): ComposedWallpaper {
     id: "mi-s-rt",
     baseY: 0.62,
     heightRange: [0.1, 0.3],
-    density: 20,
+    density: 10,
     color: colors.bg,
     opacity: 0.85,
     hasWindows: true,
-    windowProbability: 0.3,
+    windowProbability: 0.08,
     windowColor: p.colors.bgSoft,
   });
 
@@ -103,9 +108,16 @@ function midnightStillness(p: BrickParams): ComposedWallpaper {
     opacity: 0.4,
   });
 
+  const meteors = shootingStarBrick(p, {
+    id: "mi-s-mt",
+    count: 1,
+    color: "#ffffff",
+    opacity: 0.35,
+  });
+
   const vignette = vignetteBrick(p, { id: "mi-s-vig", opacity: 0.6 });
   const noise = noiseBrick(p, { id: "mi-s-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, stars, moon, lampGlow, hGlow, rooftops, vignette, noise]);
+  return mergeBricks([bg, sky, stars, meteors, moon, lampGlow, hGlow, rooftops, vignette, noise]);
 }
 
 /* ── Drift: Ink wash — sweeping brushstroke on wet paper ──────────────────── */
@@ -162,9 +174,33 @@ function midnightDrift(p: BrickParams): ComposedWallpaper {
     seed: 23,
   });
 
+  // Additional brush strokes for layered ink wash depth
+  const brushA = brushStrokeBrick(p, {
+    id: "mi-d-bsa",
+    color: colors.accent,
+    opacity: 0.18,
+    x1: 0.05,
+    y1: 0.42,
+    x2: 0.65,
+    y2: 0.38,
+    strokeWidth: 60,
+    roughness: 0.12,
+  });
+  const brushB = brushStrokeBrick(p, {
+    id: "mi-d-bsb",
+    color: colors.accentMuted,
+    opacity: 0.1,
+    x1: 0.3,
+    y1: 0.55,
+    x2: 0.95,
+    y2: 0.52,
+    strokeWidth: 45,
+    roughness: 0.08,
+  });
+
   const vignette = vignetteBrick(p, { id: "mi-d-vig", opacity: 0.55 });
   const noise = noiseBrick(p, { id: "mi-d-n", baseFrequency: 0.85, opacity: 0.05 });
-  return mergeBricks([bg, paper, grain, bloom, stroke, splatters, vignette, noise]);
+  return mergeBricks([bg, paper, grain, bloom, stroke, brushA, brushB, splatters, vignette, noise]);
 }
 
 /* ── Break: Fractured canvas — angular night light ────────────────────────── */
@@ -203,9 +239,53 @@ function midnightBreak(p: BrickParams): ComposedWallpaper {
     ],
   });
 
+  // Scattered fragments of light visible through the fractures
+  const fragments = starFieldBrick(p, {
+    id: "mi-b-fr",
+    count: 18,
+    brightCount: 3,
+    color: colors.accentSoft,
+    distribution: "full",
+    opacity: 0.25,
+  });
+
+  // Light rays piercing through fracture lines
+  const crackRays = raysBrick(p, {
+    id: "mi-b-cr",
+    cx: 0.3,
+    cy: 0.35,
+    count: 5,
+    spreadDeg: 60,
+    startDeg: 60,
+    length: 0.4,
+    color: colors.accent,
+    opacity: 0.08,
+  });
+  const crackRays2 = raysBrick(p, {
+    id: "mi-b-cr2",
+    cx: 0.75,
+    cy: 0.3,
+    count: 4,
+    spreadDeg: 50,
+    startDeg: 80,
+    length: 0.35,
+    color: colors.accentSoft,
+    opacity: 0.06,
+  });
+
   const vignette = vignetteBrick(p, { id: "mi-b-vig", opacity: 0.55 });
   const noise = noiseBrick(p, { id: "mi-b-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, shards, crackLight, vignette, noise]);
+  return mergeBricks([
+    bg,
+    sky,
+    shards,
+    crackLight,
+    crackRays,
+    crackRays2,
+    fragments,
+    vignette,
+    noise,
+  ]);
 }
 
 /* ── Void: Charcoal cave — single form in darkness ────────────────────────── */
@@ -222,27 +302,59 @@ function midnightVoid(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  // Single emerging form — soft terrain ridge barely visible
+  // Single emerging form — charcoal ridge visible in darkness
   const form = terrainStackBrick(p, {
     id: "mi-v-fm",
     points: 14,
-    layers: [{ baseY: 0.55, roughness: 0.06, color: colors.bgMid, opacity: 0.15 }],
+    layers: [
+      { baseY: 0.52, roughness: 0.07, color: colors.bgSoft, opacity: 0.18 },
+      { baseY: 0.58, roughness: 0.05, color: colors.bgMid, opacity: 0.32 },
+    ],
   });
 
-  // Faint haze
+  // Faint haze pooling over the ridge
   const haze = cloudBandBrick(p, {
     id: "mi-v-hz",
-    cy: 0.5,
-    bandHeight: 0.3,
+    cy: 0.55,
+    bandHeight: 0.2,
     color: colors.bgSoft,
-    opacity: 0.05,
+    opacity: 0.07,
     frequency: 0.003,
     seed: 47,
   });
 
+  // Ambient glow — single distant light source visible through darkness
+  const glow = nebulaGlowBrick(p, {
+    id: "mi-v-gl",
+    blur: 0.05,
+    blobs: [
+      { cx: 0.5, cy: 0.38, rx: 0.08, ry: 0.08, color: colors.accentSoft, opacity: 0.1 },
+      { cx: 0.5, cy: 0.38, rx: 0.2, ry: 0.12, color: colors.bgSoft, opacity: 0.06 },
+      { cx: 0.3, cy: 0.45, rx: 0.04, ry: 0.04, color: colors.accentMuted, opacity: 0.07 },
+      { cx: 0.7, cy: 0.42, rx: 0.04, ry: 0.04, color: colors.accentMuted, opacity: 0.06 },
+      { cx: 0.18, cy: 0.3, rx: 0.03, ry: 0.03, color: colors.accentSoft, opacity: 0.05 },
+      { cx: 0.82, cy: 0.35, rx: 0.03, ry: 0.03, color: colors.accentSoft, opacity: 0.05 },
+      { cx: 0.45, cy: 0.62, rx: 0.05, ry: 0.04, color: colors.accentMuted, opacity: 0.05 },
+      { cx: 0.62, cy: 0.6, rx: 0.04, ry: 0.04, color: colors.accentMuted, opacity: 0.04 },
+      { cx: 0.25, cy: 0.7, rx: 0.03, ry: 0.03, color: colors.bgMid, opacity: 0.08 },
+      { cx: 0.75, cy: 0.68, rx: 0.03, ry: 0.03, color: colors.bgMid, opacity: 0.07 },
+    ],
+  });
+
+  const charcoalAtmo = atmosphereBrick(p, {
+    id: "mi-v-atmo",
+    color: colors.bgSoft,
+    highlightColor: colors.accentMuted,
+    opacity: 0.06,
+    lightAzimuth: 220,
+    lightElevation: 20,
+    seed: 31,
+  });
+
+  const tone = toneCurveBrick(p, { id: "mi-v-tone", preset: "cinematic", opacity: 0.25 });
   const vignette = vignetteBrick(p, { id: "mi-v-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "mi-v-n", opacity: 0.04 });
-  return mergeBricks([bg, dark, haze, form, vignette, noise]);
+  return mergeBricks([bg, dark, glow, haze, form, charcoalAtmo, tone, vignette, noise]);
 }
 
 /* ── Pulse: Stained glass — moonlight through cathedral ───────────────────── */
@@ -264,13 +376,16 @@ function midnightPulse(p: BrickParams): ComposedWallpaper {
     id: "mi-p-gl",
     blur: 0.04,
     blobs: [
-      { cx: 0.15, cy: 0.2, rx: 0.1, ry: 0.15, color: colors.accent, opacity: 0.18 },
-      { cx: 0.4, cy: 0.3, rx: 0.12, ry: 0.18, color: colors.hueBlue, opacity: 0.12 },
-      { cx: 0.65, cy: 0.2, rx: 0.1, ry: 0.15, color: colors.huePurple, opacity: 0.15 },
-      { cx: 0.85, cy: 0.35, rx: 0.08, ry: 0.12, color: colors.hueGreen, opacity: 0.1 },
-      { cx: 0.3, cy: 0.6, rx: 0.12, ry: 0.15, color: colors.hueCyan, opacity: 0.12 },
-      { cx: 0.55, cy: 0.55, rx: 0.1, ry: 0.15, color: colors.accent, opacity: 0.15 },
-      { cx: 0.78, cy: 0.6, rx: 0.08, ry: 0.12, color: colors.hueBlue, opacity: 0.1 },
+      { cx: 0.15, cy: 0.2, rx: 0.1, ry: 0.15, color: colors.accent, opacity: 0.22 },
+      { cx: 0.4, cy: 0.3, rx: 0.12, ry: 0.18, color: colors.hueBlue, opacity: 0.16 },
+      { cx: 0.65, cy: 0.2, rx: 0.1, ry: 0.15, color: colors.huePurple, opacity: 0.18 },
+      { cx: 0.85, cy: 0.35, rx: 0.08, ry: 0.12, color: colors.hueGreen, opacity: 0.14 },
+      { cx: 0.3, cy: 0.6, rx: 0.12, ry: 0.15, color: colors.hueCyan, opacity: 0.16 },
+      { cx: 0.55, cy: 0.55, rx: 0.1, ry: 0.15, color: colors.accent, opacity: 0.18 },
+      { cx: 0.78, cy: 0.6, rx: 0.08, ry: 0.12, color: colors.hueBlue, opacity: 0.14 },
+      { cx: 0.22, cy: 0.48, rx: 0.06, ry: 0.08, color: colors.hueOrange, opacity: 0.1 },
+      { cx: 0.72, cy: 0.42, rx: 0.06, ry: 0.08, color: colors.hueCyan, opacity: 0.1 },
+      { cx: 0.5, cy: 0.12, rx: 0.18, ry: 0.12, color: colors.bgSoft, opacity: 0.08 },
     ],
   });
 
@@ -288,7 +403,20 @@ function midnightPulse(p: BrickParams): ComposedWallpaper {
     layers: [{ baseY: 0.82, roughness: 0.02, color: colors.bg, opacity: 0.9 }],
   });
 
+  // Cathedral light beams descending from window
+  const cathedralBeams = raysBrick(p, {
+    id: "mi-p-cb",
+    cx: 0.5,
+    cy: 0.0,
+    count: 8,
+    spreadDeg: 60,
+    startDeg: 60,
+    length: 0.9,
+    color: "#ffffff",
+    opacity: 0.03,
+  });
+
   const vignette = vignetteBrick(p, { id: "mi-p-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "mi-p-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, moonbeam, glass, floor, vignette, noise]);
+  return mergeBricks([bg, sky, moonbeam, cathedralBeams, glass, floor, vignette, noise]);
 }

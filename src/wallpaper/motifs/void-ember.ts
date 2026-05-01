@@ -8,15 +8,19 @@
  * Pulse     : Ember constellation — scattered embers over desert night
  */
 import {
+  atmosphereBrick,
   backgroundBrick,
   celestialBrick,
   horizonGlowBrick,
   nebulaGlowBrick,
   noiseBrick,
+  ringBrick,
   shootingStarBrick,
   skyGradientBrick,
+  sparksBrick,
   starFieldBrick,
   terrainStackBrick,
+  treelineBrick,
   vignetteBrick,
 } from "../bricks/index.js";
 import { mergeBricks } from "../composer.js";
@@ -83,9 +87,29 @@ function voidEmberStillness(p: BrickParams): ComposedWallpaper {
     ],
   });
 
+  // Concentric heat halo rings
+  const ring1 = ringBrick(p, {
+    id: "ve-s-r1",
+    cx: 0.5,
+    cy: 0.5,
+    r: 0.14,
+    strokeWidth: 2,
+    color: colors.hueOrange,
+    opacity: 0.2,
+  });
+  const ring2 = ringBrick(p, {
+    id: "ve-s-r2",
+    cx: 0.5,
+    cy: 0.5,
+    r: 0.22,
+    strokeWidth: 1,
+    color: colors.hueOrange,
+    opacity: 0.1,
+  });
+
   const vignette = vignetteBrick(p, { id: "ve-s-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "ve-s-n", opacity: 0.03 });
-  return mergeBricks([bg, dark, heatCorona, ember, desert, vignette, noise]);
+  return mergeBricks([bg, dark, heatCorona, ring1, ring2, ember, desert, vignette, noise]);
 }
 
 /* ── Drift: Cinder trail — ember path across terrain ──────────────────────── */
@@ -140,9 +164,19 @@ function voidEmberDrift(p: BrickParams): ComposedWallpaper {
     opacity: 0.7,
   });
 
+  const cinderAtmo = atmosphereBrick(p, {
+    id: "ve-d-atmo",
+    color: colors.bgSoft,
+    highlightColor: colors.hueOrange,
+    opacity: 0.07,
+    lightAzimuth: 200,
+    lightElevation: 20,
+    seed: 17,
+  });
+
   const vignette = vignetteBrick(p, { id: "ve-d-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "ve-d-n", opacity: 0.03 });
-  return mergeBricks([bg, sky, hGlow, terrain, trail, cinders, vignette, noise]);
+  return mergeBricks([bg, sky, hGlow, terrain, trail, cinders, cinderAtmo, vignette, noise]);
 }
 
 /* ── Break: Particle burst — radial explosion ─────────────────────────────── */
@@ -223,10 +257,22 @@ function voidEmberBreak(p: BrickParams): ComposedWallpaper {
 
   const vignette = vignetteBrick(p, { id: "ve-b-vig", opacity: 0.45 });
   const noise = noiseBrick(p, { id: "ve-b-n", opacity: 0.03 });
+  // Geometric shockwave ring at expansion front
+  const shockRing = ringBrick(p, {
+    id: "ve-b-sr",
+    cx: 0.5,
+    cy: 0.48,
+    r: 0.28,
+    strokeWidth: 2,
+    color: colors.hueYellow,
+    opacity: 0.2,
+  });
+
   return mergeBricks([
     bg,
     dark,
     rings,
+    shockRing,
     burstCore,
     ejecta1,
     ejecta2,
@@ -272,9 +318,19 @@ function voidEmberVoid(p: BrickParams): ComposedWallpaper {
     ],
   });
 
+  const voidAtmo = atmosphereBrick(p, {
+    id: "ve-v-atmo",
+    color: colors.bgSoft,
+    highlightColor: colors.hueRed,
+    opacity: 0.05,
+    lightAzimuth: 190,
+    lightElevation: 10,
+    seed: 29,
+  });
+
   const vignette = vignetteBrick(p, { id: "ve-v-vig", opacity: 0.6 });
   const noise = noiseBrick(p, { id: "ve-v-n", opacity: 0.03 });
-  return mergeBricks([bg, dark, dyingEmber, barren, vignette, noise]);
+  return mergeBricks([bg, dark, dyingEmber, barren, voidAtmo, vignette, noise]);
 }
 
 /* ── Pulse: Ember constellation over desert night ─────────────────────────── */
@@ -343,7 +399,41 @@ function voidEmberPulse(p: BrickParams): ComposedWallpaper {
     height: 0.05,
   });
 
+  // Ground fire sparks rising
+  const groundSparks = sparksBrick(p, {
+    id: "ve-p-gs",
+    count: 20,
+    color: colors.hueOrange,
+    opacity: 0.55,
+    direction: 1,
+    sourceCx: 0.5,
+    sourceSpread: 0.4,
+  });
+
+  // Distant treeline silhouette at horizon
+  const trees = treelineBrick(p, {
+    id: "ve-p-tl",
+    baseY: 0.7,
+    count: 25,
+    color: colors.bg,
+    opacity: 0.7,
+    maxHeight: 0.07,
+  });
+
   const vignette = vignetteBrick(p, { id: "ve-p-vig", opacity: 0.65 });
   const noise = noiseBrick(p, { id: "ve-p-n", opacity: 0.03 });
-  return mergeBricks([bg, sky, warmth, hGlow, terrain, dim, medium, bright, vignette, noise]);
+  return mergeBricks([
+    bg,
+    sky,
+    warmth,
+    hGlow,
+    terrain,
+    trees,
+    dim,
+    medium,
+    bright,
+    groundSparks,
+    vignette,
+    noise,
+  ]);
 }

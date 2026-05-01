@@ -217,7 +217,10 @@ export function curtainBrick(params: BrickParams, options: CurtainBrickOptions):
     const t = i / steps;
     const x = t * vw;
     // 2-octave fBm: primary swell + fine detail
-    const n = noise2D(t * 3.5 + phaseOffset, 0) * 0.7 + noise2D(t * 8.0 + phaseOffset, 1) * 0.3;
+    const n =
+      noise2D(t * 6.5 + phaseOffset, 0.5) * 0.5 +
+      noise2D(t * 15.0 + phaseOffset, 1.5) * 0.32 +
+      noise2D(t * 33.0 + phaseOffset, 2.5) * 0.18;
     const y = pcy + n * amp;
     pts.push(`${i === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`);
   }

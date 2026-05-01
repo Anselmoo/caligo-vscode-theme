@@ -15,6 +15,7 @@ export {
   horizonGlowBrick,
   lightningBrick,
   nebulaGlowBrick,
+  ridgeHighlightBrick,
   shootingStarBrick,
   skyGradientBrick,
   starFieldBrick,
@@ -25,7 +26,7 @@ export {
   volcanoBrick,
   waterReflectionBrick,
 } from "./landscape.js";
-export { noiseBrick, turbulenceBrick } from "./noise.js";
+export { nebulaDustBrick, noiseBrick, turbulenceBrick } from "./noise.js";
 export { particlesBrick, sparksBrick } from "./particles.js";
 export {
   arcBrick,

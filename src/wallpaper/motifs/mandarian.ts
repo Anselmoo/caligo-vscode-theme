@@ -15,9 +15,14 @@ import {
   horizonGlowBrick,
   nebulaGlowBrick,
   noiseBrick,
+  particlesBrick,
+  ringBrick,
+  shootingStarBrick,
   skyGradientBrick,
+  sparksBrick,
   starFieldBrick,
   terrainContourBrick,
+  treelineBrick,
   vignetteBrick,
 } from "../bricks/index.js";
 import { mergeBricks } from "../composer.js";
@@ -102,9 +107,28 @@ function mandarianStillness(p: BrickParams): ComposedWallpaper {
     opacity: 0.5,
   });
 
+  const desertMeteor = shootingStarBrick(p, {
+    id: "mn-s-mt",
+    count: 2,
+    color: "#ffffff",
+    opacity: 0.4,
+  });
+
   const vignette = vignetteBrick(p, { id: "mn-s-vig", opacity: 0.55 });
   const noise = noiseBrick(p, { id: "mn-s-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, stars, moon, hGlow, dune1, dune2, dune3, vignette, noise]);
+  return mergeBricks([
+    bg,
+    sky,
+    stars,
+    desertMeteor,
+    moon,
+    hGlow,
+    dune1,
+    dune2,
+    dune3,
+    vignette,
+    noise,
+  ]);
 }
 
 /* ── Drift: Dusk bleeding into night ──────────────────────────────────────── */
@@ -173,9 +197,20 @@ function mandarianDrift(p: BrickParams): ComposedWallpaper {
     opacity: 0.3,
   });
 
+  // Desert dust particles in dusk air
+  const dust = particlesBrick(p, {
+    id: "mn-d-dust",
+    count: 60,
+    color: colors.hueOrange,
+    minRadius: 1,
+    maxRadius: 2,
+    opacity: 0.12,
+    distribution: "uniform",
+  });
+
   const vignette = vignetteBrick(p, { id: "mn-d-vig", opacity: 0.55 });
   const noise = noiseBrick(p, { id: "mn-d-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, stars, hGlow, haze, dune1, dune2, dune3, vignette, noise]);
+  return mergeBricks([bg, sky, stars, hGlow, haze, dust, dune1, dune2, dune3, vignette, noise]);
 }
 
 /* ── Break: Wildfire ridge — fire glow behind mountain ────────────────────── */
@@ -238,9 +273,41 @@ function mandarianBreak(p: BrickParams): ComposedWallpaper {
     opacity: 0.35,
   });
 
+  const wildfireSparks = sparksBrick(p, {
+    id: "mn-b-sp",
+    count: 30,
+    color: colors.hueOrange,
+    opacity: 0.55,
+    direction: 1,
+    sourceCx: 0.5,
+    sourceSpread: 0.4,
+  });
+
+  // Burning treeline silhouette
+  const burnedTrees = treelineBrick(p, {
+    id: "mn-b-tl",
+    baseY: 0.52,
+    count: 30,
+    color: colors.bg,
+    opacity: 0.8,
+    maxHeight: 0.07,
+  });
+
   const vignette = vignetteBrick(p, { id: "mn-b-vig", opacity: 0.55 });
   const noise = noiseBrick(p, { id: "mn-b-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, stars, smoke, fireGlow, ridge, embers, vignette, noise]);
+  return mergeBricks([
+    bg,
+    sky,
+    stars,
+    smoke,
+    fireGlow,
+    ridge,
+    burnedTrees,
+    embers,
+    wildfireSparks,
+    vignette,
+    noise,
+  ]);
 }
 
 /* ── Void: Empty dune sea — vast barely-lit sand ──────────────────────────── */
@@ -275,9 +342,40 @@ function mandarianVoid(p: BrickParams): ComposedWallpaper {
     seed: 37,
   });
 
+  // Desert stars — sparse, dim, as seen from a moonlit dune
+  const stars = starFieldBrick(p, {
+    id: "mn-v-st",
+    count: 22,
+    brightCount: 2,
+    color: "#ffffff",
+    distribution: "upper",
+    opacity: 0.3,
+  });
+
+  // Distant moon glow on horizon
+  const moonGlow = nebulaGlowBrick(p, {
+    id: "mn-v-mg",
+    blur: 0.06,
+    blobs: [
+      { cx: 0.75, cy: 0.22, rx: 0.06, ry: 0.06, color: colors.bgSoft, opacity: 0.18 },
+      { cx: 0.75, cy: 0.22, rx: 0.15, ry: 0.1, color: colors.bgSoft, opacity: 0.07 },
+    ],
+  });
+
+  // Moon halo ring
+  const moonHalo = ringBrick(p, {
+    id: "mn-v-mh",
+    cx: 0.75,
+    cy: 0.22,
+    r: 0.07,
+    strokeWidth: 1,
+    color: colors.bgSoft,
+    opacity: 0.2,
+  });
+
   const vignette = vignetteBrick(p, { id: "mn-v-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "mn-v-n", opacity: 0.03 });
-  return mergeBricks([bg, sky, haze, dunes, vignette, noise]);
+  return mergeBricks([bg, sky, stars, moonGlow, moonHalo, haze, dunes, vignette, noise]);
 }
 
 /* ── Pulse: Fire dance — sparks rising from desert ────────────────────────── */
@@ -344,7 +442,29 @@ function mandarianPulse(p: BrickParams): ComposedWallpaper {
     opacity: 0.45,
   });
 
+  const fireDanceSparks = sparksBrick(p, {
+    id: "mn-p-sp",
+    count: 35,
+    color: colors.hueYellow,
+    opacity: 0.6,
+    direction: 1,
+    sourceCx: 0.5,
+    sourceSpread: 0.2,
+  });
+
   const vignette = vignetteBrick(p, { id: "mn-p-vig", opacity: 0.55 });
   const noise = noiseBrick(p, { id: "mn-p-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, stars, fireGlow, dune1, dune2, dune3, embers, vignette, noise]);
+  return mergeBricks([
+    bg,
+    sky,
+    stars,
+    fireGlow,
+    dune1,
+    dune2,
+    dune3,
+    embers,
+    fireDanceSparks,
+    vignette,
+    noise,
+  ]);
 }

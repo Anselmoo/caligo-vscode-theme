@@ -8,13 +8,17 @@
  * Pulse     : Mountain peak mirrored in obsidian lake
  */
 import {
+  atmosphereBrick,
   backgroundBrick,
   celestialBrick,
   cloudBandBrick,
   horizonGlowBrick,
   nebulaGlowBrick,
   noiseBrick,
+  ridgeHighlightBrick,
+  shootingStarBrick,
   skyGradientBrick,
+  sparksBrick,
   starFieldBrick,
   terrainContourBrick,
   terrainStackBrick,
@@ -102,9 +106,39 @@ function obsidianStillness(p: BrickParams): ComposedWallpaper {
     opacity: 0.5,
   });
 
+  // Moonlight edge highlight on obsidian ridge
+  const ridgeHL = ridgeHighlightBrick(p, {
+    id: "og-s-rhl",
+    baseY: 0.29,
+    roughness: 0.05,
+    points: 20,
+    color: colors.hueCyan,
+    opacity: 0.2,
+    glowPx: 8,
+  });
+
+  const meteor = shootingStarBrick(p, {
+    id: "og-s-mt",
+    count: 1,
+    color: "#ffffff",
+    opacity: 0.4,
+  });
+
   const vignette = vignetteBrick(p, { id: "og-s-vig", opacity: 0.55 });
   const noise = noiseBrick(p, { id: "og-s-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, stars, moon, hGlow, terrain, reflection, vignette, noise]);
+  return mergeBricks([
+    bg,
+    sky,
+    stars,
+    meteor,
+    moon,
+    hGlow,
+    terrain,
+    ridgeHL,
+    reflection,
+    vignette,
+    noise,
+  ]);
 }
 
 /* ── Drift: Glacial ice strata ────────────────────────────────────────────── */
@@ -161,9 +195,20 @@ function obsidianDrift(p: BrickParams): ComposedWallpaper {
     opacity: 0.4,
   });
 
+  // Cold blue ridge highlight on upper ice strata edge
+  const iceHL = ridgeHighlightBrick(p, {
+    id: "og-d-rhl",
+    baseY: 0.52,
+    roughness: 0.03,
+    points: 20,
+    color: colors.hueCyan,
+    opacity: 0.22,
+    glowPx: 6,
+  });
+
   const vignette = vignetteBrick(p, { id: "og-d-vig", opacity: 0.55 });
   const noise = noiseBrick(p, { id: "og-d-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, crystals, ice, stars, moraine, vignette, noise]);
+  return mergeBricks([bg, sky, crystals, ice, iceHL, stars, moraine, vignette, noise]);
 }
 
 /* ── Break: Geothermal vent erupting ──────────────────────────────────────── */
@@ -232,9 +277,30 @@ function obsidianBreak(p: BrickParams): ComposedWallpaper {
     opacity: 0.35,
   });
 
+  const volcanoSparks = sparksBrick(p, {
+    id: "og-b-sp",
+    count: 40,
+    color: colors.hueOrange,
+    opacity: 0.65,
+    direction: 1,
+    sourceCx: 0.5,
+    sourceSpread: 0.08,
+  });
+
   const vignette = vignetteBrick(p, { id: "og-b-vig", opacity: 0.55 });
   const noise = noiseBrick(p, { id: "og-b-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, stars, lavaGlow, steam, volcano, embers, vignette, noise]);
+  return mergeBricks([
+    bg,
+    sky,
+    stars,
+    lavaGlow,
+    steam,
+    volcano,
+    embers,
+    volcanoSparks,
+    vignette,
+    noise,
+  ]);
 }
 
 /* ── Void: Crystal cave — single distant light ────────────────────────────── */
@@ -263,19 +329,37 @@ function obsidianVoid(p: BrickParams): ComposedWallpaper {
     layers: [{ baseY: 0.3, roughness: 0.06, color: colors.bgMid, opacity: 0.35 }],
   });
 
-  // Single distant light point
+  // Distant light at tunnel end + scattered bioluminescent spots on cave walls
   const light = nebulaGlowBrick(p, {
     id: "og-v-li",
     blur: 0.04,
     blobs: [
-      { cx: 0.5, cy: 0.48, rx: 0.02, ry: 0.02, color: colors.hueCyan, opacity: 0.5 },
-      { cx: 0.5, cy: 0.48, rx: 0.06, ry: 0.06, color: colors.accent, opacity: 0.1 },
+      { cx: 0.5, cy: 0.48, rx: 0.025, ry: 0.025, color: colors.hueCyan, opacity: 0.6 },
+      { cx: 0.5, cy: 0.48, rx: 0.08, ry: 0.07, color: colors.accent, opacity: 0.12 },
+      { cx: 0.5, cy: 0.48, rx: 0.18, ry: 0.14, color: colors.accentSoft, opacity: 0.05 },
+      { cx: 0.22, cy: 0.55, rx: 0.015, ry: 0.015, color: colors.hueCyan, opacity: 0.25 },
+      { cx: 0.35, cy: 0.38, rx: 0.012, ry: 0.012, color: colors.hueCyan, opacity: 0.2 },
+      { cx: 0.65, cy: 0.42, rx: 0.012, ry: 0.012, color: colors.accent, opacity: 0.2 },
+      { cx: 0.78, cy: 0.58, rx: 0.015, ry: 0.015, color: colors.hueCyan, opacity: 0.18 },
+      { cx: 0.15, cy: 0.7, rx: 0.01, ry: 0.01, color: colors.accentSoft, opacity: 0.15 },
+      { cx: 0.6, cy: 0.65, rx: 0.01, ry: 0.01, color: colors.hueCyan, opacity: 0.12 },
+      { cx: 0.88, cy: 0.45, rx: 0.012, ry: 0.012, color: colors.accentMuted, opacity: 0.1 },
     ],
+  });
+
+  const caveAtmo = atmosphereBrick(p, {
+    id: "og-v-atmo",
+    color: colors.bgSoft,
+    highlightColor: colors.hueCyan,
+    opacity: 0.07,
+    lightAzimuth: 180,
+    lightElevation: 15,
+    seed: 53,
   });
 
   const vignette = vignetteBrick(p, { id: "og-v-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "og-v-n", opacity: 0.04 });
-  return mergeBricks([bg, dark, wallL, wallR, light, vignette, noise]);
+  return mergeBricks([bg, dark, wallL, wallR, light, caveAtmo, vignette, noise]);
 }
 
 /* ── Pulse: Mountain peak mirrored in obsidian lake ───────────────────────── */
@@ -322,7 +406,7 @@ function obsidianPulse(p: BrickParams): ComposedWallpaper {
     id: "og-p-lk",
     waterY: 0.5,
     color: colors.bgSoft,
-    opacity: 0.2,
+    opacity: 0.08,
     rippleScale: 6,
     rippleFrequency: 0.02,
   });
@@ -343,7 +427,37 @@ function obsidianPulse(p: BrickParams): ComposedWallpaper {
     opacity: 0.45,
   });
 
+  // Moonlit ridge glow on peak edges
+  const peakHL = ridgeHighlightBrick(p, {
+    id: "og-p-rhl",
+    baseY: 0.04,
+    roughness: 0.05,
+    points: 20,
+    color: colors.hueCyan,
+    opacity: 0.18,
+    glowPx: 10,
+  });
+
+  const pulseMetor = shootingStarBrick(p, {
+    id: "og-p-mt",
+    count: 1,
+    color: "#ffffff",
+    opacity: 0.35,
+  });
+
   const vignette = vignetteBrick(p, { id: "og-p-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "og-p-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, stars, moon, peaks, lake, moonRefl, vignette, noise]);
+  return mergeBricks([
+    bg,
+    sky,
+    stars,
+    pulseMetor,
+    moon,
+    peaks,
+    peakHL,
+    lake,
+    moonRefl,
+    vignette,
+    noise,
+  ]);
 }

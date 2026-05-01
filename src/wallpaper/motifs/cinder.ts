@@ -8,15 +8,18 @@
  * Pulse     : Campfire — warm lanterns and sparks ascending over mountain camp
  */
 import {
+  atmosphereBrick,
   backgroundBrick,
   cloudBandBrick,
   noiseBrick,
+  particlesBrick,
   radialGradientBrick,
   skyGradientBrick,
   sparksBrick,
   starFieldBrick,
   terrainBrick,
   terrainContourBrick,
+  treelineBrick,
   vignetteBrick,
 } from "../bricks/index.js";
 import { mergeBricks } from "../composer.js";
@@ -102,10 +105,42 @@ function cinderStillness(p: BrickParams): ComposedWallpaper {
     sourceSpread: 0.2,
   });
 
+  // Pine treeline silhouette over rough terrain
+  const pines = treelineBrick(p, {
+    id: "ci-s-tl",
+    baseY: 0.68,
+    count: 45,
+    color: colors.bg,
+    opacity: 0.95,
+    maxHeight: 0.1,
+  });
+
+  const smokeHaze = atmosphereBrick(p, {
+    id: "ci-s-ah",
+    color: colors.bgMid,
+    highlightColor: colors.hueOrange,
+    opacity: 0.07,
+    lightAzimuth: 200,
+    lightElevation: 25,
+    seed: 5,
+  });
+
   const vignette = vignetteBrick(p, { id: "ci-s-vig", opacity: 0.55 });
   const noise = noiseBrick(p, { id: "ci-s-n", opacity: 0.04 });
 
-  return mergeBricks([bg, sky, stars, fireGlow, treeline, ground, sparks, vignette, noise]);
+  return mergeBricks([
+    bg,
+    sky,
+    stars,
+    fireGlow,
+    treeline,
+    pines,
+    ground,
+    smokeHaze,
+    sparks,
+    vignette,
+    noise,
+  ]);
 }
 
 /* ── Drift: Smoke drift — lava rivers with smoke and volcanic terrain ──────── */
@@ -184,6 +219,16 @@ function cinderDrift(p: BrickParams): ComposedWallpaper {
     opacity: 0.07,
   });
 
+  const emberSparks = sparksBrick(p, {
+    id: "ci-d-es",
+    count: 25,
+    color: colors.hueOrange,
+    opacity: 0.6,
+    direction: 1,
+    sourceCx: 0.4,
+    sourceSpread: 0.25,
+  });
+
   const vignette = vignetteBrick(p, { id: "ci-d-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "ci-d-n", opacity: 0.05 });
 
@@ -197,6 +242,7 @@ function cinderDrift(p: BrickParams): ComposedWallpaper {
     volcanicMid,
     smoke2,
     volcanicFront,
+    emberSparks,
     vignette,
     noise,
   ]);
@@ -278,10 +324,32 @@ function cinderBreak(p: BrickParams): ComposedWallpaper {
     opacity: 0.3,
   });
 
+  const fireSparks = sparksBrick(p, {
+    id: "ci-b-fs",
+    count: 30,
+    color: colors.hueYellow,
+    opacity: 0.5,
+    direction: 1,
+    sourceCx: 0.5,
+    sourceSpread: 0.3,
+  });
+
   const vignette = vignetteBrick(p, { id: "ci-b-vig", opacity: 0.6 });
   const noise = noiseBrick(p, { id: "ci-b-n", opacity: 0.05 });
 
-  return mergeBricks([bg, sky, stars, clouds, boltGlow, bolt, fireGlow, ridge, vignette, noise]);
+  return mergeBricks([
+    bg,
+    sky,
+    stars,
+    clouds,
+    boltGlow,
+    bolt,
+    fireGlow,
+    ridge,
+    fireSparks,
+    vignette,
+    noise,
+  ]);
 }
 
 /* ── Void: Ash void — white ash over extinguished landscape ───────────────── */
@@ -346,10 +414,21 @@ function cinderVoid(p: BrickParams): ComposedWallpaper {
     frequency: 0.004,
   });
 
+  // Drifting ash particles
+  const ash = particlesBrick(p, {
+    id: "ci-v-ash",
+    count: 80,
+    color: colors.bgSoft,
+    minRadius: 1,
+    maxRadius: 2,
+    opacity: 0.25,
+    distribution: "uniform",
+  });
+
   const vignette = vignetteBrick(p, { id: "ci-v-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "ci-v-n", opacity: 0.04 });
 
-  return mergeBricks([bg, sky, stars, glow, ashHaze, terrain, ground, vignette, noise]);
+  return mergeBricks([bg, sky, stars, glow, ashHaze, ash, terrain, ground, vignette, noise]);
 }
 
 /* ── Pulse: Campfire — warm sparks ascending over mountain camp ────────────── */
@@ -434,8 +513,29 @@ function cinderPulse(p: BrickParams): ComposedWallpaper {
     sourceSpread: 0.15,
   });
 
+  // Forest treeline silhouette behind the camp
+  const forest = treelineBrick(p, {
+    id: "ci-p-fl",
+    baseY: 0.62,
+    count: 35,
+    color: colors.bg,
+    opacity: 0.9,
+    maxHeight: 0.09,
+  });
+
   const vignette = vignetteBrick(p, { id: "ci-p-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "ci-p-n", opacity: 0.04 });
 
-  return mergeBricks([bg, sky, stars, campfire, mountains, lanternElems, sparks, vignette, noise]);
+  return mergeBricks([
+    bg,
+    sky,
+    stars,
+    campfire,
+    mountains,
+    forest,
+    lanternElems,
+    sparks,
+    vignette,
+    noise,
+  ]);
 }

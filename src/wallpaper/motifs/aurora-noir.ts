@@ -13,6 +13,8 @@ import {
   backgroundBrick,
   cloudBandBrick,
   noiseBrick,
+  ridgeHighlightBrick,
+  shootingStarBrick,
   skyGradientBrick,
   starFieldBrick,
   terrainBrick,
@@ -104,6 +106,17 @@ function auroraStillness(p: BrickParams): ComposedWallpaper {
     points: 16,
     color: colors.bgMid,
     opacity: 0.9,
+    seedSuffix: "an-s-lw",
+    gradient: { topColor: colors.hueGreen, bottomColor: colors.bgMid, topOpacity: 0.12 },
+  });
+  const leftRidge = ridgeHighlightBrick(p, {
+    id: "an-s-lw-hl",
+    baseY: liftTerrain(0.5, tuning.terrainLift * 0.8),
+    roughness: 0.1,
+    points: 16,
+    color: colors.hueGreen,
+    opacity: 0.18,
+    seedSuffix: "an-s-lw",
   });
   const rightWall = terrainBrick(p, {
     id: "an-s-rw",
@@ -112,6 +125,17 @@ function auroraStillness(p: BrickParams): ComposedWallpaper {
     points: 16,
     color: colors.bgSoft,
     opacity: 0.85,
+    seedSuffix: "an-s-rw",
+    gradient: { topColor: colors.hueGreen, bottomColor: colors.bgSoft, topOpacity: 0.1 },
+  });
+  const rightRidge = ridgeHighlightBrick(p, {
+    id: "an-s-rw-hl",
+    baseY: liftTerrain(0.52, tuning.terrainLift * 0.7),
+    roughness: 0.08,
+    points: 16,
+    color: colors.hueGreen,
+    opacity: 0.15,
+    seedSuffix: "an-s-rw",
   });
 
   // Water surface at 50%
@@ -119,7 +143,7 @@ function auroraStillness(p: BrickParams): ComposedWallpaper {
     id: "an-s-w",
     waterY: liftTerrain(0.5, tuning.terrainLift * 0.45, 0.18),
     color: colors.hueGreen,
-    opacity: 0.15,
+    opacity: 0.07,
     rippleScale: 6,
   });
 
@@ -131,6 +155,17 @@ function auroraStillness(p: BrickParams): ComposedWallpaper {
     points: 20,
     color: colors.bg,
     opacity: 0.95,
+    seedSuffix: "an-s-fg",
+  });
+  const foreRidge = ridgeHighlightBrick(p, {
+    id: "an-s-fg-hl",
+    baseY: liftTerrain(0.6, tuning.terrainLift),
+    roughness: 0.12,
+    points: 20,
+    color: colors.hueGreen,
+    opacity: 0.12,
+    glowPx: 14,
+    seedSuffix: "an-s-fg",
   });
 
   const mist = cloudBandBrick(p, {
@@ -154,15 +189,26 @@ function auroraStillness(p: BrickParams): ComposedWallpaper {
   const tone = toneCurveBrick(p, { id: "an-s-tone", preset: "cinematic", opacity: 0.35 });
   const noise = noiseBrick(p, { id: "an-s-n", opacity: 0.04 });
 
+  const meteor = shootingStarBrick(p, {
+    id: "an-s-mt",
+    count: 1,
+    color: "#ffffff",
+    opacity: 0.3,
+  });
+
   return mergeBricks([
     bg,
     sky,
     stars,
+    meteor,
     aurora,
     leftWall,
+    leftRidge,
     rightWall,
+    rightRidge,
     water,
     foreground,
+    foreRidge,
     mist,
     atmo,
     vignette,
@@ -467,5 +513,24 @@ function auroraPulse(p: BrickParams): ComposedWallpaper {
   const tone = toneCurveBrick(p, { id: "an-p-tone", preset: "cinematic", opacity: 0.35 });
   const noise = noiseBrick(p, { id: "an-p-n", opacity: 0.04 });
 
-  return mergeBricks([bg, sky, stars, aurora, peaks, mist, atmo, vignette, tone, noise]);
+  const pulseMetors = shootingStarBrick(p, {
+    id: "an-p-mt",
+    count: 2,
+    color: "#ffffff",
+    opacity: 0.35,
+  });
+
+  return mergeBricks([
+    bg,
+    sky,
+    stars,
+    pulseMetors,
+    aurora,
+    peaks,
+    mist,
+    atmo,
+    vignette,
+    tone,
+    noise,
+  ]);
 }

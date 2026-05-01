@@ -8,6 +8,7 @@
  * Pulse     : Bridge at night — cables and lights reflected in water
  */
 import {
+  atmosphereBrick,
   backgroundBrick,
   cityscapeBrick,
   cloudBandBrick,
@@ -15,7 +16,10 @@ import {
   lightningBrick,
   nebulaGlowBrick,
   noiseBrick,
+  ringBrick,
+  shootingStarBrick,
   skyGradientBrick,
+  sparksBrick,
   starFieldBrick,
   terrainStackBrick,
   vignetteBrick,
@@ -66,20 +70,21 @@ function graphiteStillness(p: BrickParams): ComposedWallpaper {
     id: "gf-s-sl",
     baseY: 0.58,
     heightRange: [32 / 120, 32 / 60],
-    density: 32,
+    density: 16,
     color: colors.bgMid,
     opacity: 0.85,
     hasWindows: true,
+    windowProbability: 0.03,
   });
 
   const buildings = cityscapeBrick(p, {
     id: "gf-s-bld",
     baseY: 0.68,
     heightRange: [20 / 120, 20 / 60],
-    density: 20,
+    density: 10,
     color: colors.bg,
     opacity: 0.95,
-    hasWindows: true,
+    hasWindows: false,
   });
 
   const lights = starFieldBrick(p, {
@@ -100,9 +105,27 @@ function graphiteStillness(p: BrickParams): ComposedWallpaper {
     opacity: 0.35,
   });
 
+  const meteor = shootingStarBrick(p, {
+    id: "gf-s-mt",
+    count: 1,
+    color: "#ffffff",
+    opacity: 0.3,
+  });
+
   const vignette = vignetteBrick(p, { id: "gf-s-vig", opacity: 0.55 });
   const noise = noiseBrick(p, { id: "gf-s-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, stars, urbanGlow, skyline, buildings, lights, vignette, noise]);
+  return mergeBricks([
+    bg,
+    sky,
+    stars,
+    meteor,
+    urbanGlow,
+    skyline,
+    buildings,
+    lights,
+    vignette,
+    noise,
+  ]);
 }
 
 /* ── Drift: Wet streets — rain reflections ────────────────────────────────── */
@@ -124,10 +147,11 @@ function graphiteDrift(p: BrickParams): ComposedWallpaper {
     id: "gf-d-sl",
     baseY: 0.48,
     heightRange: [24 / 120, 24 / 60],
-    density: 24,
+    density: 12,
     color: colors.bgMid,
     opacity: 0.7,
     hasWindows: true,
+    windowProbability: 0.07,
   });
 
   const neon = nebulaGlowBrick(p, {
@@ -145,7 +169,7 @@ function graphiteDrift(p: BrickParams): ComposedWallpaper {
     id: "gf-d-ref",
     waterY: 0.55,
     color: colors.bgSoft,
-    opacity: 0.2,
+    opacity: 0.08,
     rippleScale: 8,
     rippleFrequency: 0.025,
   });
@@ -160,9 +184,19 @@ function graphiteDrift(p: BrickParams): ComposedWallpaper {
     seed: 7,
   });
 
+  const rainAtmo = atmosphereBrick(p, {
+    id: "gf-d-atmo",
+    color: colors.bgSoft,
+    highlightColor: colors.hueBlue,
+    opacity: 0.08,
+    lightAzimuth: 210,
+    lightElevation: 20,
+    seed: 11,
+  });
+
   const vignette = vignetteBrick(p, { id: "gf-d-vig", opacity: 0.6 });
   const noise = noiseBrick(p, { id: "gf-d-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, clouds, skyline, neon, reflection, vignette, noise]);
+  return mergeBricks([bg, sky, clouds, rainAtmo, skyline, neon, reflection, vignette, noise]);
 }
 
 /* ── Break: Thunderstrike — lightning over city ───────────────────────────── */
@@ -221,9 +255,30 @@ function graphiteBreak(p: BrickParams): ComposedWallpaper {
     ],
   });
 
+  const lightSparks = sparksBrick(p, {
+    id: "gf-b-lsp",
+    count: 20,
+    color: colors.hueCyan,
+    opacity: 0.4,
+    direction: 1,
+    sourceCx: 0.48,
+    sourceSpread: 0.15,
+  });
+
   const vignette = vignetteBrick(p, { id: "gf-b-vig", opacity: 0.55 });
   const noise = noiseBrick(p, { id: "gf-b-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, clouds1, clouds2, flash, bolt, skyline, vignette, noise]);
+  return mergeBricks([
+    bg,
+    sky,
+    clouds1,
+    clouds2,
+    flash,
+    bolt,
+    skyline,
+    lightSparks,
+    vignette,
+    noise,
+  ]);
 }
 
 /* ── Void: Dense fog — buildings vanishing ────────────────────────────────── */
@@ -272,10 +327,10 @@ function graphiteVoid(p: BrickParams): ComposedWallpaper {
     id: "gf-v-gh",
     baseY: 0.55,
     heightRange: [16 / 120, 16 / 60],
-    density: 16,
+    density: 10,
     color: colors.bgMid,
     opacity: 0.2,
-    hasWindows: true,
+    hasWindows: false,
   });
 
   const light = nebulaGlowBrick(p, {
@@ -284,9 +339,19 @@ function graphiteVoid(p: BrickParams): ComposedWallpaper {
     blobs: [{ cx: 0.5, cy: 0.5, rx: 0.06, ry: 0.04, color: colors.hueYellow, opacity: 0.12 }],
   });
 
+  const fogAtmo = atmosphereBrick(p, {
+    id: "gf-v-atmo",
+    color: colors.bgSoft,
+    highlightColor: colors.hueYellow,
+    opacity: 0.07,
+    lightAzimuth: 180,
+    lightElevation: 15,
+    seed: 23,
+  });
+
   const vignette = vignetteBrick(p, { id: "gf-v-vig", opacity: 0.75 });
   const noise = noiseBrick(p, { id: "gf-v-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, ghost, fog1, fog2, light, fog3, vignette, noise]);
+  return mergeBricks([bg, sky, ghost, fog1, fog2, light, fogAtmo, fog3, vignette, noise]);
 }
 
 /* ── Pulse: Bridge at night — lights reflected in water ───────────────────── */
@@ -329,7 +394,7 @@ function graphitePulse(p: BrickParams): ComposedWallpaper {
     id: "gf-p-wa",
     waterY: 0.5,
     color: colors.bgSoft,
-    opacity: 0.25,
+    opacity: 0.08,
     rippleScale: 10,
     rippleFrequency: 0.02,
   });
@@ -351,7 +416,37 @@ function graphitePulse(p: BrickParams): ComposedWallpaper {
     opacity: 0.3,
   });
 
+  // Moon over bridge
+  const bridgeMoon = ringBrick(p, {
+    id: "gf-p-mr",
+    cx: 0.82,
+    cy: 0.15,
+    r: 0.04,
+    strokeWidth: 2,
+    color: colors.bgSoft,
+    opacity: 0.4,
+  });
+
+  const pulseMeteor = shootingStarBrick(p, {
+    id: "gf-p-mt",
+    count: 1,
+    color: "#ffffff",
+    opacity: 0.25,
+  });
+
   const vignette = vignetteBrick(p, { id: "gf-p-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "gf-p-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, stars, cityGlow, bridge, bridgeLights, water, vignette, noise]);
+  return mergeBricks([
+    bg,
+    sky,
+    stars,
+    pulseMeteor,
+    cityGlow,
+    bridge,
+    bridgeLights,
+    bridgeMoon,
+    water,
+    vignette,
+    noise,
+  ]);
 }
