@@ -13,11 +13,9 @@ import {
   celestialBrick,
   cloudBandBrick,
   horizonGlowBrick,
-  nebulaGlowBrick,
   noiseBrick,
-  raysBrick,
-  ringBrick,
   skyGradientBrick,
+  solarCoronaBrick,
   starFieldBrick,
   terrainContourBrick,
   terrainStackBrick,
@@ -41,7 +39,7 @@ export function eclipse(params: BrickParams): ComposedWallpaper {
   }
 }
 
-/* ── Stillness: Total solar eclipse — corona ring ─────────────────────────── */
+/* ── Stillness: Total solar eclipse — full corona at peak totality ────────── */
 function eclipseStillness(p: BrickParams): ComposedWallpaper {
   const { colors } = p;
   const bg = backgroundBrick(p);
@@ -56,33 +54,39 @@ function eclipseStillness(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  const moon = celestialBrick(p, {
-    id: "ec-s-mn",
-    cx: 0.5,
-    cy: 0.38,
-    r: 0.065,
-    color: colors.bg,
-    glowColor: colors.hueOrange,
-    glowSize: 2.15,
+  // Full corona composition — replaces nebulaGlowBrick + raysBrick + ringBrick
+  const corona = solarCoronaBrick(p, {
+    id: "ec-s-co",
+    cx: 0.52,
+    cy: 0.37,
+    moonR: 0.065,
+    color: colors.hueOrange,
+    innerColor: colors.hueYellow,
+    rayCount: 92,
+    extent: 7,
+    diamondAngleDeg: 48,
+    diamondColor: "#fff3c0",
+    turbulenceStrength: 0.24,
   });
 
-  const corona = nebulaGlowBrick(p, {
-    id: "ec-s-co",
-    blur: 0.06,
-    blobs: [
-      { cx: 0.5, cy: 0.38, rx: 0.18, ry: 0.18, color: colors.hueOrange, opacity: 0.2 },
-      { cx: 0.5, cy: 0.38, rx: 0.12, ry: 0.12, color: colors.hueYellow, opacity: 0.15 },
-      { cx: 0.52, cy: 0.36, rx: 0.22, ry: 0.08, color: colors.hueOrange, opacity: 0.08 },
-    ],
+  // Moon disk drawn ON TOP of corona — pure black occluding disk
+  const moon = celestialBrick(p, {
+    id: "ec-s-mn",
+    cx: 0.52,
+    cy: 0.37,
+    r: 0.065,
+    color: "#060608",
+    glowColor: colors.hueOrange,
+    glowSize: 0, // glow handled by solarCoronaBrick
   });
 
   const stars = starFieldBrick(p, {
     id: "ec-s-st",
-    count: 80,
-    brightCount: 6,
+    count: 180,
+    brightCount: 10,
     color: "#ffffff",
     distribution: "full",
-    opacity: 0.5,
+    opacity: 0.55,
   });
 
   const hGlow = horizonGlowBrick(p, {
@@ -96,52 +100,20 @@ function eclipseStillness(p: BrickParams): ComposedWallpaper {
   // Distant mountain range silhouette
   const mountains = terrainContourBrick(p, {
     id: "ec-s-mt",
-    horizonY: 0.4,
+    horizonY: 0.42,
     layers: [
-      { color: colors.bgMid, opacity: 0.45, edgeBlur: 3 },
-      { color: colors.bgSoft, opacity: 0.62 },
-      { color: colors.bg, opacity: 0.88 },
+      { color: colors.bgMid, opacity: 0.4, edgeBlur: 4 },
+      { color: colors.bgSoft, opacity: 0.58 },
+      { color: colors.bg, opacity: 0.85 },
     ],
   });
 
-  const coronaRays = raysBrick(p, {
-    id: "ec-s-cr",
-    cx: 0.5,
-    cy: 0.38,
-    count: 16,
-    length: 0.55,
-    color: colors.hueOrange,
-    opacity: 0.07,
-  });
-
-  const coronaRing = ringBrick(p, {
-    id: "ec-s-rg",
-    cx: 0.5,
-    cy: 0.38,
-    r: 0.074,
-    strokeWidth: 3,
-    color: colors.hueOrange,
-    opacity: 0.4,
-  });
-
-  const vignette = vignetteBrick(p, { id: "ec-s-vig", opacity: 0.6 });
+  const vignette = vignetteBrick(p, { id: "ec-s-vig", opacity: 0.65 });
   const noise = noiseBrick(p, { id: "ec-s-n", opacity: 0.04 });
-  return mergeBricks([
-    bg,
-    sky,
-    corona,
-    coronaRays,
-    coronaRing,
-    moon,
-    stars,
-    hGlow,
-    mountains,
-    vignette,
-    noise,
-  ]);
+  return mergeBricks([bg, sky, corona, moon, stars, hGlow, mountains, vignette, noise]);
 }
 
-/* ── Drift: Diamond ring — partial eclipse with golden bead ───────────────── */
+/* ── Drift: Diamond ring — partial eclipse with Baily's bead flash ────────── */
 function eclipseDrift(p: BrickParams): ComposedWallpaper {
   const { colors } = p;
   const bg = backgroundBrick(p);
@@ -155,41 +127,38 @@ function eclipseDrift(p: BrickParams): ComposedWallpaper {
     ],
   });
 
+  // Partial corona — less extent, emphasize the diamond ring bead
+  const corona = solarCoronaBrick(p, {
+    id: "ec-d-co",
+    cx: 0.5,
+    cy: 0.4,
+    moonR: 0.06,
+    color: colors.hueOrange,
+    innerColor: colors.hueYellow,
+    rayCount: 76,
+    extent: 5,
+    diamondAngleDeg: 32, // ~2 o'clock — classic Baily's bead position
+    diamondColor: "#ffffff",
+    turbulenceStrength: 0.2,
+  });
+
   const eclipseBody = celestialBrick(p, {
     id: "ec-d-eb",
     cx: 0.5,
     cy: 0.4,
     r: 0.06,
-    color: colors.bg,
+    color: "#050507",
     glowColor: colors.hueYellow,
-    glowSize: 1.67,
-  });
-
-  const diamond = nebulaGlowBrick(p, {
-    id: "ec-d-dm",
-    blur: 0.03,
-    blobs: [
-      { cx: 0.54, cy: 0.36, rx: 0.012, ry: 0.012, color: "#ffffff", opacity: 0.8 },
-      { cx: 0.54, cy: 0.36, rx: 0.035, ry: 0.035, color: colors.hueYellow, opacity: 0.3 },
-    ],
-  });
-
-  const corona = nebulaGlowBrick(p, {
-    id: "ec-d-co",
-    blur: 0.05,
-    blobs: [
-      { cx: 0.56, cy: 0.38, rx: 0.14, ry: 0.1, color: colors.hueOrange, opacity: 0.15 },
-      { cx: 0.45, cy: 0.42, rx: 0.1, ry: 0.08, color: colors.hueYellow, opacity: 0.08 },
-    ],
+    glowSize: 0,
   });
 
   const stars = starFieldBrick(p, {
     id: "ec-d-st",
-    count: 60,
-    brightCount: 4,
+    count: 150,
+    brightCount: 8,
     color: "#ffffff",
     distribution: "full",
-    opacity: 0.4,
+    opacity: 0.5,
   });
 
   // Rolling hills beneath the eclipsed sky
@@ -202,46 +171,12 @@ function eclipseDrift(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  const haloRing = ringBrick(p, {
-    id: "ec-d-rg",
-    cx: 0.5,
-    cy: 0.4,
-    r: 0.07,
-    strokeWidth: 2,
-    color: colors.hueYellow,
-    opacity: 0.3,
-  });
-
-  const sideRays = raysBrick(p, {
-    id: "ec-d-sr",
-    cx: 0.5,
-    cy: 0.4,
-    count: 8,
-    spreadDeg: 180,
-    startDeg: 0,
-    length: 0.35,
-    color: colors.hueYellow,
-    opacity: 0.05,
-  });
-
   const vignette = vignetteBrick(p, { id: "ec-d-vig", opacity: 0.55 });
   const noise = noiseBrick(p, { id: "ec-d-n", opacity: 0.04 });
-  return mergeBricks([
-    bg,
-    sky,
-    corona,
-    sideRays,
-    haloRing,
-    eclipseBody,
-    diamond,
-    stars,
-    hills,
-    vignette,
-    noise,
-  ]);
+  return mergeBricks([bg, sky, corona, eclipseBody, stars, hills, vignette, noise]);
 }
 
-/* ── Break: Blood moon — red-tinted lunar eclipse ─────────────────────────── */
+/* ── Break: Blood moon — lunar eclipse with penumbral corona bleed ─────────── */
 function eclipseBreak(p: BrickParams): ComposedWallpaper {
   const { colors } = p;
   const bg = backgroundBrick(p);
@@ -255,23 +190,34 @@ function eclipseBreak(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  const bloodMoon = celestialBrick(p, {
-    id: "ec-b-bm",
-    cx: 0.5,
-    cy: 0.35,
-    r: 0.07,
-    color: colors.hueRed,
-    glowColor: colors.hueRed,
-    glowSize: 2.29,
+  // Blood moon always uses deep red — palette hueRed can drift in split-comp modes
+  const BLOOD_RED = "#8c1e1e";
+  const BLOOD_GLOW = "#c43232";
+
+  // Penumbral glow around the blood moon — Earth's shadow scatters red light
+  const bloodCorona = solarCoronaBrick(p, {
+    id: "ec-b-co",
+    cx: 0.48,
+    cy: 0.34,
+    moonR: 0.072,
+    color: BLOOD_GLOW,
+    innerColor: "#e05020",
+    rayCount: 64,
+    extent: 4,
+    diamondAngleDeg: null,
+    turbulenceStrength: 0.28,
   });
 
-  const redHaze = nebulaGlowBrick(p, {
-    id: "ec-b-rh",
-    blur: 0.06,
-    blobs: [
-      { cx: 0.5, cy: 0.35, rx: 0.2, ry: 0.2, color: colors.hueRed, opacity: 0.15 },
-      { cx: 0.5, cy: 0.35, rx: 0.3, ry: 0.25, color: colors.hueOrange, opacity: 0.06 },
-    ],
+  // Blood moon disk — deep crimson, not black (illuminated by scattered sunlight)
+  const bloodMoon = celestialBrick(p, {
+    id: "ec-b-bm",
+    cx: 0.48,
+    cy: 0.34,
+    r: 0.072,
+    color: BLOOD_RED,
+    glowColor: BLOOD_GLOW,
+    glowSize: 1.4,
+    glowOpacity: 0.2,
   });
 
   const terrain = terrainStackBrick(p, {
@@ -286,37 +232,17 @@ function eclipseBreak(p: BrickParams): ComposedWallpaper {
 
   const stars = starFieldBrick(p, {
     id: "ec-b-st",
-    count: 70,
-    brightCount: 5,
+    count: 200,
+    brightCount: 12,
     color: "#ffffff",
-    distribution: "upper",
-    opacity: 0.4,
-  });
-
-  const bloodRays = raysBrick(p, {
-    id: "ec-b-cr",
-    cx: 0.5,
-    cy: 0.35,
-    count: 14,
-    length: 0.5,
-    color: colors.hueRed,
-    opacity: 0.05,
-  });
-
-  const bloodRing = ringBrick(p, {
-    id: "ec-b-rg",
-    cx: 0.5,
-    cy: 0.35,
-    r: 0.08,
-    strokeWidth: 2,
-    color: colors.hueOrange,
-    opacity: 0.25,
+    distribution: "full",
+    opacity: 0.5,
   });
 
   const atmo = atmosphereBrick(p, {
     id: "ec-b-atmo",
-    color: colors.hueRed,
-    highlightColor: colors.hueOrange,
+    color: BLOOD_GLOW,
+    highlightColor: "#e06030",
     opacity: 0.06,
     lightAzimuth: 200,
     lightElevation: 30,
@@ -325,22 +251,10 @@ function eclipseBreak(p: BrickParams): ComposedWallpaper {
 
   const vignette = vignetteBrick(p, { id: "ec-b-vig", opacity: 0.55 });
   const noise = noiseBrick(p, { id: "ec-b-n", opacity: 0.04 });
-  return mergeBricks([
-    bg,
-    sky,
-    redHaze,
-    bloodRays,
-    bloodRing,
-    bloodMoon,
-    stars,
-    terrain,
-    atmo,
-    vignette,
-    noise,
-  ]);
+  return mergeBricks([bg, sky, bloodCorona, bloodMoon, stars, terrain, atmo, vignette, noise]);
 }
 
-/* ── Void: Total darkness — thin corona whisper ───────────────────────────── */
+/* ── Void: Total darkness — faint corona whisper at deep totality ─────────── */
 function eclipseVoid(p: BrickParams): ComposedWallpaper {
   const { colors } = p;
   const bg = backgroundBrick(p);
@@ -349,62 +263,60 @@ function eclipseVoid(p: BrickParams): ComposedWallpaper {
     id: "ec-v-sky",
     stops: [
       { offset: "0%", color: colors.bg },
-      { offset: "50%", color: colors.bgSoft, opacity: 0.3 },
+      { offset: "50%", color: colors.bgSoft },
       { offset: "100%", color: colors.bg },
     ],
+  });
+
+  // Near-black corona — very low opacity, monochromatic tones, no diamond ring
+  const whisperCorona = solarCoronaBrick(p, {
+    id: "ec-v-co",
+    cx: 0.5,
+    cy: 0.44,
+    moonR: 0.052,
+    color: colors.accentMuted,
+    innerColor: colors.accentSoft,
+    rayCount: 58,
+    extent: 5,
+    diamondAngleDeg: null,
+    turbulenceStrength: 0.18,
   });
 
   const eclipseBody = celestialBrick(p, {
     id: "ec-v-eb",
     cx: 0.5,
-    cy: 0.45,
-    r: 0.05,
-    color: colors.bg,
-    glowColor: colors.bgSoft,
-    glowSize: 1.6,
-  });
-
-  const whisper = nebulaGlowBrick(p, {
-    id: "ec-v-wh",
-    blur: 0.03,
-    blobs: [{ cx: 0.5, cy: 0.45, rx: 0.07, ry: 0.07, color: colors.accentSoft, opacity: 0.1 }],
+    cy: 0.44,
+    r: 0.052,
+    color: "#030305",
+    glowColor: colors.accentSoft,
+    glowSize: 0,
   });
 
   // Faint horizon terrain — barely visible landscape
   const horizon = terrainStackBrick(p, {
     id: "ec-v-hz",
     layers: [
-      { baseY: 0.88, roughness: 0.04, color: colors.bgSoft, opacity: 0.2 },
-      { baseY: 0.94, roughness: 0.03, color: colors.bgMid, opacity: 0.3 },
+      { baseY: 0.85, roughness: 0.04, color: colors.bgSoft, opacity: 0.18 },
+      { baseY: 0.91, roughness: 0.03, color: colors.bgMid, opacity: 0.28 },
+      { baseY: 0.97, roughness: 0.02, color: colors.bg, opacity: 0.5 },
     ],
   });
 
-  const voidRing = ringBrick(p, {
-    id: "ec-v-rg",
-    cx: 0.5,
-    cy: 0.45,
-    r: 0.057,
-    strokeWidth: 2,
-    color: colors.accentSoft,
-    opacity: 0.28,
+  const stars = starFieldBrick(p, {
+    id: "ec-v-st",
+    count: 120,
+    brightCount: 6,
+    color: "#e8e8f0",
+    distribution: "full",
+    opacity: 0.45,
   });
 
-  const voidRays = raysBrick(p, {
-    id: "ec-v-cr",
-    cx: 0.5,
-    cy: 0.45,
-    count: 10,
-    length: 0.4,
-    color: colors.accentSoft,
-    opacity: 0.035,
-  });
-
-  const vignette = vignetteBrick(p, { id: "ec-v-vig", opacity: 0.5 });
+  const vignette = vignetteBrick(p, { id: "ec-v-vig", opacity: 0.6 });
   const noise = noiseBrick(p, { id: "ec-v-n", opacity: 0.03 });
-  return mergeBricks([bg, sky, whisper, voidRays, voidRing, eclipseBody, horizon, vignette, noise]);
+  return mergeBricks([bg, sky, whisperCorona, eclipseBody, stars, horizon, vignette, noise]);
 }
 
-/* ── Pulse: Eclipse over mountain ridge ───────────────────────────────────── */
+/* ── Pulse: Eclipse over mountain ridge — crepuscular corona above peaks ───── */
 function eclipsePulse(p: BrickParams): ComposedWallpaper {
   const { colors } = p;
   const bg = backgroundBrick(p);
@@ -420,23 +332,29 @@ function eclipsePulse(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  const eclipseBody = celestialBrick(p, {
-    id: "ec-p-eb",
-    cx: 0.5,
-    cy: 0.28,
-    r: 0.055,
-    color: colors.bg,
-    glowColor: colors.hueOrange,
-    glowSize: 2.18,
+  // Full corona above the mountain ridge
+  const corona = solarCoronaBrick(p, {
+    id: "ec-p-co",
+    cx: 0.51,
+    cy: 0.27,
+    moonR: 0.055,
+    color: colors.hueOrange,
+    innerColor: colors.hueYellow,
+    rayCount: 84,
+    extent: 8,
+    diamondAngleDeg: 62,
+    diamondColor: "#fff5d0",
+    turbulenceStrength: 0.22,
   });
 
-  const corona = nebulaGlowBrick(p, {
-    id: "ec-p-co",
-    blur: 0.05,
-    blobs: [
-      { cx: 0.5, cy: 0.28, rx: 0.15, ry: 0.15, color: colors.hueOrange, opacity: 0.18 },
-      { cx: 0.53, cy: 0.25, rx: 0.08, ry: 0.04, color: colors.hueYellow, opacity: 0.1 },
-    ],
+  const eclipseBody = celestialBrick(p, {
+    id: "ec-p-eb",
+    cx: 0.51,
+    cy: 0.27,
+    r: 0.055,
+    color: "#050508",
+    glowColor: colors.hueOrange,
+    glowSize: 0,
   });
 
   const hGlow = horizonGlowBrick(p, {
@@ -449,22 +367,22 @@ function eclipsePulse(p: BrickParams): ComposedWallpaper {
 
   const ridge = terrainContourBrick(p, {
     id: "ec-p-rd",
-    horizonY: 0.28,
+    horizonY: 0.3,
     layers: [
-      { color: colors.bgMid, opacity: 0.52, edgeBlur: 3 },
-      { color: colors.bgSoft, opacity: 0.68 },
-      { color: colors.bg, opacity: 0.88 },
+      { color: colors.bgMid, opacity: 0.48, edgeBlur: 4 },
+      { color: colors.bgSoft, opacity: 0.65 },
+      { color: colors.bg, opacity: 0.85 },
       { color: colors.bg, opacity: 0.96 },
     ],
   });
 
   const stars = starFieldBrick(p, {
     id: "ec-p-st",
-    count: 55,
-    brightCount: 4,
+    count: 160,
+    brightCount: 10,
     color: "#ffffff",
-    distribution: "upper",
-    opacity: 0.45,
+    distribution: "full",
+    opacity: 0.5,
   });
 
   const mist = cloudBandBrick(p, {
@@ -477,43 +395,7 @@ function eclipsePulse(p: BrickParams): ComposedWallpaper {
     seed: 13,
   });
 
-  // Crepuscular rays emanating upward from behind the ridge
-  const pulseRays = raysBrick(p, {
-    id: "ec-p-cr",
-    cx: 0.5,
-    cy: 0.28,
-    count: 14,
-    spreadDeg: 160,
-    startDeg: 200,
-    length: 0.55,
-    color: colors.hueOrange,
-    opacity: 0.06,
-  });
-
-  const pulseRing = ringBrick(p, {
-    id: "ec-p-rg",
-    cx: 0.5,
-    cy: 0.28,
-    r: 0.062,
-    strokeWidth: 2,
-    color: colors.hueOrange,
-    opacity: 0.35,
-  });
-
   const vignette = vignetteBrick(p, { id: "ec-p-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "ec-p-n", opacity: 0.04 });
-  return mergeBricks([
-    bg,
-    sky,
-    corona,
-    pulseRays,
-    pulseRing,
-    eclipseBody,
-    stars,
-    hGlow,
-    mist,
-    ridge,
-    vignette,
-    noise,
-  ]);
+  return mergeBricks([bg, sky, corona, eclipseBody, stars, hGlow, mist, ridge, vignette, noise]);
 }

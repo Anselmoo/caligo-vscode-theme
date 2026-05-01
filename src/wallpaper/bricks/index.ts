@@ -5,6 +5,7 @@
 export { cityscapeBrick } from "./architecture.js";
 export { atmosphereBrick, blendLayerBrick, toneCurveBrick } from "./atmosphere.js";
 export { backgroundBrick } from "./background.js";
+export { solarCoronaBrick } from "./celestial.js";
 export { voronoiBrick } from "./geometry.js";
 export { linearGradientBrick, radialGradientBrick } from "./gradient.js";
 export {
