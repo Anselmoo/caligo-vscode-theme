@@ -600,18 +600,31 @@ export function cloudBandBrick(params: BrickParams, options: CloudBandBrickOptio
 
 export interface AuroraAdvancedBrickOptions {
   id?: string;
+  /** Number of overlapping curtain layers (2–5, default 4) */
   bands?: number;
   cy?: number;
   zoneHeight?: number;
   color: string;
   color2?: string;
   opacity?: number;
+  /** Kept for API compatibility — displacement is always applied */
   displacement?: boolean;
 }
 
 /**
- * Multi-band aurora curtain using cubic Bézier curves for organic curtain shapes.
- * Each band flows with seeded random undulation instead of mathematical sine.
+ * Photorealistic aurora curtain — a full composition of:
+ * - Ambient radial glow spanning the aurora zone
+ * - 2–4 overlapping curtain layers, each built from:
+ *   · anisotropic feTurbulence (high X-freq → thin vertical columns, low Y-freq → tall rays)
+ *   · feColorMatrix threshold → discrete column boundaries
+ *   · anisotropic feGaussianBlur (tight H, wide V) → each column becomes a tall light ray
+ *   · feComposite reveals a vertical color gradient (red/magenta top → green lower) through column mask
+ *   · feDisplacementMap adds large-scale curtain fold undulation
+ * - Fine shimmer overlay (higher-frequency second turbulence pass)
+ * - Base contact glow (lower aurora edge is densest and brightest)
+ *
+ * Replaces the previous horizontal bezier-path approach, which produced visible
+ * sine-wave or mountain-ridge artifacts at low band counts.
  */
 export function auroraAdvancedBrick(
   params: BrickParams,
@@ -621,115 +634,165 @@ export function auroraAdvancedBrick(
   const { width, height } = viewBox;
   const scale = Math.max(width, height);
   const {
-    bands: _bands = 5,
+    bands: bandCount = 5,
     cy = 0.25,
     zoneHeight = 0.3,
     color,
     color2,
     opacity = 0.62,
-    displacement = true,
     id = "aurora",
   } = options;
 
-  // Clamp band count: < 3 produces visible stripe gaps; > 4 causes corrugated banding.
-  const bands = Math.min(4, Math.max(3, _bands));
-
   const rng = seedRng(hashStr(`${seedId}-${harmonyMode}-aurora`));
+  const c2 = color2 ?? color;
+
+  // Aurora zone in absolute pixel coordinates
+  const zoneTop = Math.max(0, cy - zoneHeight / 2) * height;
+  const zoneH = zoneHeight * height;
+  const zoneCy = cy * height;
+
   const defs: string[] = [];
   const elems: string[] = [];
-  const c2 = color2 ?? color;
-  const heroBand = rng();
-  const blurSd = Math.max(1.4, scale * 0.0018).toFixed(1);
 
-  // One spatially-coherent noise field shared across all bands
-  const auroraNoise = createNoise2D(rng);
+  // ── 1. Ambient background glow ────────────────────────────────────────────
+  // Large soft radial glow at aurora zone center — diffuse sky luminosity before
+  // the structured curtain rays resolve.
+  const glowId = `${id}-glow`;
+  defs.push(
+    `<radialGradient id="${glowId}" cx="${(width * 0.5).toFixed(0)}" cy="${zoneCy.toFixed(0)}" r="${(scale * 0.55).toFixed(0)}" gradientUnits="userSpaceOnUse">
+  <stop offset="0%" stop-color="${color}" stop-opacity="${(opacity * 0.24).toFixed(2)}"/>
+  <stop offset="42%" stop-color="${color}" stop-opacity="${(opacity * 0.06).toFixed(2)}"/>
+  <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+</radialGradient>`
+  );
+  elems.push(`<rect width="${width}" height="${height}" fill="url(#${glowId})"/>`);
 
-  // Anisotropic blur: tighter horizontal (preserves lateral structure), wider vertical
-  // (curtain light bleeds up/down) — matches how real aurora is photographed.
-  defs.push(`<filter id="${id}-soft" x="-12%" y="-40%" width="124%" height="180%">
-  <feGaussianBlur stdDeviation="${(Number(blurSd) * 0.5).toFixed(1)} ${blurSd}"/>
-</filter>`);
+  // ── 2. Curtain layers ─────────────────────────────────────────────────────
+  // Each curtain layer uses SVG-native feTurbulence with strongly anisotropic
+  // frequency: baseFrequency="X Y" where X >> Y.
+  //   · High X frequency → many thin vertical columns across the canvas
+  //   · Very low Y frequency → column brightness is consistent top-to-bottom (tall)
+  // feColorMatrix amplifies and thresholds the turbulence R-channel into column alpha.
+  // Anisotropic feGaussianBlur: tight horizontal (column boundaries stay crisp),
+  // wide vertical (each column blooms into a tall light ray).
+  // feComposite reveals the vertical gradient through the column mask.
+  // feDisplacementMap adds large-scale lateral fold (the "curtain" sway).
 
-  for (let i = 0; i < bands; i++) {
-    const bandProgress = bands === 1 ? 0.5 : i / Math.max(1, bands - 1);
-    const spread = bandProgress ** (1.05 + rng() * 0.22);
-    const bandJitter = organicCentered(rng) * (zoneHeight / Math.max(4, bands * 1.8));
-    const bandCy =
-      clamp(cy - zoneHeight / 2 + spread * zoneHeight + bandJitter, 0.06, 0.92) * height;
-    const focusWeight = Math.max(0.3, 1 - Math.abs(bandProgress - heroBand) * 1.45);
-    const amp = (0.03 + rng() * 0.05 + focusWeight * 0.03) * height;
-    const bandColor = i % 2 === 0 ? color : c2;
-    const bandOpacity = opacity * Math.min(1, 0.42 + focusWeight * 0.38 + rng() * 0.14);
-    const sw = (36 + rng() * 100 + focusWeight * 65) * (width / 3840);
+  const curtainCount = Math.min(4, Math.max(2, Math.round(bandCount * 0.75)));
 
-    // Higher base frequency (6.5 vs 3.5) and 4-octave breakdown prevents the
-    // dominant low-frequency component from appearing as a visible sine wave.
-    // Per-band noise offset (bandOff) keeps bands independent in noise space.
-    const ctrlCount = 22 + Math.floor(rng() * 10);
-    const curvePts: Pt[] = [];
-    const bandOff = i * 2.1;
-    for (let j = 0; j <= ctrlCount; j++) {
-      const t = j / ctrlCount;
-      const xJitter = (rng() - 0.5) * (width / ctrlCount) * 0.22;
-      const x = Math.max(0, Math.min(width, t * width + xJitter));
-      const ny =
-        auroraNoise(t * 6.5, bandOff) * 0.42 +
-        auroraNoise(t * 14.0, bandOff + 7.3) * 0.3 +
-        auroraNoise(t * 31.0, bandOff + 14.6) * 0.18 +
-        auroraNoise(t * 67.0, bandOff + 21.9) * 0.1;
-      const y = bandCy + ny * amp;
-      curvePts.push([x, y]);
-    }
+  for (let ci = 0; ci < curtainCount; ci++) {
+    const isHero = ci === 0;
+    const curtainColor = ci % 2 === 0 ? color : c2;
+    const curtainOpacity = opacity * (isHero ? 1.0 : 0.38 + rng() * 0.38);
 
-    const d = catmullRomToBezierPath(curvePts);
+    // Slight vertical offset per layer — depth layering of overlapping curtains
+    const yOff = (rng() - 0.5) * zoneH * 0.28;
+    const ctTop = zoneTop + yOff;
+    const ctH = zoneH * (0.72 + rng() * 0.48);
 
-    // Gradient along the aurora band for depth
-    const gradId = `${id}-g${i}`;
-    const leadEdge = (8 + rng() * 12).toFixed(1);
-    const coreStart = (24 + rng() * 10).toFixed(1);
-    const coreEnd = (68 + rng() * 10).toFixed(1);
-    defs.push(`<linearGradient id="${gradId}" x1="0" y1="0" x2="1" y2="0">
-  <stop offset="0%" stop-color="${bandColor}" stop-opacity="0"/>
-  <stop offset="${leadEdge}%" stop-color="${bandColor}" stop-opacity="${(0.22 + focusWeight * 0.16).toFixed(2)}"/>
-  <stop offset="${coreStart}%" stop-color="${bandColor}" stop-opacity="${(0.8 + focusWeight * 0.18).toFixed(2)}"/>
-  <stop offset="${coreEnd}%" stop-color="${bandColor}" stop-opacity="${(0.72 + focusWeight * 0.14).toFixed(2)}"/>
-  <stop offset="100%" stop-color="${bandColor}" stop-opacity="0"/>
-</linearGradient>`);
+    const seed1 = Math.floor(rng() * 89) + 1;
+    const seed2 = Math.floor(rng() * 89) + 1;
 
-    elems.push(
-      `<path id="${id}-b${i}" d="${d}" fill="none" stroke="url(#${gradId})" stroke-width="${sw.toFixed(1)}" stroke-linecap="round" opacity="${bandOpacity.toFixed(2)}"/>`
+    // Anisotropic column frequencies — vary slightly between curtain layers
+    const colFreqX = (0.026 + rng() * 0.026).toFixed(4);
+    const colFreqY = (0.0016 + rng() * 0.0014).toFixed(4);
+
+    // Blur: tight horizontal preserves column structure; wide vertical creates tall rays
+    const hBlur = (scale * 0.0008 + rng() * scale * 0.0005).toFixed(1);
+    const vBlur = (scale * 0.016 + rng() * scale * 0.012).toFixed(1);
+
+    // Lateral displacement — how much curtain sways at large scale (curtain fold)
+    const dispScale = (scale * (0.036 + rng() * 0.04)).toFixed(0);
+
+    // Column contrast boost: A = boost*R + bias → threshold point at R = -bias/boost
+    const boost = (4.0 + rng() * 2.8).toFixed(1);
+    const bias = (-(Number(boost) * (0.3 + rng() * 0.12))).toFixed(2);
+
+    const cfId = `${id}-cf${ci}`;
+    const cgId = `${id}-cg${ci}`;
+
+    // Vertical color gradient: red/magenta upper magnetic altitude, green lower
+    // emission altitude — mirrors real aurora spectral physics (N₂ red, O green).
+    const topColor = isHero ? "#ff4848" : c2;
+    defs.push(
+      `<linearGradient id="${cgId}" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0%" stop-color="${topColor}" stop-opacity="0"/>
+  <stop offset="10%" stop-color="${topColor}" stop-opacity="${(curtainOpacity * 0.42).toFixed(2)}"/>
+  <stop offset="28%" stop-color="${curtainColor}" stop-opacity="${(curtainOpacity * 0.92).toFixed(2)}"/>
+  <stop offset="60%" stop-color="${curtainColor}" stop-opacity="${(curtainOpacity * 0.8).toFixed(2)}"/>
+  <stop offset="84%" stop-color="${curtainColor}" stop-opacity="${(curtainOpacity * 0.24).toFixed(2)}"/>
+  <stop offset="100%" stop-color="${curtainColor}" stop-opacity="0"/>
+</linearGradient>`
     );
 
-    // Vertical curtain skirt — large-radius stroke with userSpaceOnUse gradient anchored
-    // to band Y, creating the downward-hanging light column characteristic of aurora curtains.
-    const curtainH = (28 + focusWeight * 55) * (scale / 2160);
-    const curtainGradId = `${id}-cg${i}`;
-    defs.push(`<linearGradient id="${curtainGradId}" gradientUnits="userSpaceOnUse" x1="0" y1="${bandCy.toFixed(0)}" x2="0" y2="${(bandCy + curtainH).toFixed(0)}">
-  <stop offset="0%" stop-color="${bandColor}" stop-opacity="0"/>
-  <stop offset="28%" stop-color="${bandColor}" stop-opacity="${(bandOpacity * 0.55).toFixed(2)}"/>
-  <stop offset="68%" stop-color="${bandColor}" stop-opacity="${(bandOpacity * 0.32).toFixed(2)}"/>
-  <stop offset="100%" stop-color="${bandColor}" stop-opacity="0"/>
-</linearGradient>`);
+    defs.push(
+      `<filter id="${cfId}" x="-15%" y="-150%" width="130%" height="400%" color-interpolation-filters="linearRGB">
+  <feTurbulence type="fractalNoise" baseFrequency="${colFreqX} ${colFreqY}" numOctaves="5" seed="${seed1}" result="cols"/>
+  <feColorMatrix in="cols" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  ${boost} 0 0 0 ${bias}" result="colMask"/>
+  <feGaussianBlur in="colMask" stdDeviation="${hBlur} ${vBlur}" result="softCols"/>
+  <feComposite in="SourceGraphic" in2="softCols" operator="in" result="curtain"/>
+  <feTurbulence type="fractalNoise" baseFrequency="0.007 0.001" numOctaves="2" seed="${seed2}" result="flow"/>
+  <feDisplacementMap in="curtain" in2="flow" scale="${dispScale}" xChannelSelector="R" yChannelSelector="G"/>
+</filter>`
+    );
+
     elems.push(
-      `<path d="${d}" fill="none" stroke="url(#${curtainGradId})" stroke-width="${(curtainH * 1.7).toFixed(0)}" stroke-linecap="round" opacity="${(bandOpacity * 0.6).toFixed(2)}"/>`
+      `<rect x="0" y="${ctTop.toFixed(0)}" width="${width}" height="${ctH.toFixed(0)}" fill="url(#${cgId})" filter="url(#${cfId})"/>`
     );
   }
 
-  if (displacement) {
-    const ds = (scale * 0.01).toFixed(0);
-    defs.push(`<filter id="${id}-disp" x="-10%" y="-10%" width="120%" height="120%">
-  <feTurbulence type="fractalNoise" baseFrequency="0.004" numOctaves="3" seed="3" result="n"/>
-  <feDisplacementMap in="SourceGraphic" in2="n" scale="${ds}" xChannelSelector="R" yChannelSelector="G"/>
-</filter>`);
-    return {
-      defs: defs.join("\n"),
-      elements: `<g filter="url(#${id}-soft)"><g filter="url(#${id}-disp)">${elems.join("\n")}</g></g>`,
-    };
-  }
+  // ── 3. Fine shimmer ───────────────────────────────────────────────────────
+  // Higher-frequency second turbulence pass at low opacity — the thin bright
+  // needles of individual aurora ray segments visible at full resolution.
+  const shimSeed = Math.floor(rng() * 89) + 1;
+  const shimH = (scale * 0.0004).toFixed(1);
+  const shimV = (scale * 0.007).toFixed(1);
+  const shimId = `${id}-shim`;
+  const shimGId = `${id}-sg`;
+
+  defs.push(
+    `<linearGradient id="${shimGId}" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0%" stop-color="${color}" stop-opacity="0"/>
+  <stop offset="20%" stop-color="${color}" stop-opacity="${(opacity * 0.26).toFixed(2)}"/>
+  <stop offset="65%" stop-color="${color}" stop-opacity="${(opacity * 0.16).toFixed(2)}"/>
+  <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+</linearGradient>
+<filter id="${shimId}" x="-5%" y="-200%" width="110%" height="500%" color-interpolation-filters="linearRGB">
+  <feTurbulence type="fractalNoise" baseFrequency="0.072 0.003" numOctaves="3" seed="${shimSeed}" result="shim"/>
+  <feColorMatrix in="shim" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  7 0 0 0 -4.5" result="shimMask"/>
+  <feGaussianBlur in="shimMask" stdDeviation="${shimH} ${shimV}" result="softShim"/>
+  <feComposite in="SourceGraphic" in2="softShim" operator="in"/>
+</filter>`
+  );
+  elems.push(
+    `<rect x="0" y="${zoneTop.toFixed(0)}" width="${width}" height="${zoneH.toFixed(0)}" fill="url(#${shimGId})" filter="url(#${shimId})"/>`
+  );
+
+  // ── 4. Base contact glow ──────────────────────────────────────────────────
+  // The lower edge of the curtain is densest and brightest — magnetic field lines
+  // converge at lower altitudes, exciting more atmospheric particles per volume.
+  const baseY = zoneTop + zoneH * 0.6;
+  const baseH = zoneH * 0.24;
+  const baseFId = `${id}-bf`;
+  const baseGId = `${id}-bg`;
+
+  defs.push(
+    `<filter id="${baseFId}" x="-5%" y="-300%" width="110%" height="700%">
+  <feGaussianBlur stdDeviation="${(scale * 0.003).toFixed(0)} ${(scale * 0.0015).toFixed(0)}"/>
+</filter>
+<linearGradient id="${baseGId}" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0%" stop-color="${color}" stop-opacity="${(opacity * 0.62).toFixed(2)}"/>
+  <stop offset="48%" stop-color="${color}" stop-opacity="${(opacity * 0.48).toFixed(2)}"/>
+  <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+</linearGradient>`
+  );
+  elems.push(
+    `<rect x="0" y="${baseY.toFixed(0)}" width="${width}" height="${baseH.toFixed(0)}" fill="url(#${baseGId})" filter="url(#${baseFId})"/>`
+  );
 
   return {
-    defs: defs.length > 0 ? defs.join("\n") : undefined,
-    elements: `<g filter="url(#${id}-soft)">${elems.join("\n")}</g>`,
+    defs: defs.join("\n"),
+    elements: elems.join("\n"),
   };
 }
 
