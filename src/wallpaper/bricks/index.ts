@@ -6,6 +6,7 @@ export { cityscapeBrick } from "./architecture.js";
 export { atmosphereBrick, blendLayerBrick, toneCurveBrick } from "./atmosphere.js";
 export { backgroundBrick } from "./background.js";
 export { solarCoronaBrick } from "./celestial.js";
+export { campfireFlameBrick, lavaRiverBrick, smokeRisingBrick } from "./fire.js";
 export { voronoiBrick } from "./geometry.js";
 export { linearGradientBrick, radialGradientBrick } from "./gradient.js";
 export {
@@ -28,6 +29,7 @@ export {
   waterReflectionBrick,
 } from "./landscape.js";
 export { nebulaDustBrick, noiseBrick, turbulenceBrick } from "./noise.js";
+export { jellyfishBrick, waterCurrentBrick } from "./ocean.js";
 export { particlesBrick, sparksBrick } from "./particles.js";
 export {
   arcBrick,

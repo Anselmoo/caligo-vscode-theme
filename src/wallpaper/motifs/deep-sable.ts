@@ -11,6 +11,7 @@ import {
   atmosphereBrick,
   backgroundBrick,
   cloudBandBrick,
+  jellyfishBrick,
   nebulaGlowBrick,
   noiseBrick,
   ringBrick,
@@ -19,6 +20,7 @@ import {
   starFieldBrick,
   terrainStackBrick,
   vignetteBrick,
+  waterCurrentBrick,
   waterReflectionBrick,
 } from "../bricks/index.js";
 import { mergeBricks } from "../composer.js";
@@ -54,37 +56,26 @@ function deepStillness(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  // Jellyfish glow clusters — large soft blobs at varying depths
-  const jellies = nebulaGlowBrick(p, {
+  // Anatomical jellyfish — dome + tentacles + bioluminescent rim glow
+  const jellies = jellyfishBrick(p, {
     id: "ds-s-jel",
-    blur: 0.04,
-    blobs: [
-      { cx: 0.3, cy: 0.25, rx: 0.05, ry: 0.07, color: colors.hueCyan, opacity: 0.5 },
-      { cx: 0.65, cy: 0.4, rx: 0.04, ry: 0.06, color: colors.hueCyan, opacity: 0.4 },
-      { cx: 0.15, cy: 0.55, rx: 0.03, ry: 0.05, color: colors.hueBlue, opacity: 0.35 },
-      { cx: 0.8, cy: 0.2, rx: 0.025, ry: 0.04, color: colors.hueCyan, opacity: 0.3 },
-      { cx: 0.45, cy: 0.65, rx: 0.035, ry: 0.05, color: colors.accent, opacity: 0.35 },
+    jellyfish: [
+      { cx: 0.3, cy: 0.25, r: 0.028, color: colors.hueCyan, opacity: 0.65 },
+      { cx: 0.65, cy: 0.4, r: 0.022, color: colors.hueCyan, opacity: 0.55 },
+      { cx: 0.15, cy: 0.55, r: 0.018, color: colors.hueBlue, opacity: 0.45 },
+      { cx: 0.8, cy: 0.2, r: 0.014, color: colors.hueCyan, opacity: 0.38 },
+      { cx: 0.45, cy: 0.65, r: 0.02, color: colors.accent, opacity: 0.45 },
     ],
   });
 
-  // Deep current bands
-  const current1 = cloudBandBrick(p, {
-    id: "ds-s-c1",
-    cy: 0.35,
-    bandHeight: 0.14,
+  // Deep pressure currents — turbulence-streamed flow, not flat horizontal bands
+  const currents = waterCurrentBrick(p, {
+    id: "ds-s-cu",
+    cy: 0.45,
+    zoneHeight: 0.6,
     color: colors.hueCyan,
     opacity: 0.18,
-    frequency: 0.005,
-    seed: 11,
-  });
-  const current2 = cloudBandBrick(p, {
-    id: "ds-s-c2",
-    cy: 0.6,
-    bandHeight: 0.12,
-    color: colors.hueBlue,
-    opacity: 0.14,
-    frequency: 0.007,
-    seed: 23,
+    layers: 2,
   });
 
   // Bioluminescent particles — sparse, scattered
@@ -132,8 +123,7 @@ function deepStillness(p: BrickParams): ComposedWallpaper {
   return mergeBricks([
     bg,
     abyss,
-    current1,
-    current2,
+    currents,
     jellies,
     jellyRing1,
     jellyRing2,
@@ -159,42 +149,14 @@ function deepDrift(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  // Pressure layers — multiple cloud bands across depth
-  const band1 = cloudBandBrick(p, {
-    id: "ds-d-b1",
-    cy: 0.2,
-    bandHeight: 0.15,
+  // Deep pressure currents — volumetric horizontal flow filling the water column
+  const currents = waterCurrentBrick(p, {
+    id: "ds-d-cu",
+    cy: 0.5,
+    zoneHeight: 0.9,
     color: colors.hueCyan,
-    opacity: 0.2,
-    frequency: 0.004,
-    seed: 5,
-  });
-  const band2 = cloudBandBrick(p, {
-    id: "ds-d-b2",
-    cy: 0.4,
-    bandHeight: 0.12,
-    color: colors.hueBlue,
     opacity: 0.22,
-    frequency: 0.006,
-    seed: 11,
-  });
-  const band3 = cloudBandBrick(p, {
-    id: "ds-d-b3",
-    cy: 0.6,
-    bandHeight: 0.14,
-    color: colors.hueCyan,
-    opacity: 0.17,
-    frequency: 0.005,
-    seed: 19,
-  });
-  const band4 = cloudBandBrick(p, {
-    id: "ds-d-b4",
-    cy: 0.8,
-    bandHeight: 0.1,
-    color: colors.hueBlue,
-    opacity: 0.14,
-    frequency: 0.007,
-    seed: 29,
+    layers: 4,
   });
 
   // Bioluminescent drift trail — glowing particles in current
@@ -229,19 +191,7 @@ function deepDrift(p: BrickParams): ComposedWallpaper {
 
   const vignette = vignetteBrick(p, { id: "ds-d-vig", opacity: 0.6 });
   const noise = noiseBrick(p, { id: "ds-d-n", opacity: 0.04 });
-  return mergeBricks([
-    bg,
-    waterGrad,
-    band1,
-    band2,
-    band3,
-    band4,
-    trail,
-    particles,
-    ridges,
-    vignette,
-    noise,
-  ]);
+  return mergeBricks([bg, waterGrad, currents, trail, particles, ridges, vignette, noise]);
 }
 
 /* ── Break: Surface burst — looking up at night sky from below ────────────── */

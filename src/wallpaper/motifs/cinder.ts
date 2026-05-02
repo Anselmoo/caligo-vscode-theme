@@ -10,11 +10,14 @@
 import {
   atmosphereBrick,
   backgroundBrick,
+  campfireFlameBrick,
   cloudBandBrick,
+  lavaRiverBrick,
   noiseBrick,
   particlesBrick,
   radialGradientBrick,
   skyGradientBrick,
+  smokeRisingBrick,
   sparksBrick,
   starFieldBrick,
   terrainBrick,
@@ -166,18 +169,7 @@ function cinderDrift(p: BrickParams): ComposedWallpaper {
     opacity: 0.45,
   });
 
-  // Volcanic terrain — steep, dark, with lava glow between layers
-  const lavaGlow = radialGradientBrick(p, {
-    id: "ci-d-lg",
-    cx: 0.4,
-    cy: 0.7,
-    r: 0.4,
-    stops: [
-      { offset: "0%", color: colors.hueOrange, opacity: 0.4 },
-      { offset: "100%", color: colors.bg, opacity: 0 },
-    ],
-  });
-
+  // Volcanic terrain — steep, dark layers
   const volcanicBack = terrainBrick(p, {
     id: "ci-d-vb",
     baseY: 0.5,
@@ -203,20 +195,28 @@ function cinderDrift(p: BrickParams): ComposedWallpaper {
     opacity: 0.95,
   });
 
-  // Smoke layers drifting over the lava
-  const smoke1 = cloudBandBrick(p, {
-    id: "ci-d-sm1",
-    cy: 0.55,
-    bandHeight: 0.12,
-    color: colors.bgMid,
-    opacity: 0.07,
+  // Sinuous lava rivers flowing down the volcanic slope
+  const lavaRiver = lavaRiverBrick(p, {
+    id: "ci-d-lv",
+    startY: 0.48,
+    endY: 0.78,
+    cx: 0.42,
+    spreadX: 0.55,
+    rivers: 4,
+    hotColor: "#ffdd44",
+    glowColor: "#ff4400",
+    opacity: 0.85,
   });
-  const smoke2 = cloudBandBrick(p, {
-    id: "ci-d-sm2",
-    cy: 0.68,
-    bandHeight: 0.08,
-    color: colors.bgSoft,
-    opacity: 0.07,
+
+  // Smoke rising from the hot lava channels
+  const smokePlume = smokeRisingBrick(p, {
+    id: "ci-d-sm",
+    sourceY: 0.58,
+    riseHeight: 0.52,
+    spreadX: 0.65,
+    color: colors.bgMid,
+    opacity: 0.12,
+    columns: 3,
   });
 
   const emberSparks = sparksBrick(p, {
@@ -236,11 +236,10 @@ function cinderDrift(p: BrickParams): ComposedWallpaper {
     bg,
     sky,
     stars,
-    lavaGlow,
     volcanicBack,
-    smoke1,
+    lavaRiver,
+    smokePlume,
     volcanicMid,
-    smoke2,
     volcanicFront,
     emberSparks,
     vignette,
@@ -404,14 +403,15 @@ function cinderVoid(p: BrickParams): ComposedWallpaper {
     opacity: 0.9,
   });
 
-  // Ash haze
-  const ashHaze = cloudBandBrick(p, {
+  // Ash rising from the burnt ground — diffuse, slow vertical columns
+  const ashHaze = smokeRisingBrick(p, {
     id: "ci-v-ah",
-    cy: 0.5,
-    bandHeight: 0.6,
-    color: colors.bgMid,
-    opacity: 0.08,
-    frequency: 0.004,
+    sourceY: 0.72,
+    riseHeight: 0.68,
+    spreadX: 1.0,
+    color: colors.bgSoft,
+    opacity: 0.06,
+    columns: 4,
   });
 
   // Drifting ash particles
@@ -458,17 +458,17 @@ function cinderPulse(p: BrickParams): ComposedWallpaper {
     opacity: 0.6,
   });
 
-  // Campfire radial warmth
-  const campfire = radialGradientBrick(p, {
+  // Campfire — anatomical flame tongues with bezier paths.
+  // Fire colors are physically constrained; override palette to keep them warm.
+  const campfire = campfireFlameBrick(p, {
     id: "ci-p-cf",
     cx: 0.5,
-    cy: 0.82,
-    r: 0.25,
-    stops: [
-      { offset: "0%", color: colors.hueOrange, opacity: 0.65 },
-      { offset: "40%", color: colors.hueRed, opacity: 0.2 },
-      { offset: "100%", color: colors.bg, opacity: 0 },
-    ],
+    baseY: 0.82,
+    flameHeight: 0.08,
+    baseWidth: 0.05,
+    hotColor: "#fff4a0",
+    warmColor: "#ff6a00",
+    opacity: 0.92,
   });
 
   // Warm lantern glows ascending
@@ -530,9 +530,9 @@ function cinderPulse(p: BrickParams): ComposedWallpaper {
     bg,
     sky,
     stars,
-    campfire,
     mountains,
     forest,
+    campfire,
     lanternElems,
     sparks,
     vignette,
