@@ -79,7 +79,6 @@ export function jellyfishBrick(params: BrickParams, options: JellyfishBrickOptio
   const scale = Math.max(width, height);
   const { jellyfish, id = "jf" } = options;
   const baseSeed = options.seed ?? hashStr(`${seedId}-${harmonyMode}-jellyfish`);
-  const rng = seedRng(baseSeed);
 
   const defs: string[] = [];
   const elems: string[] = [];
@@ -116,8 +115,6 @@ export function jellyfishBrick(params: BrickParams, options: JellyfishBrickOptio
     // The bell is a dome — flat bottom at py, curved top at py-bellRy
     const bx0 = px - bellRx;
     const bx1 = px + bellRx;
-    const topY = py - bellRy;
-
     // SVG arc path: M(left) A(rx,ry,rotation,large-arc,sweep,right) Z would close at same Y
     // We want open bottom: M(left,py) A(...top...) L(right,py)
     const domeD = `M ${fmt(bx0)},${fmt(py)} A ${fmt(bellRx)},${fmt(bellRy)} 0 0 1 ${fmt(bx1)},${fmt(py)}`;
@@ -247,7 +244,6 @@ export function waterCurrentBrick(
 
   const zoneTopPx = Math.max(0, cy - zoneHeight / 2) * height;
   const zoneBottomPx = Math.min(height, cy + zoneHeight / 2) * height;
-  const zoneHPx = zoneBottomPx - zoneTopPx;
   const pct = (y: number) => `${((y / height) * 100).toFixed(2)}%`;
 
   for (let li = 0; li < layers; li++) {
@@ -268,7 +264,6 @@ export function waterCurrentBrick(
 
     const lgId = `${id}-lg${li}`;
     const fId = `${id}-f${li}`;
-    const dispSeedId = `${id}-ds${li}`;
 
     defs.push(
       `<linearGradient id="${lgId}" x1="0" y1="0" x2="0" y2="1">
