@@ -242,8 +242,6 @@ export function waterCurrentBrick(
   const defs: string[] = [];
   const elems: string[] = [];
 
-  const zoneTopPx = Math.max(0, cy - zoneHeight / 2) * height;
-  const zoneBottomPx = Math.min(height, cy + zoneHeight / 2) * height;
   const pct = (y: number) => `${((y / height) * 100).toFixed(2)}%`;
 
   for (let li = 0; li < layers; li++) {
