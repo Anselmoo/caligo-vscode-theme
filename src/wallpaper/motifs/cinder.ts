@@ -8,14 +8,14 @@
  * Pulse     : Campfire — warm lanterns and sparks ascending over mountain camp
  */
 import {
-  atmosphereBrick,
   backgroundBrick,
   campfireFlameBrick,
   cloudBandBrick,
   lavaRiverBrick,
+  lightningBrick,
   noiseBrick,
   particlesBrick,
-  radialGradientBrick,
+  ridgeHighlightBrick,
   skyGradientBrick,
   smokeRisingBrick,
   sparksBrick,
@@ -66,20 +66,7 @@ function cinderStillness(p: BrickParams): ComposedWallpaper {
     opacity: 0.7,
   });
 
-  // Warm ground glow from embers
-  const fireGlow = radialGradientBrick(p, {
-    id: "ci-s-fg",
-    cx: 0.5,
-    cy: 0.88,
-    r: 0.35,
-    stops: [
-      { offset: "0%", color: colors.hueOrange, opacity: 0.5 },
-      { offset: "50%", color: colors.hueRed, opacity: 0.15 },
-      { offset: "100%", color: colors.bg, opacity: 0 },
-    ],
-  });
-
-  // Treeline silhouette (jagged for tree tops)
+  // Treeline silhouette — rough terrain backing + pine shapes on top
   const treeline = terrainBrick(p, {
     id: "ci-s-tr",
     baseY: 0.68,
@@ -88,27 +75,6 @@ function cinderStillness(p: BrickParams): ComposedWallpaper {
     color: colors.bgMid,
     opacity: 0.9,
   });
-  const ground = terrainBrick(p, {
-    id: "ci-s-gr",
-    baseY: 0.82,
-    roughness: 0.03,
-    points: 16,
-    color: colors.bg,
-    opacity: 0.95,
-  });
-
-  // Rising sparks
-  const sparks = sparksBrick(p, {
-    id: "ci-s-sp",
-    count: 35,
-    color: colors.hueYellow,
-    opacity: 0.7,
-    direction: 1,
-    sourceCx: 0.5,
-    sourceSpread: 0.2,
-  });
-
-  // Pine treeline silhouette over rough terrain
   const pines = treelineBrick(p, {
     id: "ci-s-tl",
     baseY: 0.68,
@@ -118,14 +84,82 @@ function cinderStillness(p: BrickParams): ComposedWallpaper {
     maxHeight: 0.1,
   });
 
-  const smokeHaze = atmosphereBrick(p, {
-    id: "ci-s-ah",
+  // Ember glow catching the ridge tops — fire light from below illuminates the treeline
+  const ridgeGlow = ridgeHighlightBrick(p, {
+    id: "ci-s-rg",
+    baseY: 0.68,
+    roughness: 0.12,
+    points: 40,
+    color: "#ff6a00",
+    opacity: 0.18,
+    glowPx: 28,
+    seedSuffix: "ci-s-tr",
+  });
+
+  // Scattered ember fires smouldering in the treeline — 3 independent flame clusters
+  const ember1 = campfireFlameBrick(p, {
+    id: "ci-s-e1",
+    cx: 0.28,
+    baseY: 0.69,
+    flameHeight: 0.035,
+    baseWidth: 0.022,
+    hotColor: "#fff4a0",
+    warmColor: "#ff6a00",
+    opacity: 0.75,
+    seed: 11,
+  });
+  const ember2 = campfireFlameBrick(p, {
+    id: "ci-s-e2",
+    cx: 0.52,
+    baseY: 0.68,
+    flameHeight: 0.045,
+    baseWidth: 0.028,
+    hotColor: "#fff4a0",
+    warmColor: "#ff5500",
+    opacity: 0.8,
+    seed: 37,
+  });
+  const ember3 = campfireFlameBrick(p, {
+    id: "ci-s-e3",
+    cx: 0.74,
+    baseY: 0.7,
+    flameHeight: 0.03,
+    baseWidth: 0.018,
+    hotColor: "#fff4a0",
+    warmColor: "#ff6a00",
+    opacity: 0.65,
+    seed: 59,
+  });
+
+  // Smoke drifting from the smouldering treeline
+  const emberSmoke = smokeRisingBrick(p, {
+    id: "ci-s-sm",
+    sourceY: 0.67,
+    riseHeight: 0.55,
+    spreadX: 0.8,
     color: colors.bgMid,
-    highlightColor: colors.hueOrange,
-    opacity: 0.07,
-    lightAzimuth: 200,
-    lightElevation: 25,
-    seed: 5,
+    opacity: 0.08,
+    columns: 3,
+  });
+
+  const ground = terrainBrick(p, {
+    id: "ci-s-gr",
+    baseY: 0.82,
+    roughness: 0.03,
+    points: 16,
+    color: colors.bg,
+    opacity: 0.95,
+  });
+
+  // Rising sparks from the embers
+  const sparks = sparksBrick(p, {
+    id: "ci-s-sp",
+    count: 35,
+    color: "#ff9944",
+    opacity: 0.7,
+    direction: 1,
+    sourceCx: 0.5,
+    sourceSpread: 0.35,
   });
 
   const vignette = vignetteBrick(p, { id: "ci-s-vig", opacity: 0.55 });
@@ -135,11 +169,14 @@ function cinderStillness(p: BrickParams): ComposedWallpaper {
     bg,
     sky,
     stars,
-    fireGlow,
     treeline,
+    ridgeGlow,
+    ember1,
+    ember2,
+    ember3,
     pines,
     ground,
-    smokeHaze,
+    emberSmoke,
     sparks,
     vignette,
     noise,
@@ -249,11 +286,7 @@ function cinderDrift(p: BrickParams): ComposedWallpaper {
 
 /* ── Break: Fire ridge — lightning over burning mountain ridge ─────────────── */
 function cinderBreak(p: BrickParams): ComposedWallpaper {
-  const {
-    colors,
-    viewBox: { width, height },
-  } = p;
-  const scale = Math.max(width, height);
+  const { colors } = p;
 
   const bg = backgroundBrick(p);
   const sky = skyGradientBrick(p, {
@@ -265,34 +298,38 @@ function cinderBreak(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  // Storm cloud layer
+  const stars = starFieldBrick(p, {
+    id: "ci-b-st",
+    count: 40,
+    brightCount: 1,
+    distribution: "upper",
+    opacity: 0.3,
+  });
+
+  // Storm clouds — turbulent pressure bands at upper sky
   const clouds = cloudBandBrick(p, {
     id: "ci-b-cl",
     cy: 0.25,
-    bandHeight: 0.12,
+    bandHeight: 0.18,
     color: colors.bgMid,
-    opacity: 0.06,
+    opacity: 0.08,
     frequency: 0.006,
   });
 
-  // Lightning bolt with glow
-  const boltGlow = radialGradientBrick(p, {
-    id: "ci-b-bg",
-    cx: 0.5,
-    cy: 0.3,
-    r: 0.35,
-    stops: [
-      { offset: "0%", color: colors.hueYellow, opacity: 0.3 },
-      { offset: "100%", color: colors.bg, opacity: 0 },
-    ],
+  // Fractal lightning bolt — midpoint-displacement zigzag, not a straight line.
+  // Has built-in sky flash, branch forks, multi-layer glow, and ground strike.
+  const bolt = lightningBrick(p, {
+    id: "ci-b-bolt",
+    startX: 0.52,
+    startY: 0.04,
+    endX: 0.46,
+    endY: 0.54,
+    color: "#c8e0ff",
+    opacity: 0.92,
+    branches: 4,
   });
-  const bolt = {
-    defs: `<filter id="ci-b-bf" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="${(scale * 0.004).toFixed(0)}"/></filter>`,
-    elements: `<line x1="${(width * 0.48).toFixed(0)}" y1="${(height * 0.05).toFixed(0)}" x2="${(width * 0.52).toFixed(0)}" y2="${(height * 0.55).toFixed(0)}" stroke="${colors.hueYellow}" stroke-width="${(scale * 0.003).toFixed(1)}" opacity="0.85"/>
-<line x1="${(width * 0.48).toFixed(0)}" y1="${(height * 0.05).toFixed(0)}" x2="${(width * 0.52).toFixed(0)}" y2="${(height * 0.55).toFixed(0)}" stroke="${colors.accent}" stroke-width="${(scale * 0.01).toFixed(1)}" opacity="0.2" filter="url(#ci-b-bf)"/>`,
-  };
 
-  // Burning mountain ridge
+  // Burning mountain ridge — fire-lit layers
   const ridge = terrainContourBrick(p, {
     id: "ci-b-rd",
     horizonY: 0.52,
@@ -303,30 +340,34 @@ function cinderBreak(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  // Fire glow behind the ridge
-  const fireGlow = radialGradientBrick(p, {
-    id: "ci-b-fr",
+  // Forest fire burning along the ridgeline — wide low flames visible above the ridge
+  const forestFire = campfireFlameBrick(p, {
+    id: "ci-b-ff",
     cx: 0.5,
-    cy: 0.62,
-    r: 0.35,
-    stops: [
-      { offset: "0%", color: colors.hueOrange, opacity: 0.35 },
-      { offset: "100%", color: colors.bg, opacity: 0 },
-    ],
+    baseY: 0.52,
+    flameHeight: 0.06,
+    baseWidth: 0.55,
+    hotColor: "#fff4a0",
+    warmColor: "#ff4400",
+    opacity: 0.55,
+    seed: 77,
   });
 
-  const stars = starFieldBrick(p, {
-    id: "ci-b-st",
-    count: 40,
-    brightCount: 1,
-    distribution: "upper",
-    opacity: 0.3,
+  // Smoke column billowing up from the burning ridge
+  const fireSmoke = smokeRisingBrick(p, {
+    id: "ci-b-sm",
+    sourceY: 0.5,
+    riseHeight: 0.45,
+    spreadX: 0.7,
+    color: colors.bgMid,
+    opacity: 0.14,
+    columns: 3,
   });
 
   const fireSparks = sparksBrick(p, {
     id: "ci-b-fs",
     count: 30,
-    color: colors.hueYellow,
+    color: "#ff9944",
     opacity: 0.5,
     direction: 1,
     sourceCx: 0.5,
@@ -341,9 +382,9 @@ function cinderBreak(p: BrickParams): ComposedWallpaper {
     sky,
     stars,
     clouds,
-    boltGlow,
     bolt,
-    fireGlow,
+    forestFire,
+    fireSmoke,
     ridge,
     fireSparks,
     vignette,
@@ -373,16 +414,17 @@ function cinderVoid(p: BrickParams): ComposedWallpaper {
     opacity: 0.25,
   });
 
-  // Last ember glow
-  const glow = radialGradientBrick(p, {
+  // Last dying ember — a tiny almost-extinguished campfire, barely alive
+  const glow = campfireFlameBrick(p, {
     id: "ci-v-g",
     cx: 0.5,
-    cy: 0.72,
-    r: 0.2,
-    stops: [
-      { offset: "0%", color: colors.hueOrange, opacity: 0.4 },
-      { offset: "100%", color: colors.bg, opacity: 0 },
-    ],
+    baseY: 0.72,
+    flameHeight: 0.018,
+    baseWidth: 0.016,
+    hotColor: "#fff4a0",
+    warmColor: "#ff4400",
+    opacity: 0.38,
+    seed: 91,
   });
 
   // Desolate burnt landscape
