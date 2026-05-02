@@ -124,27 +124,36 @@ function roughifyTerrainPath(d: string, seed: number, roughness: number): string
 }
 
 /**
- * Spatially-coherent fractal terrain noise using simplex-noise.
+ * Domain-warped fractal terrain noise using simplex-noise.
  * Returns `count` Y-offsets for evenly-spaced X positions in [0, width].
- * Uses 6-octave fBm: macro shape → secondary ridges → detail → high-freq micro crag.
- * Lacunarity 2.1, gain 0.52 — slightly more persistent than standard to preserve
- * mid-frequency ridge detail that makes mountains look convincing.
+ *
+ * Domain warping: before sampling the main fBm, the horizontal coordinate t
+ * is displaced by a second independent noise field at lower frequency. This
+ * prevents the characteristic regular periodicity of bare fBm that looks like
+ * a sine wave — warped noise produces asymmetric peaks and irregular valleys
+ * that read as real mountain silhouettes.
+ *
+ * Lacunarity 2.2, gain 0.54 — persistent mid-freq detail for convincing ridges.
  */
 function terrainNoise(rng: () => number, count: number, amp: number): number[] {
   const noise2D = createNoise2D(rng);
+  const warpNoise = createNoise2D(rng); // independent seed from next rng values
   const values: number[] = [];
   for (let i = 0; i < count; i++) {
     const t = i / Math.max(1, count - 1);
-    // 4-octave fBm — octaves 5-6 alias above Nyquist at typical control-point
-    // densities and produce zig-zag artefacts; roughjs handles micro-detail instead.
+    // Two-scale domain warp: large-scale warp (0.7×) + medium-scale warp (2.0×)
+    // distorts the sampling coordinate so noise never repeats at regular intervals
+    const warp = warpNoise(t * 0.7, 53.1) * 0.42 + warpNoise(t * 2.0, 91.4) * 0.16;
+    const wt = t + warp;
+    // 4-octave fBm on warped coordinates
     let n = 0;
-    let freq = 1.8;
-    let weight = 0.5;
+    let freq = 2.0;
+    let weight = 0.48;
     let yOff = 0;
     for (let oct = 0; oct < 4; oct++) {
-      n += noise2D(t * freq, yOff) * weight;
-      freq *= 2.1;
-      weight *= 0.52;
+      n += noise2D(wt * freq, yOff) * weight;
+      freq *= 2.2;
+      weight *= 0.54;
       yOff += 3.7;
     }
     values.push(n * amp);
@@ -614,17 +623,21 @@ export interface AuroraAdvancedBrickOptions {
 /**
  * Photorealistic aurora curtain — a full composition of:
  * - Ambient radial glow spanning the aurora zone
- * - 2–4 overlapping curtain layers, each built from:
- *   · anisotropic feTurbulence (high X-freq → thin vertical columns, low Y-freq → tall rays)
- *   · feColorMatrix threshold → discrete column boundaries
- *   · anisotropic feGaussianBlur (tight H, wide V) → each column becomes a tall light ray
- *   · feComposite reveals a vertical color gradient (red/magenta top → green lower) through column mask
- *   · feDisplacementMap adds large-scale curtain fold undulation
- * - Fine shimmer overlay (higher-frequency second turbulence pass)
- * - Base contact glow (lower aurora edge is densest and brightest)
+ * - 2–4 overlapping curtain layers, each rendered as a FULL-CANVAS rect with
+ *   userSpaceOnUse gradient so visibility is controlled purely by gradient stops
+ *   (eliminates hard rect-boundary edges):
+ *   · anisotropic feTurbulence (high X / low Y) → thin vertical column structure
+ *   · feColorMatrix threshold → discrete column alpha
+ *   · anisotropic feGaussianBlur (tight H, wide V) → each column = tall light ray
+ *   · feComposite reveals gradient through column mask
+ *   · feDisplacementMap → large-scale curtain fold
+ *   · horizontal patch modulation (second low-X turbulence) → brightness variation
+ *     across the aurora width for a 3D volumetric depth impression
+ * - Fine shimmer (higher-frequency third pass)
+ * - Diffuse base contact glow (radial, not a rect band)
  *
- * Replaces the previous horizontal bezier-path approach, which produced visible
- * sine-wave or mountain-ridge artifacts at low band counts.
+ * Each layer uses progressively narrower vertical blur to create a parallax depth
+ * cue: hero curtain appears closest (tallest rays), background curtains are farther.
  */
 export function auroraAdvancedBrick(
   params: BrickParams,
@@ -646,37 +659,68 @@ export function auroraAdvancedBrick(
   const rng = seedRng(hashStr(`${seedId}-${harmonyMode}-aurora`));
   const c2 = color2 ?? color;
 
-  // Aurora zone in absolute pixel coordinates
-  const zoneTop = Math.max(0, cy - zoneHeight / 2) * height;
-  const zoneH = zoneHeight * height;
-  const zoneCy = cy * height;
+  // Aurora zone in canvas-space pixels (for userSpaceOnUse gradients)
+  const zoneTopPx = Math.max(0, cy - zoneHeight / 2) * height;
+  const zoneBottomPx = Math.min(height, cy + zoneHeight / 2) * height;
+  const zoneHPx = zoneBottomPx - zoneTopPx;
+  const zoneCyPx = cy * height;
 
   const defs: string[] = [];
   const elems: string[] = [];
 
   // ── 1. Ambient background glow ────────────────────────────────────────────
-  // Large soft radial glow at aurora zone center — diffuse sky luminosity before
-  // the structured curtain rays resolve.
   const glowId = `${id}-glow`;
   defs.push(
-    `<radialGradient id="${glowId}" cx="${(width * 0.5).toFixed(0)}" cy="${zoneCy.toFixed(0)}" r="${(scale * 0.55).toFixed(0)}" gradientUnits="userSpaceOnUse">
-  <stop offset="0%" stop-color="${color}" stop-opacity="${(opacity * 0.24).toFixed(2)}"/>
-  <stop offset="42%" stop-color="${color}" stop-opacity="${(opacity * 0.06).toFixed(2)}"/>
+    `<radialGradient id="${glowId}" cx="${(width * 0.5).toFixed(0)}" cy="${zoneCyPx.toFixed(0)}" r="${(scale * 0.55).toFixed(0)}" gradientUnits="userSpaceOnUse">
+  <stop offset="0%" stop-color="${color}" stop-opacity="${(opacity * 0.22).toFixed(2)}"/>
+  <stop offset="45%" stop-color="${color}" stop-opacity="${(opacity * 0.05).toFixed(2)}"/>
   <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
 </radialGradient>`
   );
   elems.push(`<rect width="${width}" height="${height}" fill="url(#${glowId})"/>`);
 
-  // ── 2. Curtain layers ─────────────────────────────────────────────────────
-  // Each curtain layer uses SVG-native feTurbulence with strongly anisotropic
-  // frequency: baseFrequency="X Y" where X >> Y.
-  //   · High X frequency → many thin vertical columns across the canvas
-  //   · Very low Y frequency → column brightness is consistent top-to-bottom (tall)
-  // feColorMatrix amplifies and thresholds the turbulence R-channel into column alpha.
-  // Anisotropic feGaussianBlur: tight horizontal (column boundaries stay crisp),
-  // wide vertical (each column blooms into a tall light ray).
-  // feComposite reveals the vertical gradient through the column mask.
-  // feDisplacementMap adds large-scale lateral fold (the "curtain" sway).
+  // ── 2. Background diffuse aurora ─────────────────────────────────────────
+  // Represents distant aurora behind the main active curtains — soft wide
+  // columns with heavy blur. Creates the sense of depth: there is MORE aurora
+  // behind the sharp foreground curtain. Wider column freq (0.007) + strong
+  // vertical blur = the "sky glow" of a distant aurora field.
+  const bgdSeed = Math.floor(rng() * 89) + 1;
+  const bgdId = `${id}-bgd`;
+  const bgdGId = `${id}-bgdg`;
+  const bpp = (y: number) => `${((y / height) * 100).toFixed(2)}%`;
+  defs.push(
+    `<linearGradient id="${bgdGId}" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0%" stop-color="${c2}" stop-opacity="0"/>
+  <stop offset="${bpp(zoneTopPx)}" stop-color="${c2}" stop-opacity="0"/>
+  <stop offset="${bpp(zoneTopPx + zoneHPx * 0.12)}" stop-color="${c2}" stop-opacity="${(opacity * 0.28).toFixed(2)}"/>
+  <stop offset="${bpp(zoneTopPx + zoneHPx * 0.58)}" stop-color="${color}" stop-opacity="${(opacity * 0.2).toFixed(2)}"/>
+  <stop offset="${bpp(Math.min(height, zoneBottomPx + zoneHPx * 0.45))}" stop-color="${color}" stop-opacity="0"/>
+  <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+</linearGradient>
+<filter id="${bgdId}" x="-10%" y="0%" width="120%" height="100%" color-interpolation-filters="linearRGB">
+  <feTurbulence type="fractalNoise" baseFrequency="0.0065 0.0007" numOctaves="4" seed="${bgdSeed}" result="bgc"/>
+  <feColorMatrix in="bgc" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  5.5 0 0 0 -2.8" result="bgMask"/>
+  <feGaussianBlur in="bgMask" stdDeviation="${(scale * 0.006).toFixed(1)} ${(scale * 0.045).toFixed(1)}" result="bgSoft"/>
+  <feComposite in="SourceGraphic" in2="bgSoft" operator="in"/>
+</filter>`
+  );
+  elems.push(
+    `<rect width="${width}" height="${height}" fill="url(#${bgdGId})" filter="url(#${bgdId})"/>`
+  );
+
+  // ── 3. Curtain layers ─────────────────────────────────────────────────────
+  // Critical: all rects span the FULL canvas height. Visibility is driven
+  // entirely by linearGradient stops as percentages — no hard rect boundary.
+  //
+  // 3D depth stack:
+  //   · Background diffuse (above): far aurora, softly glowing, no fold detail
+  //   · Hero curtain (ci=0): tallest rays, strongest displacement, fold shading
+  //   · Subsequent curtains: shorter rays (farther = smaller apparent height),
+  //     less sway, different color — creates parallax depth impression
+  //
+  // Fold brightness shading (key 3D cue): feBlend(multiply) of each curtain
+  // against a slowly-varying horizontal grayscale (0.36–0.88) — lit folds
+  // face the viewer, shadowed folds face away. feComposite(in) restores alpha.
 
   const curtainCount = Math.min(4, Math.max(2, Math.round(bandCount * 0.75)));
 
@@ -685,79 +729,113 @@ export function auroraAdvancedBrick(
     const curtainColor = ci % 2 === 0 ? color : c2;
     const curtainOpacity = opacity * (isHero ? 1.0 : 0.38 + rng() * 0.38);
 
-    // Slight vertical offset per layer — depth layering of overlapping curtains
-    const yOff = (rng() - 0.5) * zoneH * 0.28;
-    const ctTop = zoneTop + yOff;
-    const ctH = zoneH * (0.72 + rng() * 0.48);
-
     const seed1 = Math.floor(rng() * 89) + 1;
     const seed2 = Math.floor(rng() * 89) + 1;
+    const seed3 = Math.floor(rng() * 89) + 1;
+    const seed4 = Math.floor(rng() * 89) + 1;
 
-    // Anisotropic column frequencies — vary slightly between curtain layers
-    const colFreqX = (0.026 + rng() * 0.026).toFixed(4);
-    const colFreqY = (0.0016 + rng() * 0.0014).toFixed(4);
+    // Column frequency — wider columns = clearly visible ray structure at all scales
+    const colFreqX = (0.018 + rng() * 0.012).toFixed(4);
+    const colFreqY = (0.0012 + rng() * 0.001).toFixed(4);
 
-    // Blur: tight horizontal preserves column structure; wide vertical creates tall rays
-    const hBlur = (scale * 0.0008 + rng() * scale * 0.0005).toFixed(1);
-    const vBlur = (scale * 0.016 + rng() * scale * 0.012).toFixed(1);
+    // Depth factor: hero is 1.0, subsequent layers get progressively less blur
+    const depthFactor = 1.0 / (1 + ci * 0.32);
+    // hBlur: 4-8px at 1600 — visible column edges, not hairline or smeared
+    const hBlur = (scale * (0.0025 + rng() * 0.0015)).toFixed(1);
+    const vBlur = (scale * (0.02 + rng() * 0.012) * depthFactor).toFixed(1);
 
-    // Lateral displacement — how much curtain sways at large scale (curtain fold)
-    const dispScale = (scale * (0.036 + rng() * 0.04)).toFixed(0);
+    // Fold displacement — closer curtains sway more
+    const dispScale = (scale * (0.035 + rng() * 0.03) * (0.7 + depthFactor * 0.3)).toFixed(0);
 
-    // Column contrast boost: A = boost*R + bias → threshold point at R = -bias/boost
-    const boost = (4.0 + rng() * 2.8).toFixed(1);
-    const bias = (-(Number(boost) * (0.3 + rng() * 0.12))).toFixed(2);
+    // Large-scale sway frequency for second displacement pass
+    const hPatchFreq = (0.003 + rng() * 0.003).toFixed(4);
+
+    // High threshold: only top ~20% of noise values form ray columns
+    const boost = (10.0 + rng() * 4.0).toFixed(1);
+    const bias = (-(Number(boost) * (0.78 + rng() * 0.04))).toFixed(2);
+
+    // Fold brightness: horizontal light/shadow bands — each layer gets different
+    // fold scale (0.004-0.007 X freq → 2-4 fold sections across aurora width)
+    const foldFreqX = (0.004 + rng() * 0.003).toFixed(4);
+    const foldBlurX = (scale * (0.025 + rng() * 0.015)).toFixed(1);
 
     const cfId = `${id}-cf${ci}`;
     const cgId = `${id}-cg${ci}`;
 
-    // Vertical color gradient: red/magenta upper magnetic altitude, green lower
-    // emission altitude — mirrors real aurora spectral physics (N₂ red, O green).
+    // Gradient spans full canvas height — stops as percentages so visibility is
+    // driven purely by gradient, not rect boundaries. Extended lower fade zone
+    // (50% of zoneHeight past the bottom) prevents any hard horizontal edge.
+    const p = (y: number) => `${((y / height) * 100).toFixed(2)}%`;
+    const fadeInPct = p(zoneTopPx);
+    const peakPct = p(zoneTopPx + zoneHPx * 0.08);
+    const greenPct = p(zoneTopPx + zoneHPx * 0.35);
+    const fadeOutStartPct = p(zoneBottomPx - zoneHPx * 0.08);
+    const fadeOutEndPct = p(Math.min(height, zoneBottomPx + zoneHPx * 0.55));
     const topColor = isHero ? "#ff4848" : c2;
     defs.push(
       `<linearGradient id="${cgId}" x1="0" y1="0" x2="0" y2="1">
   <stop offset="0%" stop-color="${topColor}" stop-opacity="0"/>
-  <stop offset="10%" stop-color="${topColor}" stop-opacity="${(curtainOpacity * 0.42).toFixed(2)}"/>
-  <stop offset="28%" stop-color="${curtainColor}" stop-opacity="${(curtainOpacity * 0.92).toFixed(2)}"/>
-  <stop offset="60%" stop-color="${curtainColor}" stop-opacity="${(curtainOpacity * 0.8).toFixed(2)}"/>
-  <stop offset="84%" stop-color="${curtainColor}" stop-opacity="${(curtainOpacity * 0.24).toFixed(2)}"/>
+  <stop offset="${fadeInPct}" stop-color="${topColor}" stop-opacity="0"/>
+  <stop offset="${peakPct}" stop-color="${topColor}" stop-opacity="${(curtainOpacity * 0.45).toFixed(2)}"/>
+  <stop offset="${greenPct}" stop-color="${curtainColor}" stop-opacity="${(curtainOpacity * 0.92).toFixed(2)}"/>
+  <stop offset="${fadeOutStartPct}" stop-color="${curtainColor}" stop-opacity="${(curtainOpacity * 0.55).toFixed(2)}"/>
+  <stop offset="${fadeOutEndPct}" stop-color="${curtainColor}" stop-opacity="0"/>
   <stop offset="100%" stop-color="${curtainColor}" stop-opacity="0"/>
 </linearGradient>`
     );
 
+    // Filter chain (7 stages for 3D depth):
+    //  1. Column mask: anisotropic turbulence → threshold → blur → alpha columns
+    //  2. Reveal gradient through column mask (SourceGraphic = gradient rect)
+    //  3. FOLD BRIGHTNESS: horizontal low-freq noise → grayscale 0.36-0.88
+    //     → feBlend multiply darkens shadow-facing folds, brightens lit folds
+    //     → feComposite "in" restores original column alpha (no color leak)
+    //  4. Fine displacement: mid-freq flow turbulence → curtain sway detail
+    //  5. Coarse sway: large-scale slow undulation for broad curtain depth
     defs.push(
-      `<filter id="${cfId}" x="-15%" y="-150%" width="130%" height="400%" color-interpolation-filters="linearRGB">
+      `<filter id="${cfId}" x="-20%" y="0%" width="140%" height="100%" color-interpolation-filters="linearRGB">
   <feTurbulence type="fractalNoise" baseFrequency="${colFreqX} ${colFreqY}" numOctaves="5" seed="${seed1}" result="cols"/>
   <feColorMatrix in="cols" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  ${boost} 0 0 0 ${bias}" result="colMask"/>
   <feGaussianBlur in="colMask" stdDeviation="${hBlur} ${vBlur}" result="softCols"/>
   <feComposite in="SourceGraphic" in2="softCols" operator="in" result="curtain"/>
-  <feTurbulence type="fractalNoise" baseFrequency="0.007 0.001" numOctaves="2" seed="${seed2}" result="flow"/>
-  <feDisplacementMap in="curtain" in2="flow" scale="${dispScale}" xChannelSelector="R" yChannelSelector="G"/>
+  <feTurbulence type="fractalNoise" baseFrequency="${foldFreqX} 0.00003" numOctaves="2" seed="${seed4}" result="foldNoise"/>
+  <feColorMatrix in="foldNoise" type="matrix" values="0.52 0 0 0 0.36  0.52 0 0 0 0.36  0.52 0 0 0 0.36  0 0 0 1 0" result="foldGray"/>
+  <feGaussianBlur in="foldGray" stdDeviation="${foldBlurX} 0" result="softFold"/>
+  <feBlend in="curtain" in2="softFold" mode="multiply" result="shadedCurtain"/>
+  <feComposite in="shadedCurtain" in2="curtain" operator="in" result="foldedCurtain"/>
+  <feTurbulence type="fractalNoise" baseFrequency="0.006 0.0008" numOctaves="3" seed="${seed2}" result="flow"/>
+  <feDisplacementMap in="foldedCurtain" in2="flow" scale="${dispScale}" xChannelSelector="R" yChannelSelector="G" result="swayedCurtain"/>
+  <feTurbulence type="fractalNoise" baseFrequency="${hPatchFreq} 0.0003" numOctaves="2" seed="${seed3}" result="sway"/>
+  <feDisplacementMap in="swayedCurtain" in2="sway" scale="${(Number(dispScale) * 0.55).toFixed(0)}" xChannelSelector="G" yChannelSelector="R"/>
 </filter>`
     );
 
+    // Full-canvas rect — gradient stops control all visibility, no hard edge
     elems.push(
-      `<rect x="0" y="${ctTop.toFixed(0)}" width="${width}" height="${ctH.toFixed(0)}" fill="url(#${cgId})" filter="url(#${cfId})"/>`
+      `<rect width="${width}" height="${height}" fill="url(#${cgId})" filter="url(#${cfId})"/>`
     );
   }
 
   // ── 3. Fine shimmer ───────────────────────────────────────────────────────
-  // Higher-frequency second turbulence pass at low opacity — the thin bright
-  // needles of individual aurora ray segments visible at full resolution.
+  // Higher-frequency pass — thin bright needle rays at full 4K resolution.
+  // Also uses userSpaceOnUse with extended fade zone.
   const shimSeed = Math.floor(rng() * 89) + 1;
   const shimH = (scale * 0.0004).toFixed(1);
-  const shimV = (scale * 0.007).toFixed(1);
+  const shimV = (scale * 0.006).toFixed(1);
   const shimId = `${id}-shim`;
   const shimGId = `${id}-sg`;
+  const sp = (y: number) => `${((y / height) * 100).toFixed(2)}%`;
 
   defs.push(
     `<linearGradient id="${shimGId}" x1="0" y1="0" x2="0" y2="1">
   <stop offset="0%" stop-color="${color}" stop-opacity="0"/>
-  <stop offset="20%" stop-color="${color}" stop-opacity="${(opacity * 0.26).toFixed(2)}"/>
-  <stop offset="65%" stop-color="${color}" stop-opacity="${(opacity * 0.16).toFixed(2)}"/>
+  <stop offset="${sp(zoneTopPx)}" stop-color="${color}" stop-opacity="0"/>
+  <stop offset="${sp(zoneTopPx + zoneHPx * 0.12)}" stop-color="${color}" stop-opacity="${(opacity * 0.24).toFixed(2)}"/>
+  <stop offset="${sp(zoneTopPx + zoneHPx * 0.55)}" stop-color="${color}" stop-opacity="${(opacity * 0.14).toFixed(2)}"/>
+  <stop offset="${sp(Math.min(height, zoneBottomPx + zoneHPx * 0.4))}" stop-color="${color}" stop-opacity="0"/>
   <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
 </linearGradient>
-<filter id="${shimId}" x="-5%" y="-200%" width="110%" height="500%" color-interpolation-filters="linearRGB">
+<filter id="${shimId}" x="-5%" y="0%" width="110%" height="100%" color-interpolation-filters="linearRGB">
   <feTurbulence type="fractalNoise" baseFrequency="0.072 0.003" numOctaves="3" seed="${shimSeed}" result="shim"/>
   <feColorMatrix in="shim" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  7 0 0 0 -4.5" result="shimMask"/>
   <feGaussianBlur in="shimMask" stdDeviation="${shimH} ${shimV}" result="softShim"/>
@@ -765,30 +843,25 @@ export function auroraAdvancedBrick(
 </filter>`
   );
   elems.push(
-    `<rect x="0" y="${zoneTop.toFixed(0)}" width="${width}" height="${zoneH.toFixed(0)}" fill="url(#${shimGId})" filter="url(#${shimId})"/>`
+    `<rect width="${width}" height="${height}" fill="url(#${shimGId})" filter="url(#${shimId})"/>`
   );
 
   // ── 4. Base contact glow ──────────────────────────────────────────────────
-  // The lower edge of the curtain is densest and brightest — magnetic field lines
-  // converge at lower altitudes, exciting more atmospheric particles per volume.
-  const baseY = zoneTop + zoneH * 0.6;
-  const baseH = zoneH * 0.24;
-  const baseFId = `${id}-bf`;
-  const baseGId = `${id}-bg`;
-
+  // Radial gradient (not a rect band) centered at the lower aurora zone —
+  // where field lines converge most densely. Dissolves naturally in all directions.
+  const baseGlowId = `${id}-bg`;
+  const baseCx = width * 0.5;
+  const baseCy = zoneTopPx + zoneHPx * 0.68;
+  const baseRx = scale * 0.45;
+  const baseRy = zoneHPx * 0.38;
   defs.push(
-    `<filter id="${baseFId}" x="-5%" y="-300%" width="110%" height="700%">
-  <feGaussianBlur stdDeviation="${(scale * 0.003).toFixed(0)} ${(scale * 0.0015).toFixed(0)}"/>
-</filter>
-<linearGradient id="${baseGId}" x1="0" y1="0" x2="0" y2="1">
-  <stop offset="0%" stop-color="${color}" stop-opacity="${(opacity * 0.62).toFixed(2)}"/>
-  <stop offset="48%" stop-color="${color}" stop-opacity="${(opacity * 0.48).toFixed(2)}"/>
+    `<radialGradient id="${baseGlowId}" cx="${baseCx.toFixed(0)}" cy="${baseCy.toFixed(0)}" rx="${baseRx.toFixed(0)}" ry="${baseRy.toFixed(0)}" gradientUnits="userSpaceOnUse">
+  <stop offset="0%" stop-color="${color}" stop-opacity="${(opacity * 0.55).toFixed(2)}"/>
+  <stop offset="40%" stop-color="${color}" stop-opacity="${(opacity * 0.28).toFixed(2)}"/>
   <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
-</linearGradient>`
+</radialGradient>`
   );
-  elems.push(
-    `<rect x="0" y="${baseY.toFixed(0)}" width="${width}" height="${baseH.toFixed(0)}" fill="url(#${baseGId})" filter="url(#${baseFId})"/>`
-  );
+  elems.push(`<rect width="${width}" height="${height}" fill="url(#${baseGlowId})"/>`);
 
   return {
     defs: defs.join("\n"),
