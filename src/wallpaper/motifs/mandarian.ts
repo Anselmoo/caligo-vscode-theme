@@ -19,6 +19,7 @@ import {
   ringBrick,
   shootingStarBrick,
   skyGradientBrick,
+  smokeRisingBrick,
   sparksBrick,
   starFieldBrick,
   terrainContourBrick,
@@ -245,14 +246,14 @@ function mandarianBreak(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  const smoke = cloudBandBrick(p, {
+  const smoke = smokeRisingBrick(p, {
     id: "mn-b-sm",
-    cy: 0.35,
-    bandHeight: 0.2,
-    color: colors.hueRed,
-    opacity: 0.06,
-    frequency: 0.005,
-    seed: 19,
+    sourceY: 0.5,
+    riseHeight: 0.42,
+    spreadX: 0.8,
+    color: "#887070",
+    opacity: 0.11,
+    columns: 4,
   });
 
   const embers = starFieldBrick(p, {
