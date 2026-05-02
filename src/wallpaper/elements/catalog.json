@@ -1,0 +1,637 @@
+{
+  "$schema": "caligo-elements/v1",
+  "_comment": "Physical element catalog. Each entry is the authoritative specification for how a natural phenomenon must be rendered. Bricks and motifs derive from these — never the reverse. Palette colors may tint but never override physical color constraints.",
+
+  "elements": {
+    "full-moon": {
+      "id": "full-moon",
+      "category": "celestial",
+      "label": "Astronomically accurate full moon",
+      "physical": {
+        "object": "Earth's natural satellite at 100% illumination phase",
+        "angular_size": "~0.5 degrees in Earth sky — appears as a defined disk, not a point",
+        "surface": "Regolith-covered sphere with impact craters, maria (dark basalt plains), and highland regions (brighter anorthosite)",
+        "at_full_moon": "Nearly shadowless from Earth's perspective — craters show as albedo rings, not relief shadows"
+      },
+      "surface_detail": {
+        "required": [
+          "varied crater sizes (1px to 8px radius at scale)",
+          "maria regions (3-5 dark irregular blobs)",
+          "highlands (brighter irregular patches)",
+          "albedo gradients across surface",
+          "subtle limb darkening at edges"
+        ],
+        "forbidden": [
+          "smooth uniform fill",
+          "hard outlines",
+          "cartoon-style crater rings",
+          "pure white fill"
+        ]
+      },
+      "lighting": {
+        "model": "diffuse full illumination — no terminator line visible",
+        "limb_darkening": "soft radial darkening 10-15% toward edge of disk",
+        "crater_shadow": "minimal at full phase — primarily albedo contrast, not shadow",
+        "glow": "subtle atmospheric scatter halo around disk in 0.02-0.05 radius range"
+      },
+      "color": {
+        "base": "#c8c8be",
+        "highlight": "#e0e0d4",
+        "shadow": "#a0a098",
+        "maria": "#7a7a72",
+        "halo": "warm or cool depending on atmospheric conditions — opacity 0.08-0.15",
+        "forbidden": ["pure #ffffff", "high saturation", "blue or green tints"]
+      },
+      "svg_spec": {
+        "layers": [
+          "1. outer atmospheric glow — large radialGradient, very low opacity (0.06-0.1)",
+          "2. limb darkening — radialGradient from edge inward, subtle darkening",
+          "3. base sphere — radialGradient slightly off-center highlight",
+          "4. maria — 3-5 feTurbulence-masked ellipses at 30-45% opacity",
+          "5. crater field — feTurbulence noise overlay with feColorMatrix threshold",
+          "6. surface texture — fine feTurbulence noise, very low opacity (0.04-0.08)"
+        ],
+        "filter_techniques": [
+          "feTurbulence for surface grain",
+          "feGaussianBlur for glow and limb softening",
+          "feColorMatrix for albedo thresholding"
+        ],
+        "forbidden_svg": ["flat <circle> fills", "stroke outlines", "single gradient only"]
+      }
+    },
+
+    "crescent-moon": {
+      "id": "crescent-moon",
+      "category": "celestial",
+      "label": "Crescent moon with earthshine",
+      "physical": {
+        "object": "Moon at 15-30% illumination, showing lit crescent and dark limb",
+        "earthshine": "Faint illumination of dark portion by light reflected from Earth — visible as ghostly full disk outline"
+      },
+      "color": {
+        "crescent": "#d4d0c0",
+        "earthshine_disk": "#1a2030 at opacity 0.35",
+        "halo": "cool blue-silver"
+      },
+      "svg_spec": {
+        "layers": [
+          "1. full disk at very low opacity for earthshine",
+          "2. crescent mask — clip circle offset to reveal only crescent portion",
+          "3. crescent fill with surface texture (same as full-moon surface spec)",
+          "4. thin bright limb edge on lit side"
+        ]
+      }
+    },
+
+    "solar-corona": {
+      "id": "solar-corona",
+      "category": "celestial",
+      "label": "Total solar eclipse corona",
+      "physical": {
+        "object": "Solar corona visible only during totality — extends 2-3 solar radii",
+        "structure": "Plasma streamers radiating from hidden sun disk, not uniform ring",
+        "color": "Pearlescent white with warm inner edge, cool outer streamers"
+      },
+      "surface_detail": {
+        "required": [
+          "irregular streamer structure (not uniform ring)",
+          "brighter inner corona",
+          "distinct equatorial streamers",
+          "polar plumes (shorter, more uniform)"
+        ],
+        "forbidden": [
+          "perfectly uniform radial gradient",
+          "colored corona (it is white)",
+          "sharp corona edge"
+        ]
+      },
+      "color": {
+        "inner": "#f0ede0",
+        "mid": "#d8d4c8",
+        "outer": "#a0a8b0",
+        "moon_disk": "#050508"
+      },
+      "svg_spec": {
+        "layers": [
+          "1. outer corona — very large low-opacity radialGradient",
+          "2. streamer base — anisotropic feTurbulence rays from center",
+          "3. inner corona — tighter bright radialGradient",
+          "4. moon disk — near-black filled circle on top, slightly smaller than sun"
+        ]
+      }
+    },
+
+    "blood-moon": {
+      "id": "blood-moon",
+      "category": "celestial",
+      "label": "Total lunar eclipse — blood moon",
+      "physical": {
+        "object": "Moon fully inside Earth's umbra — illuminated only by light refracted through Earth's atmosphere",
+        "color_source": "Red wavelengths from all of Earth's sunrises and sunsets projected onto moon surface"
+      },
+      "color": {
+        "base": "#8c1e1e",
+        "highlight": "#c43232",
+        "edge": "#e05020",
+        "penumbral_halo": "dusky orange-red at low opacity",
+        "forbidden": ["gray or white fills", "blue tints", "palette-derived hue — ALWAYS hardcode"]
+      },
+      "svg_spec": {
+        "layers": [
+          "1. penumbral glow — large warm radialGradient behind disk",
+          "2. disk base — deep crimson radialGradient",
+          "3. color variation — subtle feTurbulence-masked warm/cool zones within disk",
+          "4. limb brightening — slightly brighter edge on one side (uneven eclipse depth)"
+        ]
+      }
+    },
+
+    "aurora-borealis": {
+      "id": "aurora-borealis",
+      "category": "atmospheric",
+      "label": "Aurora borealis / australis",
+      "physical": {
+        "object": "Plasma emission from solar wind particles colliding with atmospheric gases at 100-300km altitude",
+        "structure": "Curtain-like vertical bands, not horizontal. Bottom edge sharper, top fades. Bands move and pulse.",
+        "colors": "Green (oxygen at 100km), red (oxygen at 200km+), blue/purple (nitrogen) — often multiple simultaneously"
+      },
+      "surface_detail": {
+        "required": [
+          "vertical curtain orientation (not horizontal bands)",
+          "undulating waving motion implied by shape",
+          "feathered upper edge",
+          "sharper but soft lower edge",
+          "brightness variation along bands (brighter nodes)"
+        ],
+        "forbidden": [
+          "flat horizontal bands",
+          "uniform opacity",
+          "single color band",
+          "cartoon ribbon shape"
+        ]
+      },
+      "color": {
+        "primary_green": "#40c870",
+        "secondary_cyan": "#30b8d0",
+        "accent_purple": "#9040c0",
+        "rare_red": "#c04040",
+        "palette_use": "Use palette hueGreen/hueCyan as primary, but ensure vertical orientation"
+      },
+      "svg_spec": {
+        "layers": [
+          "1. background glow — wide soft gradient wash at horizon",
+          "2. main curtain bands — vertically-oriented feTurbulence with high Y/X ratio",
+          "3. undulation — feDisplacementMap to create wave in curtain",
+          "4. brightness nodes — localized bright spots along bands",
+          "5. upper fade — linearGradient mask fading to transparent at top"
+        ],
+        "turbulence": "baseFrequency: low X (0.002-0.005), high Y (0.02-0.06) for vertical structure"
+      }
+    },
+
+    "star-field": {
+      "id": "star-field",
+      "category": "celestial",
+      "label": "Night sky star field",
+      "physical": {
+        "object": "Random distribution of stars with power-law brightness distribution",
+        "structure": "Many faint stars (80%), some mid-brightness (15%), few bright anchor stars (5%)",
+        "milky-way": "Optional: diffuse band of unresolved stars at low opacity"
+      },
+      "surface_detail": {
+        "required": [
+          "non-uniform distribution (slight clustering)",
+          "varied star sizes (0.5-3px)",
+          "varied opacity/brightness",
+          "occasional slight color variation (warm/cool)"
+        ],
+        "forbidden": ["uniform grid distribution", "all stars same size", "uniform brightness"]
+      },
+      "color": {
+        "bright_stars": "#ffffff",
+        "mid_stars": "#e0e8f0 (slight blue-white)",
+        "faint_stars": "#a0b0c0",
+        "warm_stars": "#f0e0c0 (occasional)"
+      }
+    },
+
+    "ocean-surface": {
+      "id": "ocean-surface",
+      "category": "terrain",
+      "label": "Ocean at night — surface reflection",
+      "physical": {
+        "object": "Dark open ocean surface reflecting sky light",
+        "structure": "Horizontal with slight wave texture — reflections of aurora, stars, or moon distorted by waves",
+        "depth_cue": "Darker at horizon, slightly lighter where reflecting sky at viewer angle"
+      },
+      "surface_detail": {
+        "required": [
+          "wave-distorted reflections (not perfect mirror)",
+          "horizontal ripple texture",
+          "darker overall than sky",
+          "bright specular highlights from light sources"
+        ],
+        "forbidden": ["perfect flat mirror", "uniform dark fill", "cartoon wave shapes"]
+      },
+      "color": {
+        "base": "Very dark, near-black with slight blue-green tint",
+        "reflection": "Same hue as sky light source at 40-60% opacity",
+        "specular": "Point highlights from moon/stars at high opacity"
+      },
+      "svg_spec": {
+        "layers": [
+          "1. base dark water fill",
+          "2. horizontal feTurbulence for wave texture (low Y, moderate X frequency)",
+          "3. reflection strip — linearGradient of sky color masked by wave turbulence",
+          "4. specular highlights — scattered bright points along wave peaks"
+        ]
+      }
+    },
+
+    "deep-ocean": {
+      "id": "deep-ocean",
+      "category": "terrain",
+      "label": "Abyssal deep ocean interior",
+      "physical": {
+        "object": "Deep ocean water column 200m-4000m — no surface light, bioluminescence only light source",
+        "structure": "Pressure currents flow horizontally at varying depths — visible as streaming turbulence patterns",
+        "bioluminescence": "Scattered light organs of organisms — point sources at very low density"
+      },
+      "color": {
+        "water": "#050a14 to #0a1428",
+        "bioluminescence": "#40c8d0 (cyan-green) or #4060ff (blue)",
+        "forbidden": [
+          "anything resembling daylight",
+          "warm tones without a source",
+          "green without bioluminescence source"
+        ]
+      }
+    },
+
+    "fog-bank": {
+      "id": "fog-bank",
+      "category": "atmospheric",
+      "label": "Ground fog / sea fog",
+      "physical": {
+        "object": "Water droplet suspension at ground level — radiates from cold surface upward",
+        "structure": "Tendrils rise from ground, not uniform horizontal band. Denser at base, thinner at top. Objects partially obscured.",
+        "light_interaction": "Scatters and diffuses any light source — creates soft halos around lights, obscures distant objects"
+      },
+      "surface_detail": {
+        "required": [
+          "vertical tendrils from ground level",
+          "variable density (patchier at edges)",
+          "soft diffused light scattering",
+          "partial object occlusion (silhouettes visible through fog)"
+        ],
+        "forbidden": [
+          "flat horizontal band",
+          "uniform opacity throughout",
+          "solid white fill",
+          "sharp fog edge"
+        ]
+      },
+      "color": {
+        "base": "Near-white to light gray when illuminated",
+        "night_fog": "#1a2028 tinted very slightly by light source",
+        "texture": "Slight feTurbulence for tendrils"
+      },
+      "svg_spec": {
+        "layers": [
+          "1. base fog density — linearGradient dense at bottom, sparse at top",
+          "2. tendril structure — feTurbulence with moderate Y variation over low X",
+          "3. light scattering halo — radialGradient around any light source within fog",
+          "4. depth fade — objects at distance have higher fog opacity"
+        ]
+      }
+    },
+
+    "mountain-silhouette": {
+      "id": "mountain-silhouette",
+      "category": "terrain",
+      "label": "Mountain range at night",
+      "physical": {
+        "object": "Rocky peaks silhouetted against night sky",
+        "structure": "Jagged irregular skyline — no two peaks same height or spacing. Ridge lines have texture.",
+        "depth": "Multiple layers at different distances — closer = darker, farther = slightly lighter (atmospheric perspective)"
+      },
+      "surface_detail": {
+        "required": [
+          "irregular non-repeating peak shapes",
+          "subtle surface texture on lit ridges",
+          "atmospheric depth separation between layers",
+          "occasional ridge highlight from moon or aurora"
+        ],
+        "forbidden": [
+          "symmetric mountain shapes",
+          "uniform silhouette color across layers",
+          "perfectly smooth ridge line"
+        ]
+      },
+      "color": {
+        "near": "#08080f (near-black)",
+        "mid": "#12121e",
+        "far": "#1a1a2a (slight atmospheric bluing)",
+        "ridge_highlight": "Moonlit: cool silver. Aurora-lit: tinted with aurora color"
+      }
+    },
+
+    "desert-dunes": {
+      "id": "desert-dunes",
+      "category": "terrain",
+      "label": "Desert sand dunes at night",
+      "physical": {
+        "object": "Wind-formed sand ridges — sinusoidal cross-section with sharp crests and gentle windward slopes",
+        "structure": "Dunes have a specific anatomy: windward slope (gentle, 10-15°), slip face (steep, 30-34°), sharp crest line",
+        "at_night": "Lit by moon — cool silver on windward face, dark slip face. Stars reflected in inter-dune flat sand."
+      },
+      "surface_detail": {
+        "required": [
+          "asymmetric dune profile (windward vs slip face)",
+          "sharp crest line with slight glow",
+          "varied dune heights",
+          "ripple texture on surface"
+        ],
+        "forbidden": ["symmetric rounded hills", "uniform fill", "perfectly flat crest"]
+      },
+      "color": {
+        "moonlit_face": "#a09070",
+        "shadow_face": "#28201a",
+        "crest": "#c0a880 (brightest)",
+        "sand_base": "#1a1410"
+      },
+      "svg_spec": {
+        "layers": [
+          "1. base dark fill for inter-dune areas",
+          "2. dune body — cubic bezier path, asymmetric sides",
+          "3. windward highlight — linearGradient on lit slope",
+          "4. crest highlight — thin bright stroke along top edge",
+          "5. ripple texture — fine anisotropic feTurbulence"
+        ]
+      }
+    },
+
+    "pyramid": {
+      "id": "pyramid",
+      "category": "architecture",
+      "label": "Ancient stone pyramid at night",
+      "physical": {
+        "object": "Large-scale limestone/sandstone stepped pyramid — Egyptian style (Giza proportions)",
+        "proportion": "Base:height ratio approximately 1.57:1 (Great Pyramid). Faces slope at ~52 degrees.",
+        "at_night": "Lit from one side by moon or fire — half in deep shadow, half showing surface stone texture. Stars visible behind."
+      },
+      "surface_detail": {
+        "required": [
+          "correct proportions (not too steep or flat)",
+          "stone block texture on lit face",
+          "deep shadow on dark face",
+          "slightly weathered/irregular edge profile",
+          "ground shadow cast"
+        ],
+        "forbidden": [
+          "smooth gradient fills",
+          "symmetric lighting on both faces",
+          "cartoon triangular shape",
+          "bright colors"
+        ]
+      },
+      "color": {
+        "lit_face": "#6a5a40 to #8a7050",
+        "shadow_face": "#1a1408",
+        "capstone": "Slightly different tone from body",
+        "ground": "#1a1208 (sand at night)"
+      },
+      "svg_spec": {
+        "layers": [
+          "1. shadow face — dark trapezoid polygon",
+          "2. lit face — trapezoid with linearGradient (lighter top, darker bottom)",
+          "3. stone texture — horizontal feTurbulence bands at low opacity",
+          "4. edge detail — slightly irregular polygon path (not perfect straight lines)",
+          "5. ground cast shadow — feGaussianBlur dark ellipse"
+        ]
+      }
+    },
+
+    "volcanic-eruption": {
+      "id": "volcanic-eruption",
+      "category": "geological",
+      "label": "Active volcano with lava",
+      "physical": {
+        "object": "Stratovolcano or shield volcano cone with summit vent activity",
+        "structure": "Cone profile with rounded summit, lava channels on flanks, ash cloud above vent"
+      },
+      "color": {
+        "lava_core": "#ffdd44 (hottest — 1300°C+)",
+        "lava_mid": "#ff6600",
+        "lava_crust": "#aa2200 (cooling)",
+        "ash_cloud": "#504040",
+        "glow": "#ff4400 at low opacity illuminating surroundings",
+        "forbidden": ["palette-derived hue — ALWAYS hardcode lava colors"]
+      }
+    },
+
+    "campfire": {
+      "id": "campfire",
+      "category": "fire",
+      "label": "Wood campfire",
+      "physical": {
+        "object": "Combustion of organic material — turbulent convection column of burning gases",
+        "flame_anatomy": "Base: hot blue-white core (rare, near fuel). Lower: orange-yellow primary combustion zone. Tips: red-orange dimmer ends. Outer envelope: near-transparent hot gas.",
+        "motion_implied": "Flame tongues extend upward and lean with air currents — not symmetric"
+      },
+      "surface_detail": {
+        "required": [
+          "multiple overlapping flame tongues (5-8)",
+          "brightest at center base",
+          "dimmer and thinner at tips",
+          "slight lean suggesting air movement",
+          "warm ground glow beneath"
+        ],
+        "forbidden": ["single blob shape", "symmetric flame", "uniform orange fill", "no hot core"]
+      },
+      "color": {
+        "hot_core": "#fff4a0 (near-white yellow)",
+        "primary_flame": "#ff9900",
+        "outer_flame": "#ff5500",
+        "tip": "#cc2200",
+        "ground_glow": "#ff6600 at 0.15-0.25 opacity",
+        "forbidden": ["palette colors — ALWAYS hardcode", "#d6638e or any pink"]
+      },
+      "svg_spec": {
+        "layers": [
+          "1. ground glow — large radialGradient at base",
+          "2. back flames — 2-3 bezier tongues, slightly cooler color, behind",
+          "3. front flames — 3-4 bezier tongues, hotter color, front",
+          "4. hot core — bright ellipse at base of flame column",
+          "5. ember particles — scattered small circles above"
+        ]
+      }
+    },
+
+    "lightning-bolt": {
+      "id": "lightning-bolt",
+      "category": "atmospheric",
+      "label": "Cloud-to-ground lightning",
+      "physical": {
+        "object": "Electrical discharge — stepped leader + return stroke",
+        "structure": "Primary channel: near-vertical with characteristic Z-direction changes. Branch forks: exponentially smaller. Width: 1-5cm real, should appear as thin bright line.",
+        "color": "Core is white to blue-white plasma (>30,000K). Outer glow is purple-blue from ionized nitrogen."
+      },
+      "surface_detail": {
+        "required": [
+          "fractal branching (recursive smaller branches from main channel)",
+          "irregular Z-pattern (not straight line)",
+          "bright white core + purple-blue outer glow",
+          "sky flash illumination of clouds",
+          "brief ground strike illumination"
+        ],
+        "forbidden": [
+          "straight line",
+          "uniform thickness",
+          "no branching",
+          "red or orange color",
+          "palette-derived color — ALWAYS hardcode"
+        ]
+      },
+      "color": {
+        "core": "#ffffff",
+        "inner_glow": "#c8e0ff",
+        "outer_glow": "#6080ff at low opacity",
+        "sky_flash": "#1a2040 (brief blue-white cloud illumination)",
+        "forbidden": ["palette colors"]
+      }
+    },
+
+    "ocean-night-surface": {
+      "id": "ocean-night-surface",
+      "category": "terrain",
+      "label": "Open ocean at night from above",
+      "physical": {
+        "object": "Vast open ocean surface under night sky",
+        "horizon": "Very dark, nearly black water. Slight phosphorescence in wave crests in some conditions.",
+        "reflection": "Moon path: bright ribbon of reflected moonlight across water surface. Star reflections: scattered points at wave peaks."
+      },
+      "color": {
+        "deep_water": "#04080f",
+        "wave_crest": "#0a1828",
+        "moon_path": "warm white at 0.3-0.5 opacity",
+        "phosphorescence": "#20d0a0 at very low opacity (optional)"
+      }
+    },
+
+    "storm-clouds": {
+      "id": "storm-clouds",
+      "category": "atmospheric",
+      "label": "Cumulonimbus storm clouds",
+      "physical": {
+        "object": "Towering convective clouds — anvil top, dark base",
+        "structure": "Cauliflower-textured upper portions, flat base, interior lightning illumination from within"
+      },
+      "color": {
+        "base": "#151520 (dark blue-gray)",
+        "mid": "#252535",
+        "lit_from_within": "brief brighter flash, same tone as cloud but +30% lightness"
+      }
+    },
+
+    "aurora-reflection": {
+      "id": "aurora-reflection",
+      "category": "composite",
+      "label": "Aurora reflected in water",
+      "physical": {
+        "object": "Fjord or lake reflecting aurora above",
+        "structure": "Reflection is vertically mirrored but distorted by ripples. Colors same but slightly desaturated. Brighter lines = wave crest specular."
+      }
+    }
+  },
+
+  "scenarios": {
+    "_comment": "Each scenario assembles elements into a complete scene. Motifs reference these. Physical constraints override palette constraints.",
+
+    "arctic-aurora-fjord": {
+      "id": "arctic-aurora-fjord",
+      "label": "Arctic fjord under aurora borealis",
+      "elements": [
+        "aurora-borealis",
+        "star-field",
+        "mountain-silhouette",
+        "ocean-surface",
+        "aurora-reflection"
+      ],
+      "composition": "Sky occupies 60-70% of canvas. Aurora in upper-mid. Mountains as silhouette in lower third. Fjord water at bottom 20%.",
+      "palette_role": "hueCyan/hueGreen tint aurora. bgDark for water and terrain. Stars use white hardcoded."
+    },
+
+    "full-moon-desert": {
+      "id": "full-moon-desert",
+      "label": "Full moon over desert with pyramids",
+      "elements": ["full-moon", "star-field", "desert-dunes", "pyramid", "fog-bank"],
+      "composition": "Moon in upper right. Stars scattered upper half. Pyramids mid-canvas. Dunes foreground. Optional light fog at pyramid base.",
+      "palette_role": "Moon colors hardcoded. Dune warmth can tint from hueOrange at 30% max."
+    },
+
+    "solar-eclipse-totality": {
+      "id": "solar-eclipse-totality",
+      "label": "Total solar eclipse at totality",
+      "elements": ["solar-corona", "star-field", "mountain-silhouette"],
+      "composition": "Eclipse centered upper-mid. Stars visible (daytime stars during totality). Mountain silhouette at bottom.",
+      "palette_role": "Corona is hardcoded white. Moon disk is near-black. Stars are white."
+    },
+
+    "blood-moon-rise": {
+      "id": "blood-moon-rise",
+      "label": "Total lunar eclipse blood moon",
+      "elements": ["blood-moon", "star-field", "mountain-silhouette"],
+      "composition": "Moon prominent, mid-upper. Atmospheric haze around it. Dark mountains below.",
+      "palette_role": "Blood moon ALWAYS hardcoded crimson. Never palette-derived."
+    },
+
+    "deep-ocean-bioluminescence": {
+      "id": "deep-ocean-bioluminescence",
+      "label": "Abyssal ocean — bioluminescent jellyfish",
+      "elements": ["deep-ocean", "jellyfish", "ocean-floor"],
+      "composition": "Water column fills canvas. Jellyfish in mid-upper water. Ocean floor terrain at bottom 20%.",
+      "palette_role": "Water darkness from bg/bgDark. Bioluminescence from hueCyan. Hardcode if palette corrupts."
+    },
+
+    "mountain-lightning-storm": {
+      "id": "mountain-lightning-storm",
+      "label": "Lightning over mountain ridge",
+      "elements": ["storm-clouds", "lightning-bolt", "mountain-silhouette", "fog-bank"],
+      "composition": "Clouds fill upper 40%. Lightning strikes mid-canvas. Mountains below. Fog at base.",
+      "palette_role": "Lightning hardcoded white/blue-white. Clouds use bgMid/bgSoft. Fog near-transparent."
+    },
+
+    "volcanic-night": {
+      "id": "volcanic-night",
+      "label": "Active volcano at night",
+      "elements": ["volcanic-eruption", "campfire", "mountain-silhouette", "storm-clouds"],
+      "composition": "Volcano cone center-lower. Lava glow illuminates surroundings. Ash cloud above.",
+      "palette_role": "Lava ALWAYS hardcoded. Ash cloud uses bgMid darkened."
+    },
+
+    "ocean-midnight": {
+      "id": "ocean-midnight",
+      "label": "Open ocean under full moon at midnight",
+      "elements": ["full-moon", "star-field", "ocean-night-surface", "fog-bank"],
+      "composition": "Moon upper right. Stars across upper half. Ocean takes lower 35%. Optional fog on horizon.",
+      "palette_role": "Moon hardcoded. Ocean uses bg darkened. Moon reflection path hardcoded warm white."
+    },
+
+    "fog-mountain-valley": {
+      "id": "fog-mountain-valley",
+      "label": "Mountain valley filled with fog",
+      "elements": ["fog-bank", "mountain-silhouette", "crescent-moon", "star-field"],
+      "composition": "Mountains frame upper sides. Fog fills valley (mid-lower). Moon above. Stars sparse.",
+      "palette_role": "Fog uses bgSoft at very low opacity. Mountains use bg darkened."
+    },
+
+    "campfire-wilderness": {
+      "id": "campfire-wilderness",
+      "label": "Campfire in wilderness at night",
+      "elements": ["campfire", "star-field", "mountain-silhouette"],
+      "composition": "Campfire lower center. Warm glow illuminates immediate ground. Stars bright above (no moon).",
+      "palette_role": "Fire ALWAYS hardcoded. Stars white. Mountains near-black."
+    }
+  }
+}
