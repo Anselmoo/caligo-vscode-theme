@@ -471,6 +471,16 @@ export function celestialBrick(params: BrickParams, options: CelestialBrickOptio
   const defs: string[] = [];
   const elems: string[] = [];
 
+  // Crescent mask — SVG mask punches the shadow circle out of the moon disc
+  if (crescent) {
+    const sx = px + crescent.offsetX * pr;
+    const sy = py + crescent.offsetY * pr;
+    defs.push(`<mask id="${id}-msk">
+  <circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${pr.toFixed(1)}" fill="white"/>
+  <circle cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="${(pr * 0.92).toFixed(1)}" fill="black"/>
+</mask>`);
+  }
+
   // Radial glow
   defs.push(`<radialGradient id="${id}-rg" cx="50%" cy="50%" r="50%">
   <stop offset="0%" stop-color="${gc}" stop-opacity="${glowOpacity}"/>
@@ -482,9 +492,10 @@ export function celestialBrick(params: BrickParams, options: CelestialBrickOptio
     `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${glowR.toFixed(1)}" fill="url(#${id}-rg)"/>`
   );
 
-  // Disc
+  // Disc — apply crescent mask when specified
+  const maskAttr = crescent ? ` mask="url(#${id}-msk)"` : "";
   elems.push(
-    `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${pr.toFixed(1)}" fill="${color}" opacity="0.95"/>`
+    `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${pr.toFixed(1)}" fill="${color}" opacity="0.95"${maskAttr}/>`
   );
 
   // Crater texture
@@ -496,16 +507,7 @@ export function celestialBrick(params: BrickParams, options: CelestialBrickOptio
   <feBlend in="masked" in2="SourceGraphic" mode="soft-light"/>
 </filter>`);
     elems.push(
-      `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${pr.toFixed(1)}" fill="${color}" opacity="0.2" filter="url(#${id}-tex)"/>`
-    );
-  }
-
-  // Crescent shadow
-  if (crescent) {
-    const sx = px + crescent.offsetX * pr;
-    const sy = py + crescent.offsetY * pr;
-    elems.push(
-      `<circle cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="${(pr * 0.92).toFixed(1)}" fill="${crescent.color}" opacity="0.95"/>`
+      `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${pr.toFixed(1)}" fill="${color}" opacity="0.2" filter="url(#${id}-tex)"${maskAttr}/>`
     );
   }
 
@@ -847,17 +849,19 @@ export function auroraAdvancedBrick(
   );
 
   // ── 4. Base contact glow ──────────────────────────────────────────────────
-  // Radial gradient (not a rect band) centered at the lower aurora zone —
-  // where field lines converge most densely. Dissolves naturally in all directions.
+  // Subtle radial gradient centered at the lower aurora zone —
+  // kept intentionally dim so it doesn't overwhelm the curtain structure.
+  // Real aurora background luminosity is ≤10–15% compared to the bright rays.
   const baseGlowId = `${id}-bg`;
   const baseCx = width * 0.5;
-  const baseCy = zoneTopPx + zoneHPx * 0.68;
-  const baseRx = scale * 0.45;
-  const baseRy = zoneHPx * 0.38;
+  const baseCy = zoneTopPx + zoneHPx * 0.72;
+  // Narrower radius so the glow stays within the aurora band, not flooding the whole sky
+  const baseRx = scale * 0.3;
+  const baseRy = zoneHPx * 0.28;
   defs.push(
     `<radialGradient id="${baseGlowId}" cx="${baseCx.toFixed(0)}" cy="${baseCy.toFixed(0)}" rx="${baseRx.toFixed(0)}" ry="${baseRy.toFixed(0)}" gradientUnits="userSpaceOnUse">
-  <stop offset="0%" stop-color="${color}" stop-opacity="${(opacity * 0.55).toFixed(2)}"/>
-  <stop offset="40%" stop-color="${color}" stop-opacity="${(opacity * 0.28).toFixed(2)}"/>
+  <stop offset="0%" stop-color="${color}" stop-opacity="${(opacity * 0.22).toFixed(2)}"/>
+  <stop offset="45%" stop-color="${color}" stop-opacity="${(opacity * 0.1).toFixed(2)}"/>
   <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
 </radialGradient>`
   );
@@ -903,11 +907,13 @@ export function starFieldBrick(params: BrickParams, options: StarFieldBrickOptio
   const rng = seedRng(hashStr(`${seedId}-${harmonyMode}-starfield`));
   const defs: string[] = [];
   const elems: string[] = [];
-  const sc = scale / 2160;
+  // sc=1.0 at 960px (gallery/HD), scales up for 4K — ensures stars are always ≥0.5px
+  const sc = scale / 960;
 
-  // Fixed small stdDeviation — avoids scale-proportional blobs at high resolution
+  // Glow filter: moderate blur so halos don't overwhelm at any resolution
+  const glowBlur = (2.5 * sc).toFixed(1);
   defs.push(
-    `<filter id="${id}-glow" x="-300%" y="-300%" width="700%" height="700%"><feGaussianBlur stdDeviation="3 3"/></filter>`
+    `<filter id="${id}-glow" x="-400%" y="-400%" width="900%" height="900%"><feGaussianBlur stdDeviation="${glowBlur}"/></filter>`
   );
 
   const getY = (): number => {
@@ -939,42 +945,45 @@ export function starFieldBrick(params: BrickParams, options: StarFieldBrickOptio
     return { x: rng() * width, y: getY() };
   };
 
-  // Dim stars — sub-pixel to ~1px cores; no glow filter
+  // Dim stars — crisp single-pixel dots with magnitude variation
+  // r = 0.5–1.3px at 960px canvas, scales proportionally for 4K
   for (let i = 0; i < count; i++) {
     const { x, y } = pickPosition();
-    const r = (0.15 + rng() * 0.55) * sc;
+    const r = (0.5 + rng() * 0.8) * sc;
     // Atmospheric extinction: stars near the horizon scatter through more atmosphere
     const extinction =
       distribution === "upper" ? Math.max(0.2, 1 - (y / (height * 0.55)) ** 1.3 * 0.7) : 1.0;
-    const a = (0.2 + rng() * 0.55) * opacity * extinction;
+    const a = (0.25 + rng() * 0.65) * opacity * extinction;
     elems.push(
-      `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${r.toFixed(2)}" fill="${color}" opacity="${a.toFixed(2)}"/>`
+      `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(2)}" fill="${color}" opacity="${a.toFixed(2)}"/>`
     );
   }
 
-  // Bright stars — sharp core + larger glow halo + cross twinkle
+  // Bright stars — sharp core + radial glow halo + cross-shaped diffraction spike
+  // r = 1.2–2.5px core at 960px, glow 5–14px, arms 6–18px
   for (let i = 0; i < brightCount; i++) {
     const { x, y } = pickPosition();
-    // Core radius: 0.8–1.5 device units (scale-relative but kept small)
-    const r = (0.8 + rng() * 0.7) * sc;
+    const r = (1.2 + rng() * 1.3) * sc;
     const extinctBright =
-      distribution === "upper" ? Math.max(0.25, 1 - (y / (height * 0.55)) ** 1.3 * 0.6) : 1.0;
-    const a = (0.75 + rng() * 0.25) * opacity * extinctBright;
-    // Glow circle: wider halo for visibility at thumbnail scale
-    const glowR = (5.0 + rng() * 5.0) * sc;
+      distribution === "upper" ? Math.max(0.3, 1 - (y / (height * 0.55)) ** 1.3 * 0.6) : 1.0;
+    const a = (0.8 + rng() * 0.2) * opacity * extinctBright;
+    // Glow halo — soft blur, 4–12px radius
+    const glowR = (4 + rng() * 8) * sc;
     elems.push(
-      `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${glowR.toFixed(1)}" fill="${color}" opacity="${(a * 0.18).toFixed(2)}" filter="url(#${id}-glow)"/>`
+      `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${glowR.toFixed(1)}" fill="${color}" opacity="${(a * 0.22).toFixed(2)}" filter="url(#${id}-glow)"/>`
     );
-    // Cross twinkle arms — slightly longer for visibility at thumbnail
-    const armLen = r * 7;
+    // Cross diffraction spike (4-pointed star shape)
+    const armLen = (3 + rng() * 5) * sc;
+    const armW = (r * 0.35).toFixed(2);
     elems.push(
-      `<line x1="${(x - armLen).toFixed(0)}" y1="${y.toFixed(0)}" x2="${(x + armLen).toFixed(0)}" y2="${y.toFixed(0)}" stroke="${color}" stroke-width="${(r * 0.25).toFixed(1)}" opacity="${(a * 0.35).toFixed(2)}"/>`
-    );
-    elems.push(
-      `<line x1="${x.toFixed(0)}" y1="${(y - armLen).toFixed(0)}" x2="${x.toFixed(0)}" y2="${(y + armLen).toFixed(0)}" stroke="${color}" stroke-width="${(r * 0.25).toFixed(1)}" opacity="${(a * 0.35).toFixed(2)}"/>`
+      `<line x1="${(x - armLen).toFixed(1)}" y1="${y.toFixed(1)}" x2="${(x + armLen).toFixed(1)}" y2="${y.toFixed(1)}" stroke="${color}" stroke-width="${armW}" opacity="${(a * 0.45).toFixed(2)}"/>`
     );
     elems.push(
-      `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${r.toFixed(2)}" fill="${color}" opacity="${a.toFixed(2)}"/>`
+      `<line x1="${x.toFixed(1)}" y1="${(y - armLen).toFixed(1)}" x2="${x.toFixed(1)}" y2="${(y + armLen).toFixed(1)}" stroke="${color}" stroke-width="${armW}" opacity="${(a * 0.45).toFixed(2)}"/>`
+    );
+    // Bright core circle
+    elems.push(
+      `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(2)}" fill="${color}" opacity="${a.toFixed(2)}"/>`
     );
   }
 
@@ -1124,23 +1133,65 @@ export function shootingStarBrick(
   const { count = 3, color = "#ffffff", opacity = 0.6, id = "meteor" } = options;
 
   const rng = seedRng(hashStr(`${seedId}-${harmonyMode}-meteor`));
-  const defs = `<filter id="${id}-trail" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="${(scale * 0.002).toFixed(1)}"/></filter>`;
+  // sc=1.0 at 960px canvas, scales up for 4K
+  const sc = scale / 960;
+
+  const defs: string[] = [];
   const elems: string[] = [];
 
+  // Soft outer glow filter for meteor trails
+  defs.push(
+    `<filter id="${id}-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="${(1.5 * sc).toFixed(1)}"/></filter>`
+  );
+
   for (let i = 0; i < count; i++) {
-    const x1 = rng() * width * 0.8 + width * 0.1;
-    const y1 = rng() * height * 0.4;
-    const len = (0.05 + rng() * 0.1) * width;
-    const angle = 0.3 + rng() * 0.8;
-    const x2 = x1 + len * Math.cos(angle);
-    const y2 = y1 + len * Math.sin(angle);
-    const sw = (1 + rng() * 2) * (scale / 2160);
+    // Meteors enter from upper portion of sky, travel at a downward angle
+    const x1 = rng() * width * 0.7 + width * 0.05;
+    const y1 = rng() * height * 0.35;
+    // Angle: 25–55° below horizontal (realistic meteor entry angle)
+    const angle = 0.44 + rng() * 0.52; // 25–55° in radians
+    // Trail length: 8–18% of canvas width for prominent visibility
+    const len = (0.08 + rng() * 0.1) * width;
+    // Head is at (x1,y1), trail extends BACKWARDS (opposite direction of travel)
+    const dx = Math.cos(angle);
+    const dy = Math.sin(angle);
+    const x2 = x1 - len * dx;
+    const y2 = y1 - len * dy;
+
+    const mOp = opacity * (0.65 + rng() * 0.35);
+    const gradId = `${id}-g${i}`;
+    const coreW = (1.5 + rng() * 1.5) * sc;
+    const glowW = coreW * 4;
+
+    // Linear gradient: bright at head (x1,y1), transparent at tail (x2,y2)
+    defs.push(
+      `<linearGradient id="${gradId}" x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" gradientUnits="userSpaceOnUse">
+  <stop offset="0%" stop-color="${color}" stop-opacity="${mOp.toFixed(2)}"/>
+  <stop offset="15%" stop-color="${color}" stop-opacity="${(mOp * 0.85).toFixed(2)}"/>
+  <stop offset="60%" stop-color="${color}" stop-opacity="${(mOp * 0.35).toFixed(2)}"/>
+  <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+</linearGradient>`
+    );
+
+    // Outer glow pass (wide, blurred)
     elems.push(
-      `<line x1="${x1.toFixed(0)}" y1="${y1.toFixed(0)}" x2="${x2.toFixed(0)}" y2="${y2.toFixed(0)}" stroke="${color}" stroke-width="${sw.toFixed(1)}" stroke-linecap="round" opacity="${(opacity * (0.5 + rng() * 0.5)).toFixed(2)}" filter="url(#${id}-trail)"/>`
+      `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${color}" stroke-width="${glowW.toFixed(1)}" stroke-linecap="round" opacity="${(mOp * 0.25).toFixed(2)}" filter="url(#${id}-glow)"/>`
+    );
+    // Core trail with gradient fade
+    elems.push(
+      `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="url(#${gradId})" stroke-width="${coreW.toFixed(1)}" stroke-linecap="round"/>`
+    );
+    // Bright glowing head dot
+    const headR = (coreW * 1.8).toFixed(1);
+    elems.push(
+      `<circle cx="${x1.toFixed(1)}" cy="${y1.toFixed(1)}" r="${headR}" fill="${color}" opacity="${mOp.toFixed(2)}" filter="url(#${id}-glow)"/>`
+    );
+    elems.push(
+      `<circle cx="${x1.toFixed(1)}" cy="${y1.toFixed(1)}" r="${(parseFloat(headR) * 0.45).toFixed(1)}" fill="${color}" opacity="${mOp.toFixed(2)}"/>`
     );
   }
 
-  return { defs, elements: `<g id="${id}">${elems.join("\n")}</g>` };
+  return { defs: defs.join("\n"), elements: `<g id="${id}">${elems.join("\n")}</g>` };
 }
 
 // ─── Dune Brick ─────────────────────────────────────────────────────────────────
@@ -1585,7 +1636,9 @@ export function terrainContourBrick(
       );
       filterAttr = ` filter="url(#${blurId})"`;
     }
-    elemParts.push(`<path d="${svgD}" fill="${color}" opacity="${opacity}"${filterAttr}/>`);
+    elemParts.push(
+      `<path id="${layerId}" d="${svgD}" fill="${color}" opacity="${opacity}"${filterAttr}/>`
+    );
   }
 
   const groupElem = `<g transform="scale(${scaleX} ${scaleY})">${elemParts.join("")}</g>`;

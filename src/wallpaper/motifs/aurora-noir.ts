@@ -82,8 +82,8 @@ function auroraStillness(p: BrickParams): ComposedWallpaper {
 
   const stars = starFieldBrick(p, {
     id: "an-s-st",
-    count: Math.round(100 * tuning.starDensity),
-    brightCount: Math.max(3, Math.round(5 * tuning.starDensity)),
+    count: Math.round(260 * tuning.starDensity),
+    brightCount: Math.max(8, Math.round(12 * tuning.starDensity)),
     distribution: "upper",
     opacity: 0.7,
   });
@@ -100,7 +100,7 @@ function auroraStillness(p: BrickParams): ComposedWallpaper {
 
   // Fjord walls — steep terrain on both sides leaving a narrow water gap
   const leftWall = terrainBrick(p, {
-    id: "an-s-lw",
+    id: "an-s-tc-lw",
     baseY: liftTerrain(0.5, tuning.terrainLift * 0.8),
     roughness: 0.1,
     points: 16,
@@ -119,7 +119,7 @@ function auroraStillness(p: BrickParams): ComposedWallpaper {
     seedSuffix: "an-s-lw",
   });
   const rightWall = terrainBrick(p, {
-    id: "an-s-rw",
+    id: "an-s-tc-rw",
     baseY: liftTerrain(0.52, tuning.terrainLift * 0.7),
     roughness: 0.08,
     points: 16,
@@ -149,7 +149,7 @@ function auroraStillness(p: BrickParams): ComposedWallpaper {
 
   // Foreground terrain (closest mountains, darkest)
   const foreground = terrainBrick(p, {
-    id: "an-s-fg",
+    id: "an-s-tc-fg",
     baseY: liftTerrain(0.6, tuning.terrainLift),
     roughness: 0.12,
     points: 20,
@@ -235,8 +235,8 @@ function auroraDrift(p: BrickParams): ComposedWallpaper {
 
   const stars = starFieldBrick(p, {
     id: "an-d-st",
-    count: Math.round(120 * tuning.starDensity),
-    brightCount: Math.max(3, Math.round(4 * tuning.starDensity)),
+    count: Math.round(280 * tuning.starDensity),
+    brightCount: Math.max(8, Math.round(10 * tuning.starDensity)),
     distribution: "upper",
     opacity: 0.6,
   });
@@ -309,8 +309,8 @@ function auroraBreak(p: BrickParams): ComposedWallpaper {
 
   const stars = starFieldBrick(p, {
     id: "an-b-st",
-    count: Math.round(80 * tuning.starDensity),
-    brightCount: Math.max(2, Math.round(3 * tuning.starDensity)),
+    count: Math.round(250 * tuning.starDensity),
+    brightCount: Math.max(7, Math.round(9 * tuning.starDensity)),
     distribution: "upper",
     opacity: 0.6,
   });
@@ -336,7 +336,7 @@ function auroraBreak(p: BrickParams): ComposedWallpaper {
 
   // Jagged ice terrain — high roughness for fractured look
   const ice = terrainStackBrick(p, {
-    id: "an-b-ice",
+    id: "an-b-tc-ice",
     points: 30,
     layers: [
       {
@@ -393,8 +393,8 @@ function auroraVoid(p: BrickParams): ComposedWallpaper {
 
   const stars = starFieldBrick(p, {
     id: "an-v-st",
-    count: Math.round(50 * tuning.starDensity),
-    brightCount: Math.max(2, Math.round(2 * tuning.starDensity)),
+    count: Math.round(200 * tuning.starDensity),
+    brightCount: Math.max(5, Math.round(6 * tuning.starDensity)),
     distribution: "upper",
     opacity: 0.4,
   });
@@ -412,7 +412,7 @@ function auroraVoid(p: BrickParams): ComposedWallpaper {
 
   // Flat, desolate tundra — low roughness, just a subtle ridge
   const tundra = terrainBrick(p, {
-    id: "an-v-td",
+    id: "an-v-tc-td",
     baseY: liftTerrain(0.7, tuning.terrainLift),
     roughness: 0.03,
     points: 16,
@@ -420,7 +420,7 @@ function auroraVoid(p: BrickParams): ComposedWallpaper {
     opacity: 0.6,
   });
   const ground = terrainBrick(p, {
-    id: "an-v-gr",
+    id: "an-v-tc-gr",
     baseY: liftTerrain(0.75, tuning.terrainLift * 0.9),
     roughness: 0.02,
     points: 12,
@@ -462,8 +462,8 @@ function auroraPulse(p: BrickParams): ComposedWallpaper {
 
   const stars = starFieldBrick(p, {
     id: "an-p-st",
-    count: Math.round(140 * tuning.starDensity),
-    brightCount: Math.max(4, Math.round(6 * tuning.starDensity)),
+    count: Math.round(300 * tuning.starDensity),
+    brightCount: Math.max(9, Math.round(12 * tuning.starDensity)),
     distribution: "upper",
     opacity: 0.65,
   });
@@ -482,7 +482,7 @@ function auroraPulse(p: BrickParams): ComposedWallpaper {
 
   // Layered peaks — 4 contour levels with atmospheric depth
   const peaks = terrainContourBrick(p, {
-    id: "an-p-pk",
+    id: "an-p-tc-pk",
     horizonY: Math.max(0.17, 0.28 - tuning.terrainLift),
     layers: [
       { color: colors.bgMid, opacity: 0.45, edgeBlur: 5 },

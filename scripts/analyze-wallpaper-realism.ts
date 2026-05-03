@@ -327,7 +327,16 @@ const CHECKS: RealismCheck[] = [
       "Even a hint of ground transforms a 'void' into a 'landscape'.",
     detect: m => {
       const hasAnyGround =
-        m.hasTerrain || m.ids.some(id => /-(d1|d2|d3|dn|tl|ripple|wv)(-|$)/.test(id));
+        m.hasTerrain ||
+        m.ids.some(id => /-(d1|d2|d3|dn|tl|ripple|wv)(-|$)/.test(id)) ||
+        // cityscape: skyline, buildings, city, ghost buildings
+        m.ids.some(id => /-(sl|bld|city|cs|ug|gh)(-|$)/.test(id)) ||
+        // ocean/water: currents, jellyfish, abyss, reef
+        m.ids.some(id => /-(cu|jel|wc|aby|rf)(-|$)/.test(id)) ||
+        // numbered terrain layers (terrainStackBrick: id-0, id-1, id-2)
+        m.ids.some(id => /-[0-9]+$/.test(id)) ||
+        // single terrain bricks with common abbreviations
+        m.ids.some(id => /-(vb|vm|vf|hl|hz|gr|br|ds|fm|fm|at|vc|wl|wr|fl)(-|$)/.test(id));
       return !hasAnyGround;
     },
   },
@@ -357,10 +366,10 @@ function extractMetrics(svg: string, ids: string[]): SVGMetrics {
   const fileSizeKB = Math.round(svg.length / 1024);
 
   const hasAurora = ids.some(id => /-au(-|$)/.test(id));
-  const hasTerrain = ids.some(id => /-(mtn|tc|rd|cr)(-|$)/.test(id));
+  const hasTerrain = ids.some(id => /-(mtn|tc|rd|cr|tr)(-|$)/.test(id));
   const hasStars = ids.some(id => /-st(-|$)/.test(id));
   const hasMoon = ids.some(id => /-(mn|pl)(-|$)/.test(id));
-  const hasGalaxyBand = ids.some(id => /-(gb|galaxy|gal|mw)(-|$)/.test(id));
+  const hasGalaxyBand = ids.some(id => /-(gb|galaxy|gal|mw|ng)(-|$)/.test(id));
 
   // Extract star circles (small circles with fill=#fff or opacity < 0.5)
   const starCircles: SVGMetrics["starCircles"] = [];
@@ -387,7 +396,7 @@ function extractMetrics(svg: string, ids: string[]): SVGMetrics {
   // Terrain path commands (count C/L commands in terrain paths)
   let terrainPathCommands = 0;
   let terrainLayerCount = 0;
-  const terrainIDs = ids.filter(id => /-(mtn|tc|rd|cr)(-|$)/.test(id));
+  const terrainIDs = ids.filter(id => /-(mtn|tc|rd|cr|tr)(-|$)/.test(id));
   terrainLayerCount = terrainIDs.length;
   for (const tid of terrainIDs) {
     const pathRe = new RegExp(`id="${tid}"[^>]*d="([^"]+)"`);

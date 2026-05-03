@@ -351,10 +351,11 @@ export function lavaRiverBrick(params: BrickParams, options: LavaRiverBrickOptio
   const defs: string[] = [];
   const elems: string[] = [];
 
-  // Glow filter
+  // Glow filter — sc=1.0 at 960px, blur=6px at gallery size, 24px at 4K
+  const sc = scale / 960;
   const glowFiltId = `${id}-gf`;
   defs.push(
-    `<filter id="${glowFiltId}" x="-200%" y="-20%" width="500%" height="140%"><feGaussianBlur stdDeviation="${(scale * 0.006).toFixed(1)}"/></filter>`
+    `<filter id="${glowFiltId}" x="-200%" y="-20%" width="500%" height="140%"><feGaussianBlur stdDeviation="${(6 * sc).toFixed(1)}"/></filter>`
   );
 
   const riverPaths: string[] = [];
@@ -392,10 +393,12 @@ export function lavaRiverBrick(params: BrickParams, options: LavaRiverBrickOptio
       d += ` C ${(px1 + wander).toFixed(1)},${cpY.toFixed(1)} ${(px2 - wander).toFixed(1)},${cpY.toFixed(1)} ${px2.toFixed(1)},${py2.toFixed(1)}`;
     }
 
-    // Stroke width increases toward bottom (pooling effect)
-    const baseW = (scale * (0.002 + rng() * 0.002)).toFixed(1);
-    const glowW = (scale * (0.008 + rng() * 0.004)).toFixed(1);
-    const coreW = (scale * 0.001).toFixed(1);
+    // Stroke width — sc=1.0 at 960px, scales up for 4K
+    // baseW: 2–5px at 960p; glowW: 8–16px at 960p; coreW: 1.5px
+    const sc2 = scale / 960;
+    const baseW = ((2 + rng() * 3) * sc2).toFixed(1);
+    const glowW = ((8 + rng() * 8) * sc2).toFixed(1);
+    const coreW = (1.5 * sc2).toFixed(1);
     const rOp = (opacity * (0.55 + rng() * 0.35)).toFixed(2);
 
     glowPaths.push(

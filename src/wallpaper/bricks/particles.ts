@@ -109,6 +109,7 @@ export interface SparksBrickOptions {
 export function sparksBrick(params: BrickParams, options: SparksBrickOptions): BrickOutput {
   const { viewBox, seedId, harmonyMode } = params;
   const { width, height } = viewBox;
+  const scale = Math.max(width, height);
   const {
     count = 80,
     color,
@@ -120,17 +121,25 @@ export function sparksBrick(params: BrickParams, options: SparksBrickOptions): B
 
   const rng = seedRng(hashStr(`${seedId}-${harmonyMode}-sparks`));
   const lines: string[] = [];
+  // sc=1.0 at 960px, scales for higher-res canvases
+  const sc = scale / 960;
   const baseY = direction === 1 ? height * 0.85 : height * 0.15;
 
   for (let i = 0; i < count; i++) {
+    // Spread sparks across the source width — each spark starts near the base
     const x = (sourceCx - sourceSpread / 2 + rng() * sourceSpread) * width;
-    const y1 = baseY + (rng() - 0.5) * height * 0.3;
-    const len = (5 + rng() * 25) * (height / 2160);
+    // Vertical jitter so sparks aren't all at exactly the same height
+    const y1 = baseY + (rng() - 0.5) * height * 0.18;
+    // Length: 15–60px at 960p — clearly visible ember streaks
+    const len = (15 + rng() * 45) * sc;
+    // Slight horizontal drift (embers don't rise perfectly straight)
+    const driftX = (rng() - 0.5) * 8 * sc;
+    const x2 = x + driftX;
     const y2 = y1 - direction * len;
-    const alpha = (0.3 + rng() * 0.7) * opacity;
-    const sw = 0.5 + rng() * 1.5;
+    const alpha = (0.35 + rng() * 0.65) * opacity;
+    const sw = (0.6 + rng() * 1.4) * sc;
     lines.push(
-      `<line x1="${x.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${color}" stroke-width="${sw.toFixed(2)}" opacity="${alpha.toFixed(3)}"/>`
+      `<line x1="${x.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${color}" stroke-width="${sw.toFixed(2)}" stroke-linecap="round" opacity="${alpha.toFixed(3)}"/>`
     );
   }
 

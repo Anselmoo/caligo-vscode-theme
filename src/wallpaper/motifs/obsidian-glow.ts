@@ -59,15 +59,16 @@ function obsidianStillness(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  // Full moon
+  // Gibbous moon — crescent shadow offset to give natural lit phase
   const moon = celestialBrick(p, {
     id: "og-s-mn",
     cx: 0.5,
     cy: 0.25,
-    r: 0.055,
+    r: 0.028,
     color: "#c8d0e0",
     glowColor: colors.hueCyan,
-    glowSize: 2.18,
+    glowSize: 4.5,
+    crescent: { offsetX: 0.6, offsetY: -0.25, color: colors.bg },
   });
 
   // Volcanic plain — natural contour terrain
@@ -99,8 +100,8 @@ function obsidianStillness(p: BrickParams): ComposedWallpaper {
 
   const stars = starFieldBrick(p, {
     id: "og-s-st",
-    count: 80,
-    brightCount: 5,
+    count: 260,
+    brightCount: 10,
     color: "#ffffff",
     distribution: "upper",
     opacity: 0.5,
@@ -188,8 +189,8 @@ function obsidianDrift(p: BrickParams): ComposedWallpaper {
 
   const stars = starFieldBrick(p, {
     id: "og-d-st",
-    count: 60,
-    brightCount: 4,
+    count: 240,
+    brightCount: 8,
     color: "#ffffff",
     distribution: "upper",
     opacity: 0.4,
@@ -270,8 +271,8 @@ function obsidianBreak(p: BrickParams): ComposedWallpaper {
 
   const stars = starFieldBrick(p, {
     id: "og-b-stars",
-    count: 50,
-    brightCount: 3,
+    count: 230,
+    brightCount: 8,
     color: "#ffffff",
     distribution: "upper",
     opacity: 0.35,
@@ -381,7 +382,7 @@ function obsidianPulse(p: BrickParams): ComposedWallpaper {
 
   // Mountain peaks above waterline
   const peaks = terrainContourBrick(p, {
-    id: "og-p-pk",
+    id: "og-p-tc-pk",
     horizonY: 0.04,
     layers: [
       { color: colors.bgMid, opacity: 0.52, edgeBlur: 3 },
@@ -390,15 +391,16 @@ function obsidianPulse(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  // Moon above peaks
+  // Crescent moon above peaks
   const moon = celestialBrick(p, {
     id: "og-p-mn",
     cx: 0.5,
     cy: 0.15,
-    r: 0.04,
+    r: 0.028,
     color: "#c8d0e0",
     glowColor: colors.hueCyan,
-    glowSize: 2.0,
+    glowSize: 4.0,
+    crescent: { offsetX: 0.58, offsetY: -0.2, color: colors.bg },
   });
 
   // Lake reflection — water surface with ripple
@@ -420,8 +422,8 @@ function obsidianPulse(p: BrickParams): ComposedWallpaper {
 
   const stars = starFieldBrick(p, {
     id: "og-p-st",
-    count: 65,
-    brightCount: 4,
+    count: 250,
+    brightCount: 9,
     color: "#ffffff",
     distribution: "upper",
     opacity: 0.45,

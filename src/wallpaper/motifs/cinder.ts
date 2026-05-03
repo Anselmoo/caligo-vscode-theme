@@ -60,8 +60,8 @@ function cinderStillness(p: BrickParams): ComposedWallpaper {
 
   const stars = starFieldBrick(p, {
     id: "ci-s-st",
-    count: 180,
-    brightCount: 5,
+    count: 280,
+    brightCount: 10,
     distribution: "upper",
     opacity: 0.7,
   });
@@ -200,8 +200,8 @@ function cinderDrift(p: BrickParams): ComposedWallpaper {
 
   const stars = starFieldBrick(p, {
     id: "ci-d-st",
-    count: 80,
-    brightCount: 3,
+    count: 220,
+    brightCount: 7,
     distribution: "upper",
     opacity: 0.45,
   });
@@ -300,8 +300,8 @@ function cinderBreak(p: BrickParams): ComposedWallpaper {
 
   const stars = starFieldBrick(p, {
     id: "ci-b-st",
-    count: 40,
-    brightCount: 1,
+    count: 200,
+    brightCount: 5,
     distribution: "upper",
     opacity: 0.3,
   });
@@ -408,8 +408,8 @@ function cinderVoid(p: BrickParams): ComposedWallpaper {
   // Barely visible stars through ash haze
   const stars = starFieldBrick(p, {
     id: "ci-v-st",
-    count: 30,
-    brightCount: 1,
+    count: 200,
+    brightCount: 4,
     distribution: "upper",
     opacity: 0.25,
   });
@@ -494,7 +494,7 @@ function cinderPulse(p: BrickParams): ComposedWallpaper {
 
   const stars = starFieldBrick(p, {
     id: "ci-p-st",
-    count: 150,
+    count: 260,
     brightCount: 6,
     distribution: "upper",
     opacity: 0.6,
@@ -536,7 +536,7 @@ function cinderPulse(p: BrickParams): ComposedWallpaper {
 
   // Mountain backdrop
   const mountains = terrainContourBrick(p, {
-    id: "ci-p-mt",
+    id: "ci-p-mtn",
     horizonY: 0.5,
     layers: [
       { color: colors.bgMid, opacity: 0.5 },

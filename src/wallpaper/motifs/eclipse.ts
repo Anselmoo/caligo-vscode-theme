@@ -69,9 +69,9 @@ function eclipseStillness(p: BrickParams): ComposedWallpaper {
     turbulenceStrength: 0.24,
   });
 
-  // Moon disk drawn ON TOP of corona — pure black occluding disk
+  // Occluding disk drawn ON TOP of corona — pure black moon disk
   const moon = celestialBrick(p, {
-    id: "ec-s-mn",
+    id: "ec-s-od",
     cx: 0.52,
     cy: 0.37,
     r: 0.065,
@@ -82,8 +82,8 @@ function eclipseStillness(p: BrickParams): ComposedWallpaper {
 
   const stars = starFieldBrick(p, {
     id: "ec-s-st",
-    count: 180,
-    brightCount: 10,
+    count: 260,
+    brightCount: 12,
     color: "#ffffff",
     distribution: "full",
     opacity: 0.55,
@@ -99,7 +99,7 @@ function eclipseStillness(p: BrickParams): ComposedWallpaper {
 
   // Distant mountain range silhouette
   const mountains = terrainContourBrick(p, {
-    id: "ec-s-mt",
+    id: "ec-s-mtn",
     horizonY: 0.42,
     layers: [
       { color: colors.bgMid, opacity: 0.4, edgeBlur: 4 },
@@ -143,7 +143,7 @@ function eclipseDrift(p: BrickParams): ComposedWallpaper {
   });
 
   const eclipseBody = celestialBrick(p, {
-    id: "ec-d-eb",
+    id: "ec-d-od",
     cx: 0.5,
     cy: 0.4,
     r: 0.06,
@@ -154,8 +154,8 @@ function eclipseDrift(p: BrickParams): ComposedWallpaper {
 
   const stars = starFieldBrick(p, {
     id: "ec-d-st",
-    count: 150,
-    brightCount: 8,
+    count: 260,
+    brightCount: 10,
     color: "#ffffff",
     distribution: "full",
     opacity: 0.5,
@@ -283,7 +283,7 @@ function eclipseVoid(p: BrickParams): ComposedWallpaper {
   });
 
   const eclipseBody = celestialBrick(p, {
-    id: "ec-v-eb",
+    id: "ec-v-od",
     cx: 0.5,
     cy: 0.44,
     r: 0.052,
@@ -304,8 +304,8 @@ function eclipseVoid(p: BrickParams): ComposedWallpaper {
 
   const stars = starFieldBrick(p, {
     id: "ec-v-st",
-    count: 120,
-    brightCount: 6,
+    count: 220,
+    brightCount: 8,
     color: "#e8e8f0",
     distribution: "full",
     opacity: 0.45,
@@ -348,7 +348,7 @@ function eclipsePulse(p: BrickParams): ComposedWallpaper {
   });
 
   const eclipseBody = celestialBrick(p, {
-    id: "ec-p-eb",
+    id: "ec-p-od",
     cx: 0.51,
     cy: 0.27,
     r: 0.055,
@@ -378,8 +378,8 @@ function eclipsePulse(p: BrickParams): ComposedWallpaper {
 
   const stars = starFieldBrick(p, {
     id: "ec-p-st",
-    count: 160,
-    brightCount: 10,
+    count: 260,
+    brightCount: 12,
     color: "#ffffff",
     distribution: "full",
     opacity: 0.5,
