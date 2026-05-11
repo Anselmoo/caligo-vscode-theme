@@ -106,7 +106,7 @@
     "@vscode/test-electron": "^2.5.2",
     "@vscode/vsce": "^3.7.1",
     "@vue/test-utils": "^2.4.9",
-    "axe-core": "^4.11.2",
+    "axe-core": "^4.11.4",
     "happy-dom": "^20.9.0",
     "lefthook": "^2.1.5",
     "jsdom": "^28.1.0",
