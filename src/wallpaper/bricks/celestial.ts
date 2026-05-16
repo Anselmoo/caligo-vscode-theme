@@ -5,6 +5,16 @@
  * a single SVG primitive. The principle: every visible phenomenon in nature
  * is a composition of many overlapping, interacting structures.
  *
+ * moonBrick — physically accurate moon per catalog element "full-moon":
+ *   Layer 1: Outer atmospheric glow (radialGradient, very low opacity)
+ *   Layer 2: Earthshine (crescent phase only — faint full-disk illumination)
+ *   Layer 3: Base sphere (off-center radialGradient with limb darkening)
+ *   Layer 4: Maria / dark basalt plains (3–5 seeded blurred ellipses)
+ *   Layer 5: Crater field (seeded random small circles with blur)
+ *   Layer 6: Fine surface texture (feTurbulence at 0.04–0.07 opacity)
+ *   All layers 3–6 clipped to the phase-accurate moon shape (full / crescent / gibbous).
+ *   Colors are physically hardcoded — never palette-derived.
+ *
  * solarCoronaBrick — photorealistic solar eclipse corona:
  *   · 80-100 organic rays (variable length, width, opacity, curvature)
  *   · Turbulence-displaced inner corona halo (not a perfect circle)

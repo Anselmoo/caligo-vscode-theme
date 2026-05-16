@@ -18,8 +18,10 @@ import {
   ringBrick,
   shootingStarBrick,
   skyGradientBrick,
+  sparksBrick,
   starFieldBrick,
   terrainStackBrick,
+  treelineBrick,
   vignetteBrick,
 } from "../bricks/index.js";
 import { mergeBricks } from "../composer.js";
@@ -55,14 +57,15 @@ function nebulaStillness(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  // Nebula emission glow — warm region behind pillars
+  // Nebula emission glow — warm region behind pillars — boosted opacity
   const emission = nebulaGlowBrick(p, {
     id: "nn-s-em",
     blur: 0.06,
     blobs: [
-      { cx: 0.5, cy: 0.7, rx: 0.3, ry: 0.25, color: colors.accent, opacity: 0.18 },
-      { cx: 0.35, cy: 0.6, rx: 0.15, ry: 0.2, color: colors.huePurple, opacity: 0.1 },
-      { cx: 0.65, cy: 0.5, rx: 0.2, ry: 0.15, color: colors.accentSoft, opacity: 0.12 },
+      { cx: 0.5, cy: 0.65, rx: 0.35, ry: 0.3, color: colors.accent, opacity: 0.28 },
+      { cx: 0.35, cy: 0.55, rx: 0.2, ry: 0.25, color: colors.huePurple, opacity: 0.18 },
+      { cx: 0.65, cy: 0.45, rx: 0.22, ry: 0.18, color: colors.accentSoft, opacity: 0.2 },
+      { cx: 0.5, cy: 0.35, rx: 0.25, ry: 0.15, color: colors.hueCyan, opacity: 0.1 },
     ],
   });
 
@@ -78,24 +81,34 @@ function nebulaStillness(p: BrickParams): ComposedWallpaper {
     layers: [{ baseY: 0.25, roughness: 0.03, color: colors.bg, opacity: 0.9 }],
   });
 
-  // Dust cloud texture
+  // Dust cloud texture — denser
   const dust = cloudBandBrick(p, {
     id: "nn-s-du",
-    cy: 0.6,
-    bandHeight: 0.3,
+    cy: 0.55,
+    bandHeight: 0.35,
     color: colors.huePurple,
-    opacity: 0.06,
+    opacity: 0.1,
     frequency: 0.003,
     seed: 11,
   });
 
   const stars = starFieldBrick(p, {
     id: "nn-s-st",
-    count: 90,
-    brightCount: 8,
+    count: 380,
+    brightCount: 18,
     color: "#ffffff",
     distribution: "full",
-    opacity: 0.55,
+    opacity: 0.65,
+  });
+
+  // Bright star cluster visible through nebula gap
+  const clusterStars = starFieldBrick(p, {
+    id: "nn-s-cs",
+    count: 80,
+    brightCount: 10,
+    color: colors.accentSoft,
+    distribution: "full",
+    opacity: 0.45,
   });
 
   const vignette = vignetteBrick(p, { id: "nn-s-vig", opacity: 0.5 });
@@ -103,17 +116,17 @@ function nebulaStillness(p: BrickParams): ComposedWallpaper {
 
   const horizGlow = horizonGlowBrick(p, {
     id: "nn-s-hg",
-    y: 0.44,
+    y: 0.4,
     color: colors.accentSoft,
-    opacity: 0.15,
-    height: 0.1,
+    opacity: 0.18,
+    height: 0.12,
   });
 
   const meteors = shootingStarBrick(p, {
     id: "nn-s-mt",
-    count: 3,
+    count: 5,
     color: "#ffffff",
-    opacity: 0.45,
+    opacity: 0.55,
   });
 
   return mergeBricks([
@@ -121,6 +134,7 @@ function nebulaStillness(p: BrickParams): ComposedWallpaper {
     sky,
     emission,
     dust,
+    clusterStars,
     stars,
     meteors,
     horizGlow,
@@ -150,8 +164,8 @@ function nebulaDrift(p: BrickParams): ComposedWallpaper {
     id: "nn-d-co",
     blur: 0.06,
     blobs: [
-      { cx: 0.15, cy: 0.8, rx: 0.2, ry: 0.15, color: colors.hueYellow, opacity: 0.2 },
-      { cx: 0.2, cy: 0.75, rx: 0.12, ry: 0.1, color: colors.hueOrange, opacity: 0.12 },
+      { cx: 0.15, cy: 0.75, rx: 0.22, ry: 0.18, color: colors.hueYellow, opacity: 0.25 },
+      { cx: 0.2, cy: 0.68, rx: 0.14, ry: 0.12, color: colors.hueOrange, opacity: 0.16 },
     ],
   });
 
@@ -160,19 +174,19 @@ function nebulaDrift(p: BrickParams): ComposedWallpaper {
     id: "nn-d-ag",
     blur: 0.05,
     blobs: [
-      { cx: 0.3, cy: 0.6, rx: 0.15, ry: 0.04, color: colors.accent, opacity: 0.15 },
-      { cx: 0.5, cy: 0.5, rx: 0.18, ry: 0.05, color: colors.huePurple, opacity: 0.1 },
-      { cx: 0.7, cy: 0.4, rx: 0.15, ry: 0.04, color: colors.hueBlue, opacity: 0.12 },
+      { cx: 0.28, cy: 0.58, rx: 0.18, ry: 0.06, color: colors.accent, opacity: 0.2 },
+      { cx: 0.5, cy: 0.47, rx: 0.2, ry: 0.07, color: colors.huePurple, opacity: 0.15 },
+      { cx: 0.72, cy: 0.36, rx: 0.18, ry: 0.06, color: colors.hueBlue, opacity: 0.16 },
     ],
   });
 
   // Dust lane — dark cloud crossing the arm
   const dustLane = cloudBandBrick(p, {
     id: "nn-d-dl",
-    cy: 0.5,
-    bandHeight: 0.08,
+    cy: 0.48,
+    bandHeight: 0.1,
     color: colors.bg,
-    opacity: 0.12,
+    opacity: 0.14,
     frequency: 0.005,
     seed: 19,
   });
@@ -180,37 +194,47 @@ function nebulaDrift(p: BrickParams): ComposedWallpaper {
   // Dense stars along the arm
   const denseStars = starFieldBrick(p, {
     id: "nn-d-ds",
-    count: 120,
-    brightCount: 10,
+    count: 200,
+    brightCount: 16,
     color: "#ffffff",
     distribution: "full",
-    opacity: 0.5,
+    opacity: 0.6,
   });
 
   // Background dim stars
   const bgStars = starFieldBrick(p, {
     id: "nn-d-bs",
-    count: 50,
-    brightCount: 2,
+    count: 80,
+    brightCount: 4,
     color: colors.accentSoft,
     distribution: "full",
-    opacity: 0.25,
+    opacity: 0.3,
   });
 
-  // Distant planetary terrain — viewing the galaxy from surface
+  // Distant planetary terrain — raised by 0.15
   const terrain = terrainStackBrick(p, {
     id: "nn-d-tr",
     layers: [
-      { baseY: 0.82, roughness: 0.03, color: colors.bgMid, opacity: 0.3 },
-      { baseY: 0.9, roughness: 0.04, color: colors.bg, opacity: 0.6 },
+      { baseY: 0.65, roughness: 0.04, color: colors.bgMid, opacity: 0.38 },
+      { baseY: 0.75, roughness: 0.05, color: colors.bg, opacity: 0.7 },
     ],
+  });
+
+  // Alien treeline silhouette on distant world
+  const treeline = treelineBrick(p, {
+    id: "nn-d-tl",
+    baseY: 0.72,
+    count: 28,
+    color: colors.bg,
+    opacity: 0.65,
+    maxHeight: 0.06,
   });
 
   const meteor = shootingStarBrick(p, {
     id: "nn-d-mt",
-    count: 2,
+    count: 4,
     color: "#ffffff",
-    opacity: 0.4,
+    opacity: 0.5,
   });
 
   const spiralRing = ringBrick(p, {
@@ -220,7 +244,7 @@ function nebulaDrift(p: BrickParams): ComposedWallpaper {
     r: 0.32,
     strokeWidth: 1,
     color: colors.accentSoft,
-    opacity: 0.08,
+    opacity: 0.1,
   });
 
   const vignette = vignetteBrick(p, { id: "nn-d-vig", opacity: 0.55 });
@@ -236,6 +260,7 @@ function nebulaDrift(p: BrickParams): ComposedWallpaper {
     denseStars,
     meteor,
     terrain,
+    treeline,
     vignette,
     noise,
   ]);
@@ -259,11 +284,11 @@ function nebulaBreak(p: BrickParams): ComposedWallpaper {
   const novaCore = celestialBrick(p, {
     id: "nn-b-nc",
     cx: 0.5,
-    cy: 0.45,
-    r: 0.02,
+    cy: 0.42,
+    r: 0.022,
     color: "#ffffff",
     glowColor: colors.hueBlue,
-    glowSize: 4.0,
+    glowSize: 4.5,
   });
 
   // Expanding shockwave rings — concentric nebula blobs
@@ -271,46 +296,57 @@ function nebulaBreak(p: BrickParams): ComposedWallpaper {
     id: "nn-b-ri",
     blur: 0.04,
     blobs: [
-      { cx: 0.5, cy: 0.45, rx: 0.06, ry: 0.06, color: colors.hueCyan, opacity: 0.3 },
-      { cx: 0.5, cy: 0.45, rx: 0.14, ry: 0.14, color: colors.hueBlue, opacity: 0.18 },
-      { cx: 0.5, cy: 0.45, rx: 0.24, ry: 0.22, color: colors.huePurple, opacity: 0.1 },
-      { cx: 0.5, cy: 0.45, rx: 0.35, ry: 0.3, color: colors.hueRed, opacity: 0.05 },
+      { cx: 0.5, cy: 0.42, rx: 0.07, ry: 0.07, color: colors.hueCyan, opacity: 0.35 },
+      { cx: 0.5, cy: 0.42, rx: 0.16, ry: 0.16, color: colors.hueBlue, opacity: 0.22 },
+      { cx: 0.5, cy: 0.42, rx: 0.28, ry: 0.26, color: colors.huePurple, opacity: 0.12 },
+      { cx: 0.5, cy: 0.42, rx: 0.4, ry: 0.35, color: colors.hueRed, opacity: 0.06 },
     ],
   });
 
   // Ejected debris
   const debris = starFieldBrick(p, {
     id: "nn-b-db",
-    count: 50,
-    brightCount: 8,
+    count: 80,
+    brightCount: 14,
     color: colors.hueCyan,
     distribution: "full",
-    opacity: 0.5,
+    opacity: 0.6,
   });
 
   // Shooting stars — ejecta trails
   const ejecta = shootingStarBrick(p, {
     id: "nn-b-ej",
-    count: 3,
+    count: 5,
     color: colors.hueBlue,
-    opacity: 0.4,
+    opacity: 0.55,
   });
 
   const bgStars = starFieldBrick(p, {
     id: "nn-b-bs",
-    count: 60,
-    brightCount: 3,
+    count: 120,
+    brightCount: 5,
     color: "#ffffff",
     distribution: "full",
-    opacity: 0.35,
+    opacity: 0.45,
   });
 
-  // Rocky asteroid terrain in foreground
+  // Explosion particle sparks radiating outward
+  const burst = sparksBrick(p, {
+    id: "nn-b-sp",
+    count: 35,
+    color: colors.hueCyan,
+    opacity: 0.5,
+    direction: 1,
+    sourceCx: 0.5,
+    sourceSpread: 0.3,
+  });
+
+  // Rocky asteroid terrain in foreground — raised by 0.15
   const asteroidTerrain = terrainStackBrick(p, {
     id: "nn-b-at",
     layers: [
-      { baseY: 0.85, roughness: 0.05, color: colors.bgMid, opacity: 0.35 },
-      { baseY: 0.92, roughness: 0.04, color: colors.bg, opacity: 0.65 },
+      { baseY: 0.70, roughness: 0.06, color: colors.bgMid, opacity: 0.4 },
+      { baseY: 0.80, roughness: 0.05, color: colors.bg, opacity: 0.72 },
     ],
   });
 
@@ -319,9 +355,9 @@ function nebulaBreak(p: BrickParams): ComposedWallpaper {
 
   const horizGlow = horizonGlowBrick(p, {
     id: "nn-b-hg",
-    y: 0.62,
+    y: 0.58,
     color: colors.hueBlue,
-    opacity: 0.14,
+    opacity: 0.16,
     height: 0.1,
   });
 
@@ -329,11 +365,11 @@ function nebulaBreak(p: BrickParams): ComposedWallpaper {
   const shockRing = ringBrick(p, {
     id: "nn-b-sr",
     cx: 0.5,
-    cy: 0.45,
+    cy: 0.42,
     r: 0.3,
     strokeWidth: 2,
     color: colors.hueCyan,
-    opacity: 0.2,
+    opacity: 0.25,
   });
 
   return mergeBricks([
@@ -343,6 +379,7 @@ function nebulaBreak(p: BrickParams): ComposedWallpaper {
     shockRing,
     novaCore,
     ejecta,
+    burst,
     bgStars,
     debris,
     horizGlow,
@@ -361,19 +398,29 @@ function nebulaVoid(p: BrickParams): ComposedWallpaper {
     id: "nn-v-sky",
     stops: [
       { offset: "0%", color: colors.bg },
-      { offset: "50%", color: colors.bgSoft, opacity: 0.2 },
+      { offset: "50%", color: colors.bgSoft, opacity: 0.25 },
       { offset: "100%", color: colors.bg },
     ],
   });
 
-  // Faint background stars
+  // Faint background stars — behind the dark cloud
   const bgStars = starFieldBrick(p, {
     id: "nn-v-bs",
-    count: 80,
-    brightCount: 4,
+    count: 140,
+    brightCount: 8,
     color: "#ffffff",
     distribution: "full",
-    opacity: 0.3,
+    opacity: 0.45,
+  });
+
+  // More distant dim stars
+  const dimStars = starFieldBrick(p, {
+    id: "nn-v-ds",
+    count: 80,
+    brightCount: 2,
+    color: colors.accentSoft,
+    distribution: "full",
+    opacity: 0.2,
   });
 
   // Dark nebula mass — terrain-like silhouette absorbing stars
@@ -386,15 +433,25 @@ function nebulaVoid(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  // Faint nebula edge glow
+  // Faint nebula edge glow — boosted
   const edgeGlow = cloudBandBrick(p, {
     id: "nn-v-eg",
-    cy: 0.35,
-    bandHeight: 0.15,
+    cy: 0.32,
+    bandHeight: 0.18,
     color: colors.huePurple,
-    opacity: 0.04,
+    opacity: 0.08,
     frequency: 0.004,
     seed: 41,
+  });
+
+  // Faint emission behind the cloud
+  const backGlow = nebulaGlowBrick(p, {
+    id: "nn-v-bg",
+    blur: 0.07,
+    blobs: [
+      { cx: 0.5, cy: 0.5, rx: 0.3, ry: 0.2, color: colors.huePurple, opacity: 0.1 },
+      { cx: 0.3, cy: 0.4, rx: 0.15, ry: 0.12, color: colors.accent, opacity: 0.06 },
+    ],
   });
 
   const vignette = vignetteBrick(p, { id: "nn-v-vig", opacity: 0.5 });
@@ -402,22 +459,24 @@ function nebulaVoid(p: BrickParams): ComposedWallpaper {
 
   const horizGlow = horizonGlowBrick(p, {
     id: "nn-v-hg",
-    y: 0.5,
+    y: 0.48,
     color: colors.huePurple,
-    opacity: 0.12,
-    height: 0.12,
+    opacity: 0.14,
+    height: 0.14,
   });
 
   const voidMeteor = shootingStarBrick(p, {
     id: "nn-v-mt",
-    count: 1,
+    count: 3,
     color: "#ffffff",
-    opacity: 0.2,
+    opacity: 0.35,
   });
 
   return mergeBricks([
     bg,
     sky,
+    backGlow,
+    dimStars,
     bgStars,
     voidMeteor,
     edgeGlow,
@@ -447,28 +506,28 @@ function nebulaPulse(p: BrickParams): ComposedWallpaper {
     id: "nn-p-cg",
     blur: 0.06,
     blobs: [
-      { cx: 0.5, cy: 0.5, rx: 0.12, ry: 0.1, color: colors.hueYellow, opacity: 0.3 },
-      { cx: 0.5, cy: 0.5, rx: 0.22, ry: 0.18, color: colors.hueOrange, opacity: 0.15 },
-      { cx: 0.5, cy: 0.5, rx: 0.35, ry: 0.3, color: colors.accent, opacity: 0.08 },
+      { cx: 0.5, cy: 0.5, rx: 0.14, ry: 0.12, color: colors.hueYellow, opacity: 0.35 },
+      { cx: 0.5, cy: 0.5, rx: 0.26, ry: 0.22, color: colors.hueOrange, opacity: 0.18 },
+      { cx: 0.5, cy: 0.5, rx: 0.4, ry: 0.35, color: colors.accent, opacity: 0.1 },
     ],
   });
 
   // Dust lanes crossing core
   const dust1 = cloudBandBrick(p, {
     id: "nn-p-d1",
-    cy: 0.48,
-    bandHeight: 0.06,
+    cy: 0.47,
+    bandHeight: 0.07,
     color: colors.bg,
-    opacity: 0.12,
+    opacity: 0.14,
     frequency: 0.006,
     seed: 7,
   });
   const dust2 = cloudBandBrick(p, {
     id: "nn-p-d2",
-    cy: 0.55,
-    bandHeight: 0.04,
+    cy: 0.54,
+    bandHeight: 0.05,
     color: colors.bg,
-    opacity: 0.08,
+    opacity: 0.1,
     frequency: 0.008,
     seed: 13,
   });
@@ -476,52 +535,69 @@ function nebulaPulse(p: BrickParams): ComposedWallpaper {
   // Dense star field
   const denseStars = starFieldBrick(p, {
     id: "nn-p-ds",
-    count: 150,
-    brightCount: 15,
+    count: 250,
+    brightCount: 20,
     color: "#ffffff",
     distribution: "full",
-    opacity: 0.6,
+    opacity: 0.7,
   });
 
   // Secondary warm stars
   const warmStars = starFieldBrick(p, {
     id: "nn-p-ws",
-    count: 40,
-    brightCount: 5,
+    count: 60,
+    brightCount: 8,
     color: colors.hueYellow,
     distribution: "full",
-    opacity: 0.4,
+    opacity: 0.5,
   });
 
-  // Cratered landscape beneath the galactic core
+  // Cratered landscape beneath — raised by 0.15
   const craters = terrainStackBrick(p, {
     id: "nn-p-cr",
     layers: [
-      { baseY: 0.78, roughness: 0.04, color: colors.bgMid, opacity: 0.3 },
-      { baseY: 0.85, roughness: 0.05, color: colors.bgSoft, opacity: 0.5 },
-      { baseY: 0.93, roughness: 0.035, color: colors.bg, opacity: 0.75 },
+      { baseY: 0.62, roughness: 0.05, color: colors.bgMid, opacity: 0.35 },
+      { baseY: 0.72, roughness: 0.055, color: colors.bgSoft, opacity: 0.55 },
+      { baseY: 0.83, roughness: 0.04, color: colors.bg, opacity: 0.8 },
     ],
+  });
+
+  // Alien vegetation at crater ridge — small scale relative to crater landscape
+  const treeline = treelineBrick(p, {
+    id: "nn-p-tl",
+    baseY: 0.75,
+    count: 35,
+    color: colors.bg,
+    opacity: 0.7,
+    maxHeight: 0.035,
   });
 
   // Galactic halo ring
   const coreRing = ringBrick(p, {
-    id: "nn-p-cr",
+    id: "nn-p-cr2",
     cx: 0.5,
     cy: 0.5,
     r: 0.22,
     strokeWidth: 1,
     color: colors.hueYellow,
-    opacity: 0.1,
+    opacity: 0.12,
   });
 
   const coreAtmo = atmosphereBrick(p, {
     id: "nn-p-atmo",
     color: colors.hueYellow,
     highlightColor: colors.hueOrange,
-    opacity: 0.06,
+    opacity: 0.07,
     lightAzimuth: 180,
     lightElevation: 45,
     seed: 19,
+  });
+
+  const pulseMeteors = shootingStarBrick(p, {
+    id: "nn-p-mt",
+    count: 4,
+    color: "#ffffff",
+    opacity: 0.5,
   });
 
   const vignette = vignetteBrick(p, { id: "nn-p-vig", opacity: 0.5 });
@@ -535,8 +611,10 @@ function nebulaPulse(p: BrickParams): ComposedWallpaper {
     dust2,
     warmStars,
     denseStars,
+    pulseMeteors,
     coreAtmo,
     craters,
+    treeline,
     vignette,
     noise,
   ]);

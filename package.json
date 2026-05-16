@@ -64,6 +64,7 @@
     "wallpapers:bundle": "npx tsx scripts/bundle-wallpapers.ts",
     "wallpapers:all": "npm run wallpapers:generate && npm run wallpapers:manifest && npm run wallpapers:bundle",
     "wallpapers:gallery": "npx tsx scripts/generate-gallery.ts && npx serve public --listen 5050",
+    "wallpapers:bricks": "npx tsx scripts/generate-brick-gallery.ts",
     "wallpapers:classify": "npx tsx scripts/classify-svg-bugs.ts",
     "wallpapers:analyze": "npx tsx scripts/analyze-wallpaper-quality.ts",
     "wallpapers:analyze:motif": "npx tsx scripts/analyze-wallpaper-quality.ts --motif",

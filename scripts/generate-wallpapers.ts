@@ -158,7 +158,7 @@ async function rasteriseAll(specs: WallpaperSpec[]) {
     const html = `<!DOCTYPE html><html><body style="margin:0;padding:0;overflow:hidden;width:${width}px;height:${height}px;background:none">${svgContent}</body></html>`;
 
     await page.setViewportSize({ width, height });
-    await page.setContent(html, { waitUntil: "load" });
+    await page.setContent(html, { waitUntil: "load", timeout: 60_000 });
 
     const pngRelPath = wallpaperFilename(spec, "png");
     const pngAbsPath = join(OUTPUT_DIR, pngRelPath);
@@ -167,6 +167,7 @@ async function rasteriseAll(specs: WallpaperSpec[]) {
     await page.screenshot({
       path: pngAbsPath,
       clip: { x: 0, y: 0, width, height },
+      timeout: 120_000,
     });
 
     count++;

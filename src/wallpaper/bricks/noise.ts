@@ -63,21 +63,23 @@ export interface NebulaDustBrickOptions {
 }
 
 /**
- * Cosmic dust overlay using feTurbulence(fractalNoise) + feColorMatrix constant-color trick.
- * Creates large organic cloud blobs tinted to the scene's accent color, reproducing the
- * technique from photorealistic reference SVGs: low baseFrequency → broad nebular structures,
- * feColorMatrix ignores input RGB (constant columns) and scales turbulence alpha directly.
+ * Cosmic dust overlay — large nebular structures (NOT fine grain).
+ *
+ * Uses very low base frequencies so the resulting "dust" forms broad organic
+ * cloud regions that span 1/3+ of the canvas — what real nebula photographs look like.
+ * Includes a heavy gaussian blur so the structures soften into nebular gas.
  */
 export function nebulaDustBrick(params: BrickParams, options: NebulaDustBrickOptions): BrickOutput {
   const { viewBox } = params;
   const { width, height } = viewBox;
+  const scale = Math.max(width, height);
   const {
     id = "nebula-dust",
     tintColor,
     opacity = 0.35,
-    baseFrequency = 0.012,
-    numOctaves = 3,
-    alphaStrength = 0.28,
+    baseFrequency = 0.0035, // much lower — large nebula structures, not fine grain
+    numOctaves = 4,
+    alphaStrength = 0.55, // higher so visible against dark backgrounds
     seed = 7,
   } = options;
 
@@ -86,11 +88,13 @@ export function nebulaDustBrick(params: BrickParams, options: NebulaDustBrickOpt
   const g = (parseInt(hex.slice(2, 4), 16) / 255).toFixed(4);
   const b = (parseInt(hex.slice(4, 6), 16) / 255).toFixed(4);
   const a = alphaStrength.toFixed(4);
+  const blurSd = (scale * 0.012).toFixed(0);
 
   return {
     defs: `<filter id="${id}" x="0" y="0" width="100%" height="100%" color-interpolation-filters="linearRGB">
-  <feTurbulence type="fractalNoise" baseFrequency="${baseFrequency}" numOctaves="${numOctaves}" seed="${seed}" result="dust"/>
-  <feColorMatrix in="dust" type="matrix" values="0 0 0 0 ${r}  0 0 0 0 ${g}  0 0 0 0 ${b}  0 0 0 ${a} 0"/>
+  <feTurbulence type="fractalNoise" baseFrequency="${baseFrequency} ${(baseFrequency * 0.7).toFixed(4)}" numOctaves="${numOctaves}" seed="${seed}" result="dust"/>
+  <feColorMatrix in="dust" type="matrix" values="0 0 0 0 ${r}  0 0 0 0 ${g}  0 0 0 0 ${b}  0 0 0 ${a} -0.18" result="tinted"/>
+  <feGaussianBlur in="tinted" stdDeviation="${blurSd}"/>
 </filter>`,
     elements: `<rect width="${width}" height="${height}" opacity="${opacity}" filter="url(#${id})"/>`,
   };

@@ -17,13 +17,16 @@ export function vignetteBrick(
 ): BrickOutput {
   const { viewBox, colors } = params;
   const { width, height } = viewBox;
-  const { id = "vignette", opacity = 0.6, innerRadius = 0.35, color = colors.bg } = options;
+  const { id = "vignette", opacity = 0.7, innerRadius = 0.3, color = colors.bg } = options;
   const cx = width / 2;
   const cy = height / 2;
   const r = Math.max(width, height) * 0.75;
   return {
     defs: `<radialGradient id="${id}" cx="${cx.toFixed(0)}" cy="${cy.toFixed(0)}" r="${r.toFixed(0)}" gradientUnits="userSpaceOnUse">
+  <stop offset="0%" stop-color="${color}" stop-opacity="0"/>
   <stop offset="${(innerRadius * 100).toFixed(0)}%" stop-color="${color}" stop-opacity="0"/>
+  <stop offset="${(innerRadius * 100 + 20).toFixed(0)}%" stop-color="${color}" stop-opacity="${(opacity * 0.15).toFixed(2)}"/>
+  <stop offset="${(innerRadius * 100 + 40).toFixed(0)}%" stop-color="${color}" stop-opacity="${(opacity * 0.5).toFixed(2)}"/>
   <stop offset="100%" stop-color="${color}" stop-opacity="${opacity}"/>
 </radialGradient>`,
     elements: `<rect width="${width}" height="${height}" fill="url(#${id})"/>`,

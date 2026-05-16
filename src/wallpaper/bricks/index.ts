@@ -13,6 +13,7 @@ export {
   auroraAdvancedBrick,
   celestialBrick,
   cloudBandBrick,
+  desertBrick,
   duneBrick,
   horizonGlowBrick,
   lightningBrick,
@@ -29,8 +30,9 @@ export {
   waterReflectionBrick,
 } from "./landscape.js";
 export { nebulaDustBrick, noiseBrick, turbulenceBrick } from "./noise.js";
-export { jellyfishBrick, waterCurrentBrick } from "./ocean.js";
+export { beachBrick, jellyfishBrick, waterCurrentBrick } from "./ocean.js";
 export { particlesBrick, sparksBrick } from "./particles.js";
+// (textBrick exports below - keep aligned)
 export {
   arcBrick,
   bandBrick,

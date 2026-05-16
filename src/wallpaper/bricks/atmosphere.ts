@@ -57,7 +57,7 @@ export function atmosphereBrick(params: BrickParams, options: AtmosphereBrickOpt
     highlightColor,
     turbulenceFreq = 0.003,
     displacementScale = 0.025,
-    opacity = 0.1,
+    opacity = 0.25,
     seed = 7,
     id = "atmo",
   } = options;
@@ -80,16 +80,16 @@ export function atmosphereBrick(params: BrickParams, options: AtmosphereBrickOpt
     : "";
 
   const defs = `<filter id="${id}-f" x="-35%" y="-35%" width="170%" height="170%" color-interpolation-filters="sRGB">
-  <feTurbulence type="fractalNoise" baseFrequency="${freqX} ${freqY}" numOctaves="4" seed="${seed}" result="MACRO"/>
-  <feTurbulence type="fractalNoise" baseFrequency="${detailFreqX} ${detailFreqY}" numOctaves="2" seed="${seed + 17}" result="DETAIL"/>
+  <feTurbulence type="fractalNoise" baseFrequency="${freqX} ${freqY}" numOctaves="5" seed="${seed}" result="MACRO"/>
+  <feTurbulence type="fractalNoise" baseFrequency="${detailFreqX} ${detailFreqY}" numOctaves="3" seed="${seed + 17}" result="DETAIL"/>
   <feBlend in="MACRO" in2="DETAIL" mode="multiply" result="NOISE"/>
-  <!-- Extract noise luminance as an alpha fog-density mask -->
+  <!-- Stronger threshold extraction for visibly defined fog clumps -->
   <feColorMatrix type="matrix" in="NOISE" result="ALPHAMASK"
     values="0 0 0 0 0
             0 0 0 0 0
             0 0 0 0 0
-            0.42 0.32 0.26 0 -0.1"/>
-  <!-- Soften fog patch edges so they blend organically with no hard rectangular border -->
+            0.62 0.48 0.38 0 -0.22"/>
+  <!-- Soften fog patch edges -->
   <feGaussianBlur in="ALPHAMASK" stdDeviation="${blurSd}" result="SOFTMASK"/>
   <!-- Apply atmosphere colour only where fog density is non-zero -->
   <feFlood flood-color="${color}" flood-opacity="${opacity}" result="COLORFILL"/>

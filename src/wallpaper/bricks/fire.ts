@@ -76,7 +76,7 @@ export function smokeRisingBrick(
     riseHeight = 0.5,
     spreadX = 0.6,
     color = "#888888",
-    opacity = 0.2,
+    opacity = 0.35,
     columns = 3,
     id = "smoke",
   } = options;
@@ -101,45 +101,56 @@ export function smokeRisingBrick(
     // Each column drifts horizontally from center
     const drift = (rng() - 0.5) * xSpread * 0.7;
     const colCx = xCenter + drift;
-    // Smoke column width: starts narrower at source, widens as it rises
-    // We control this via turbulence column frequency
-    const colFreqX = (0.006 + rng() * 0.006).toFixed(4); // wide columns (0.006-0.012)
-    const colFreqY = (0.0008 + rng() * 0.0006).toFixed(4); // tall vertical structure
-    const dispScale = (scale * (0.012 + rng() * 0.01)).toFixed(0);
-    const hBlur = (scale * (0.008 + rng() * 0.006)).toFixed(1); // wider than aurora
-    const vBlur = (scale * (0.006 + rng() * 0.005)).toFixed(1); // vertical blur = rising
+    // Wider plumes with soft organic shapes (lower freqX → bigger swirls)
+    const colFreqX = (0.0015 + rng() * 0.002).toFixed(4);
+    const colFreqY = (0.0004 + rng() * 0.0005).toFixed(4);
+    const dispScale = (scale * (0.022 + rng() * 0.015)).toFixed(0);
+    const hBlur = (scale * (0.008 + rng() * 0.006)).toFixed(1);
+    const vBlur = (scale * (0.016 + rng() * 0.012)).toFixed(1);
 
-    // Gradient: smoke rises from sourceY to topPx
-    // Opacity peaks just above source (dense base), fades to zero at top
     const gId = `${id}-g${ci}`;
     const fId = `${id}-f${ci}`;
+    const maskId = `${id}-m${ci}`;
 
+    // Radial-gradient mask → soft horizontal fade (no hard rect edges)
+    const colW = xSpread * (0.35 + rng() * 0.25);
+    defs.push(
+      `<mask id="${maskId}">
+  <radialGradient id="${maskId}-rg" cx="${colCx.toFixed(1)}" cy="${((topPx + sourcePx) * 0.5).toFixed(1)}" rx="${(colW * 0.55).toFixed(1)}" ry="${(riseH * 0.55).toFixed(1)}" gradientUnits="userSpaceOnUse">
+    <stop offset="0%" stop-color="white" stop-opacity="1"/>
+    <stop offset="65%" stop-color="white" stop-opacity="0.6"/>
+    <stop offset="100%" stop-color="white" stop-opacity="0"/>
+  </radialGradient>
+  <rect width="${width}" height="${height}" fill="url(#${maskId}-rg)"/>
+</mask>`
+    );
+
+    // Vertical opacity gradient (source bright, dissipation faded)
     defs.push(
       `<linearGradient id="${gId}" x1="0" y1="0" x2="0" y2="1">
   <stop offset="0%" stop-color="${color}" stop-opacity="0"/>
   <stop offset="${pp(topPx)}" stop-color="${color}" stop-opacity="0"/>
-  <stop offset="${pp(topPx + riseH * 0.12)}" stop-color="${color}" stop-opacity="${(colOp * 0.25).toFixed(2)}"/>
-  <stop offset="${pp(topPx + riseH * 0.45)}" stop-color="${color}" stop-opacity="${(colOp * 0.55).toFixed(2)}"/>
-  <stop offset="${pp(sourcePx - riseH * 0.08)}" stop-color="${color}" stop-opacity="${(colOp * 0.8).toFixed(2)}"/>
-  <stop offset="${pp(sourcePx)}" stop-color="${color}" stop-opacity="${(colOp * 0.95).toFixed(2)}"/>
-  <stop offset="${pp(Math.min(height, sourcePx + riseH * 0.15))}" stop-color="${color}" stop-opacity="0"/>
+  <stop offset="${pp(topPx + riseH * 0.2)}" stop-color="${color}" stop-opacity="${(colOp * 0.15).toFixed(2)}"/>
+  <stop offset="${pp(topPx + riseH * 0.5)}" stop-color="${color}" stop-opacity="${(colOp * 0.55).toFixed(2)}"/>
+  <stop offset="${pp(sourcePx - riseH * 0.05)}" stop-color="${color}" stop-opacity="${(colOp * 0.95).toFixed(2)}"/>
+  <stop offset="${pp(sourcePx)}" stop-color="${color}" stop-opacity="${colOp.toFixed(2)}"/>
+  <stop offset="${pp(Math.min(height, sourcePx + riseH * 0.05))}" stop-color="${color}" stop-opacity="0"/>
   <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
 </linearGradient>
-<filter id="${fId}" x="-30%" y="0%" width="160%" height="100%" color-interpolation-filters="linearRGB">
+<filter id="${fId}" x="-40%" y="-5%" width="180%" height="110%" color-interpolation-filters="linearRGB">
   <feTurbulence type="fractalNoise" baseFrequency="${colFreqX} ${colFreqY}" numOctaves="5" seed="${seed1}" result="cols"/>
-  <feColorMatrix in="cols" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  5.5 0 0 0 -2.2" result="colMask"/>
+  <!-- Softer threshold for wispy organic shapes, not hard blocks -->
+  <feColorMatrix in="cols" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  4.0 0 0 0 -1.2" result="colMask"/>
   <feGaussianBlur in="colMask" stdDeviation="${hBlur} ${vBlur}" result="softCols"/>
   <feComposite in="SourceGraphic" in2="softCols" operator="in" result="plume"/>
-  <feTurbulence type="fractalNoise" baseFrequency="0.004 0.001" numOctaves="3" seed="${seed2}" result="drift"/>
+  <feTurbulence type="fractalNoise" baseFrequency="0.003 0.0008" numOctaves="3" seed="${seed2}" result="drift"/>
   <feDisplacementMap in="plume" in2="drift" scale="${dispScale}" xChannelSelector="R" yChannelSelector="G"/>
 </filter>`
     );
 
-    // Constrain rect horizontally to the spread zone so smoke comes from the right source
-    const rectX = Math.max(0, colCx - xSpread / 2);
-    const rectW = Math.min(width - rectX, xSpread);
+    // Full-width rect with radial mask → organically shaped plume, no hard edges
     elems.push(
-      `<rect x="${fmt(rectX)}" y="0" width="${fmt(rectW)}" height="${height}" fill="url(#${gId})" filter="url(#${fId})"/>`
+      `<rect x="0" y="0" width="${width}" height="${height}" fill="url(#${gId})" filter="url(#${fId})" mask="url(#${maskId})"/>`
     );
   }
 
@@ -315,107 +326,137 @@ export interface LavaRiverBrickOptions {
 }
 
 /**
- * Sinuous lava river channels flowing down a volcanic slope.
+ * Lava river system — inverted rendering model for realistic volcanic flow:
  *
- * Each river is a 4-5 segment cubic bezier path, meandering from startY to endY.
- * Rendered in 3 passes:
- *  1. Wide blurred outer glow (heat signature)
- *  2. Medium stroke (lava channel body)
- *  3. Thin bright core (hottest, fresh lava center)
+ *  1. HEAT GLOW AURA — shaped to follow the river path (not rectangular)
+ *  2. BRIGHT LAVA FLOW BASE — single sinuous river as a filled closed polygon
+ *  3. DARK ROCK CRUST OVERLAY — feTurbulence clipped to river shape (no rectangle)
+ *  4. BRIGHT HOT CRACKS — secondary turbulence also clipped to river shape
+ *  5. STEAM/HEAT SHIMMER wisps above the river
  *
- * Channels widen near the bottom (pooling) and narrow at the source.
+ * Key: clipPath on crust/crack overlays eliminates visible rectangular boundaries.
+ * Single wide sinuous river reads as a natural flow, not separate columns.
  */
 export function lavaRiverBrick(params: BrickParams, options: LavaRiverBrickOptions): BrickOutput {
   const { viewBox, seedId, harmonyMode } = params;
   const { width, height } = viewBox;
   const scale = Math.max(width, height);
+  const sc = scale / 960;
   const {
-    startY = 0.45,
-    endY = 0.85,
+    startY = 0.32,
+    endY = 0.92,
     cx = 0.5,
-    spreadX = 0.6,
-    rivers = 4,
-    hotColor = "#ffdd44",
-    glowColor = "#ff4400",
-    opacity = 0.8,
+    spreadX = 0.7,
+    hotColor = "#fff0a0",
+    glowColor = "#ff3a00",
+    opacity = 0.85,
     id = "lava",
   } = options;
 
   const rng = seedRng(options.seed ?? hashStr(`${seedId}-${harmonyMode}-lava`));
-
   const startPx = startY * height;
   const endPx = endY * height;
   const cxPx = cx * width;
   const spreadPx = spreadX * width;
+  const lavaH = endPx - startPx;
 
   const defs: string[] = [];
   const elems: string[] = [];
 
-  // Glow filter — sc=1.0 at 960px, blur=6px at gallery size, 24px at 4K
-  const sc = scale / 960;
-  const glowFiltId = `${id}-gf`;
-  defs.push(
-    `<filter id="${glowFiltId}" x="-200%" y="-20%" width="500%" height="140%"><feGaussianBlur stdDeviation="${(6 * sc).toFixed(1)}"/></filter>`
-  );
+  // ── Build SINGLE sinuous river shape ──────────────────────────────────────
+  // One main river with variable width, meandering across the scene.
+  const segments = 14;
+  const segH = lavaH / segments;
+  const leftPts: [number, number][] = [];
+  const rightPts: [number, number][] = [];
+  let xCenter = cxPx + (rng() - 0.5) * spreadPx * 0.2;
 
-  const riverPaths: string[] = [];
-  const glowPaths: string[] = [];
-  const corePaths: string[] = [];
-
-  for (let ri = 0; ri < rivers; ri++) {
-    // Start position spread across the source zone
-    const x0 = cxPx + (rng() - 0.5) * spreadPx * 0.5;
-
-    // Build winding path with 4 segments from startY to endY
-    const segCount = 4;
-    const segH = (endPx - startPx) / segCount;
-    const pts: [number, number][] = [[x0, startPx]];
-    let xCurr = x0;
-
-    for (let si = 1; si <= segCount; si++) {
-      const y = startPx + si * segH;
-      // Rivers meander left/right but generally follow the terrain
-      // They widen toward the bottom (lava pool spreading)
-      const wanderAmp = spreadPx * 0.12 * (1 + si * 0.15);
-      xCurr += (rng() - 0.5) * wanderAmp;
-      // Keep within canvas
-      xCurr = Math.max(spreadPx * 0.05, Math.min(width - spreadPx * 0.05, xCurr));
-      pts.push([xCurr, y]);
-    }
-
-    // Build smooth cubic bezier path through the points
-    let d = `M ${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`;
-    for (let pi = 1; pi < pts.length; pi++) {
-      const [px1, py1] = pts[pi - 1];
-      const [px2, py2] = pts[pi];
-      const cpY = (py1 + py2) / 2;
-      const wander = (rng() - 0.5) * spreadPx * 0.08;
-      d += ` C ${(px1 + wander).toFixed(1)},${cpY.toFixed(1)} ${(px2 - wander).toFixed(1)},${cpY.toFixed(1)} ${px2.toFixed(1)},${py2.toFixed(1)}`;
-    }
-
-    // Stroke width — sc=1.0 at 960px, scales up for 4K
-    // baseW: 2–5px at 960p; glowW: 8–16px at 960p; coreW: 1.5px
-    const sc2 = scale / 960;
-    const baseW = ((2 + rng() * 3) * sc2).toFixed(1);
-    const glowW = ((8 + rng() * 8) * sc2).toFixed(1);
-    const coreW = (1.5 * sc2).toFixed(1);
-    const rOp = (opacity * (0.55 + rng() * 0.35)).toFixed(2);
-
-    glowPaths.push(
-      `<path d="${d}" fill="none" stroke="${glowColor}" stroke-width="${glowW}" opacity="${rOp}" stroke-linecap="round" stroke-linejoin="round"/>`
-    );
-    riverPaths.push(
-      `<path d="${d}" fill="none" stroke="${glowColor}" stroke-width="${baseW}" opacity="${rOp}" stroke-linecap="round" stroke-linejoin="round"/>`
-    );
-    corePaths.push(
-      `<path d="${d}" fill="none" stroke="${hotColor}" stroke-width="${coreW}" opacity="${(opacity * 0.9).toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"/>`
-    );
+  for (let s = 0; s <= segments; s++) {
+    const y = startPx + s * segH;
+    const t = s / segments;
+    // Width: narrow at source (top), widens to middle, stays wide to bottom
+    const widthMul = Math.min(1, t * 2.5) * 0.7 + 0.3;
+    const halfW = (25 + rng() * 40) * sc * widthMul;
+    // Stronger meander — river snakes across the scene
+    xCenter += (rng() - 0.5) * 35 * sc;
+    xCenter = Math.max(cxPx - spreadPx * 0.35, Math.min(cxPx + spreadPx * 0.35, xCenter));
+    const lj = (rng() - 0.5) * halfW * 0.4;
+    const rj = (rng() - 0.5) * halfW * 0.4;
+    leftPts.push([xCenter - halfW + lj, y]);
+    rightPts.push([xCenter + halfW + rj, y]);
   }
 
-  // Render: glow (blurred) → channel body → hot core
-  elems.push(`<g id="${id}-glow" filter="url(#${glowFiltId})">${glowPaths.join("")}</g>`);
-  elems.push(`<g id="${id}-body">${riverPaths.join("")}</g>`);
-  elems.push(`<g id="${id}-core">${corePaths.join("")}</g>`);
+  // Build closed path: left edge down, right edge back up
+  let riverD = `M ${leftPts[0][0].toFixed(1)},${leftPts[0][1].toFixed(1)}`;
+  for (let i = 1; i < leftPts.length; i++) {
+    const prev = leftPts[i - 1];
+    const curr = leftPts[i];
+    const cpY = (prev[1] + curr[1]) / 2;
+    riverD += ` C ${prev[0].toFixed(1)},${cpY.toFixed(1)} ${curr[0].toFixed(1)},${cpY.toFixed(1)} ${curr[0].toFixed(1)},${curr[1].toFixed(1)}`;
+  }
+  riverD += ` L ${rightPts[rightPts.length - 1][0].toFixed(1)},${rightPts[rightPts.length - 1][1].toFixed(1)}`;
+  for (let i = rightPts.length - 2; i >= 0; i--) {
+    const prev = rightPts[i + 1];
+    const curr = rightPts[i];
+    const cpY = (prev[1] + curr[1]) / 2;
+    riverD += ` C ${prev[0].toFixed(1)},${cpY.toFixed(1)} ${curr[0].toFixed(1)},${cpY.toFixed(1)} ${curr[0].toFixed(1)},${curr[1].toFixed(1)}`;
+  }
+  riverD += " Z";
+
+  // ── ClipPath for overlays to match river shape ────────────────────────────
+  const clipId = `${id}-clip`;
+  defs.push(`<clipPath id="${clipId}"><path d="${riverD}"/></clipPath>`);
+
+  // ── 1. HEAT GLOW AURA — follows river shape (blurred version of the path)
+  const auraBlurId = `${id}-ab`;
+  defs.push(`<filter id="${auraBlurId}" x="-40%" y="-20%" width="180%" height="140%"><feGaussianBlur stdDeviation="${(25 * sc).toFixed(1)}"/></filter>`);
+  elems.push(`<path d="${riverD}" fill="${glowColor}" opacity="${(opacity * 0.3).toFixed(2)}" filter="url(#${auraBlurId})"/>`);
+
+  // ── 2. BRIGHT LAVA FLOW BASE — filled river shape with hot gradient
+  const flowGradId = `${id}-fg`;
+  defs.push(`<linearGradient id="${flowGradId}" x1="0" y1="${startPx.toFixed(0)}" x2="0" y2="${endPx.toFixed(0)}" gradientUnits="userSpaceOnUse">
+  <stop offset="0%" stop-color="${hotColor}" stop-opacity="${opacity.toFixed(2)}"/>
+  <stop offset="20%" stop-color="#ffa030" stop-opacity="${(opacity * 0.95).toFixed(2)}"/>
+  <stop offset="50%" stop-color="${glowColor}" stop-opacity="${(opacity * 0.88).toFixed(2)}"/>
+  <stop offset="75%" stop-color="#aa2000" stop-opacity="${(opacity * 0.75).toFixed(2)}"/>
+  <stop offset="100%" stop-color="#5a0a00" stop-opacity="${(opacity * 0.55).toFixed(2)}"/>
+</linearGradient>`);
+  // Soft outer glow
+  const flowBlurId = `${id}-fb`;
+  defs.push(`<filter id="${flowBlurId}" x="-15%" y="-5%" width="130%" height="110%"><feGaussianBlur stdDeviation="${(4 * sc).toFixed(1)}"/></filter>`);
+  elems.push(`<path d="${riverD}" fill="url(#${flowGradId})" opacity="${(opacity * 0.5).toFixed(2)}" filter="url(#${flowBlurId})"/>`);
+  // Main flow body
+  elems.push(`<path d="${riverD}" fill="url(#${flowGradId})" opacity="${(opacity * 0.9).toFixed(2)}"/>`);
+
+  // ── 3. DARK CRUST OVERLAY — clipped to river shape (no rectangular boundary!)
+  const crustSeed = Math.floor(rng() * 89) + 1;
+  const crustId = `${id}-crust`;
+  defs.push(`<filter id="${crustId}" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+  <feTurbulence type="fractalNoise" baseFrequency="0.025 0.015" numOctaves="5" seed="${crustSeed}" result="n"/>
+  <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.02  0 0 0 0 0.01  0 0 0 0 0.01  5.0 0 0 0 -1.8" result="crust"/>
+  <feGaussianBlur in="crust" stdDeviation="0.8" result="softCrust"/>
+  <feComposite in="softCrust" in2="SourceGraphic" operator="in"/>
+</filter>`);
+  elems.push(`<rect x="0" y="${startPx.toFixed(0)}" width="${width}" height="${lavaH.toFixed(0)}" fill="#0a0204" opacity="${(opacity * 0.75).toFixed(2)}" filter="url(#${crustId})" clip-path="url(#${clipId})"/>`);
+
+  // ── 4. BRIGHT HOT CRACKS — also clipped to river shape
+  const crackSeed = crustSeed + 13;
+  const crackId = `${id}-crack`;
+  defs.push(`<filter id="${crackId}" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+  <feTurbulence type="fractalNoise" baseFrequency="0.035 0.018" numOctaves="4" seed="${crackSeed}" result="n"/>
+  <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  8.0 0 0 0 -3.5" result="cracks"/>
+  <feGaussianBlur in="cracks" stdDeviation="0.5"/>
+  <feComposite operator="in" in2="SourceGraphic"/>
+</filter>`);
+  elems.push(`<rect x="0" y="${startPx.toFixed(0)}" width="${width}" height="${lavaH.toFixed(0)}" fill="${hotColor}" opacity="${(opacity * 0.5).toFixed(2)}" filter="url(#${crackId})" clip-path="url(#${clipId})"/>`);
+
+  // ── 5. STEAM/HEAT SHIMMER wisps above the river source
+  for (let s = 0; s < 4; s++) {
+    const sx = leftPts[0][0] + rng() * (rightPts[0][0] - leftPts[0][0]);
+    const sy = startPx - (5 + rng() * 25) * sc;
+    const sr = (12 + rng() * 20) * sc;
+    elems.push(`<ellipse cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" rx="${sr.toFixed(1)}" ry="${(sr * 0.6).toFixed(1)}" fill="#bfb0a0" opacity="${(0.06 + rng() * 0.06).toFixed(3)}"/>`);
+  }
 
   return { defs: defs.join("\n"), elements: elems.join("\n") };
 }

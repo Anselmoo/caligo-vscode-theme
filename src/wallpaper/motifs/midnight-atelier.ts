@@ -59,15 +59,16 @@ function midnightStillness(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  // Moon in upper corner
+  // Crescent moon in upper corner
   const moon = celestialBrick(p, {
     id: "mi-s-mn",
     cx: 0.72,
     cy: 0.18,
-    r: 0.035,
+    r: 0.025,
     color: colors.bgSoft,
     glowColor: colors.hueYellow,
-    glowSize: 0.08,
+    glowSize: 3.5,
+    crescent: { offsetX: 0.6, offsetY: -0.18, color: colors.bg },
   });
 
   // Warm interior glow — from a lamp
@@ -77,11 +78,11 @@ function midnightStillness(p: BrickParams): ComposedWallpaper {
     blobs: [{ cx: 0.5, cy: 0.5, rx: 0.15, ry: 0.12, color: colors.hueOrange, opacity: 0.12 }],
   });
 
-  // Rooftop silhouettes visible through window
+  // Rooftop silhouettes — grounded in lower third
   const rooftops = cityscapeBrick(p, {
     id: "mi-s-rt",
-    baseY: 0.62,
-    heightRange: [0.1, 0.3],
+    baseY: 0.74,
+    heightRange: [0.1, 0.28],
     density: 10,
     color: colors.bg,
     opacity: 0.85,
@@ -93,7 +94,7 @@ function midnightStillness(p: BrickParams): ComposedWallpaper {
   // City light glow at horizon
   const hGlow = horizonGlowBrick(p, {
     id: "mi-s-hg",
-    y: 0.68,
+    y: 0.76,
     color: colors.hueOrange,
     opacity: 0.08,
     height: 0.06,
@@ -101,8 +102,8 @@ function midnightStillness(p: BrickParams): ComposedWallpaper {
 
   const stars = starFieldBrick(p, {
     id: "mi-s-st",
-    count: 45,
-    brightCount: 3,
+    count: 230,
+    brightCount: 7,
     color: "#ffffff",
     distribution: "upper",
     opacity: 0.4,
@@ -115,9 +116,46 @@ function midnightStillness(p: BrickParams): ComposedWallpaper {
     opacity: 0.35,
   });
 
+  // Moonlight rays — diagonal beams from moon across sky
+  const moonRays = raysBrick(p, {
+    id: "mi-s-ray",
+    cx: 0.72,
+    cy: 0.18,
+    count: 5,
+    length: 0.4,
+    color: colors.hueYellow,
+    opacity: 0.04,
+    spreadDeg: 100,
+    startDeg: 200,
+  });
+
+  // Atmospheric haze above rooftops
+  const atmo = atmosphereBrick(p, {
+    id: "mi-s-atmo",
+    color: colors.bgSoft,
+    highlightColor: colors.hueYellow,
+    opacity: 0.06,
+    lightAzimuth: 220,
+    lightElevation: 25,
+    seed: 7,
+  });
+
   const vignette = vignetteBrick(p, { id: "mi-s-vig", opacity: 0.6 });
   const noise = noiseBrick(p, { id: "mi-s-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, stars, meteors, moon, lampGlow, hGlow, rooftops, vignette, noise]);
+  return mergeBricks([
+    bg,
+    sky,
+    stars,
+    meteors,
+    moon,
+    moonRays,
+    lampGlow,
+    hGlow,
+    rooftops,
+    atmo,
+    vignette,
+    noise,
+  ]);
 }
 
 /* ── Drift: Ink wash — sweeping brushstroke on wet paper ──────────────────── */
@@ -302,13 +340,13 @@ function midnightVoid(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  // Single emerging form — charcoal ridge visible in darkness
+  // Single emerging form — charcoal ridge visible in darkness (lower half)
   const form = terrainStackBrick(p, {
     id: "mi-v-fm",
     points: 14,
     layers: [
-      { baseY: 0.52, roughness: 0.07, color: colors.bgSoft, opacity: 0.18 },
-      { baseY: 0.58, roughness: 0.05, color: colors.bgMid, opacity: 0.32 },
+      { baseY: 0.62, roughness: 0.07, color: colors.bgSoft, opacity: 0.18 },
+      { baseY: 0.70, roughness: 0.05, color: colors.bgMid, opacity: 0.32 },
     ],
   });
 

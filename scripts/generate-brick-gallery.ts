@@ -15,12 +15,14 @@ import {
   atmosphereBrick,
   auroraAdvancedBrick,
   backgroundBrick,
+  beachBrick,
   celestialBrick,
   cityscapeBrick,
+  solarCoronaBrick,
   cloudBandBrick,
+  desertBrick,
   duneBrick,
   horizonGlowBrick,
-  jellyfishBrick,
   lavaRiverBrick,
   lightningBrick,
   nebulaDustBrick,
@@ -40,6 +42,7 @@ import {
   toneCurveBrick,
   treelineBrick,
   vignetteBrick,
+  volcanoBrick,
   waterCurrentBrick,
   waterReflectionBrick,
 } from "../src/wallpaper/bricks/index.js";
@@ -162,22 +165,43 @@ function makeCatalog(): BrickEntry[] {
     },
     {
       group: "Stars & Sky",
-      name: "Sky Gradient — dusk",
-      description: "Multi-stop vertical gradient for atmospheric depth",
-      generate: () =>
-        wrap(
-          bg(),
-          skyGradientBrick(p, {
-            id: "t-sky",
-            stops: [
-              { offset: "0%", color: p.colors.bg },
-              { offset: "35%", color: p.colors.bgSoft },
-              { offset: "65%", color: p.colors.hueCyan, opacity: 0.1 },
-              { offset: "100%", color: p.colors.bg },
-            ],
-          }),
-          p
-        ),
+      name: "Sky Gradient — sunset",
+      description: "Photorealistic sunset: deep blue zenith with stars → warm pink horizon strip → dark foreground (composited with starfield + horizon glow for full atmospheric depth)",
+      generate: () => {
+        // Compose the sky preset WITH stars + cloud band + horizon glow so the
+        // gallery test reads as a real photographic sky, not just a flat gradient.
+        const sky = skyGradientBrick(p, {
+          id: "t-sky",
+          stops: [
+            { offset: "0%", color: "#0a1838" },
+            { offset: "30%", color: "#1f3160" },
+            { offset: "55%", color: "#5a4a7a" },
+            { offset: "65%", color: "#d28a78" },
+            { offset: "70%", color: "#ffb888" },
+            { offset: "75%", color: "#a85e5a" },
+            { offset: "82%", color: "#3b2842" },
+            { offset: "100%", color: "#0a0d18" },
+          ],
+        });
+        const stars = starFieldBrick(p, {
+          id: "t-sky-stars",
+          count: 80,
+          brightCount: 6,
+          color: "#ffffff",
+          distribution: "upper",
+          opacity: 0.55,
+        });
+        const wisps = cloudBandBrick(p, {
+          id: "t-sky-wisp",
+          cy: 0.4,
+          bandHeight: 0.08,
+          color: "#3a4a64",
+          opacity: 0.22,
+          frequency: 0.004,
+          seed: 17,
+        });
+        return toSvgDocument(mergeBricks([bg(), sky, stars, wisps]), p.viewBox);
+      },
     },
     {
       group: "Stars & Sky",
@@ -205,9 +229,10 @@ function makeCatalog(): BrickEntry[] {
           nebulaDustBrick(p, {
             id: "t-nd",
             tintColor: p.colors.hueCyan,
-            opacity: 0.12,
-            baseFrequency: 0.015,
-            numOctaves: 4,
+            opacity: 0.45,
+            baseFrequency: 0.004,
+            numOctaves: 5,
+            alphaStrength: 0.65,
           }),
           p
         ),
@@ -223,9 +248,9 @@ function makeCatalog(): BrickEntry[] {
             id: "t-ng",
             blur: 0.06,
             blobs: [
-              { cx: 0.3, cy: 0.3, rx: 0.15, ry: 0.1, color: p.colors.hueBlue, opacity: 0.35 },
-              { cx: 0.7, cy: 0.5, rx: 0.12, ry: 0.08, color: p.colors.huePurple, opacity: 0.25 },
-              { cx: 0.5, cy: 0.2, rx: 0.18, ry: 0.07, color: p.colors.hueCyan, opacity: 0.2 },
+              { cx: 0.3, cy: 0.3, rx: 0.15, ry: 0.1, color: p.colors.hueBlue, opacity: 0.55 },
+              { cx: 0.7, cy: 0.5, rx: 0.12, ry: 0.08, color: p.colors.huePurple, opacity: 0.40 },
+              { cx: 0.5, cy: 0.2, rx: 0.18, ry: 0.07, color: p.colors.hueCyan, opacity: 0.35 },
             ],
           }),
           p
@@ -235,19 +260,19 @@ function makeCatalog(): BrickEntry[] {
     // ── Aurora ─────────────────────────────────────────────────────────────────
     {
       group: "Aurora",
-      name: "Aurora — 3 bands",
-      description: "Displaced sine-wave curtains with feDisplacementMap turbulence",
+      name: "Aurora — 3 bands (curtain folds)",
+      description: "Three layered curtains with bright pink-magenta top ribbon edge, dense turbulent column structure, and flowing fold shading",
       generate: () =>
         wrap(
           bg(),
           auroraAdvancedBrick(p, {
             id: "t-au-3",
             bands: 3,
-            cy: 0.25,
-            zoneHeight: 0.22,
+            cy: 0.32,
+            zoneHeight: 0.4,
             color: p.colors.hueGreen,
             color2: p.colors.hueCyan,
-            opacity: 0.55,
+            opacity: 0.85,
             displacement: true,
           }),
           p
@@ -255,19 +280,19 @@ function makeCatalog(): BrickEntry[] {
     },
     {
       group: "Aurora",
-      name: "Aurora — 5 bands wide",
-      description: "Broader aurora with more bands for triadic/pulse mode",
+      name: "Aurora — 5 bands wide (storm)",
+      description: "Auroral storm event — five overlapping curtains with violet-purple top ribbons, deeper green core, broad sky illumination",
       generate: () =>
         wrap(
           bg(),
           auroraAdvancedBrick(p, {
             id: "t-au-5",
             bands: 5,
-            cy: 0.28,
-            zoneHeight: 0.3,
+            cy: 0.35,
+            zoneHeight: 0.5,
             color: p.colors.hueGreen,
             color2: p.colors.huePurple,
-            opacity: 0.5,
+            opacity: 0.85,
             displacement: true,
           }),
           p
@@ -275,18 +300,18 @@ function makeCatalog(): BrickEntry[] {
     },
     {
       group: "Aurora",
-      name: "Cloud Band — atmospheric",
-      description: "feTurbulence horizontal band for mist, fog, or aurora base",
+      name: "Cloud Band — white cumulus",
+      description: "Bright cumulus clouds with thick structure (dual-frequency turbulence + amplified alpha)",
       generate: () =>
         wrap(
           bg(),
           cloudBandBrick(p, {
             id: "t-cb",
             cy: 0.35,
-            bandHeight: 0.18,
-            color: p.colors.hueGreen,
-            opacity: 0.14,
-            frequency: 0.004,
+            bandHeight: 0.22,
+            color: "#e8eaf0",
+            opacity: 0.55,
+            frequency: 0.005,
             seed: 7,
           }),
           p
@@ -297,15 +322,15 @@ function makeCatalog(): BrickEntry[] {
     {
       group: "Moon & Celestial",
       name: "Crescent Moon",
-      description: "Moon with SVG mask crescent cut-out and radial glow",
+      description: "Moon with SVG mask crescent cut-out, radial glow, maria texture, and limb darkening",
       generate: () =>
         wrap(
           bg(),
           celestialBrick(p, {
             id: "t-mn",
             cx: 0.72,
-            cy: 0.2,
-            r: 0.025,
+            cy: 0.32,
+            r: 0.06,
             color: "#e8dcc8",
             glowColor: "#c8a96e",
             glowSize: 4.5,
@@ -316,8 +341,28 @@ function makeCatalog(): BrickEntry[] {
     },
     {
       group: "Moon & Celestial",
-      name: "Ring — halo",
-      description: "Stroked ellipse for moon halo or ring effects",
+      name: "Full Moon",
+      description: "Spherical moon with terminator shading, maria, atmospheric halo, and specular highlight",
+      generate: () =>
+        wrap(
+          bg(),
+          celestialBrick(p, {
+            id: "t-fm",
+            cx: 0.5,
+            cy: 0.42,
+            r: 0.085,
+            color: "#e8dcc8",
+            glowColor: "#c8a96e",
+            glowSize: 4.0,
+            glowOpacity: 0.28,
+          }),
+          p
+        ),
+    },
+    {
+      group: "Moon & Celestial",
+      name: "Ring Halo — moon corona",
+      description: "Stroked ellipse for atmospheric moon halo or planetary ring effects",
       generate: () =>
         wrap(
           bg(),
@@ -325,30 +370,63 @@ function makeCatalog(): BrickEntry[] {
             id: "t-rg",
             cx: 0.5,
             cy: 0.35,
-            r: 0.08,
-            strokeWidth: 1.5,
-            color: p.colors.bgSoft,
-            opacity: 0.45,
+            r: 0.15,
+            strokeWidth: 5,
+            color: "#8899bb",
+            opacity: 0.75,
+            blurRadius: 6,
           }),
           p
         ),
     },
     {
       group: "Moon & Celestial",
-      name: "Horizon Glow",
-      description: "Soft radial gradient band at the horizon",
+      name: "Horizon Glow — sunset",
+      description: "Sharp warm horizon strip + atmospheric scattering halo (sunset/sunrise look)",
       generate: () =>
         wrap(
           bg(),
           horizonGlowBrick(p, {
             id: "t-hg",
-            y: 0.65,
-            color: p.colors.hueOrange,
-            opacity: 0.18,
-            height: 0.12,
+            y: 0.6,
+            color: "#ff9968",
+            opacity: 0.45,
+            height: 0.18,
           }),
           p
         ),
+    },
+    {
+      group: "Moon & Celestial",
+      name: "Solar Eclipse",
+      description: "Total solar eclipse with organic corona rays, coronal streamers, and diamond ring bead",
+      generate: () => {
+        const corona = solarCoronaBrick(p, {
+          id: "t-eclipse-corona",
+          cx: 0.5,
+          cy: 0.38,
+          moonR: 0.065,
+          color: "#e0dcd8",
+          innerColor: "#ffffff",
+          rayCount: 90,
+          extent: 7,
+          diamondAngleDeg: 50,
+        });
+        // The moon disk covers the sun — completely dark, no specular highlight
+        const moonDisk = celestialBrick(p, {
+          id: "t-eclipse-moon",
+          cx: 0.5,
+          cy: 0.38,
+          r: 0.065,
+          color: "#080808",
+          glowColor: "#080808",
+          glowSize: 0.01,
+          glowOpacity: 0,
+          texture: false,
+          specular: false,
+        });
+        return toSvgDocument(mergeBricks([bg(), corona, moonDisk]), p.viewBox);
+      },
     },
 
     // ── Terrain & Landscape ────────────────────────────────────────────────────
@@ -462,6 +540,100 @@ function makeCatalog(): BrickEntry[] {
     },
     {
       group: "Terrain",
+      name: "Snow Mountains",
+      description: "Multi-layer mountain range with snow-capped peaks and atmospheric perspective",
+      generate: () => {
+        // 3-layer mountain stack: far hazy → mid → close dark
+        const mountains = terrainStackBrick(p, {
+          id: "t-snm",
+          layers: [
+            { baseY: 0.42, roughness: 0.10, color: "#2a3040", opacity: 0.45, edgeBlur: 3 },
+            { baseY: 0.52, roughness: 0.12, color: "#1c2433", opacity: 0.70 },
+            { baseY: 0.64, roughness: 0.14, color: "#0e1420", opacity: 0.92 },
+          ],
+        });
+        // Snow caps — a bright white terrain layer at the peak zone only
+        const snow = terrainBrick(p, {
+          id: "t-snm-snow",
+          baseY: 0.42,
+          roughness: 0.10,
+          points: 40,
+          color: "#c8d0e0",
+          opacity: 0.35,
+          seedSuffix: "snow-cap",
+          gradient: { topColor: "#e0e8f0", bottomColor: "#c8d0e0", topOpacity: 0.40, bottomOpacity: 0.0 },
+        });
+        return toSvgDocument(mergeBricks([bg(), mountains, snow]), p.viewBox);
+      },
+    },
+    {
+      group: "Terrain",
+      name: "Forested Mountains",
+      description: "Mountain ridges with dense treeline silhouette — mixed conifer and broadleaf",
+      generate: () => {
+        // Background mountain
+        const farMtn = terrainBrick(p, {
+          id: "t-fm-far",
+          baseY: 0.48,
+          roughness: 0.09,
+          points: 35,
+          color: "#1c2433",
+          opacity: 0.50,
+          seedSuffix: "far-mtn",
+        });
+        // Mid mountain
+        const midMtn = terrainBrick(p, {
+          id: "t-fm-mid",
+          baseY: 0.56,
+          roughness: 0.10,
+          points: 40,
+          color: "#141c28",
+          opacity: 0.75,
+          seedSuffix: "mid-mtn",
+        });
+        // Tree canopy on mid mountain
+        const trees = treelineBrick(p, {
+          id: "t-fm-trees",
+          baseY: 0.56,
+          count: 80,
+          color: "#0a1018",
+          opacity: 0.90,
+          maxHeight: 0.08,
+        });
+        // Foreground treeline — darker, taller
+        const fgTrees = treelineBrick(p, {
+          id: "t-fm-fgtrees",
+          baseY: 0.72,
+          count: 50,
+          color: "#060c14",
+          opacity: 0.95,
+          maxHeight: 0.11,
+        });
+        return toSvgDocument(mergeBricks([bg(), farMtn, midMtn, trees, fgTrees]), p.viewBox);
+      },
+    },
+    {
+      group: "Terrain",
+      name: "Volcano",
+      description: "Volcanic cone with 3D rock texture, scattered boulders, lava flow streaks, and crater glow",
+      generate: () => {
+        const vol = volcanoBrick(p, {
+          id: "t-vol",
+          cx: 0.5,
+          baseY: 0.65,
+          peakHeight: 0.30,
+          craterWidth: 0.025,
+          color: "#1a1008",
+          lavaColor: "#ff4400",
+          opacity: 0.95,
+          rocky: true,
+          rockColor: "#2a1a10",
+        });
+        return toSvgDocument(mergeBricks([bg(), vol]), p.viewBox);
+      },
+    },
+    {
+      group: "Terrain",
       name: "Dune",
       description: "Smooth sine-based desert dune ridgeline",
       generate: () =>
@@ -499,23 +671,48 @@ function makeCatalog(): BrickEntry[] {
     // ── City & Architecture ────────────────────────────────────────────────────
     {
       group: "City",
-      name: "Cityscape — foreground",
-      description: "Procedural building silhouettes with window lights",
-      generate: () =>
-        wrap(
-          bg(),
-          cityscapeBrick(p, {
-            id: "t-cs",
-            baseY: 0.6,
-            heightRange: [0.2, 0.42],
-            density: 14,
-            color: p.colors.bgMid,
-            opacity: 0.85,
-            hasWindows: true,
-            windowProbability: 0.05,
-          }),
-          p
-        ),
+      name: "Cityscape — night skyline",
+      description: "City skyline with floor lines, vertical mullions, varied tower roofs (flat/stepped/peaked), and clustered illuminated windows in mixed warm/cool tones, plus water reflection beneath",
+      generate: () => {
+        // Sky with subtle horizon glow (inspired by purple-night skyline reference)
+        const sky = skyGradientBrick(p, {
+          id: "t-cs-sky",
+          stops: [
+            { offset: "0%", color: "#060a18" },
+            { offset: "50%", color: "#0c1428" },
+            { offset: "80%", color: "#142038" },
+            { offset: "100%", color: "#1a2848" },
+          ],
+        });
+        const cityGlow = horizonGlowBrick(p, {
+          id: "t-cs-cg",
+          y: 0.55,
+          color: "#ff8844",
+          opacity: 0.18,
+          height: 0.1,
+        });
+        const skyline = cityscapeBrick(p, {
+          id: "t-cs",
+          baseY: 0.55,
+          heightRange: [0.12, 0.52],
+          density: 22,
+          color: "#0a0815",
+          opacity: 0.95,
+          hasWindows: true,
+          windowProbability: 0.12,
+          windowColor: "#a8c8ff",
+        });
+        // Water reflection of the city
+        const water = waterReflectionBrick(p, {
+          id: "t-cs-w",
+          waterY: 0.55,
+          color: "#1a3050",
+          opacity: 0.12,
+          rippleScale: 8,
+          rippleFrequency: 0.02,
+        });
+        return toSvgDocument(mergeBricks([bg(), sky, cityGlow, skyline, water]), p.viewBox);
+      },
     },
 
     // ── Fire & Atmosphere ──────────────────────────────────────────────────────
@@ -564,8 +761,8 @@ function makeCatalog(): BrickEntry[] {
             riseHeight: 0.5,
             spreadX: 0.6,
             color: "#887070",
-            opacity: 0.14,
-            columns: 5,
+            opacity: 0.35,
+            columns: 4,
           }),
           pFire
         ),
@@ -596,11 +793,11 @@ function makeCatalog(): BrickEntry[] {
           bg(),
           atmosphereBrick(p, {
             id: "t-atmo",
-            color: p.colors.bgSoft,
+            color: "#2a3a5a",
             highlightColor: p.colors.hueCyan,
-            opacity: 0.1,
-            lightAzimuth: 210,
-            lightElevation: 30,
+            opacity: 0.35,
+            turbulenceFreq: 0.0025,
+            displacementScale: 0.035,
             seed: 7,
           }),
           p
@@ -624,30 +821,69 @@ function makeCatalog(): BrickEntry[] {
         ),
     },
 
-    // ── Ocean ──────────────────────────────────────────────────────────────────
+    // ── Ocean & Beach ──────────────────────────────────────────────────────────
     {
-      group: "Ocean",
-      name: "Jellyfish",
-      description: "Anatomical jellyfish dome + bioluminescent tentacles",
+      group: "Ocean & Beach",
+      name: "Beach at Night",
+      description: "Sand foreground with breaking waves, foam streaks, wet-sand reflection, and scattered debris",
       generate: () =>
         wrap(
           bgOcean(),
-          jellyfishBrick(pOcean, {
-            id: "t-jf",
-            jellyfish: [
-              { cx: 0.25, cy: 0.3, r: 0.045, color: pOcean.colors.hueCyan, opacity: 0.7 },
-              { cx: 0.6, cy: 0.45, r: 0.032, color: pOcean.colors.accent, opacity: 0.6 },
-              { cx: 0.8, cy: 0.25, r: 0.024, color: pOcean.colors.hueCyan, opacity: 0.5 },
-              { cx: 0.45, cy: 0.62, r: 0.02, color: pOcean.colors.hueBlue, opacity: 0.45 },
-            ],
+          beachBrick(pOcean, {
+            id: "t-bch",
+            shoreY: 0.5,
+            sandColor: "#3a3128",
+            foamColor: "#b0a898",
+            waterColor: "#0a1a28",
+            waves: 4,
           }),
           pOcean
         ),
     },
     {
-      group: "Ocean",
+      group: "Ocean & Beach",
+      name: "Beach — bioluminescent",
+      description: "Glowing turquoise plankton along wave crests (Vaadhoo / Maldives bioluminescent tide)",
+      generate: () =>
+        wrap(
+          bgOcean(),
+          beachBrick(pOcean, {
+            id: "t-bch-bio",
+            shoreY: 0.5,
+            sandColor: "#1a1820",
+            foamColor: "#3a4a52",
+            waterColor: "#050a14",
+            waves: 4,
+            bioluminescent: true,
+            bioluminescenceColor: "#5cdcff",
+          }),
+          pOcean
+        ),
+    },
+    {
+      group: "Ocean & Beach",
+      name: "Rocky Shore",
+      description: "Rugged coastline with boulders, rock texture, tide pools, and crashing waves",
+      generate: () =>
+        wrap(
+          bgOcean(),
+          beachBrick(pOcean, {
+            id: "t-bch-rock",
+            shoreY: 0.5,
+            sandColor: "#2a2e32",
+            foamColor: "#a0b0b8",
+            waterColor: "#0a1a28",
+            waves: 4,
+            rocky: true,
+            rockColor: "#2a2e32",
+          }),
+          pOcean
+        ),
+    },
+    {
+      group: "Ocean & Beach",
       name: "Water Current",
-      description: "Deep pressure current bands with volumetric flow",
+      description: "Deep pressure current bands with volumetric flow and anisotropic streaming",
       generate: () =>
         wrap(
           bgOcean(),
@@ -656,10 +892,83 @@ function makeCatalog(): BrickEntry[] {
             cy: 0.5,
             zoneHeight: 0.8,
             color: pOcean.colors.hueCyan,
-            opacity: 0.22,
-            layers: 4,
+            opacity: 0.32,
+            layers: 5,
           }),
           pOcean
+        ),
+    },
+
+    // ── Desert ─────────────────────────────────────────────────────────────────
+    {
+      group: "Desert",
+      name: "Desert — Dunes",
+      description: "Rolling sinusoidal dune ridgelines with slip-face shadows and sand-grain texture on a warm sand plain",
+      generate: () =>
+        wrap(
+          bgFire(),
+          desertBrick(pFire, {
+            id: "t-dst-d",
+            baseY: 0.62,
+            sandColor: "#5a3a1f",
+            cactusColor: "#0a0d12",
+            variant: "dunes",
+          }),
+          pFire
+        ),
+    },
+    {
+      group: "Desert",
+      name: "Desert — Pyramids",
+      description: "Egyptian pyramid silhouettes with lit/shadow faces and atmospheric perspective (Giza-style)",
+      generate: () =>
+        wrap(
+          bgFire(),
+          desertBrick(pFire, {
+            id: "t-dst-p",
+            baseY: 0.62,
+            sandColor: "#7a4a25",
+            cactusColor: "#1a1018",
+            variant: "pyramids",
+            pyramidCount: 4,
+          }),
+          pFire
+        ),
+    },
+    {
+      group: "Desert",
+      name: "Desert — Salt Flat",
+      description: "Bonneville/Salar de Uyuni-style salt flat with reflective crust and polygonal salt cracks",
+      generate: () =>
+        wrap(
+          bg(),
+          desertBrick(p, {
+            id: "t-dst-s",
+            baseY: 0.55,
+            sandColor: "#8a8898",
+            cactusColor: "#3a3848",
+            variant: "saltflat",
+          }),
+          p
+        ),
+    },
+
+    {
+      group: "Desert",
+      name: "Desert — Cacti",
+      description: "Saguaro, barrel, and prickly-pear cactus silhouettes with Bob Ross 3D lighting — directional gradients, rim highlights, and base shadows on a lit sand floor",
+      generate: () =>
+        wrap(
+          bgFire(),
+          desertBrick(pFire, {
+            id: "t-dst-c",
+            baseY: 0.60,
+            sandColor: "#5a3a1f",
+            cactusColor: "#0a0d12",
+            variant: "cacti",
+            cactusCount: 8,
+          }),
+          pFire
         ),
     },
 
@@ -667,14 +976,18 @@ function makeCatalog(): BrickEntry[] {
     {
       group: "Effects",
       name: "Vignette",
-      description: "Radial darkening vignette to pull eye to center",
+      description: "Radial darkening vignette to pull eye to center — shown on a gradient background for contrast",
       generate: () => {
-        // show on a lighter bg so vignette is visible
-        const lightBg: BrickOutput = {
-          elements: `<rect width="${W}" height="${H}" fill="#1c2133"/>`,
+        // Show on a scene-like gradient so the vignette effect is obvious
+        const sceneBg: BrickOutput = {
+          elements: `<defs><radialGradient id="vig-bg" cx="50%" cy="45%" r="65%">
+            <stop offset="0%" stop-color="#2a3a58"/><stop offset="100%" stop-color="#0a1020"/>
+          </radialGradient></defs>
+          <rect width="${W}" height="${H}" fill="url(#vig-bg)"/>`,
         };
+        const stars = starFieldBrick(p, { id: "t-vig-stars", count: 60, brightCount: 4, color: "#ffffff", distribution: "full", opacity: 0.5 });
         return toSvgDocument(
-          mergeBricks([lightBg, vignetteBrick(p, { id: "t-vig", opacity: 0.7 })]),
+          mergeBricks([sceneBg, stars, vignetteBrick(p, { id: "t-vig", opacity: 0.85 })]),
           p.viewBox
         );
       },

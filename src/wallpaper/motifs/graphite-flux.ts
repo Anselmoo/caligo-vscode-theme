@@ -16,6 +16,7 @@ import {
   lightningBrick,
   nebulaGlowBrick,
   noiseBrick,
+  raysBrick,
   ringBrick,
   shootingStarBrick,
   skyGradientBrick,
@@ -43,66 +44,86 @@ export function graphiteFlux(params: BrickParams): ComposedWallpaper {
   }
 }
 
-/* ── Stillness: City skyline at night ─────────────────────────────────────── */
+/* ── Stillness: City skyline at night — viewed from distance ─────────────── */
 function graphiteStillness(p: BrickParams): ComposedWallpaper {
   const { colors } = p;
   const bg = backgroundBrick(p);
 
+  // Night sky — dark above, light pollution glow towards city
   const sky = skyGradientBrick(p, {
     id: "gf-s-sky",
     stops: [
       { offset: "0%", color: colors.bg },
-      { offset: "50%", color: colors.bgSoft },
-      { offset: "80%", color: colors.bgMid },
+      { offset: "55%", color: colors.bgSoft },
       { offset: "100%", color: colors.bg },
     ],
   });
 
+  const stars = starFieldBrick(p, {
+    id: "gf-s-st",
+    count: 200,
+    brightCount: 6,
+    color: "#ffffff",
+    distribution: "upper",
+    opacity: 0.35,
+  });
+
+  // Urban light pollution glow on horizon — BEHIND the skyline
   const urbanGlow = horizonGlowBrick(p, {
     id: "gf-s-ug",
     y: 0.62,
     color: colors.hueOrange,
-    opacity: 0.15,
-    height: 0.1,
+    opacity: 0.12,
+    height: 0.12,
   });
 
+  // City skyline silhouette — CONSTRAINED to bottom 35% of canvas.
+  // baseY 0.80 with heightRange [0.1, 0.22] means tallest building
+  // reaches 0.80 - 0.22 = 0.58. City lives from ~58% to ~80% height.
   const skyline = cityscapeBrick(p, {
     id: "gf-s-sl",
-    baseY: 0.58,
-    heightRange: [32 / 120, 32 / 60],
-    density: 16,
+    baseY: 0.78,
+    heightRange: [0.08, 0.2],
+    density: 14,
     color: colors.bgMid,
-    opacity: 0.85,
+    opacity: 0.8,
     hasWindows: true,
-    windowProbability: 0.03,
+    windowProbability: 0.04,
   });
 
+  // Foreground buildings — darker, closer, shorter (we're looking past them)
   const buildings = cityscapeBrick(p, {
     id: "gf-s-bld",
-    baseY: 0.68,
-    heightRange: [20 / 120, 20 / 60],
-    density: 10,
+    baseY: 0.88,
+    heightRange: [0.06, 0.14],
+    density: 8,
     color: colors.bg,
     opacity: 0.95,
     hasWindows: false,
   });
 
-  const lights = starFieldBrick(p, {
-    id: "gf-s-li",
-    count: 40,
-    brightCount: 8,
+  // Streetlight rays from cityscape — vertical accent
+  const streetRays = raysBrick(p, {
+    id: "gf-s-ray",
+    cx: 0.5,
+    cy: 0.78,
+    count: 3,
+    length: 0.12,
     color: colors.hueYellow,
-    distribution: "full",
-    opacity: 0.6,
+    opacity: 0.05,
+    spreadDeg: 50,
+    startDeg: 250,
   });
 
-  const stars = starFieldBrick(p, {
-    id: "gf-s-st",
-    count: 40,
-    brightCount: 3,
-    color: "#ffffff",
-    distribution: "upper",
-    opacity: 0.35,
+  // Atmospheric light pollution haze
+  const atmo = atmosphereBrick(p, {
+    id: "gf-s-atmo",
+    color: colors.bgSoft,
+    highlightColor: colors.hueOrange,
+    opacity: 0.06,
+    lightAzimuth: 180,
+    lightElevation: 20,
+    seed: 9,
   });
 
   const meteor = shootingStarBrick(p, {
@@ -112,7 +133,7 @@ function graphiteStillness(p: BrickParams): ComposedWallpaper {
     opacity: 0.3,
   });
 
-  const vignette = vignetteBrick(p, { id: "gf-s-vig", opacity: 0.55 });
+  const vignette = vignetteBrick(p, { id: "gf-s-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "gf-s-n", opacity: 0.04 });
   return mergeBricks([
     bg,
@@ -122,7 +143,8 @@ function graphiteStillness(p: BrickParams): ComposedWallpaper {
     urbanGlow,
     skyline,
     buildings,
-    lights,
+    streetRays,
+    atmo,
     vignette,
     noise,
   ]);
@@ -143,10 +165,11 @@ function graphiteDrift(p: BrickParams): ComposedWallpaper {
     ],
   });
 
+  // City grounded in lower third — buildings grow upward from base
   const skyline = cityscapeBrick(p, {
     id: "gf-d-sl",
-    baseY: 0.48,
-    heightRange: [24 / 120, 24 / 60],
+    baseY: 0.72,
+    heightRange: [0.1, 0.22],
     density: 12,
     color: colors.bgMid,
     opacity: 0.7,
@@ -154,20 +177,22 @@ function graphiteDrift(p: BrickParams): ComposedWallpaper {
     windowProbability: 0.07,
   });
 
+  // Neon signs on buildings (adjusted to city position)
   const neon = nebulaGlowBrick(p, {
     id: "gf-d-ne",
     blur: 0.03,
     blobs: [
-      { cx: 0.2, cy: 0.46, rx: 0.015, ry: 0.01, color: colors.accent, opacity: 0.5 },
-      { cx: 0.45, cy: 0.44, rx: 0.012, ry: 0.008, color: colors.hueBlue, opacity: 0.4 },
-      { cx: 0.7, cy: 0.48, rx: 0.018, ry: 0.012, color: colors.hueOrange, opacity: 0.45 },
-      { cx: 0.85, cy: 0.45, rx: 0.01, ry: 0.008, color: colors.accent, opacity: 0.35 },
+      { cx: 0.2, cy: 0.62, rx: 0.015, ry: 0.01, color: colors.accent, opacity: 0.5 },
+      { cx: 0.45, cy: 0.58, rx: 0.012, ry: 0.008, color: colors.hueBlue, opacity: 0.4 },
+      { cx: 0.7, cy: 0.65, rx: 0.018, ry: 0.012, color: colors.hueOrange, opacity: 0.45 },
+      { cx: 0.85, cy: 0.60, rx: 0.01, ry: 0.008, color: colors.accent, opacity: 0.35 },
     ],
   });
 
+  // Wet street reflection below city
   const reflection = waterReflectionBrick(p, {
     id: "gf-d-ref",
-    waterY: 0.55,
+    waterY: 0.72,
     color: colors.bgSoft,
     opacity: 0.08,
     rippleScale: 8,
@@ -246,12 +271,13 @@ function graphiteBreak(p: BrickParams): ComposedWallpaper {
     blobs: [{ cx: 0.48, cy: 0.3, rx: 0.3, ry: 0.2, color: colors.hueCyan, opacity: 0.08 }],
   });
 
+  // City skyline silhouette — grounded in lower third
   const skyline = terrainStackBrick(p, {
     id: "gf-b-sl",
     points: 28,
     layers: [
-      { baseY: 0.55, roughness: 0.12, color: colors.bgMid, opacity: 0.6 },
-      { baseY: 0.65, roughness: 0.08, color: colors.bg, opacity: 0.9 },
+      { baseY: 0.68, roughness: 0.10, color: colors.bgMid, opacity: 0.6 },
+      { baseY: 0.78, roughness: 0.06, color: colors.bg, opacity: 0.9 },
     ],
   });
 
@@ -323,10 +349,11 @@ function graphiteVoid(p: BrickParams): ComposedWallpaper {
     seed: 53,
   });
 
+  // Ghost buildings emerging from fog — grounded in lower third
   const ghost = cityscapeBrick(p, {
     id: "gf-v-gh",
-    baseY: 0.55,
-    heightRange: [16 / 120, 16 / 60],
+    baseY: 0.72,
+    heightRange: [0.10, 0.22],
     density: 10,
     color: colors.bgMid,
     opacity: 0.2,
@@ -336,7 +363,7 @@ function graphiteVoid(p: BrickParams): ComposedWallpaper {
   const light = nebulaGlowBrick(p, {
     id: "gf-v-li",
     blur: 0.05,
-    blobs: [{ cx: 0.5, cy: 0.5, rx: 0.06, ry: 0.04, color: colors.hueYellow, opacity: 0.12 }],
+    blobs: [{ cx: 0.5, cy: 0.65, rx: 0.06, ry: 0.04, color: colors.hueYellow, opacity: 0.12 }],
   });
 
   const fogAtmo = atmosphereBrick(p, {
@@ -349,9 +376,22 @@ function graphiteVoid(p: BrickParams): ComposedWallpaper {
     seed: 23,
   });
 
+  // Diffused light beams through fog — vertical/diagonal depth cue
+  const fogRays = raysBrick(p, {
+    id: "gf-v-ray",
+    cx: 0.5,
+    cy: 0.65,
+    count: 4,
+    length: 0.3,
+    color: colors.hueYellow,
+    opacity: 0.04,
+    spreadDeg: 40,
+    startDeg: 250,
+  });
+
   const vignette = vignetteBrick(p, { id: "gf-v-vig", opacity: 0.75 });
   const noise = noiseBrick(p, { id: "gf-v-n", opacity: 0.04 });
-  return mergeBricks([bg, sky, ghost, fog1, fog2, light, fogAtmo, fog3, vignette, noise]);
+  return mergeBricks([bg, sky, ghost, fog1, fog2, light, fogRays, fogAtmo, fog3, vignette, noise]);
 }
 
 /* ── Pulse: Bridge at night — lights reflected in water ───────────────────── */
@@ -369,12 +409,13 @@ function graphitePulse(p: BrickParams): ComposedWallpaper {
     ],
   });
 
+  // Bridge structure grounded — spans across the lower half
   const bridge = terrainStackBrick(p, {
     id: "gf-p-br",
     points: 20,
     layers: [
-      { baseY: 0.42, roughness: 0.06, color: colors.bgMid, opacity: 0.6 },
-      { baseY: 0.48, roughness: 0.04, color: colors.bg, opacity: 0.8 },
+      { baseY: 0.58, roughness: 0.04, color: colors.bgMid, opacity: 0.6 },
+      { baseY: 0.64, roughness: 0.03, color: colors.bg, opacity: 0.8 },
     ],
   });
 
@@ -382,17 +423,18 @@ function graphitePulse(p: BrickParams): ComposedWallpaper {
     id: "gf-p-bl",
     blur: 0.02,
     blobs: [
-      { cx: 0.15, cy: 0.44, rx: 0.01, ry: 0.008, color: colors.hueYellow, opacity: 0.5 },
-      { cx: 0.35, cy: 0.42, rx: 0.012, ry: 0.009, color: colors.hueOrange, opacity: 0.45 },
-      { cx: 0.55, cy: 0.43, rx: 0.01, ry: 0.008, color: colors.hueYellow, opacity: 0.5 },
-      { cx: 0.75, cy: 0.44, rx: 0.012, ry: 0.009, color: colors.hueOrange, opacity: 0.45 },
-      { cx: 0.9, cy: 0.43, rx: 0.01, ry: 0.008, color: colors.hueYellow, opacity: 0.4 },
+      { cx: 0.15, cy: 0.60, rx: 0.01, ry: 0.008, color: colors.hueYellow, opacity: 0.5 },
+      { cx: 0.35, cy: 0.58, rx: 0.012, ry: 0.009, color: colors.hueOrange, opacity: 0.45 },
+      { cx: 0.55, cy: 0.59, rx: 0.01, ry: 0.008, color: colors.hueYellow, opacity: 0.5 },
+      { cx: 0.75, cy: 0.60, rx: 0.012, ry: 0.009, color: colors.hueOrange, opacity: 0.45 },
+      { cx: 0.9, cy: 0.59, rx: 0.01, ry: 0.008, color: colors.hueYellow, opacity: 0.4 },
     ],
   });
 
+  // Water below bridge
   const water = waterReflectionBrick(p, {
     id: "gf-p-wa",
-    waterY: 0.5,
+    waterY: 0.66,
     color: colors.bgSoft,
     opacity: 0.08,
     rippleScale: 10,
@@ -401,7 +443,7 @@ function graphitePulse(p: BrickParams): ComposedWallpaper {
 
   const cityGlow = horizonGlowBrick(p, {
     id: "gf-p-cg",
-    y: 0.48,
+    y: 0.62,
     color: colors.hueOrange,
     opacity: 0.1,
     height: 0.06,
@@ -409,8 +451,8 @@ function graphitePulse(p: BrickParams): ComposedWallpaper {
 
   const stars = starFieldBrick(p, {
     id: "gf-p-st",
-    count: 35,
-    brightCount: 3,
+    count: 220,
+    brightCount: 6,
     color: "#ffffff",
     distribution: "upper",
     opacity: 0.3,

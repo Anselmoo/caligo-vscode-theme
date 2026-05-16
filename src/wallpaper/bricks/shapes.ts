@@ -37,17 +37,24 @@ export interface RingBrickOptions {
   strokeWidth?: number;
   color: string;
   opacity?: number;
+  /** Optional feGaussianBlur radius for soft halo effect */
+  blurRadius?: number;
 }
 
 export function ringBrick(params: BrickParams, options: RingBrickOptions): BrickOutput {
   const { viewBox } = params;
   const { width, height } = viewBox;
-  const { cx = 0.5, cy = 0.5, r, strokeWidth = 2, color, opacity = 0.8, id = "ring" } = options;
+  const { cx = 0.5, cy = 0.5, r, strokeWidth = 2, color, opacity = 0.8, id = "ring", blurRadius } = options;
   const pcx = (cx * width).toFixed(1);
   const pcy = (cy * height).toFixed(1);
   const scale = Math.max(width, height);
+  const filterAttr = blurRadius ? ` filter="url(#${id}-blur)"` : "";
+  const defs = blurRadius
+    ? `<filter id="${id}-blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="${blurRadius}"/></filter>`
+    : undefined;
   return {
-    elements: `<circle id="${id}" cx="${pcx}" cy="${pcy}" r="${(r * scale).toFixed(1)}" fill="none" stroke="${color}" stroke-width="${((strokeWidth * scale) / 2160).toFixed(1)}" opacity="${opacity}"/>`,
+    defs,
+    elements: `<circle id="${id}" cx="${pcx}" cy="${pcy}" r="${(r * scale).toFixed(1)}" fill="none" stroke="${color}" stroke-width="${((strokeWidth * scale) / 2160).toFixed(1)}" opacity="${opacity}"${filterAttr}/>`,
   };
 }
 
@@ -109,7 +116,7 @@ export interface RaysBrickOptions {
 }
 
 export function raysBrick(params: BrickParams, options: RaysBrickOptions): BrickOutput {
-  const { viewBox } = params;
+  const { viewBox, seedId } = params;
   const { width, height } = viewBox;
   const {
     cx = 0.5,
@@ -126,19 +133,55 @@ export function raysBrick(params: BrickParams, options: RaysBrickOptions): Brick
   const pcx = cx * width;
   const pcy = cy * height;
   const pl = length * scale;
-  const lines: string[] = [];
+  const sw = (scale / 1080) * 2.5;
+
+  const defs: string[] = [];
+  const elems: string[] = [];
+
+  // Per-ray PRNG so widths/lengths vary deterministically
+  const rng = seedRng(hashStr(`${seedId}-${id}-rays`));
+
+  // Soft glow filter — rays look like volumetric light, not just sharp lines
+  const glowId = `${id}-glow`;
+  defs.push(
+    `<filter id="${glowId}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="${(scale * 0.003).toFixed(1)}"/></filter>`
+  );
+
+  // Each ray gets its OWN linear gradient (bright at source → transparent at tip)
+  // No more cosine cycling — every ray is fully visible, varied only in width/length.
   for (let i = 0; i < count; i++) {
-    const deg = startDeg + (spreadDeg * i) / count;
+    const deg = startDeg + (spreadDeg * (i + (count > 1 ? 0 : 0))) / Math.max(1, count);
     const rad = (deg * Math.PI) / 180;
-    const x2 = pcx + Math.cos(rad) * pl;
-    const y2 = pcy + Math.sin(rad) * pl;
-    const alpha = opacity * (0.5 + 0.5 * Math.cos((i * Math.PI * 2) / count));
-    lines.push(
-      `  <line x1="${pcx.toFixed(1)}" y1="${pcy.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${color}" stroke-width="${((scale / 2160) * 2).toFixed(1)}" opacity="${alpha.toFixed(3)}"/>`
+    // Length jitter — rays of varying length feel volumetric, not cookie-cutter
+    const lenJitter = 0.78 + rng() * 0.42;
+    const rayLen = pl * lenJitter;
+    const x2 = pcx + Math.cos(rad) * rayLen;
+    const y2 = pcy + Math.sin(rad) * rayLen;
+    const rayOp = opacity * (0.65 + rng() * 0.35);
+    const rayWidth = sw * (0.55 + rng() * 1.1);
+
+    const gradId = `${id}-g${i}`;
+    defs.push(
+      `<linearGradient id="${gradId}" x1="${pcx.toFixed(1)}" y1="${pcy.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" gradientUnits="userSpaceOnUse">
+  <stop offset="0%" stop-color="${color}" stop-opacity="${rayOp.toFixed(3)}"/>
+  <stop offset="35%" stop-color="${color}" stop-opacity="${(rayOp * 0.7).toFixed(3)}"/>
+  <stop offset="80%" stop-color="${color}" stop-opacity="${(rayOp * 0.18).toFixed(3)}"/>
+  <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+</linearGradient>`
+    );
+
+    // Outer soft glow pass (wider, blurred)
+    elems.push(
+      `<line x1="${pcx.toFixed(1)}" y1="${pcy.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="url(#${gradId})" stroke-width="${(rayWidth * 3.2).toFixed(1)}" stroke-linecap="round" opacity="${(rayOp * 0.45).toFixed(3)}" filter="url(#${glowId})"/>`
+    );
+    // Crisp core ray on top
+    elems.push(
+      `<line x1="${pcx.toFixed(1)}" y1="${pcy.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="url(#${gradId})" stroke-width="${rayWidth.toFixed(1)}" stroke-linecap="round"/>`
     );
   }
   return {
-    elements: `<g id="${id}">\n${lines.join("\n")}\n</g>`,
+    defs: defs.join("\n"),
+    elements: `<g id="${id}">\n${elems.join("\n")}\n</g>`,
   };
 }
 
