@@ -9,7 +9,7 @@
  *  5. Base shadow — dark gradient at building base grounding them to the surface
  */
 import type { BrickOutput, BrickParams } from "../types.js";
-import { SUN_AZIMUTH, SUN_ELEVATION, WARM_HIGHLIGHT, COOL_SHADOW } from "./lighting.js";
+import { COOL_SHADOW, SUN_AZIMUTH, SUN_ELEVATION, WARM_HIGHLIGHT } from "./lighting.js";
 
 export function seedRng(seed: number) {
   let s = seed % 2147483647;
@@ -86,7 +86,9 @@ export function cityscapeBrick(params: BrickParams, options: CityscapeBrickOptio
 
   // ─── Bob Ross Pillar 2: Rim highlight filter (soft glow on rooftop edges) ───
   const rimGlowId = `${id}-rimglow`;
-  defs.push(`<filter id="${rimGlowId}" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="${(2 * sc).toFixed(1)}"/></filter>`);
+  defs.push(
+    `<filter id="${rimGlowId}" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="${(2 * sc).toFixed(1)}"/></filter>`
+  );
 
   // ─── Bob Ross Pillar 5: Base shadow gradient ──────────────────────────────────
   const baseShadowGradId = `${id}-bshadow`;
@@ -159,7 +161,7 @@ export function cityscapeBrick(params: BrickParams, options: CityscapeBrickOptio
     }
 
     // Floor moods for window lighting
-    const windowRows = Math.max(4, Math.floor(bldgH / (height * 0.020)));
+    const windowRows = Math.max(4, Math.floor(bldgH / (height * 0.02)));
     for (let r = 0; r < windowRows; r++) {
       b.floorMoods.push(rng() < 0.35 ? 1.7 : rng() < 0.6 ? 1.0 : 0.4);
     }
@@ -203,7 +205,9 @@ export function cityscapeBrick(params: BrickParams, options: CityscapeBrickOptio
 
       // Surface texture (concrete) — clipped to this rect
       const clipId = `${id}-clip${bi}-${rx.toFixed(0)}`;
-      defs.push(`<clipPath id="${clipId}"><rect x="${rx.toFixed(1)}" y="${ry.toFixed(1)}" width="${rw.toFixed(1)}" height="${rh.toFixed(1)}"/></clipPath>`);
+      defs.push(
+        `<clipPath id="${clipId}"><rect x="${rx.toFixed(1)}" y="${ry.toFixed(1)}" width="${rw.toFixed(1)}" height="${rh.toFixed(1)}"/></clipPath>`
+      );
 
       // Concrete texture overlay
       elems.push(
@@ -256,11 +260,10 @@ export function cityscapeBrick(params: BrickParams, options: CityscapeBrickOptio
 
     // ── Bob Ross Pillar 2: Rooftop rim highlight ──
     // Bright warm edge along the top of the building (sun catching the parapet)
-    const roofTopY = b.roofShape >= 0.85 ? b.y : (b.roofShape >= 0.6 ? b.y : b.y);
-    const roofLeftX = b.roofShape >= 0.6 && b.roofShape < 0.85
-      ? b.x + (b.setbackInset || 0) : b.x;
-    const roofRightX = b.roofShape >= 0.6 && b.roofShape < 0.85
-      ? b.x + b.w - (b.setbackInset || 0) : b.x + b.w;
+    const roofTopY = b.roofShape >= 0.85 ? b.y : b.roofShape >= 0.6 ? b.y : b.y;
+    const roofLeftX = b.roofShape >= 0.6 && b.roofShape < 0.85 ? b.x + (b.setbackInset || 0) : b.x;
+    const roofRightX =
+      b.roofShape >= 0.6 && b.roofShape < 0.85 ? b.x + b.w - (b.setbackInset || 0) : b.x + b.w;
 
     if (b.roofShape < 0.85) {
       // Horizontal rooftop highlight — soft glow
@@ -283,7 +286,7 @@ export function cityscapeBrick(params: BrickParams, options: CityscapeBrickOptio
 
     // ── FACADE STRUCTURE — horizontal floor lines + vertical mullions ──
     if (b.w > width * 0.012) {
-      const floorCount = Math.max(4, Math.floor(b.h / (height * 0.020)));
+      const floorCount = Math.max(4, Math.floor(b.h / (height * 0.02)));
       const floorH = b.h / floorCount;
       for (let f = 1; f < floorCount; f++) {
         const fy = b.y + f * floorH;
@@ -303,7 +306,7 @@ export function cityscapeBrick(params: BrickParams, options: CityscapeBrickOptio
 
     // ── LIT WINDOWS — with window glow halos ──
     if (hasWindows && b.w > width * 0.005) {
-      const windowRows = Math.max(4, Math.floor(b.h / (height * 0.020)));
+      const windowRows = Math.max(4, Math.floor(b.h / (height * 0.02)));
       const windowCols = Math.max(2, Math.floor((b.w * 0.85) / (width * 0.0075)));
 
       const marginX = b.w * 0.08;
@@ -323,8 +326,16 @@ export function cityscapeBrick(params: BrickParams, options: CityscapeBrickOptio
             const colourRoll = rng();
             const finalColor =
               b.warmthBias > 0.55
-                ? colourRoll < 0.65 ? "#ffd58c" : colourRoll < 0.85 ? "#ff9a4a" : windowColor
-                : colourRoll < 0.5 ? windowColor : colourRoll < 0.8 ? "#a8c8ff" : "#ffd58c";
+                ? colourRoll < 0.65
+                  ? "#ffd58c"
+                  : colourRoll < 0.85
+                    ? "#ff9a4a"
+                    : windowColor
+                : colourRoll < 0.5
+                  ? windowColor
+                  : colourRoll < 0.8
+                    ? "#a8c8ff"
+                    : "#ffd58c";
             elems.push(
               `<rect x="${wx.toFixed(1)}" y="${wy.toFixed(1)}" width="${winW.toFixed(1)}" height="${winH.toFixed(1)}" fill="${finalColor}" opacity="${winOpacity.toFixed(2)}"/>`
             );
@@ -356,11 +367,12 @@ export function cityscapeBrick(params: BrickParams, options: CityscapeBrickOptio
   // ─── Atmospheric haze between buildings and sky ──────────────────────────────
   // Semi-transparent fog band at the skyline horizon — depth separation
   const hazeH = height * 0.03;
-  const topBldgY = buildings.length > 0
-    ? Math.min(...buildings.map(b => b.y))
-    : basePx - height * 0.15;
+  const topBldgY =
+    buildings.length > 0 ? Math.min(...buildings.map(b => b.y)) : basePx - height * 0.15;
   const hazeFilterId = `${id}-hazef`;
-  defs.push(`<filter id="${hazeFilterId}" x="-5%" y="-50%" width="110%" height="200%"><feGaussianBlur stdDeviation="0 ${(hazeH * 0.5).toFixed(0)}"/></filter>`);
+  defs.push(
+    `<filter id="${hazeFilterId}" x="-5%" y="-50%" width="110%" height="200%"><feGaussianBlur stdDeviation="0 ${(hazeH * 0.5).toFixed(0)}"/></filter>`
+  );
   elems.push(
     `<rect x="0" y="${(basePx - hazeH * 1.5).toFixed(0)}" width="${width}" height="${(hazeH * 2).toFixed(0)}" fill="${COOL_SHADOW}" opacity="${(opacity * 0.08).toFixed(3)}" filter="url(#${hazeFilterId})"/>`
   );

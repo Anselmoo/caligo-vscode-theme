@@ -185,7 +185,7 @@ function graphiteDrift(p: BrickParams): ComposedWallpaper {
       { cx: 0.2, cy: 0.62, rx: 0.015, ry: 0.01, color: colors.accent, opacity: 0.5 },
       { cx: 0.45, cy: 0.58, rx: 0.012, ry: 0.008, color: colors.hueBlue, opacity: 0.4 },
       { cx: 0.7, cy: 0.65, rx: 0.018, ry: 0.012, color: colors.hueOrange, opacity: 0.45 },
-      { cx: 0.85, cy: 0.60, rx: 0.01, ry: 0.008, color: colors.accent, opacity: 0.35 },
+      { cx: 0.85, cy: 0.6, rx: 0.01, ry: 0.008, color: colors.accent, opacity: 0.35 },
     ],
   });
 
@@ -276,7 +276,7 @@ function graphiteBreak(p: BrickParams): ComposedWallpaper {
     id: "gf-b-sl",
     points: 28,
     layers: [
-      { baseY: 0.68, roughness: 0.10, color: colors.bgMid, opacity: 0.6 },
+      { baseY: 0.68, roughness: 0.1, color: colors.bgMid, opacity: 0.6 },
       { baseY: 0.78, roughness: 0.06, color: colors.bg, opacity: 0.9 },
     ],
   });
@@ -353,7 +353,7 @@ function graphiteVoid(p: BrickParams): ComposedWallpaper {
   const ghost = cityscapeBrick(p, {
     id: "gf-v-gh",
     baseY: 0.72,
-    heightRange: [0.10, 0.22],
+    heightRange: [0.1, 0.22],
     density: 10,
     color: colors.bgMid,
     opacity: 0.2,
@@ -423,10 +423,10 @@ function graphitePulse(p: BrickParams): ComposedWallpaper {
     id: "gf-p-bl",
     blur: 0.02,
     blobs: [
-      { cx: 0.15, cy: 0.60, rx: 0.01, ry: 0.008, color: colors.hueYellow, opacity: 0.5 },
+      { cx: 0.15, cy: 0.6, rx: 0.01, ry: 0.008, color: colors.hueYellow, opacity: 0.5 },
       { cx: 0.35, cy: 0.58, rx: 0.012, ry: 0.009, color: colors.hueOrange, opacity: 0.45 },
       { cx: 0.55, cy: 0.59, rx: 0.01, ry: 0.008, color: colors.hueYellow, opacity: 0.5 },
-      { cx: 0.75, cy: 0.60, rx: 0.012, ry: 0.009, color: colors.hueOrange, opacity: 0.45 },
+      { cx: 0.75, cy: 0.6, rx: 0.012, ry: 0.009, color: colors.hueOrange, opacity: 0.45 },
       { cx: 0.9, cy: 0.59, rx: 0.01, ry: 0.008, color: colors.hueYellow, opacity: 0.4 },
     ],
   });

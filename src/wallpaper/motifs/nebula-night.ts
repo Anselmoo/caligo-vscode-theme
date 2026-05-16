@@ -345,8 +345,8 @@ function nebulaBreak(p: BrickParams): ComposedWallpaper {
   const asteroidTerrain = terrainStackBrick(p, {
     id: "nn-b-at",
     layers: [
-      { baseY: 0.70, roughness: 0.06, color: colors.bgMid, opacity: 0.4 },
-      { baseY: 0.80, roughness: 0.05, color: colors.bg, opacity: 0.72 },
+      { baseY: 0.7, roughness: 0.06, color: colors.bgMid, opacity: 0.4 },
+      { baseY: 0.8, roughness: 0.05, color: colors.bg, opacity: 0.72 },
     ],
   });
 

@@ -18,7 +18,6 @@ import {
   beachBrick,
   celestialBrick,
   cityscapeBrick,
-  solarCoronaBrick,
   cloudBandBrick,
   desertBrick,
   duneBrick,
@@ -34,6 +33,7 @@ import {
   shootingStarBrick,
   skyGradientBrick,
   smokeRisingBrick,
+  solarCoronaBrick,
   sparksBrick,
   starFieldBrick,
   terrainBrick,
@@ -166,7 +166,8 @@ function makeCatalog(): BrickEntry[] {
     {
       group: "Stars & Sky",
       name: "Sky Gradient — sunset",
-      description: "Photorealistic sunset: deep blue zenith with stars → warm pink horizon strip → dark foreground (composited with starfield + horizon glow for full atmospheric depth)",
+      description:
+        "Photorealistic sunset: deep blue zenith with stars → warm pink horizon strip → dark foreground (composited with starfield + horizon glow for full atmospheric depth)",
       generate: () => {
         // Compose the sky preset WITH stars + cloud band + horizon glow so the
         // gallery test reads as a real photographic sky, not just a flat gradient.
@@ -249,7 +250,7 @@ function makeCatalog(): BrickEntry[] {
             blur: 0.06,
             blobs: [
               { cx: 0.3, cy: 0.3, rx: 0.15, ry: 0.1, color: p.colors.hueBlue, opacity: 0.55 },
-              { cx: 0.7, cy: 0.5, rx: 0.12, ry: 0.08, color: p.colors.huePurple, opacity: 0.40 },
+              { cx: 0.7, cy: 0.5, rx: 0.12, ry: 0.08, color: p.colors.huePurple, opacity: 0.4 },
               { cx: 0.5, cy: 0.2, rx: 0.18, ry: 0.07, color: p.colors.hueCyan, opacity: 0.35 },
             ],
           }),
@@ -261,7 +262,8 @@ function makeCatalog(): BrickEntry[] {
     {
       group: "Aurora",
       name: "Aurora — 3 bands (curtain folds)",
-      description: "Three layered curtains with bright pink-magenta top ribbon edge, dense turbulent column structure, and flowing fold shading",
+      description:
+        "Three layered curtains with bright pink-magenta top ribbon edge, dense turbulent column structure, and flowing fold shading",
       generate: () =>
         wrap(
           bg(),
@@ -281,7 +283,8 @@ function makeCatalog(): BrickEntry[] {
     {
       group: "Aurora",
       name: "Aurora — 5 bands wide (storm)",
-      description: "Auroral storm event — five overlapping curtains with violet-purple top ribbons, deeper green core, broad sky illumination",
+      description:
+        "Auroral storm event — five overlapping curtains with violet-purple top ribbons, deeper green core, broad sky illumination",
       generate: () =>
         wrap(
           bg(),
@@ -301,7 +304,8 @@ function makeCatalog(): BrickEntry[] {
     {
       group: "Aurora",
       name: "Cloud Band — white cumulus",
-      description: "Bright cumulus clouds with thick structure (dual-frequency turbulence + amplified alpha)",
+      description:
+        "Bright cumulus clouds with thick structure (dual-frequency turbulence + amplified alpha)",
       generate: () =>
         wrap(
           bg(),
@@ -322,7 +326,8 @@ function makeCatalog(): BrickEntry[] {
     {
       group: "Moon & Celestial",
       name: "Crescent Moon",
-      description: "Moon with SVG mask crescent cut-out, radial glow, maria texture, and limb darkening",
+      description:
+        "Moon with SVG mask crescent cut-out, radial glow, maria texture, and limb darkening",
       generate: () =>
         wrap(
           bg(),
@@ -342,7 +347,8 @@ function makeCatalog(): BrickEntry[] {
     {
       group: "Moon & Celestial",
       name: "Full Moon",
-      description: "Spherical moon with terminator shading, maria, atmospheric halo, and specular highlight",
+      description:
+        "Spherical moon with terminator shading, maria, atmospheric halo, and specular highlight",
       generate: () =>
         wrap(
           bg(),
@@ -399,7 +405,8 @@ function makeCatalog(): BrickEntry[] {
     {
       group: "Moon & Celestial",
       name: "Solar Eclipse",
-      description: "Total solar eclipse with organic corona rays, coronal streamers, and diamond ring bead",
+      description:
+        "Total solar eclipse with organic corona rays, coronal streamers, and diamond ring bead",
       generate: () => {
         const corona = solarCoronaBrick(p, {
           id: "t-eclipse-corona",
@@ -547,8 +554,8 @@ function makeCatalog(): BrickEntry[] {
         const mountains = terrainStackBrick(p, {
           id: "t-snm",
           layers: [
-            { baseY: 0.42, roughness: 0.10, color: "#2a3040", opacity: 0.45, edgeBlur: 3 },
-            { baseY: 0.52, roughness: 0.12, color: "#1c2433", opacity: 0.70 },
+            { baseY: 0.42, roughness: 0.1, color: "#2a3040", opacity: 0.45, edgeBlur: 3 },
+            { baseY: 0.52, roughness: 0.12, color: "#1c2433", opacity: 0.7 },
             { baseY: 0.64, roughness: 0.14, color: "#0e1420", opacity: 0.92 },
           ],
         });
@@ -556,12 +563,17 @@ function makeCatalog(): BrickEntry[] {
         const snow = terrainBrick(p, {
           id: "t-snm-snow",
           baseY: 0.42,
-          roughness: 0.10,
+          roughness: 0.1,
           points: 40,
           color: "#c8d0e0",
           opacity: 0.35,
           seedSuffix: "snow-cap",
-          gradient: { topColor: "#e0e8f0", bottomColor: "#c8d0e0", topOpacity: 0.40, bottomOpacity: 0.0 },
+          gradient: {
+            topColor: "#e0e8f0",
+            bottomColor: "#c8d0e0",
+            topOpacity: 0.4,
+            bottomOpacity: 0.0,
+          },
         });
         return toSvgDocument(mergeBricks([bg(), mountains, snow]), p.viewBox);
       },
@@ -578,14 +590,14 @@ function makeCatalog(): BrickEntry[] {
           roughness: 0.09,
           points: 35,
           color: "#1c2433",
-          opacity: 0.50,
+          opacity: 0.5,
           seedSuffix: "far-mtn",
         });
         // Mid mountain
         const midMtn = terrainBrick(p, {
           id: "t-fm-mid",
           baseY: 0.56,
-          roughness: 0.10,
+          roughness: 0.1,
           points: 40,
           color: "#141c28",
           opacity: 0.75,
@@ -597,7 +609,7 @@ function makeCatalog(): BrickEntry[] {
           baseY: 0.56,
           count: 80,
           color: "#0a1018",
-          opacity: 0.90,
+          opacity: 0.9,
           maxHeight: 0.08,
         });
         // Foreground treeline — darker, taller
@@ -615,13 +627,14 @@ function makeCatalog(): BrickEntry[] {
     {
       group: "Terrain",
       name: "Volcano",
-      description: "Volcanic cone with 3D rock texture, scattered boulders, lava flow streaks, and crater glow",
+      description:
+        "Volcanic cone with 3D rock texture, scattered boulders, lava flow streaks, and crater glow",
       generate: () => {
         const vol = volcanoBrick(p, {
           id: "t-vol",
           cx: 0.5,
           baseY: 0.65,
-          peakHeight: 0.30,
+          peakHeight: 0.3,
           craterWidth: 0.025,
           color: "#1a1008",
           lavaColor: "#ff4400",
@@ -672,7 +685,8 @@ function makeCatalog(): BrickEntry[] {
     {
       group: "City",
       name: "Cityscape — night skyline",
-      description: "City skyline with floor lines, vertical mullions, varied tower roofs (flat/stepped/peaked), and clustered illuminated windows in mixed warm/cool tones, plus water reflection beneath",
+      description:
+        "City skyline with floor lines, vertical mullions, varied tower roofs (flat/stepped/peaked), and clustered illuminated windows in mixed warm/cool tones, plus water reflection beneath",
       generate: () => {
         // Sky with subtle horizon glow (inspired by purple-night skyline reference)
         const sky = skyGradientBrick(p, {
@@ -825,7 +839,8 @@ function makeCatalog(): BrickEntry[] {
     {
       group: "Ocean & Beach",
       name: "Beach at Night",
-      description: "Sand foreground with breaking waves, foam streaks, wet-sand reflection, and scattered debris",
+      description:
+        "Sand foreground with breaking waves, foam streaks, wet-sand reflection, and scattered debris",
       generate: () =>
         wrap(
           bgOcean(),
@@ -843,7 +858,8 @@ function makeCatalog(): BrickEntry[] {
     {
       group: "Ocean & Beach",
       name: "Beach — bioluminescent",
-      description: "Glowing turquoise plankton along wave crests (Vaadhoo / Maldives bioluminescent tide)",
+      description:
+        "Glowing turquoise plankton along wave crests (Vaadhoo / Maldives bioluminescent tide)",
       generate: () =>
         wrap(
           bgOcean(),
@@ -903,7 +919,8 @@ function makeCatalog(): BrickEntry[] {
     {
       group: "Desert",
       name: "Desert — Dunes",
-      description: "Rolling sinusoidal dune ridgelines with slip-face shadows and sand-grain texture on a warm sand plain",
+      description:
+        "Rolling sinusoidal dune ridgelines with slip-face shadows and sand-grain texture on a warm sand plain",
       generate: () =>
         wrap(
           bgFire(),
@@ -920,7 +937,8 @@ function makeCatalog(): BrickEntry[] {
     {
       group: "Desert",
       name: "Desert — Pyramids",
-      description: "Egyptian pyramid silhouettes with lit/shadow faces and atmospheric perspective (Giza-style)",
+      description:
+        "Egyptian pyramid silhouettes with lit/shadow faces and atmospheric perspective (Giza-style)",
       generate: () =>
         wrap(
           bgFire(),
@@ -938,7 +956,8 @@ function makeCatalog(): BrickEntry[] {
     {
       group: "Desert",
       name: "Desert — Salt Flat",
-      description: "Bonneville/Salar de Uyuni-style salt flat with reflective crust and polygonal salt cracks",
+      description:
+        "Bonneville/Salar de Uyuni-style salt flat with reflective crust and polygonal salt cracks",
       generate: () =>
         wrap(
           bg(),
@@ -956,13 +975,14 @@ function makeCatalog(): BrickEntry[] {
     {
       group: "Desert",
       name: "Desert — Cacti",
-      description: "Saguaro, barrel, and prickly-pear cactus silhouettes with Bob Ross 3D lighting — directional gradients, rim highlights, and base shadows on a lit sand floor",
+      description:
+        "Saguaro, barrel, and prickly-pear cactus silhouettes with Bob Ross 3D lighting — directional gradients, rim highlights, and base shadows on a lit sand floor",
       generate: () =>
         wrap(
           bgFire(),
           desertBrick(pFire, {
             id: "t-dst-c",
-            baseY: 0.60,
+            baseY: 0.6,
             sandColor: "#5a3a1f",
             cactusColor: "#0a0d12",
             variant: "cacti",
@@ -976,7 +996,8 @@ function makeCatalog(): BrickEntry[] {
     {
       group: "Effects",
       name: "Vignette",
-      description: "Radial darkening vignette to pull eye to center — shown on a gradient background for contrast",
+      description:
+        "Radial darkening vignette to pull eye to center — shown on a gradient background for contrast",
       generate: () => {
         // Show on a scene-like gradient so the vignette effect is obvious
         const sceneBg: BrickOutput = {
@@ -985,7 +1006,14 @@ function makeCatalog(): BrickEntry[] {
           </radialGradient></defs>
           <rect width="${W}" height="${H}" fill="url(#vig-bg)"/>`,
         };
-        const stars = starFieldBrick(p, { id: "t-vig-stars", count: 60, brightCount: 4, color: "#ffffff", distribution: "full", opacity: 0.5 });
+        const stars = starFieldBrick(p, {
+          id: "t-vig-stars",
+          count: 60,
+          brightCount: 4,
+          color: "#ffffff",
+          distribution: "full",
+          opacity: 0.5,
+        });
         return toSvgDocument(
           mergeBricks([sceneBg, stars, vignetteBrick(p, { id: "t-vig", opacity: 0.85 })]),
           p.viewBox

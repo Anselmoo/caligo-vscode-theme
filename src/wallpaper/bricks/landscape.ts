@@ -328,7 +328,9 @@ export function terrainBrick(params: BrickParams, options: TerrainBrickOptions):
 
   // ── Rim highlight — bright stroke along the ridgeline for sun-facing edge ──
   const rimBlurId = `${id}-rimblur`;
-  defs.push(`<filter id="${rimBlurId}" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3"/></filter>`);
+  defs.push(
+    `<filter id="${rimBlurId}" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3"/></filter>`
+  );
 
   const elems = [
     `<path id="${id}" d="${sketchPath}" ${fillAttr} opacity="${opacity}"${filterAttr}/>`,
@@ -590,7 +592,7 @@ export function waterReflectionBrick(
     // Length scales with perspective — short near horizon, longer near foreground
     const lengthFrac = 0.18 + t * 0.55 + rng() * 0.25;
     const lineW = lengthFrac * width;
-    const lineX = (rng() * (1 - lengthFrac)) * width;
+    const lineX = rng() * (1 - lengthFrac) * width;
     const sw = (0.6 + rng() * 0.9) * (scale / 1080);
     const lineOpacity = (opacity * 1.6 * (0.4 + rng() * 0.5) * (1 - t * 0.4)).toFixed(3);
     elems.push(
@@ -623,7 +625,7 @@ export function waterReflectionBrick(
   <feComposite in="waterLit" in2="SourceGraphic" operator="in"/>
 </filter>`);
   elems.push(
-    `<rect x="0" y="${wy.toFixed(0)}" width="${width}" height="${waterHeight.toFixed(0)}" fill="${color}" opacity="${(opacity * 0.10).toFixed(3)}" filter="url(#${waterLitId})"/>`
+    `<rect x="0" y="${wy.toFixed(0)}" width="${width}" height="${waterHeight.toFixed(0)}" fill="${color}" opacity="${(opacity * 0.1).toFixed(3)}" filter="url(#${waterLitId})"/>`
   );
 
   // ── Bob Ross: Directional warm→cool gradient on water ──
@@ -752,11 +754,17 @@ export function celestialBrick(params: BrickParams, options: CelestialBrickOptio
     const coronaR = pr * 1.8;
     const coronaSW = Math.max(2.0, pr * 0.08);
     const coronaBlurId = `${id}-cbr`;
-    defs.push(`<filter id="${coronaBlurId}" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="${(coronaSW * 1.8).toFixed(1)}"/></filter>`);
+    defs.push(
+      `<filter id="${coronaBlurId}" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="${(coronaSW * 1.8).toFixed(1)}"/></filter>`
+    );
     // Outer soft ring (blurred)
-    elems.push(`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${coronaR.toFixed(1)}" fill="none" stroke="${gc}" stroke-width="${(coronaSW * 4).toFixed(1)}" opacity="${Math.min(0.45, glowOpacity * 1.2).toFixed(3)}" filter="url(#${coronaBlurId})"/>`);
+    elems.push(
+      `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${coronaR.toFixed(1)}" fill="none" stroke="${gc}" stroke-width="${(coronaSW * 4).toFixed(1)}" opacity="${Math.min(0.45, glowOpacity * 1.2).toFixed(3)}" filter="url(#${coronaBlurId})"/>`
+    );
     // Inner crisp ring
-    elems.push(`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${coronaR.toFixed(1)}" fill="none" stroke="${gc}" stroke-width="${(coronaSW * 1.2).toFixed(1)}" opacity="${Math.min(0.3, glowOpacity * 0.7).toFixed(3)}"/>`);
+    elems.push(
+      `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${coronaR.toFixed(1)}" fill="none" stroke="${gc}" stroke-width="${(coronaSW * 1.2).toFixed(1)}" opacity="${Math.min(0.3, glowOpacity * 0.7).toFixed(3)}"/>`
+    );
   }
 
   // Tight inner corona — sharper warm/cool edge close to the disc
@@ -881,7 +889,9 @@ export function skyGradientBrick(
   const elems: string[] = [];
 
   // Base sky gradient
-  defs.push(`<linearGradient id="${id}-grad" x1="0" y1="0" x2="0" y2="1">\n  ${stopElems}\n</linearGradient>`);
+  defs.push(
+    `<linearGradient id="${id}-grad" x1="0" y1="0" x2="0" y2="1">\n  ${stopElems}\n</linearGradient>`
+  );
   elems.push(`<rect id="${id}" width="${width}" height="${height}" fill="url(#${id}-grad)"/>`);
 
   // ── Bob Ross: Directional warm overlay from sun direction ──
@@ -910,7 +920,7 @@ export function skyGradientBrick(
   elems.push(`<rect width="${width}" height="${height}" fill="url(#${horizWarmId})"/>`);
 
   // ── Bob Ross: Subtle sky texture — atmosphere is never perfectly smooth ──
-  const skyTexSeed = hashStr(`${seedId}-${harmonyMode}-sky`) % 89 + 1;
+  const skyTexSeed = (hashStr(`${seedId}-${harmonyMode}-sky`) % 89) + 1;
   const skyTexId = `${id}-skytex`;
   defs.push(`<filter id="${skyTexId}" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB">
   <feTurbulence type="fractalNoise" baseFrequency="0.004 0.003" numOctaves="3" seed="${skyTexSeed}" result="skyN"/>
@@ -918,7 +928,9 @@ export function skyGradientBrick(
   <feGaussianBlur in="skyMask" stdDeviation="4" result="softSky"/>
   <feComposite in="softSky" in2="SourceGraphic" operator="in"/>
 </filter>`);
-  elems.push(`<rect width="${width}" height="${height}" fill="#6070a0" opacity="0.025" filter="url(#${skyTexId})"/>`);
+  elems.push(
+    `<rect width="${width}" height="${height}" fill="#6070a0" opacity="0.025" filter="url(#${skyTexId})"/>`
+  );
 
   return {
     defs: defs.join("\n"),
@@ -1162,7 +1174,7 @@ export function auroraAdvancedBrick(
     // Column frequency — VARY widely between curtains so we get thin needle rays
     // (high freq) AND wide soft columns (low freq) in the same scene.
     // ci=0 (hero): mid-range, ci=1: thin/needle, ci=2: wide/soft, ci=3: extra detail
-    const freqProfile = ci === 0 ? 0.022 : ci === 1 ? 0.040 : ci === 2 ? 0.012 : 0.030;
+    const freqProfile = ci === 0 ? 0.022 : ci === 1 ? 0.04 : ci === 2 ? 0.012 : 0.03;
     const colFreqX = (freqProfile + rng() * 0.008).toFixed(4);
     const colFreqY = (0.0008 + rng() * 0.0014).toFixed(4);
 
@@ -1547,9 +1559,9 @@ export function treelineBrick(params: BrickParams, options: TreelineBrickOptions
       const notchDepths: number[] = [];
       const tierYJitter: number[] = [];
       for (let t = 0; t <= tiers; t++) {
-        leftWidths.push(0.80 + rng() * 0.40);   // 0.80-1.20 asymmetry
-        rightWidths.push(0.80 + rng() * 0.40);
-        notchDepths.push(0.35 + rng() * 0.35);   // how deep the notch cuts
+        leftWidths.push(0.8 + rng() * 0.4); // 0.80-1.20 asymmetry
+        rightWidths.push(0.8 + rng() * 0.4);
+        notchDepths.push(0.35 + rng() * 0.35); // how deep the notch cuts
         tierYJitter.push((rng() - 0.5) * treeH * 0.06); // slight Y variation
       }
 
@@ -1560,14 +1572,18 @@ export function treelineBrick(params: BrickParams, options: TreelineBrickOptions
         const tT0 = t / tiers;
         const wBase = treeW * (1 - tT0) * leftWidths[t];
         const wNext = treeW * (1 - tT) * leftWidths[t + 1] * (0.6 + rng() * 0.25);
-        const yMid = by - treeH * (tT0 + (tT - tT0) * (0.40 + rng() * 0.15)) + tierYJitter[t];
+        const yMid = by - treeH * (tT0 + (tT - tT0) * (0.4 + rng() * 0.15)) + tierYJitter[t];
         const yNext = by - treeH * tT + tierYJitter[t + 1];
         const notchW = wBase * notchDepths[t];
         // Notch in (droopy branch curve inward)
         const droopY = yMid + treeH * 0.02 * rng(); // slight downward droop
-        pts.push(`Q ${(trunkX - notchW * 0.8).toFixed(1)} ${droopY.toFixed(1)} ${(trunkX - notchW).toFixed(1)} ${yMid.toFixed(1)}`);
+        pts.push(
+          `Q ${(trunkX - notchW * 0.8).toFixed(1)} ${droopY.toFixed(1)} ${(trunkX - notchW).toFixed(1)} ${yMid.toFixed(1)}`
+        );
         // Branch out (sweep to next tier width with upward curve)
-        pts.push(`Q ${(trunkX - wNext * 1.1).toFixed(1)} ${(yNext + treeH * 0.03).toFixed(1)} ${(trunkX - wNext).toFixed(1)} ${yNext.toFixed(1)}`);
+        pts.push(
+          `Q ${(trunkX - wNext * 1.1).toFixed(1)} ${(yNext + treeH * 0.03).toFixed(1)} ${(trunkX - wNext).toFixed(1)} ${yNext.toFixed(1)}`
+        );
       }
       // Tip — slightly off-center
       const tipOffX = (rng() - 0.5) * treeW * 0.15;
@@ -1578,18 +1594,20 @@ export function treelineBrick(params: BrickParams, options: TreelineBrickOptions
         const tT0 = t / tiers;
         const wBase = treeW * (1 - tT0) * rightWidths[t];
         const wNext = treeW * (1 - tT) * rightWidths[t + 1] * (0.6 + rng() * 0.25);
-        const yMid = by - treeH * (tT0 + (tT - tT0) * (0.40 + rng() * 0.15)) + tierYJitter[t];
+        const yMid = by - treeH * (tT0 + (tT - tT0) * (0.4 + rng() * 0.15)) + tierYJitter[t];
         const yNext = by - treeH * tT + tierYJitter[t + 1];
         const notchW = wBase * notchDepths[t];
-        pts.push(`Q ${(trunkX + wNext * 1.1).toFixed(1)} ${(yNext + treeH * 0.03).toFixed(1)} ${(trunkX + wNext).toFixed(1)} ${yNext.toFixed(1)}`);
-        pts.push(`Q ${(trunkX + notchW * 0.8).toFixed(1)} ${(yMid + treeH * 0.02 * rng()).toFixed(1)} ${(trunkX + notchW).toFixed(1)} ${yMid.toFixed(1)}`);
+        pts.push(
+          `Q ${(trunkX + wNext * 1.1).toFixed(1)} ${(yNext + treeH * 0.03).toFixed(1)} ${(trunkX + wNext).toFixed(1)} ${yNext.toFixed(1)}`
+        );
+        pts.push(
+          `Q ${(trunkX + notchW * 0.8).toFixed(1)} ${(yMid + treeH * 0.02 * rng()).toFixed(1)} ${(trunkX + notchW).toFixed(1)} ${yMid.toFixed(1)}`
+        );
       }
       pts.push(`L ${(x + treeW * 0.5).toFixed(1)} ${by.toFixed(1)}`);
       pts.push("Z");
 
-      elems.push(
-        `<path d="${pts.join(" ")}" fill="${color}" opacity="${treeOpacity}"/>`
-      );
+      elems.push(`<path d="${pts.join(" ")}" fill="${color}" opacity="${treeOpacity}"/>`);
     } else {
       // ── BROADLEAF: bumpy canopy with noise-perturbed contour ─────────────
       const canopyH = treeH * (0.72 + rng() * 0.12);
@@ -1608,7 +1626,7 @@ export function treelineBrick(params: BrickParams, options: TreelineBrickOptions
         let cpx = trunkX + Math.cos(angle) * rx;
         let cpy = by + Math.sin(angle) * ry * 0.85; // squish vertically
         // Noise bumps: larger at top, smaller at sides
-        const bumpMag = canopyH * (0.06 + rng() * 0.10);
+        const bumpMag = canopyH * (0.06 + rng() * 0.1);
         const bumpAngle = (rng() - 0.5) * 2;
         cpx += Math.cos(angle + bumpAngle) * bumpMag * (0.5 + rng());
         cpy += Math.sin(angle + bumpAngle) * bumpMag * (0.5 + rng());
@@ -1619,7 +1637,9 @@ export function treelineBrick(params: BrickParams, options: TreelineBrickOptions
       canopyPoints[canopyPoints.length - 1].y = by;
 
       // Build path with Q curves through the bumpy points
-      const dParts: string[] = [`M ${canopyPoints[0].x.toFixed(1)} ${canopyPoints[0].y.toFixed(1)}`];
+      const dParts: string[] = [
+        `M ${canopyPoints[0].x.toFixed(1)} ${canopyPoints[0].y.toFixed(1)}`,
+      ];
       for (let ci = 1; ci < canopyPoints.length; ci++) {
         const prev = canopyPoints[ci - 1];
         const cur = canopyPoints[ci];
@@ -1629,9 +1649,7 @@ export function treelineBrick(params: BrickParams, options: TreelineBrickOptions
         dParts.push(`Q ${mx.toFixed(1)} ${my.toFixed(1)} ${cur.x.toFixed(1)} ${cur.y.toFixed(1)}`);
       }
       dParts.push("Z");
-      elems.push(
-        `<path d="${dParts.join(" ")}" fill="${color}" opacity="${treeOpacity}"/>`
-      );
+      elems.push(`<path d="${dParts.join(" ")}" fill="${color}" opacity="${treeOpacity}"/>`);
       // Implied trunk
       if (trunkH > 1) {
         elems.push(
@@ -1677,7 +1695,7 @@ export function treelineBrick(params: BrickParams, options: TreelineBrickOptions
     `<rect x="0" y="${(by - maxHeight * height - 20).toFixed(0)}" width="${width}" height="${(maxHeight * height + 40).toFixed(0)}" fill="url(#${treeLitId})" opacity="1"/>`,
     // Surface texture overlay
     `<rect x="0" y="${(by - maxHeight * height - 20).toFixed(0)}" width="${width}" height="${(maxHeight * height + 40).toFixed(0)}" fill="${color}" opacity="0.12" filter="url(#${treeSurfId})"/>`,
-    `</g>`,
+    "</g>",
   ];
 
   return {
@@ -1829,7 +1847,7 @@ export function shootingStarBrick(
     const x1 = zoneXStart + zoneW * i + rng() * zoneW;
     const y1 = rng() * height * 0.5 + height * 0.02;
     const angle = 0.3 + rng() * 0.8;
-    const len = (0.10 + rng() * 0.13) * width;
+    const len = (0.1 + rng() * 0.13) * width;
     const goRight = rng() < 0.5;
     const dx = goRight ? -Math.cos(angle) : Math.cos(angle);
     const dy = Math.sin(angle);
@@ -2027,7 +2045,9 @@ export function duneBrick(params: BrickParams, options: DuneBrickOptions): Brick
 
     // ── PILLAR 2: Ridge spine highlight — bright warm knife-edge catching the crest
     const hlBlurId = `${id}-hlblur-${r}`;
-    defs.push(`<filter id="${hlBlurId}" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="${(2.5 * sc).toFixed(1)}"/></filter>`);
+    defs.push(
+      `<filter id="${hlBlurId}" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="${(2.5 * sc).toFixed(1)}"/></filter>`
+    );
     // Soft glow
     elems.push(
       `<path d="${d}" fill="none" stroke="#fff0d0" stroke-width="${(4 * sc).toFixed(1)}" opacity="${(ridgeOpacity * 0.15).toFixed(3)}" stroke-linecap="round" filter="url(#${hlBlurId})"/>`
@@ -2045,14 +2065,14 @@ export function duneBrick(params: BrickParams, options: DuneBrickOptions): Brick
   <stop offset="70%" stop-color="#0a0804" stop-opacity="${(ridgeOpacity * 0.18).toFixed(3)}"/>
   <stop offset="100%" stop-color="#0a0804" stop-opacity="${(ridgeOpacity * 0.35).toFixed(3)}"/>
 </radialGradient>`);
-    elems.push(
-      `<path d="${polyD}" fill="url(#${shadowGradId})"/>`
-    );
+    elems.push(`<path d="${polyD}" fill="url(#${shadowGradId})"/>`);
 
     // ── PILLAR 3: Atmospheric haze between ridges
     if (r < ridges - 1) {
       const hazeBlurId = `${id}-dhaze-${r}`;
-      defs.push(`<filter id="${hazeBlurId}" x="-5%" y="-50%" width="110%" height="200%"><feGaussianBlur stdDeviation="0 ${(8 * sc).toFixed(0)}"/></filter>`);
+      defs.push(
+        `<filter id="${hazeBlurId}" x="-5%" y="-50%" width="110%" height="200%"><feGaussianBlur stdDeviation="0 ${(8 * sc).toFixed(0)}"/></filter>`
+      );
       elems.push(
         `<rect x="0" y="${(dy - amp * 0.2).toFixed(0)}" width="${width}" height="${(amp * 0.5).toFixed(0)}" fill="#1a1610" opacity="0.08" filter="url(#${hazeBlurId})"/>`
       );
@@ -2182,8 +2202,8 @@ export function desertBrick(params: BrickParams, options: DesertBrickOptions): B
 
     const pyramids: Array<{ cx: number; size: number; depth: number }> = [];
     for (let i = 0; i < pyramidCount; i++) {
-      const cx = (0.15 + (i / Math.max(1, pyramidCount - 1)) * 0.7) * width
-        + (rng() - 0.5) * width * 0.08;
+      const cx =
+        (0.15 + (i / Math.max(1, pyramidCount - 1)) * 0.7) * width + (rng() - 0.5) * width * 0.08;
       const depth = rng(); // 0=far, 1=close
       const size = (50 + depth * 110 + rng() * 30) * sc;
       pyramids.push({ cx, size, depth });
@@ -2214,8 +2234,8 @@ export function desertBrick(params: BrickParams, options: DesertBrickOptions): B
       // Shadow face (right) — darker, cooler tone
       const shadowGradId = `${id}-pyr-shd-${pi}`;
       defs.push(`<linearGradient id="${shadowGradId}" x1="0" y1="0" x2="1" y2="0.5">
-  <stop offset="0%" stop-color="${cactusColor}" stop-opacity="${(opacity * 0.60 * distFade).toFixed(2)}"/>
-  <stop offset="100%" stop-color="${cactusColor}" stop-opacity="${(opacity * 0.80 * distFade).toFixed(2)}"/>
+  <stop offset="0%" stop-color="${cactusColor}" stop-opacity="${(opacity * 0.6 * distFade).toFixed(2)}"/>
+  <stop offset="100%" stop-color="${cactusColor}" stop-opacity="${(opacity * 0.8 * distFade).toFixed(2)}"/>
 </linearGradient>`);
       const shadowD = `M ${pMidX.toFixed(1)} ${pTop.toFixed(1)} L ${pRight.toFixed(1)} ${pBase.toFixed(1)} L ${pMidX.toFixed(1)} ${pBase.toFixed(1)} Z`;
       elems.push(`<path d="${shadowD}" fill="url(#${shadowGradId})"/>`);
@@ -2232,7 +2252,7 @@ export function desertBrick(params: BrickParams, options: DesertBrickOptions): B
       // Real pyramids show horizontal course lines where limestone blocks meet.
       // The spacing narrows toward the apex (perspective foreshortening).
       const pyrHeight = pBase - pTop;
-      const courseSpacing = (6 + p.size * 0.045) * sc;  // proportional to pyramid size
+      const courseSpacing = (6 + p.size * 0.045) * sc; // proportional to pyramid size
       const courseCount = Math.floor(pyrHeight / courseSpacing);
       for (let ci = 1; ci < courseCount; ci++) {
         const courseY = pTop + ci * courseSpacing;
@@ -2274,14 +2294,16 @@ export function desertBrick(params: BrickParams, options: DesertBrickOptions): B
 
       // Atmospheric haze on distant pyramids
       if (p.depth < 0.4) {
-        const hazeOp = (0.20 * (1 - p.depth * 2.5)).toFixed(3);
+        const hazeOp = (0.2 * (1 - p.depth * 2.5)).toFixed(3);
         elems.push(`<path d="${fullD}" fill="${sandColor}" opacity="${hazeOp}"/>`);
       }
 
       // Ground shadow — cast shadow at the base of the pyramid
       const shadowLen = p.size * 0.6;
       const shadowGD = `M ${pRight.toFixed(1)} ${pBase.toFixed(1)} L ${(pRight + shadowLen).toFixed(1)} ${pBase.toFixed(1)} L ${pRight.toFixed(1)} ${(pBase - 2 * sc).toFixed(1)} Z`;
-      elems.push(`<path d="${shadowGD}" fill="#0a0500" opacity="${(opacity * 0.15 * distFade).toFixed(3)}"/>`);
+      elems.push(
+        `<path d="${shadowGD}" fill="#0a0500" opacity="${(opacity * 0.15 * distFade).toFixed(3)}"/>`
+      );
     }
 
     // ── 3D lit desert floor — feDiffuseLighting for actual sand surface depth ──
@@ -2299,7 +2321,9 @@ export function desertBrick(params: BrickParams, options: DesertBrickOptions): B
   <feGaussianBlur in="ripMask" stdDeviation="1" result="softRip"/>
   <feComposite in="softRip" in2="SourceGraphic" operator="in"/>
 </filter>`);
-    elems.push(`<rect x="0" y="${by.toFixed(0)}" width="${width}" height="${floorH.toFixed(0)}" fill="${sandColor}" opacity="${(opacity * 0.10).toFixed(2)}" filter="url(#${pyrRippleId})"/>`);
+    elems.push(
+      `<rect x="0" y="${by.toFixed(0)}" width="${width}" height="${floorH.toFixed(0)}" fill="${sandColor}" opacity="${(opacity * 0.1).toFixed(2)}" filter="url(#${pyrRippleId})"/>`
+    );
 
     // Specular sparkle on desert floor — sun catching sand grains
     const pyrSpecId = `${id}-pyrspec`;
@@ -2310,7 +2334,9 @@ export function desertBrick(params: BrickParams, options: DesertBrickOptions): B
   </feSpecularLighting>
   <feComposite in="spec" in2="SourceGraphic" operator="in"/>
 </filter>`);
-    elems.push(`<rect x="0" y="${by.toFixed(0)}" width="${width}" height="${floorH.toFixed(0)}" fill="#ffffff" opacity="${(opacity * 0.03).toFixed(3)}" filter="url(#${pyrSpecId})"/>`);
+    elems.push(
+      `<rect x="0" y="${by.toFixed(0)}" width="${width}" height="${floorH.toFixed(0)}" fill="#ffffff" opacity="${(opacity * 0.03).toFixed(3)}" filter="url(#${pyrSpecId})"/>`
+    );
 
     // Scattered small rocks/pebbles with tiny ground shadows
     for (let i = 0; i < 18; i++) {
@@ -2378,7 +2404,7 @@ export function desertBrick(params: BrickParams, options: DesertBrickOptions): B
   <feComposite in="sga" in2="SourceGraphic" operator="in"/>
 </filter>`);
     elems.push(
-      `<rect x="0" y="${by.toFixed(0)}" width="${width}" height="${(height - by).toFixed(0)}" fill="#ffffff" opacity="${(opacity * 0.10).toFixed(2)}" filter="url(#${saltGrainId})"/>`
+      `<rect x="0" y="${by.toFixed(0)}" width="${width}" height="${(height - by).toFixed(0)}" fill="#ffffff" opacity="${(opacity * 0.1).toFixed(2)}" filter="url(#${saltGrainId})"/>`
     );
 
     // 3. Multi-scale polygonal crack network — the chaotic beauty of real salt flats.
@@ -2416,7 +2442,7 @@ export function desertBrick(params: BrickParams, options: DesertBrickOptions): B
       const neighborCount = 3 + Math.floor(rng() * 3);
       for (let j = 0; j < Math.min(neighborCount, dists.length); j++) {
         const ni = dists[j].ni;
-        const edgeKey = Math.min(i, ni) + '-' + Math.max(i, ni);
+        const edgeKey = Math.min(i, ni) + "-" + Math.max(i, ni);
         if (drawnEdges.has(edgeKey)) continue;
         drawnEdges.add(edgeKey);
         const n = pCenters[ni];
@@ -2431,7 +2457,7 @@ export function desertBrick(params: BrickParams, options: DesertBrickOptions): B
         const perspT = (c.t + n.t) / 2;
         // Perspective: foreground cracks thicker, more opaque
         const sw = ((0.3 + perspT * 1.2) * sc).toFixed(1);
-        const cOp = (opacity * (0.12 + perspT * 0.40 + rng() * 0.08)).toFixed(3);
+        const cOp = (opacity * (0.12 + perspT * 0.4 + rng() * 0.08)).toFixed(3);
         elems.push(
           `<path d="M ${c.x.toFixed(1)} ${c.y.toFixed(1)} C ${cpx1.toFixed(1)} ${cpy1.toFixed(1)} ${cpx2.toFixed(1)} ${cpy2.toFixed(1)} ${n.x.toFixed(1)} ${n.y.toFixed(1)}" fill="none" stroke="${cactusColor}" stroke-width="${sw}" opacity="${cOp}" stroke-linecap="round"/>`
         );
@@ -2467,7 +2493,7 @@ export function desertBrick(params: BrickParams, options: DesertBrickOptions): B
       const neighborCount = 2 + Math.floor(rng() * 2);
       for (let j = 0; j < Math.min(neighborCount, dists.length); j++) {
         const ni = dists[j].ni;
-        const edgeKey = Math.min(i, ni) + '-' + Math.max(i, ni);
+        const edgeKey = Math.min(i, ni) + "-" + Math.max(i, ni);
         if (drawnEdges2.has(edgeKey)) continue;
         drawnEdges2.add(edgeKey);
         const n = sCenters[ni];
@@ -2486,7 +2512,9 @@ export function desertBrick(params: BrickParams, options: DesertBrickOptions): B
     // ── Crack edge highlights — light catching the raised edge of each crack ──
     // Use noise to add subtle bright lines alongside some primary cracks
     const crackHighlightId = `${id}-crackhl`;
-    defs.push(`<filter id="${crackHighlightId}" x="-10%" y="-50%" width="120%" height="200%"><feGaussianBlur stdDeviation="${(0.4 * sc).toFixed(1)}"/></filter>`);
+    defs.push(
+      `<filter id="${crackHighlightId}" x="-10%" y="-50%" width="120%" height="200%"><feGaussianBlur stdDeviation="${(0.4 * sc).toFixed(1)}"/></filter>`
+    );
 
     for (let i = 0; i < pCenters.length; i++) {
       if (rng() > 0.3) continue; // only some cracks get highlights
@@ -2511,7 +2539,7 @@ export function desertBrick(params: BrickParams, options: DesertBrickOptions): B
     // 4. Sky reflection on distant salt surface — horizon mirror effect
     const reflId = `${id}-saltrefl`;
     defs.push(`<linearGradient id="${reflId}" x1="0" y1="${by.toFixed(0)}" x2="0" y2="${(by + floorH * 0.4).toFixed(0)}" gradientUnits="userSpaceOnUse">
-  <stop offset="0%" stop-color="#6688aa" stop-opacity="${(opacity * 0.10).toFixed(3)}"/>
+  <stop offset="0%" stop-color="#6688aa" stop-opacity="${(opacity * 0.1).toFixed(3)}"/>
   <stop offset="100%" stop-color="#6688aa" stop-opacity="0"/>
 </linearGradient>`);
     elems.push(
@@ -2583,17 +2611,17 @@ export function desertBrick(params: BrickParams, options: DesertBrickOptions): B
     for (let r = 0; r < duneRidges; r++) {
       const depthT = r / Math.max(1, duneRidges - 1); // 0=furthest, 1=closest
       // Vertical position: quadratic spacing → more compressed near horizon
-      const dy = by + (depthT * depthT) * floorH * 0.75;
+      const dy = by + depthT * depthT * floorH * 0.75;
       // DRAMATIC amplitude — towering dunes like in Dune movie: massive height variation
       const amp = (0.03 + depthT * 0.18 + rng() * 0.06) * height;
-      const ridgeOp = opacity * (0.35 + depthT * 0.60);
+      const ridgeOp = opacity * (0.35 + depthT * 0.6);
 
       // ── Dune profile: 4-octave simplex noise for organic wind-sculpted shape ──
       // KEY: primary frequency must be LOW (0.8-1.2) for one or two broad sweeping
       // humps across the width. Higher frequencies add detail ON TOP of that.
       const ridgePhase = r * 3.7 + rng() * 10.0;
       // Each ridge tilts — dune crests are diagonal, not perfectly horizontal
-      const ridgeTilt = (rng() - 0.5) * floorH * 0.10;
+      const ridgeTilt = (rng() - 0.5) * floorH * 0.1;
       const sampleCount = 120;
       const pts: Pt[] = [];
       for (let i = 0; i <= sampleCount; i++) {
@@ -2602,7 +2630,7 @@ export function desertBrick(params: BrickParams, options: DesertBrickOptions): B
         // 4-octave noise: one big sweeping arc + medium shape + fine + micro
         const n =
           duneNoise(t * 0.9 + ridgePhase, r * 4.3) * 0.45 +
-          duneNoise(t * 2.5 + ridgePhase, r * 4.3 + 10) * 0.30 +
+          duneNoise(t * 2.5 + ridgePhase, r * 4.3 + 10) * 0.3 +
           duneNoise(t * 7.0 + ridgePhase, r * 4.3 + 20) * 0.16 +
           duneNoise(t * 16.0 + ridgePhase, r * 4.3 + 30) * 0.09;
         // Gentle edge taper
@@ -2630,7 +2658,7 @@ export function desertBrick(params: BrickParams, options: DesertBrickOptions): B
       const gradAngle = 0.15 + rng() * 0.08; // slight angle variation per ridge
       defs.push(`<linearGradient id="${gradId}" x1="0" y1="0" x2="1" y2="${gradAngle.toFixed(2)}">
   <stop offset="0%" stop-color="${duneColor}" stop-opacity="${(ridgeOp * 1.0).toFixed(3)}"/>
-  <stop offset="35%" stop-color="${duneColor}" stop-opacity="${(ridgeOp * 0.90).toFixed(3)}"/>
+  <stop offset="35%" stop-color="${duneColor}" stop-opacity="${(ridgeOp * 0.9).toFixed(3)}"/>
   <stop offset="100%" stop-color="${duneColor}" stop-opacity="${(ridgeOp * 0.55).toFixed(3)}"/>
 </linearGradient>`);
       elems.push(`<path d="${polyD}" fill="url(#${gradId})"/>`);
@@ -2657,7 +2685,7 @@ export function desertBrick(params: BrickParams, options: DesertBrickOptions): B
       const texY = (dy - amp * 1.5).toFixed(0);
       const texH = (floorH + amp * 1.5).toFixed(0);
       elems.push(
-        `<rect x="0" y="${texY}" width="${width}" height="${texH}" fill="${duneColor}" opacity="${(ridgeOp * 0.30).toFixed(2)}" filter="url(#${sandLitId})" clip-path="url(#${clipId})"/>`
+        `<rect x="0" y="${texY}" width="${width}" height="${texH}" fill="${duneColor}" opacity="${(ridgeOp * 0.3).toFixed(2)}" filter="url(#${sandLitId})" clip-path="url(#${clipId})"/>`
       );
 
       // ── Layer 5: Fine sand grain overlay ──
@@ -2673,7 +2701,7 @@ export function desertBrick(params: BrickParams, options: DesertBrickOptions): B
       }
 
       // ── Layer 7: Specular sparkle (sand grains catching sun) ──
-      if (depthT > 0.30) {
+      if (depthT > 0.3) {
         elems.push(
           `<rect x="0" y="${texY}" width="${width}" height="${texH}" fill="#ffffff" opacity="${(ridgeOp * 0.035 * depthT).toFixed(3)}" filter="url(#${specSandId})" clip-path="url(#${clipId})"/>`
         );
@@ -2697,18 +2725,24 @@ export function desertBrick(params: BrickParams, options: DesertBrickOptions): B
     }
 
     // ── Global wind ripple texture on entire desert floor ──
-    elems.push(`<rect x="0" y="${by.toFixed(0)}" width="${width}" height="${floorH.toFixed(0)}" fill="${sandColor}" opacity="${(opacity * 0.08).toFixed(2)}" filter="url(#${rippleId})"/>`);
+    elems.push(
+      `<rect x="0" y="${by.toFixed(0)}" width="${width}" height="${floorH.toFixed(0)}" fill="${sandColor}" opacity="${(opacity * 0.08).toFixed(2)}" filter="url(#${rippleId})"/>`
+    );
 
     // ── Scattered rocks — irregular shapes with ground shadows ──
     for (let i = 0; i < 10; i++) {
       const rx = rng() * width;
       const ry = by + (0.35 + rng() * 0.55) * floorH;
       const rr = (0.8 + rng() * 1.5) * sc;
-      const rOp = (opacity * (0.20 + rng() * 0.25)).toFixed(2);
+      const rOp = (opacity * (0.2 + rng() * 0.25)).toFixed(2);
       // Rock shadow
-      elems.push(`<ellipse cx="${(rx + rr * 0.4).toFixed(1)}" cy="${(ry + rr * 0.3).toFixed(1)}" rx="${(rr * 1.0).toFixed(1)}" ry="${(rr * 0.25).toFixed(1)}" fill="#000000" opacity="${(parseFloat(rOp) * 0.25).toFixed(3)}"/>`);
+      elems.push(
+        `<ellipse cx="${(rx + rr * 0.4).toFixed(1)}" cy="${(ry + rr * 0.3).toFixed(1)}" rx="${(rr * 1.0).toFixed(1)}" ry="${(rr * 0.25).toFixed(1)}" fill="#000000" opacity="${(parseFloat(rOp) * 0.25).toFixed(3)}"/>`
+      );
       // Rock body — irregular via different rx/ry
-      elems.push(`<ellipse cx="${rx.toFixed(1)}" cy="${ry.toFixed(1)}" rx="${(rr * (0.8 + rng() * 0.6)).toFixed(1)}" ry="${(rr * (0.3 + rng() * 0.3)).toFixed(1)}" fill="${cactusColor}" opacity="${rOp}"/>`);
+      elems.push(
+        `<ellipse cx="${rx.toFixed(1)}" cy="${ry.toFixed(1)}" rx="${(rr * (0.8 + rng() * 0.6)).toFixed(1)}" ry="${(rr * (0.3 + rng() * 0.3)).toFixed(1)}" fill="${cactusColor}" opacity="${rOp}"/>`
+      );
     }
   } else {
     // ─ CACTI with Bob Ross 3D drama ─
@@ -2741,112 +2775,130 @@ export function desertBrick(params: BrickParams, options: DesertBrickOptions): B
     // Directional lit gradient for cactus silhouettes (warm left → dark right)
     const cactusLitId = `${id}-clit`;
     defs.push(`<linearGradient id="${cactusLitId}" x1="0" y1="0" x2="1" y2="0.3">
-  <stop offset="0%" stop-color="#1a2030" stop-opacity="${(opacity * 0.90).toFixed(3)}"/>
+  <stop offset="0%" stop-color="#1a2030" stop-opacity="${(opacity * 0.9).toFixed(3)}"/>
   <stop offset="25%" stop-color="${cactusColor}" stop-opacity="${(opacity * 0.95).toFixed(3)}"/>
   <stop offset="100%" stop-color="#040608" stop-opacity="${(opacity * 1.0).toFixed(3)}"/>
 </linearGradient>`);
 
     // Rim glow filter for cactus edge highlights
     const cactusRimId = `${id}-crimglow`;
-    defs.push(`<filter id="${cactusRimId}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="${(1.5 * sc).toFixed(1)}"/></filter>`);
+    defs.push(
+      `<filter id="${cactusRimId}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="${(1.5 * sc).toFixed(1)}"/></filter>`
+    );
 
     for (let i = 0; i < cactusCount; i++) {
-    const cx = rng() * width;
-    const cType = rng();
-    const cBaseOp = (opacity * (0.78 + rng() * 0.22)).toFixed(2);
+      const cx = rng() * width;
+      const cType = rng();
+      const cBaseOp = (opacity * (0.78 + rng() * 0.22)).toFixed(2);
 
-    if (cType < 0.6) {
-      // ── SAGUARO — tall main column + 0..2 arms
-      const cH = (60 + rng() * 90) * sc;
-      const cW = (10 + rng() * 6) * sc;
-      const trunkX = cx - cW / 2;
-      const trunkY = by - cH;
-      const trunkR = cW * 0.5;
-      const d = `M ${trunkX.toFixed(1)} ${by.toFixed(1)} L ${trunkX.toFixed(1)} ${(trunkY + trunkR).toFixed(1)} A ${trunkR.toFixed(1)} ${trunkR.toFixed(1)} 0 0 1 ${(trunkX + cW).toFixed(1)} ${(trunkY + trunkR).toFixed(1)} L ${(trunkX + cW).toFixed(1)} ${by.toFixed(1)} Z`;
+      if (cType < 0.6) {
+        // ── SAGUARO — tall main column + 0..2 arms
+        const cH = (60 + rng() * 90) * sc;
+        const cW = (10 + rng() * 6) * sc;
+        const trunkX = cx - cW / 2;
+        const trunkY = by - cH;
+        const trunkR = cW * 0.5;
+        const d = `M ${trunkX.toFixed(1)} ${by.toFixed(1)} L ${trunkX.toFixed(1)} ${(trunkY + trunkR).toFixed(1)} A ${trunkR.toFixed(1)} ${trunkR.toFixed(1)} 0 0 1 ${(trunkX + cW).toFixed(1)} ${(trunkY + trunkR).toFixed(1)} L ${(trunkX + cW).toFixed(1)} ${by.toFixed(1)} Z`;
 
-      // Bob Ross: Base shadow
-      elems.push(`<ellipse cx="${cx.toFixed(1)}" cy="${(by + 1.5 * sc).toFixed(1)}" rx="${(cW * 1.2).toFixed(1)}" ry="${(3 * sc).toFixed(1)}" fill="#000000" opacity="${(parseFloat(cBaseOp) * 0.15).toFixed(3)}"/>`);
-
-      // Main body with directional gradient
-      elems.push(`<path d="${d}" fill="url(#${cactusLitId})" opacity="${cBaseOp}"/>`);
-
-      // Bob Ross: Rim highlight on left (sun-facing) edge
-      elems.push(`<line x1="${trunkX.toFixed(1)}" y1="${(trunkY + trunkR).toFixed(1)}" x2="${trunkX.toFixed(1)}" y2="${by.toFixed(1)}" stroke="#fff0d0" stroke-width="${(1.5 * sc).toFixed(1)}" opacity="${(parseFloat(cBaseOp) * 0.10).toFixed(3)}" filter="url(#${cactusRimId})"/>`);
-      elems.push(`<line x1="${trunkX.toFixed(1)}" y1="${(trunkY + trunkR).toFixed(1)}" x2="${trunkX.toFixed(1)}" y2="${by.toFixed(1)}" stroke="#fff0d0" stroke-width="${(0.5 * sc).toFixed(1)}" opacity="${(parseFloat(cBaseOp) * 0.15).toFixed(3)}"/>`);
-
-      // 0–2 side arms
-      const armCount = Math.floor(rng() * 3);
-      for (let a = 0; a < armCount; a++) {
-        const armSide = rng() < 0.5 ? -1 : 1;
-        const armStartY = by - cH * (0.35 + rng() * 0.25);
-        const armW = cW * 0.65;
-        const armH = cH * (0.3 + rng() * 0.2);
-        const armReach = (10 + rng() * 14) * sc;
-        const ax = armSide < 0 ? trunkX : trunkX + cW;
-        const ay = armStartY;
-        const ax2 = ax + armSide * armReach;
-        const ay2 = ay - armH;
-        const armR = armW * 0.5;
-        const armEndY = ay2;
-        const armD = `M ${ax.toFixed(1)} ${(ay - armW * 0.3).toFixed(1)} L ${ax2.toFixed(1)} ${(ay - armW * 0.3).toFixed(1)} L ${ax2.toFixed(1)} ${(armEndY + armR).toFixed(1)} A ${armR.toFixed(1)} ${armR.toFixed(1)} 0 0 ${armSide < 0 ? 0 : 1} ${(ax2 + armSide * armW).toFixed(1)} ${(armEndY + armR).toFixed(1)} L ${(ax2 + armSide * armW).toFixed(1)} ${(ay + armW * 0.3).toFixed(1)} L ${ax.toFixed(1)} ${(ay + armW * 0.3).toFixed(1)} Z`;
-        elems.push(`<path d="${armD}" fill="url(#${cactusLitId})" opacity="${cBaseOp}"/>`);
-      }
-
-      // Vertical rib highlights on the lit (left) side
-      const ribCount = 3;
-      for (let rib = 0; rib < ribCount; rib++) {
-        const ribX = trunkX + cW * (0.15 + rib * 0.18);
+        // Bob Ross: Base shadow
         elems.push(
-          `<line x1="${ribX.toFixed(1)}" y1="${(trunkY + trunkR * 1.5).toFixed(1)}" x2="${ribX.toFixed(1)}" y2="${(by - 4).toFixed(1)}" stroke="${cactusColor}" stroke-width="${(0.5 * sc).toFixed(1)}" opacity="${(parseFloat(cBaseOp) * 0.5).toFixed(2)}"/>`
+          `<ellipse cx="${cx.toFixed(1)}" cy="${(by + 1.5 * sc).toFixed(1)}" rx="${(cW * 1.2).toFixed(1)}" ry="${(3 * sc).toFixed(1)}" fill="#000000" opacity="${(parseFloat(cBaseOp) * 0.15).toFixed(3)}"/>`
         );
-      }
-    } else if (cType < 0.9) {
-      // ── BARREL — short squat rounded
-      const bW = (24 + rng() * 18) * sc;
-      const bH = (18 + rng() * 16) * sc;
-      const bx = cx - bW / 2;
-      const bY = by - bH;
-      const d = `M ${bx.toFixed(1)} ${by.toFixed(1)} A ${(bW / 2).toFixed(1)} ${bH.toFixed(1)} 0 0 1 ${(bx + bW).toFixed(1)} ${by.toFixed(1)} Z`;
 
-      // Base shadow
-      elems.push(`<ellipse cx="${cx.toFixed(1)}" cy="${(by + 1 * sc).toFixed(1)}" rx="${(bW * 0.6).toFixed(1)}" ry="${(2 * sc).toFixed(1)}" fill="#000000" opacity="${(parseFloat(cBaseOp) * 0.12).toFixed(3)}"/>`);
+        // Main body with directional gradient
+        elems.push(`<path d="${d}" fill="url(#${cactusLitId})" opacity="${cBaseOp}"/>`);
 
-      elems.push(`<path d="${d}" fill="url(#${cactusLitId})" opacity="${cBaseOp}"/>`);
-      // Vertical ridges
-      for (let r = 0; r < 4; r++) {
-        const rx = bx + bW * (0.18 + r * 0.22);
+        // Bob Ross: Rim highlight on left (sun-facing) edge
         elems.push(
-          `<line x1="${rx.toFixed(1)}" y1="${(bY + bH * 0.4).toFixed(1)}" x2="${rx.toFixed(1)}" y2="${(by - 2).toFixed(1)}" stroke="${cactusColor}" stroke-width="${(0.4 * sc).toFixed(1)}" opacity="${(parseFloat(cBaseOp) * 0.4).toFixed(2)}"/>`
+          `<line x1="${trunkX.toFixed(1)}" y1="${(trunkY + trunkR).toFixed(1)}" x2="${trunkX.toFixed(1)}" y2="${by.toFixed(1)}" stroke="#fff0d0" stroke-width="${(1.5 * sc).toFixed(1)}" opacity="${(parseFloat(cBaseOp) * 0.1).toFixed(3)}" filter="url(#${cactusRimId})"/>`
         );
+        elems.push(
+          `<line x1="${trunkX.toFixed(1)}" y1="${(trunkY + trunkR).toFixed(1)}" x2="${trunkX.toFixed(1)}" y2="${by.toFixed(1)}" stroke="#fff0d0" stroke-width="${(0.5 * sc).toFixed(1)}" opacity="${(parseFloat(cBaseOp) * 0.15).toFixed(3)}"/>`
+        );
+
+        // 0–2 side arms
+        const armCount = Math.floor(rng() * 3);
+        for (let a = 0; a < armCount; a++) {
+          const armSide = rng() < 0.5 ? -1 : 1;
+          const armStartY = by - cH * (0.35 + rng() * 0.25);
+          const armW = cW * 0.65;
+          const armH = cH * (0.3 + rng() * 0.2);
+          const armReach = (10 + rng() * 14) * sc;
+          const ax = armSide < 0 ? trunkX : trunkX + cW;
+          const ay = armStartY;
+          const ax2 = ax + armSide * armReach;
+          const ay2 = ay - armH;
+          const armR = armW * 0.5;
+          const armEndY = ay2;
+          const armD = `M ${ax.toFixed(1)} ${(ay - armW * 0.3).toFixed(1)} L ${ax2.toFixed(1)} ${(ay - armW * 0.3).toFixed(1)} L ${ax2.toFixed(1)} ${(armEndY + armR).toFixed(1)} A ${armR.toFixed(1)} ${armR.toFixed(1)} 0 0 ${armSide < 0 ? 0 : 1} ${(ax2 + armSide * armW).toFixed(1)} ${(armEndY + armR).toFixed(1)} L ${(ax2 + armSide * armW).toFixed(1)} ${(ay + armW * 0.3).toFixed(1)} L ${ax.toFixed(1)} ${(ay + armW * 0.3).toFixed(1)} Z`;
+          elems.push(`<path d="${armD}" fill="url(#${cactusLitId})" opacity="${cBaseOp}"/>`);
+        }
+
+        // Vertical rib highlights on the lit (left) side
+        const ribCount = 3;
+        for (let rib = 0; rib < ribCount; rib++) {
+          const ribX = trunkX + cW * (0.15 + rib * 0.18);
+          elems.push(
+            `<line x1="${ribX.toFixed(1)}" y1="${(trunkY + trunkR * 1.5).toFixed(1)}" x2="${ribX.toFixed(1)}" y2="${(by - 4).toFixed(1)}" stroke="${cactusColor}" stroke-width="${(0.5 * sc).toFixed(1)}" opacity="${(parseFloat(cBaseOp) * 0.5).toFixed(2)}"/>`
+          );
+        }
+      } else if (cType < 0.9) {
+        // ── BARREL — short squat rounded
+        const bW = (24 + rng() * 18) * sc;
+        const bH = (18 + rng() * 16) * sc;
+        const bx = cx - bW / 2;
+        const bY = by - bH;
+        const d = `M ${bx.toFixed(1)} ${by.toFixed(1)} A ${(bW / 2).toFixed(1)} ${bH.toFixed(1)} 0 0 1 ${(bx + bW).toFixed(1)} ${by.toFixed(1)} Z`;
+
+        // Base shadow
+        elems.push(
+          `<ellipse cx="${cx.toFixed(1)}" cy="${(by + 1 * sc).toFixed(1)}" rx="${(bW * 0.6).toFixed(1)}" ry="${(2 * sc).toFixed(1)}" fill="#000000" opacity="${(parseFloat(cBaseOp) * 0.12).toFixed(3)}"/>`
+        );
+
+        elems.push(`<path d="${d}" fill="url(#${cactusLitId})" opacity="${cBaseOp}"/>`);
+        // Vertical ridges
+        for (let r = 0; r < 4; r++) {
+          const rx = bx + bW * (0.18 + r * 0.22);
+          elems.push(
+            `<line x1="${rx.toFixed(1)}" y1="${(bY + bH * 0.4).toFixed(1)}" x2="${rx.toFixed(1)}" y2="${(by - 2).toFixed(1)}" stroke="${cactusColor}" stroke-width="${(0.4 * sc).toFixed(1)}" opacity="${(parseFloat(cBaseOp) * 0.4).toFixed(2)}"/>`
+          );
+        }
+        // Rim highlight on left edge
+        elems.push(
+          `<line x1="${bx.toFixed(1)}" y1="${(bY + bH * 0.3).toFixed(1)}" x2="${bx.toFixed(1)}" y2="${by.toFixed(1)}" stroke="#fff0d0" stroke-width="${(0.5 * sc).toFixed(1)}" opacity="${(parseFloat(cBaseOp) * 0.1).toFixed(3)}"/>`
+        );
+      } else {
+        // ── PRICKLY PEAR — cluster of overlapping pads (2–4 oval shapes)
+        const pads = 2 + Math.floor(rng() * 3);
+        // Base shadow for whole cluster
+        elems.push(
+          `<ellipse cx="${cx.toFixed(1)}" cy="${(by + 1 * sc).toFixed(1)}" rx="${(14 * sc).toFixed(1)}" ry="${(2 * sc).toFixed(1)}" fill="#000000" opacity="${(parseFloat(cBaseOp) * 0.1).toFixed(3)}"/>`
+        );
+        for (let p = 0; p < pads; p++) {
+          const pW = (16 + rng() * 12) * sc;
+          const pH = (22 + rng() * 14) * sc;
+          const px = cx + (rng() - 0.5) * 18 * sc;
+          const py = by - pH / 2 - p * 8 * sc;
+          elems.push(
+            `<ellipse cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" rx="${(pW / 2).toFixed(1)}" ry="${(pH / 2).toFixed(1)}" fill="url(#${cactusLitId})" opacity="${cBaseOp}"/>`
+          );
+          // Rim highlight on left edge of each pad
+          elems.push(
+            `<ellipse cx="${(px - pW * 0.35).toFixed(1)}" cy="${py.toFixed(1)}" rx="${(1 * sc).toFixed(1)}" ry="${(pH * 0.35).toFixed(1)}" fill="#fff0d0" opacity="${(parseFloat(cBaseOp) * 0.06).toFixed(3)}"/>`
+          );
+        }
       }
-      // Rim highlight on left edge
-      elems.push(`<line x1="${bx.toFixed(1)}" y1="${(bY + bH * 0.3).toFixed(1)}" x2="${bx.toFixed(1)}" y2="${by.toFixed(1)}" stroke="#fff0d0" stroke-width="${(0.5 * sc).toFixed(1)}" opacity="${(parseFloat(cBaseOp) * 0.10).toFixed(3)}"/>`);
-    } else {
-      // ── PRICKLY PEAR — cluster of overlapping pads (2–4 oval shapes)
-      const pads = 2 + Math.floor(rng() * 3);
-      // Base shadow for whole cluster
-      elems.push(`<ellipse cx="${cx.toFixed(1)}" cy="${(by + 1 * sc).toFixed(1)}" rx="${(14 * sc).toFixed(1)}" ry="${(2 * sc).toFixed(1)}" fill="#000000" opacity="${(parseFloat(cBaseOp) * 0.10).toFixed(3)}"/>`);
-      for (let p = 0; p < pads; p++) {
-        const pW = (16 + rng() * 12) * sc;
-        const pH = (22 + rng() * 14) * sc;
-        const px = cx + (rng() - 0.5) * 18 * sc;
-        const py = by - pH / 2 - p * 8 * sc;
-        elems.push(
-          `<ellipse cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" rx="${(pW / 2).toFixed(1)}" ry="${(pH / 2).toFixed(1)}" fill="url(#${cactusLitId})" opacity="${cBaseOp}"/>`
-        );
-        // Rim highlight on left edge of each pad
-        elems.push(
-          `<ellipse cx="${(px - pW * 0.35).toFixed(1)}" cy="${py.toFixed(1)}" rx="${(1 * sc).toFixed(1)}" ry="${(pH * 0.35).toFixed(1)}" fill="#fff0d0" opacity="${(parseFloat(cBaseOp) * 0.06).toFixed(3)}"/>`
-        );
-      }
-    }
     } // end cacti for-loop
 
     // 3D lit sand floor
     const cactiFloorH = height - by;
-    elems.push(`<rect x="0" y="${by.toFixed(0)}" width="${width}" height="${cactiFloorH.toFixed(0)}" fill="${sandColor}" opacity="${(opacity * 0.18).toFixed(2)}" filter="url(#${cactiFloorTexId})"/>`);
+    elems.push(
+      `<rect x="0" y="${by.toFixed(0)}" width="${width}" height="${cactiFloorH.toFixed(0)}" fill="${sandColor}" opacity="${(opacity * 0.18).toFixed(2)}" filter="url(#${cactiFloorTexId})"/>`
+    );
     // Wind ripple on floor
-    elems.push(`<rect x="0" y="${by.toFixed(0)}" width="${width}" height="${cactiFloorH.toFixed(0)}" fill="${sandColor}" opacity="${(opacity * 0.08).toFixed(2)}" filter="url(#${cactiRippleId})"/>`);
+    elems.push(
+      `<rect x="0" y="${by.toFixed(0)}" width="${width}" height="${cactiFloorH.toFixed(0)}" fill="${sandColor}" opacity="${(opacity * 0.08).toFixed(2)}" filter="url(#${cactiRippleId})"/>`
+    );
   } // end cacti variant else-branch
 
   // ── 4. Scattered pebbles (skipped on saltflat — would break the smooth crust)
@@ -3163,8 +3215,8 @@ export function volcanoBrick(params: BrickParams, options: VolcanoBrickOptions):
 
   // ── Organic volcano silhouette — noise-perturbed multi-point contour ──
   // Asymmetric slopes: left flank slightly different from right
-  const leftBias = 0.85 + rng() * 0.30;  // 0.85–1.15 asymmetry
-  const rightBias = 0.85 + rng() * 0.30;
+  const leftBias = 0.85 + rng() * 0.3; // 0.85–1.15 asymmetry
+  const rightBias = 0.85 + rng() * 0.3;
   const leftSlopeW = slopeW * leftBias;
   const rightSlopeW = slopeW * rightBias;
   const contourSteps = 48; // per side
@@ -3176,13 +3228,13 @@ export function volcanoBrick(params: BrickParams, options: VolcanoBrickOptions):
     const t = i / contourSteps; // 0=base, 1=crater
     const baseX = px - leftSlopeW * (1 - t);
     // Concave volcanic profile: steeper cone shape (0.72 power = conical, not dome)
-    const profile = Math.pow(t, 0.72);
+    const profile = t ** 0.72;
     const baseYAtT = by - profile * volcH;
     // Multi-octave noise for rocky irregularity — stronger amplitude
-    const noiseAmp = volcH * 0.06 * (1 - Math.pow(Math.abs(t - 0.5) * 2, 3)); // max noise in middle, smooth at base & peak
+    const noiseAmp = volcH * 0.06 * (1 - (Math.abs(t - 0.5) * 2) ** 3); // max noise in middle, smooth at base & peak
     const n =
       volcNoise(t * 4.0, 0.3) * 0.45 +
-      volcNoise(t * 10.0, 0.3 + 5) * 0.30 +
+      volcNoise(t * 10.0, 0.3 + 5) * 0.3 +
       volcNoise(t * 22.0, 0.3 + 10) * 0.25;
     const nx = leftSlopeW * 0.018 * volcNoise(t * 7.0, 3.5); // slight x jitter
     leftPts.push({ x: baseX + nx, y: baseYAtT + n * noiseAmp });
@@ -3193,12 +3245,12 @@ export function volcanoBrick(params: BrickParams, options: VolcanoBrickOptions):
   for (let i = 0; i <= contourSteps; i++) {
     const t = i / contourSteps; // 0=crater, 1=base
     const baseX = px + rightSlopeW * t;
-    const profile = Math.pow(1 - t, 0.72);
+    const profile = (1 - t) ** 0.72;
     const baseYAtT = by - profile * volcH;
-    const noiseAmp = volcH * 0.06 * (1 - Math.pow(Math.abs(t - 0.5) * 2, 3));
+    const noiseAmp = volcH * 0.06 * (1 - (Math.abs(t - 0.5) * 2) ** 3);
     const n =
       volcNoise(t * 4.0 + 20, 1.7) * 0.45 +
-      volcNoise(t * 10.0 + 20, 1.7 + 5) * 0.30 +
+      volcNoise(t * 10.0 + 20, 1.7 + 5) * 0.3 +
       volcNoise(t * 22.0 + 20, 1.7 + 10) * 0.25;
     const nx = rightSlopeW * 0.018 * volcNoise(t * 7.0 + 20, 4.5);
     rightPts.push({ x: baseX + nx, y: baseYAtT + n * noiseAmp });
@@ -3210,7 +3262,7 @@ export function volcanoBrick(params: BrickParams, options: VolcanoBrickOptions):
   const craterPts: { x: number; y: number }[] = [];
   for (let i = 0; i <= craterSteps; i++) {
     const t = i / craterSteps;
-    const craterX = (px - cw) + t * (cw * 2);
+    const craterX = px - cw + t * (cw * 2);
     // Slight W-shape: higher at edges, lower in center
     const rimProfile = Math.sin(t * Math.PI) * craterDip;
     const rimNoise = volcNoise(t * 6.0 + 40, 5.0) * craterDip * 0.4;
@@ -3231,20 +3283,28 @@ export function volcanoBrick(params: BrickParams, options: VolcanoBrickOptions):
       const cp1y = p1.y + (p2.y - p0.y) / 6;
       const cp2x = p2.x - (p3.x - p1.x) / 6;
       const cp2y = p2.y - (p3.y - p1.y) / 6;
-      segs.push(`C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)} ${cp2x.toFixed(1)} ${cp2y.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`);
+      segs.push(
+        `C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)} ${cp2x.toFixed(1)} ${cp2y.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`
+      );
     }
     return segs.join(" ");
   }
 
   // Full contour: left slope → crater rim → right slope → base close
   const leftPath = catmullToBezier(leftPts);
-  const craterPath = craterPts.slice(1).map(p => `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" ");
-  const rightPath = rightPts.slice(1).map((p, i) => {
-    if (i === 0) return `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
-    const prev = rightPts[i];
-    const cur = rightPts[i + 1];
-    return `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
-  }).join(" ");
+  const craterPath = craterPts
+    .slice(1)
+    .map(p => `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`)
+    .join(" ");
+  const rightPath = rightPts
+    .slice(1)
+    .map((p, i) => {
+      if (i === 0) return `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
+      const prev = rightPts[i];
+      const cur = rightPts[i + 1];
+      return `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
+    })
+    .join(" ");
   // Build right slope as Catmull-Rom too
   const rightSmooth = catmullToBezier(rightPts);
   // Extract just the curve commands (skip the M)
@@ -3296,7 +3356,7 @@ export function volcanoBrick(params: BrickParams, options: VolcanoBrickOptions):
   <feComposite in="rockLit" in2="SourceGraphic" operator="in"/>
 </filter>`);
   elems.push(
-    `<rect x="${(px - maxSlopeW - 10).toFixed(0)}" y="${(peakY - 10).toFixed(0)}" width="${(maxSlopeW * 2 + 20).toFixed(0)}" height="${(height - peakY + 20).toFixed(0)}" fill="${rockColor}" opacity="${(opacity * 0.40).toFixed(2)}" filter="url(#${rockTexId})" clip-path="url(#${clipId})"/>`
+    `<rect x="${(px - maxSlopeW - 10).toFixed(0)}" y="${(peakY - 10).toFixed(0)}" width="${(maxSlopeW * 2 + 20).toFixed(0)}" height="${(height - peakY + 20).toFixed(0)}" fill="${rockColor}" opacity="${(opacity * 0.4).toFixed(2)}" filter="url(#${rockTexId})" clip-path="url(#${clipId})"/>`
   );
 
   // Specular highlight layer — wet/glossy rock facets catching sun
@@ -3328,7 +3388,9 @@ export function volcanoBrick(params: BrickParams, options: VolcanoBrickOptions):
   // ════════════════════════════════════════════════════════════════════════════
   const rimPath = catmullToBezier(leftPts);
   const rimGlowId = `${id}-rimglow`;
-  defs.push(`<filter id="${rimGlowId}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="${(4 * sc).toFixed(1)}"/></filter>`);
+  defs.push(
+    `<filter id="${rimGlowId}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="${(4 * sc).toFixed(1)}"/></filter>`
+  );
   // Outer soft glow
   elems.push(
     `<path d="${rimPath}" fill="none" stroke="#fff0d0" stroke-width="${(5 * sc).toFixed(1)}" opacity="0.12" stroke-linecap="round" filter="url(#${rimGlowId})"/>`
@@ -3343,13 +3405,13 @@ export function volcanoBrick(params: BrickParams, options: VolcanoBrickOptions):
   // ════════════════════════════════════════════════════════════════════════════
   const boulderCount = 20 + Math.floor(rng() * 10);
   for (let i = 0; i < boulderCount; i++) {
-    const slopeT = 0.15 + rng() * 0.80;
+    const slopeT = 0.15 + rng() * 0.8;
     const sideT = (rng() - 0.5) * 2;
     const boulderY = peakY + slopeT * (by - peakY);
     const widthAtY = maxSlopeW * slopeT;
     const boulderX = px + sideT * widthAtY * 0.8;
     const bSize = (1.5 + slopeT * 4 + rng() * 3) * sc;
-    const bOp = (opacity * (0.18 + rng() * 0.30 + slopeT * 0.15)).toFixed(2);
+    const bOp = (opacity * (0.18 + rng() * 0.3 + slopeT * 0.15)).toFixed(2);
     // Cast shadow
     elems.push(
       `<ellipse cx="${(boulderX + bSize * 0.4).toFixed(1)}" cy="${(boulderY + bSize * 0.25).toFixed(1)}" rx="${(bSize * 1.0).toFixed(1)}" ry="${(bSize * 0.3).toFixed(1)}" fill="#000000" opacity="${(parseFloat(bOp) * 0.35).toFixed(3)}" clip-path="url(#${clipId})"/>`
@@ -3357,7 +3419,7 @@ export function volcanoBrick(params: BrickParams, options: VolcanoBrickOptions):
     // Boulder body — directional fill (left = lit, right = dark)
     const bGradId = `${id}-b${i}`;
     defs.push(`<linearGradient id="${bGradId}" x1="0" y1="0" x2="1" y2="0.5">
-  <stop offset="0%" stop-color="${rng() > 0.5 ? '#3a2818' : '#2a1a10'}" stop-opacity="1"/>
+  <stop offset="0%" stop-color="${rng() > 0.5 ? "#3a2818" : "#2a1a10"}" stop-opacity="1"/>
   <stop offset="100%" stop-color="#0a0608" stop-opacity="1"/>
 </linearGradient>`);
     elems.push(
@@ -3384,7 +3446,7 @@ export function volcanoBrick(params: BrickParams, options: VolcanoBrickOptions):
       const flowMidX = (flowX1 + flowX2) / 2 + (rng() - 0.5) * maxSlopeW * 0.12;
       const flowMidY = (peakY + flowEndY) / 2;
       const flowSw = (0.8 + rng() * 2.0) * sc;
-      const flowOp = (0.20 + rng() * 0.35).toFixed(2);
+      const flowOp = (0.2 + rng() * 0.35).toFixed(2);
       // Wide diffuse glow
       elems.push(
         `<path d="M ${flowX1.toFixed(1)} ${peakY.toFixed(1)} Q ${flowMidX.toFixed(1)} ${flowMidY.toFixed(1)} ${flowX2.toFixed(1)} ${flowEndY.toFixed(1)}" fill="none" stroke="${lavaColor}" stroke-width="${(flowSw * 6).toFixed(1)}" opacity="${(parseFloat(flowOp) * 0.18).toFixed(3)}" stroke-linecap="round" clip-path="url(#${clipId})"/>`
@@ -3404,7 +3466,9 @@ export function volcanoBrick(params: BrickParams, options: VolcanoBrickOptions):
   // PILLAR 3: Atmospheric haze — smoke/mist at the base of the volcano
   // ════════════════════════════════════════════════════════════════════════════
   const hazeFilterId = `${id}-haze`;
-  defs.push(`<filter id="${hazeFilterId}" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="${(18 * sc).toFixed(0)} ${(12 * sc).toFixed(0)}"/></filter>`);
+  defs.push(
+    `<filter id="${hazeFilterId}" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="${(18 * sc).toFixed(0)} ${(12 * sc).toFixed(0)}"/></filter>`
+  );
   // Atmospheric mist at the lower slopes
   elems.push(
     `<ellipse cx="${px.toFixed(0)}" cy="${(by + volcH * 0.05).toFixed(0)}" rx="${(maxSlopeW * 0.9).toFixed(0)}" ry="${(volcH * 0.25).toFixed(0)}" fill="#1a2030" opacity="0.18" filter="url(#${hazeFilterId})"/>`
@@ -3412,7 +3476,7 @@ export function volcanoBrick(params: BrickParams, options: VolcanoBrickOptions):
   // Warm smoke near lava flows
   if (lavaColor) {
     elems.push(
-      `<ellipse cx="${px.toFixed(0)}" cy="${(peakY + volcH * 0.2).toFixed(0)}" rx="${(maxSlopeW * 0.35).toFixed(0)}" ry="${(volcH * 0.20).toFixed(0)}" fill="${lavaColor}" opacity="0.06" filter="url(#${hazeFilterId})"/>`
+      `<ellipse cx="${px.toFixed(0)}" cy="${(peakY + volcH * 0.2).toFixed(0)}" rx="${(maxSlopeW * 0.35).toFixed(0)}" ry="${(volcH * 0.2).toFixed(0)}" fill="${lavaColor}" opacity="0.06" filter="url(#${hazeFilterId})"/>`
     );
   }
 

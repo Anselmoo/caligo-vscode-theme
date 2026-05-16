@@ -296,7 +296,7 @@ function auroraDrift(p: BrickParams): ComposedWallpaper {
     id: "an-d-au",
     bands: Math.max(5, Math.round(7 * tuning.auroraBandScale)),
     cy: shiftDown(0.18, tuning.auroraYShift * 0.6),
-    zoneHeight: scaleZone(0.40, tuning.auroraZoneScale),
+    zoneHeight: scaleZone(0.4, tuning.auroraZoneScale),
     color: colors.hueGreen,
     color2: colors.hueCyan,
     opacity: 0.65,
@@ -593,7 +593,7 @@ function auroraPulse(p: BrickParams): ComposedWallpaper {
   const aurora2 = auroraAdvancedBrick(p, {
     id: "an-p-au2",
     bands: Math.max(3, Math.round(4 * tuning.auroraBandScale)),
-    cy: shiftDown(0.30, tuning.auroraYShift * 0.5),
+    cy: shiftDown(0.3, tuning.auroraYShift * 0.5),
     zoneHeight: scaleZone(0.22, tuning.auroraZoneScale),
     color: colors.huePurple,
     color2: colors.hueGreen,
@@ -604,7 +604,7 @@ function auroraPulse(p: BrickParams): ComposedWallpaper {
   // Layered peaks — 4 contour levels with atmospheric depth — raised by 0.08
   const peaks = terrainContourBrick(p, {
     id: "an-p-tc-pk",
-    horizonY: Math.max(0.14, 0.20 - tuning.terrainLift),
+    horizonY: Math.max(0.14, 0.2 - tuning.terrainLift),
     layers: [
       { color: colors.bgMid, opacity: 0.45, edgeBlur: 5 },
       { color: colors.bgMid, opacity: 0.62 },

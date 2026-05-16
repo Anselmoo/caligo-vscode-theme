@@ -322,17 +322,7 @@ function mandarianBreak(p: BrickParams): ComposedWallpaper {
 
   const vignette = vignetteBrick(p, { id: "mn-b-vig", opacity: 0.55 });
   const noise = noiseBrick(p, { id: "mn-b-n", opacity: 0.04 });
-  return mergeBricks([
-    bg,
-    sky,
-    stars,
-    smoke,
-    fireGlow,
-    ridge,
-    sparks,
-    vignette,
-    noise,
-  ]);
+  return mergeBricks([bg, sky, stars, smoke, fireGlow, ridge, sparks, vignette, noise]);
 }
 
 /* ── Void: Empty desert night — lone tree under vast sky ─────────────────── */
@@ -414,18 +404,7 @@ function mandarianVoid(p: BrickParams): ComposedWallpaper {
 
   const vignette = vignetteBrick(p, { id: "mn-v-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "mn-v-n", opacity: 0.03 });
-  return mergeBricks([
-    bg,
-    sky,
-    stars,
-    moonGlow,
-    moonRays,
-    dune,
-    loneTree,
-    ground,
-    vignette,
-    noise,
-  ]);
+  return mergeBricks([bg, sky, stars, moonGlow, moonRays, dune, loneTree, ground, vignette, noise]);
 }
 
 /* ── Pulse: Desert campfire — sparks ascending into starry night ─────────── */
@@ -503,16 +482,5 @@ function mandarianPulse(p: BrickParams): ComposedWallpaper {
 
   const vignette = vignetteBrick(p, { id: "mn-p-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "mn-p-n", opacity: 0.04 });
-  return mergeBricks([
-    bg,
-    sky,
-    stars,
-    farDune,
-    ground,
-    fireGlow,
-    smoke,
-    sparks,
-    vignette,
-    noise,
-  ]);
+  return mergeBricks([bg, sky, stars, farDune, ground, fireGlow, smoke, sparks, vignette, noise]);
 }

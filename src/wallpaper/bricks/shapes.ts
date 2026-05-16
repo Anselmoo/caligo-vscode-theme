@@ -44,7 +44,16 @@ export interface RingBrickOptions {
 export function ringBrick(params: BrickParams, options: RingBrickOptions): BrickOutput {
   const { viewBox } = params;
   const { width, height } = viewBox;
-  const { cx = 0.5, cy = 0.5, r, strokeWidth = 2, color, opacity = 0.8, id = "ring", blurRadius } = options;
+  const {
+    cx = 0.5,
+    cy = 0.5,
+    r,
+    strokeWidth = 2,
+    color,
+    opacity = 0.8,
+    id = "ring",
+    blurRadius,
+  } = options;
   const pcx = (cx * width).toFixed(1);
   const pcy = (cy * height).toFixed(1);
   const scale = Math.max(width, height);

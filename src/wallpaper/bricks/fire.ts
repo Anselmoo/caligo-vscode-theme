@@ -409,8 +409,12 @@ export function lavaRiverBrick(params: BrickParams, options: LavaRiverBrickOptio
 
   // ── 1. HEAT GLOW AURA — follows river shape (blurred version of the path)
   const auraBlurId = `${id}-ab`;
-  defs.push(`<filter id="${auraBlurId}" x="-40%" y="-20%" width="180%" height="140%"><feGaussianBlur stdDeviation="${(25 * sc).toFixed(1)}"/></filter>`);
-  elems.push(`<path d="${riverD}" fill="${glowColor}" opacity="${(opacity * 0.3).toFixed(2)}" filter="url(#${auraBlurId})"/>`);
+  defs.push(
+    `<filter id="${auraBlurId}" x="-40%" y="-20%" width="180%" height="140%"><feGaussianBlur stdDeviation="${(25 * sc).toFixed(1)}"/></filter>`
+  );
+  elems.push(
+    `<path d="${riverD}" fill="${glowColor}" opacity="${(opacity * 0.3).toFixed(2)}" filter="url(#${auraBlurId})"/>`
+  );
 
   // ── 2. BRIGHT LAVA FLOW BASE — filled river shape with hot gradient
   const flowGradId = `${id}-fg`;
@@ -423,10 +427,16 @@ export function lavaRiverBrick(params: BrickParams, options: LavaRiverBrickOptio
 </linearGradient>`);
   // Soft outer glow
   const flowBlurId = `${id}-fb`;
-  defs.push(`<filter id="${flowBlurId}" x="-15%" y="-5%" width="130%" height="110%"><feGaussianBlur stdDeviation="${(4 * sc).toFixed(1)}"/></filter>`);
-  elems.push(`<path d="${riverD}" fill="url(#${flowGradId})" opacity="${(opacity * 0.5).toFixed(2)}" filter="url(#${flowBlurId})"/>`);
+  defs.push(
+    `<filter id="${flowBlurId}" x="-15%" y="-5%" width="130%" height="110%"><feGaussianBlur stdDeviation="${(4 * sc).toFixed(1)}"/></filter>`
+  );
+  elems.push(
+    `<path d="${riverD}" fill="url(#${flowGradId})" opacity="${(opacity * 0.5).toFixed(2)}" filter="url(#${flowBlurId})"/>`
+  );
   // Main flow body
-  elems.push(`<path d="${riverD}" fill="url(#${flowGradId})" opacity="${(opacity * 0.9).toFixed(2)}"/>`);
+  elems.push(
+    `<path d="${riverD}" fill="url(#${flowGradId})" opacity="${(opacity * 0.9).toFixed(2)}"/>`
+  );
 
   // ── 3. DARK CRUST OVERLAY — clipped to river shape (no rectangular boundary!)
   const crustSeed = Math.floor(rng() * 89) + 1;
@@ -437,7 +447,9 @@ export function lavaRiverBrick(params: BrickParams, options: LavaRiverBrickOptio
   <feGaussianBlur in="crust" stdDeviation="0.8" result="softCrust"/>
   <feComposite in="softCrust" in2="SourceGraphic" operator="in"/>
 </filter>`);
-  elems.push(`<rect x="0" y="${startPx.toFixed(0)}" width="${width}" height="${lavaH.toFixed(0)}" fill="#0a0204" opacity="${(opacity * 0.75).toFixed(2)}" filter="url(#${crustId})" clip-path="url(#${clipId})"/>`);
+  elems.push(
+    `<rect x="0" y="${startPx.toFixed(0)}" width="${width}" height="${lavaH.toFixed(0)}" fill="#0a0204" opacity="${(opacity * 0.75).toFixed(2)}" filter="url(#${crustId})" clip-path="url(#${clipId})"/>`
+  );
 
   // ── 4. BRIGHT HOT CRACKS — also clipped to river shape
   const crackSeed = crustSeed + 13;
@@ -448,14 +460,18 @@ export function lavaRiverBrick(params: BrickParams, options: LavaRiverBrickOptio
   <feGaussianBlur in="cracks" stdDeviation="0.5"/>
   <feComposite operator="in" in2="SourceGraphic"/>
 </filter>`);
-  elems.push(`<rect x="0" y="${startPx.toFixed(0)}" width="${width}" height="${lavaH.toFixed(0)}" fill="${hotColor}" opacity="${(opacity * 0.5).toFixed(2)}" filter="url(#${crackId})" clip-path="url(#${clipId})"/>`);
+  elems.push(
+    `<rect x="0" y="${startPx.toFixed(0)}" width="${width}" height="${lavaH.toFixed(0)}" fill="${hotColor}" opacity="${(opacity * 0.5).toFixed(2)}" filter="url(#${crackId})" clip-path="url(#${clipId})"/>`
+  );
 
   // ── 5. STEAM/HEAT SHIMMER wisps above the river source
   for (let s = 0; s < 4; s++) {
     const sx = leftPts[0][0] + rng() * (rightPts[0][0] - leftPts[0][0]);
     const sy = startPx - (5 + rng() * 25) * sc;
     const sr = (12 + rng() * 20) * sc;
-    elems.push(`<ellipse cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" rx="${sr.toFixed(1)}" ry="${(sr * 0.6).toFixed(1)}" fill="#bfb0a0" opacity="${(0.06 + rng() * 0.06).toFixed(3)}"/>`);
+    elems.push(
+      `<ellipse cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" rx="${sr.toFixed(1)}" ry="${(sr * 0.6).toFixed(1)}" fill="#bfb0a0" opacity="${(0.06 + rng() * 0.06).toFixed(3)}"/>`
+    );
   }
 
   return { defs: defs.join("\n"), elements: elems.join("\n") };

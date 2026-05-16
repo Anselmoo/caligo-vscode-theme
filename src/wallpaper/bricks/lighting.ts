@@ -136,7 +136,10 @@ export interface AtmosphericHazeOptions {
  * Creates a semi-transparent fog/haze rectangle between depth layers.
  * Place between far and near layers for atmospheric perspective.
  */
-export function atmosphericHaze(options: AtmosphericHazeOptions): { defs?: string; elements: string } {
+export function atmosphericHaze(options: AtmosphericHazeOptions): {
+  defs?: string;
+  elements: string;
+} {
   const {
     id,
     viewBox,
@@ -179,14 +182,7 @@ export interface BaseShadowOptions {
  * grounding it on the surface.
  */
 export function baseShadow(options: BaseShadowOptions): { defs: string; elements: string } {
-  const {
-    id,
-    cx,
-    baseY,
-    width,
-    height = 15,
-    opacity = 0.20,
-  } = options;
+  const { id, cx, baseY, width, height = 15, opacity = 0.2 } = options;
 
   const gradId = `${id}-grad`;
   const defs = `<radialGradient id="${gradId}" cx="50%" cy="30%" r="50%">
@@ -224,15 +220,18 @@ export interface SurfaceTextureOptions {
 export function surfaceTextureFilter(options: SurfaceTextureOptions): string {
   const { id, type, seed = 42 } = options;
 
-  const presets: Record<string, {
-    baseFrequency: string;
-    surfaceScale: number;
-    specScale: number;
-    specConstant: number;
-    specExponent: number;
-    octaves: number;
-    lightingColor: string;
-  }> = {
+  const presets: Record<
+    string,
+    {
+      baseFrequency: string;
+      surfaceScale: number;
+      specScale: number;
+      specConstant: number;
+      specExponent: number;
+      octaves: number;
+      lightingColor: string;
+    }
+  > = {
     rock: {
       baseFrequency: "0.035 0.05",
       surfaceScale: 4,

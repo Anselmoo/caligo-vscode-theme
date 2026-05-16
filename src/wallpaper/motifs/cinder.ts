@@ -217,9 +217,9 @@ function cinderDrift(p: BrickParams): ComposedWallpaper {
     id: "ci-d-vol",
     horizonY: 0.35,
     layers: [
-      { color: colors.bgMid, opacity: 0.6, edgeBlur: 3 },  // far ridges, hazy
-      { color: colors.bgSoft, opacity: 0.8 },               // mid slopes
-      { color: colors.bg, opacity: 1.0 },                   // near face, fully opaque
+      { color: colors.bgMid, opacity: 0.6, edgeBlur: 3 }, // far ridges, hazy
+      { color: colors.bgSoft, opacity: 0.8 }, // mid slopes
+      { color: colors.bg, opacity: 1.0 }, // near face, fully opaque
     ],
   });
 
@@ -227,7 +227,7 @@ function cinderDrift(p: BrickParams): ComposedWallpaper {
   // startY begins where the far ridge emerges, endY at the near face
   const lavaRiver = lavaRiverBrick(p, {
     id: "ci-d-lv",
-    startY: 0.40,
+    startY: 0.4,
     endY: 0.82,
     cx: 0.45,
     spreadX: 0.4,
@@ -320,9 +320,9 @@ function cinderBreak(p: BrickParams): ComposedWallpaper {
     id: "ci-b-rd",
     horizonY: 0.42,
     layers: [
-      { color: colors.hueRed, opacity: 0.15, edgeBlur: 2 },  // far fire-lit ridge
-      { color: colors.bgMid, opacity: 0.7 },                   // mid mountain
-      { color: colors.bg, opacity: 1.0 },                      // near face, opaque
+      { color: colors.hueRed, opacity: 0.15, edgeBlur: 2 }, // far fire-lit ridge
+      { color: colors.bgMid, opacity: 0.7 }, // mid mountain
+      { color: colors.bg, opacity: 1.0 }, // near face, opaque
     ],
   });
 
@@ -533,8 +533,8 @@ function cinderPulse(p: BrickParams): ComposedWallpaper {
     id: "ci-p-mtn",
     horizonY: 0.42,
     layers: [
-      { color: colors.bgMid, opacity: 0.35, edgeBlur: 4 },  // very far, nearly invisible
-      { color: colors.bgSoft, opacity: 0.55, edgeBlur: 2 },  // mid-distance
+      { color: colors.bgMid, opacity: 0.35, edgeBlur: 4 }, // very far, nearly invisible
+      { color: colors.bgSoft, opacity: 0.55, edgeBlur: 2 }, // mid-distance
     ],
   });
 
@@ -542,7 +542,7 @@ function cinderPulse(p: BrickParams): ComposedWallpaper {
   // Occupies bottom 20% of canvas. The campfire sits ON this ground.
   const campGround = terrainBrick(p, {
     id: "ci-p-cg",
-    baseY: 0.80,
+    baseY: 0.8,
     roughness: 0.03,
     points: 12,
     color: colors.bg,
@@ -552,7 +552,7 @@ function cinderPulse(p: BrickParams): ComposedWallpaper {
   // Small foreground trees framing the camp — at ground level, not on mountains
   const campTrees = treelineBrick(p, {
     id: "ci-p-fl",
-    baseY: 0.80,
+    baseY: 0.8,
     count: 12,
     color: colors.bg,
     opacity: 0.85,

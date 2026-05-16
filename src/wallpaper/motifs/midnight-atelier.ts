@@ -346,7 +346,7 @@ function midnightVoid(p: BrickParams): ComposedWallpaper {
     points: 14,
     layers: [
       { baseY: 0.62, roughness: 0.07, color: colors.bgSoft, opacity: 0.18 },
-      { baseY: 0.70, roughness: 0.05, color: colors.bgMid, opacity: 0.32 },
+      { baseY: 0.7, roughness: 0.05, color: colors.bgMid, opacity: 0.32 },
     ],
   });
 

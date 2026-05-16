@@ -237,18 +237,7 @@ function voidEmberDrift(p: BrickParams): ComposedWallpaper {
 
   const vignette = vignetteBrick(p, { id: "ve-d-vig", opacity: 0.5 });
   const noise = noiseBrick(p, { id: "ve-d-n", opacity: 0.03 });
-  return mergeBricks([
-    bg,
-    sky,
-    hGlow,
-    terrain,
-    trees,
-    trail,
-    cinders,
-    cinderAtmo,
-    vignette,
-    noise,
-  ]);
+  return mergeBricks([bg, sky, hGlow, terrain, trees, trail, cinders, cinderAtmo, vignette, noise]);
 }
 
 /* ── Break: Particle burst — radial explosion ─────────────────────────────── */
@@ -539,7 +528,7 @@ function voidEmberPulse(p: BrickParams): ComposedWallpaper {
   // Treeline on foreground terrain — properly scaled to terrain distance
   const trees = treelineBrick(p, {
     id: "ve-p-tl",
-    baseY: 0.70,
+    baseY: 0.7,
     count: 32,
     color: colors.bg,
     opacity: 0.72,

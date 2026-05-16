@@ -84,7 +84,7 @@ function deepStillness(p: BrickParams): ComposedWallpaper {
     cy: 0.45,
     zoneHeight: 0.55,
     color: colors.hueCyan,
-    opacity: 0.20,
+    opacity: 0.2,
     layers: 3,
   });
 
@@ -126,7 +126,7 @@ function deepStillness(p: BrickParams): ComposedWallpaper {
     layers: [
       { baseY: 0.75, roughness: 0.08, color: colors.bgMid, opacity: 0.55 },
       { baseY: 0.82, roughness: 0.07, color: colors.bgSoft, opacity: 0.72 },
-      { baseY: 0.89, roughness: 0.05, color: colors.bg, opacity: 0.90 },
+      { baseY: 0.89, roughness: 0.05, color: colors.bg, opacity: 0.9 },
       { baseY: 0.95, roughness: 0.03, color: colors.bg, opacity: 1.0 },
     ],
   });
@@ -444,5 +444,15 @@ function deepPulse(p: BrickParams): ComposedWallpaper {
 
   const vignette = vignetteBrick(p, { id: "ds-p-vig", opacity: 0.55 });
   const noise = noiseBrick(p, { id: "ds-p-n", opacity: 0.04 });
-  return mergeBricks([bg, ocean, reef, reefGlow, bioColumns, particles, coralAtmo, vignette, noise]);
+  return mergeBricks([
+    bg,
+    ocean,
+    reef,
+    reefGlow,
+    bioColumns,
+    particles,
+    coralAtmo,
+    vignette,
+    noise,
+  ]);
 }

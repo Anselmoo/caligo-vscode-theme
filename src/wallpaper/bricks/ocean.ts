@@ -279,7 +279,7 @@ export function beachBrick(params: BrickParams, options: BeachBrickOptions): Bri
   const noise2D = createNoise2D(rng);
   const shorePx = shoreY * height;
   // Much larger ocean zone — 30% of height for realistic depth
-  const horizonPx = shorePx - height * 0.30;
+  const horizonPx = shorePx - height * 0.3;
 
   const defs: string[] = [];
   const elems: string[] = [];
@@ -288,8 +288,11 @@ export function beachBrick(params: BrickParams, options: BeachBrickOptions): Bri
   // Uses LOW-frequency noise for broad sweeping arcs (not fine ripples).
   // Optional tilt parameter rotates the wave front so waves approach at angles.
   function waveContour(
-    baseY: number, amplitude: number, phaseOff: number,
-    steps = 80, tilt = 0 // tilt: y-offset per unit width (diagonal wave front)
+    baseY: number,
+    amplitude: number,
+    phaseOff: number,
+    steps = 80,
+    tilt = 0 // tilt: y-offset per unit width (diagonal wave front)
   ): { x: number; y: number }[] {
     const pts: { x: number; y: number }[] = [];
     for (let s = 0; s <= steps; s++) {
@@ -299,7 +302,7 @@ export function beachBrick(params: BrickParams, options: BeachBrickOptions): Bri
       // Low primary frequency (1.2) creates wide sweeping arcs, not flat lines
       const n =
         noise2D(t * 1.2 + phaseOff, phaseOff * 5) * 0.45 +
-        noise2D(t * 3.5 + phaseOff, phaseOff * 5 + 8) * 0.30 +
+        noise2D(t * 3.5 + phaseOff, phaseOff * 5 + 8) * 0.3 +
         noise2D(t * 8.0 + phaseOff, phaseOff * 5 + 16) * 0.16 +
         noise2D(t * 18.0 + phaseOff, phaseOff * 5 + 24) * 0.09;
       // Apply tilt so wave front is diagonal
@@ -323,7 +326,9 @@ export function beachBrick(params: BrickParams, options: BeachBrickOptions): Bri
       const cp1y = p1.y + (p2.y - p0.y) / 6;
       const cp2x = p2.x - (p3.x - p1.x) / 6;
       const cp2y = p2.y - (p3.y - p1.y) / 6;
-      d.push(`C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)} ${cp2x.toFixed(1)} ${cp2y.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`);
+      d.push(
+        `C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)} ${cp2x.toFixed(1)} ${cp2y.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`
+      );
     }
     return d.join(" ");
   }
@@ -424,7 +429,9 @@ export function beachBrick(params: BrickParams, options: BeachBrickOptions): Bri
 
   // Shared filters
   const crestGlowId = `${id}-cglow`;
-  defs.push(`<filter id="${crestGlowId}" x="-10%" y="-50%" width="120%" height="200%"><feGaussianBlur stdDeviation="${(1.5 * sc).toFixed(1)} ${(0.8 * sc).toFixed(1)}"/></filter>`);
+  defs.push(
+    `<filter id="${crestGlowId}" x="-10%" y="-50%" width="120%" height="200%"><feGaussianBlur stdDeviation="${(1.5 * sc).toFixed(1)} ${(0.8 * sc).toFixed(1)}"/></filter>`
+  );
 
   // General foam turbulence filter (shared across wave segments)
   const foamFiltId = `${id}-wfoam`;
@@ -440,7 +447,7 @@ export function beachBrick(params: BrickParams, options: BeachBrickOptions): Bri
     const rowT = row / Math.max(1, breakRows - 1); // 0=farthest, 1=closest
     // Irregular spacing — waves cluster near shore with random gaps
     const rowJitter = (rng() - 0.5) * 0.12;
-    const baseY = horizonPx + (0.12 + rowT * 0.80 + rowJitter) * oceanH;
+    const baseY = horizonPx + (0.12 + rowT * 0.8 + rowJitter) * oceanH;
     // MUCH bigger amplitude — waves need to curve dramatically, not be flat lines
     // Close waves: up to 30px of sweep; distant: 5-10px
     const waveAmp = (4 + rowT * 25 + rng() * 12) * sc;
@@ -455,7 +462,7 @@ export function beachBrick(params: BrickParams, options: BeachBrickOptions): Bri
     // ── Break the wave into 2-5 segments (not full width) ──
     // Real waves don't break uniformly — they peak and collapse in sections
     const segCount = 2 + Math.floor(rng() * 4);
-    const segBoundaries: Array<{start: number; end: number}> = [];
+    const segBoundaries: Array<{ start: number; end: number }> = [];
     for (let s = 0; s < segCount; s++) {
       const center = rng();
       const halfWidth = 0.08 + rng() * 0.25; // segment spans 16-66% of width
@@ -466,7 +473,7 @@ export function beachBrick(params: BrickParams, options: BeachBrickOptions): Bri
     }
     // Merge overlapping segments
     segBoundaries.sort((a, b) => a.start - b.start);
-    const merged: Array<{start: number; end: number}> = [segBoundaries[0]];
+    const merged: Array<{ start: number; end: number }> = [segBoundaries[0]];
     for (let s = 1; s < segBoundaries.length; s++) {
       const last = merged[merged.length - 1];
       if (segBoundaries[s].start <= last.end + 0.02) {
@@ -500,11 +507,11 @@ export function beachBrick(params: BrickParams, options: BeachBrickOptions): Bri
   <stop offset="100%" stop-color="${foamColor}" stop-opacity="0.05"/>
 </linearGradient>`);
 
-      const rowOp = (0.10 + rowT * 0.38 + rng() * 0.08).toFixed(2);
+      const rowOp = (0.1 + rowT * 0.38 + rng() * 0.08).toFixed(2);
 
       // Dark wave body
       elems.push(
-        `<path d="${filledD}" fill="${waterColor}" opacity="${(0.10 + rowT * 0.20).toFixed(2)}"/>`
+        `<path d="${filledD}" fill="${waterColor}" opacity="${(0.1 + rowT * 0.2).toFixed(2)}"/>`
       );
       // Foam texture clipped to segment
       elems.push(
@@ -528,7 +535,7 @@ export function beachBrick(params: BrickParams, options: BeachBrickOptions): Bri
   for (let fp = 0; fp < foamPatchCount; fp++) {
     const fpx = rng() * width;
     const fpRowT = rng();
-    const fpy = horizonPx + (0.20 + fpRowT * 0.75) * oceanH;
+    const fpy = horizonPx + (0.2 + fpRowT * 0.75) * oceanH;
     const fprx = (4 + rng() * 18 + fpRowT * 10) * sc;
     // Varied aspect ratio — some round, some elongated
     const fpry = fprx * (0.15 + rng() * 0.35);
@@ -545,8 +552,8 @@ export function beachBrick(params: BrickParams, options: BeachBrickOptions): Bri
   for (let t = 0; t < 3; t++) {
     const tongueAmp = (8 + rng() * 12) * sc;
     const tongueThick = (12 + rng() * 14) * sc;
-    const tongueY = shorePx - tongueThick * (0.10 + rng() * 0.20);
-    const tongueTilt = (rng() - 0.5) * oceanH * 0.10;
+    const tongueY = shorePx - tongueThick * (0.1 + rng() * 0.2);
+    const tongueTilt = (rng() - 0.5) * oceanH * 0.1;
     const tongueCrest = waveContour(tongueY, tongueAmp, 8.5 + t * 4.2 + rng() * 3, 80, tongueTilt);
 
     // Break tongue into 1-3 segments
@@ -592,11 +599,11 @@ export function beachBrick(params: BrickParams, options: BeachBrickOptions): Bri
 
   // ── 4b. Wash foam on sand — irregular bright patches where water met sand ──
   for (let w = 0; w < 8; w++) {
-    const wy = shorePx + (rng() * 0.06) * (height - shorePx);
+    const wy = shorePx + rng() * 0.06 * (height - shorePx);
     const wx = rng() * width;
     const wrx = (10 + rng() * 30) * sc;
     const wry = (1.5 + rng() * 3) * sc;
-    const wOp = (0.06 + rng() * 0.10).toFixed(3);
+    const wOp = (0.06 + rng() * 0.1).toFixed(3);
     elems.push(
       `<ellipse cx="${wx.toFixed(1)}" cy="${wy.toFixed(1)}" rx="${wrx.toFixed(1)}" ry="${wry.toFixed(1)}" fill="${foamColor}" opacity="${wOp}"/>`
     );
@@ -662,7 +669,7 @@ export function beachBrick(params: BrickParams, options: BeachBrickOptions): Bri
       const bt = rng(); // 0=near shore, 1=far down
       const bby = shorePx + bt * shoreH * 0.85;
       // Perspective: closer boulders larger
-      const bScale = (1 + bt * 0.8);
+      const bScale = 1 + bt * 0.8;
       const brx = (8 + rng() * 22) * sc * bScale;
       const bry = brx * (0.45 + rng() * 0.3);
       const bOp = (opacity * (0.45 + rng() * 0.35)).toFixed(2);
@@ -676,7 +683,7 @@ export function beachBrick(params: BrickParams, options: BeachBrickOptions): Bri
         `<ellipse cx="${bx.toFixed(1)}" cy="${bby.toFixed(1)}" rx="${brx.toFixed(1)}" ry="${bry.toFixed(1)}" fill="${bColor}" opacity="${bOp}"/>`
       );
       // 3D lit highlight on top-left (light-catching wet surface)
-      const hlOp = (opacity * (0.10 + rng() * 0.15)).toFixed(2);
+      const hlOp = (opacity * (0.1 + rng() * 0.15)).toFixed(2);
       elems.push(
         `<ellipse cx="${(bx - brx * 0.1).toFixed(1)}" cy="${(bby - bry * 0.35).toFixed(1)}" rx="${(brx * 0.7).toFixed(1)}" ry="${(bry * 0.35).toFixed(1)}" fill="#6a7888" opacity="${hlOp}"/>`
       );
@@ -709,7 +716,7 @@ export function beachBrick(params: BrickParams, options: BeachBrickOptions): Bri
     // Wet rock specular band — gradient sheen near the waterline
     defs.push(`<linearGradient id="${id}-rspec" x1="0" y1="${shorePx.toFixed(0)}" x2="0" y2="${(shorePx + shoreH * 0.18).toFixed(0)}" gradientUnits="userSpaceOnUse">
   <stop offset="0%" stop-color="#667788" stop-opacity="${(opacity * 0.22).toFixed(2)}"/>
-  <stop offset="50%" stop-color="#667788" stop-opacity="${(opacity * 0.10).toFixed(2)}"/>
+  <stop offset="50%" stop-color="#667788" stop-opacity="${(opacity * 0.1).toFixed(2)}"/>
   <stop offset="100%" stop-color="#667788" stop-opacity="0"/>
 </linearGradient>`);
     const specH = shoreH * 0.18;
@@ -750,7 +757,7 @@ export function beachBrick(params: BrickParams, options: BeachBrickOptions): Bri
   <feComposite in="fga" in2="SourceGraphic" operator="in"/>
 </filter>`);
     elems.push(
-      `<rect x="0" y="${shorePx.toFixed(0)}" width="${width}" height="${sandH.toFixed(0)}" fill="${sandColor}" opacity="${(opacity * 0.30).toFixed(2)}" filter="url(#${fineGrainId})"/>`
+      `<rect x="0" y="${shorePx.toFixed(0)}" width="${width}" height="${sandH.toFixed(0)}" fill="${sandColor}" opacity="${(opacity * 0.3).toFixed(2)}" filter="url(#${fineGrainId})"/>`
     );
 
     // ── 5d. Wind ripple texture on dry sand — anisotropic feDiffuseLighting
@@ -845,7 +852,7 @@ export function beachBrick(params: BrickParams, options: BeachBrickOptions): Bri
         if (segPts.length < 3) continue;
         const segPath = smoothPath(segPts);
         const bsw = (1.5 + rng() * 2.5) * sc;
-        const bOp = (0.30 + rng() * 0.45).toFixed(2);
+        const bOp = (0.3 + rng() * 0.45).toFixed(2);
         // Outer glow pass
         elems.push(
           `<path d="${segPath}" fill="none" stroke="${bioluminescenceColor}" stroke-width="${(bsw * 4).toFixed(1)}" opacity="${(parseFloat(bOp) * 0.35).toFixed(3)}" stroke-linecap="round" filter="url(#${bioGlowId})"/>`
@@ -861,7 +868,7 @@ export function beachBrick(params: BrickParams, options: BeachBrickOptions): Bri
       const sy = horizonPx + (0.15 + rng() * 0.85) * oceanH;
       const sx = rng() * width;
       const sr = (0.7 + rng() * 1.8) * sc;
-      const sOp = (0.20 + rng() * 0.55).toFixed(2);
+      const sOp = (0.2 + rng() * 0.55).toFixed(2);
       elems.push(
         `<circle cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="${(sr * 3).toFixed(2)}" fill="${bioluminescenceColor}" opacity="${(parseFloat(sOp) * 0.3).toFixed(2)}" filter="url(#${bioGlowId})"/>`
       );

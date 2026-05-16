@@ -333,7 +333,7 @@ function eclipseBreak(p: BrickParams): ComposedWallpaper {
   // Treeline on foreground ridge — proportional to terrain scale
   const treeline = treelineBrick(p, {
     id: "ec-b-tl",
-    baseY: 0.70,
+    baseY: 0.7,
     count: 38,
     color: colors.bg,
     opacity: 0.8,
