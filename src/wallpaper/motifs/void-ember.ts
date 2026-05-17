@@ -215,14 +215,15 @@ function voidEmberDrift(p: BrickParams): ComposedWallpaper {
     opacity: 0.7,
   });
 
-  // Drifting cinder particles
+  // Drifting cinder particles — capped above terrain (terrain baseY: 0.62)
   const cinders = starFieldBrick(p, {
     id: "ve-d-ci",
     count: 80,
     brightCount: 16,
     color: colors.hueOrange,
     distribution: "full",
-    opacity: 0.75,
+    maxY: 0.60,
+    opacity: 0.7,
   });
 
   const cinderAtmo = atmosphereBrick(p, {
@@ -479,14 +480,15 @@ function voidEmberPulse(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  // Three tiers of embers — bright, medium, dim
+  // Ember constellation — capped above desert terrain (terrain baseY: 0.70)
   const bright = starFieldBrick(p, {
     id: "ve-p-t1",
     count: 20,
     brightCount: 16,
     color: colors.hueYellow,
     distribution: "full",
-    opacity: 0.75,
+    maxY: 0.68,
+    opacity: 0.7,
   });
   const medium = starFieldBrick(p, {
     id: "ve-p-t2",
@@ -494,7 +496,8 @@ function voidEmberPulse(p: BrickParams): ComposedWallpaper {
     brightCount: 10,
     color: colors.hueOrange,
     distribution: "full",
-    opacity: 0.55,
+    maxY: 0.68,
+    opacity: 0.5,
   });
   const dim = starFieldBrick(p, {
     id: "ve-p-t3",
@@ -502,7 +505,8 @@ function voidEmberPulse(p: BrickParams): ComposedWallpaper {
     brightCount: 4,
     color: colors.hueRed,
     distribution: "full",
-    opacity: 0.35,
+    maxY: 0.68,
+    opacity: 0.3,
   });
 
   // Horizon warmth from ground fire

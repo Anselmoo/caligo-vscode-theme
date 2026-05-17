@@ -21,6 +21,7 @@ import {
   shootingStarBrick,
   skyGradientBrick,
   starFieldBrick,
+  terrainBrick,
   terrainStackBrick,
   toneCurveBrick,
   vignetteBrick,
@@ -78,7 +79,17 @@ function midnightStillness(p: BrickParams): ComposedWallpaper {
     blobs: [{ cx: 0.5, cy: 0.5, rx: 0.15, ry: 0.12, color: colors.hueOrange, opacity: 0.12 }],
   });
 
-  // Rooftop silhouettes — grounded in lower third
+  // Ground plane that anchors rooftops — without this the buildings float in sky
+  const rooftopGround = terrainBrick(p, {
+    id: "mi-s-rg",
+    baseY: 0.65,
+    roughness: 0.01,
+    points: 12,
+    color: colors.bg,
+    opacity: 1.0,
+  });
+
+  // Rooftop silhouettes visible through window
   const rooftops = cityscapeBrick(p, {
     id: "mi-s-rt",
     baseY: 0.74,
@@ -142,20 +153,7 @@ function midnightStillness(p: BrickParams): ComposedWallpaper {
 
   const vignette = vignetteBrick(p, { id: "mi-s-vig", opacity: 0.6 });
   const noise = noiseBrick(p, { id: "mi-s-n", opacity: 0.04 });
-  return mergeBricks([
-    bg,
-    sky,
-    stars,
-    meteors,
-    moon,
-    moonRays,
-    lampGlow,
-    hGlow,
-    rooftops,
-    atmo,
-    vignette,
-    noise,
-  ]);
+  return mergeBricks([bg, sky, stars, moon, lampGlow, hGlow, rooftopGround, rooftops, vignette, noise]);
 }
 
 /* ── Drift: Ink wash — sweeping brushstroke on wet paper ──────────────────── */

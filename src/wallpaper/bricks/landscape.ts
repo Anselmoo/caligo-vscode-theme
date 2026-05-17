@@ -1333,6 +1333,8 @@ export interface StarFieldBrickOptions {
   bandCy?: number;
   bandHeight?: number;
   opacity?: number;
+  /** Hard ceiling for star Y positions (0–1 fraction of height). Keeps stars out of terrain zones. */
+  maxY?: number;
 }
 
 /**
@@ -1351,7 +1353,10 @@ export function starFieldBrick(params: BrickParams, options: StarFieldBrickOptio
     bandHeight = 0.5,
     opacity = 0.8,
     id = "stars",
+    maxY,
   } = options;
+
+  const yMax = maxY !== undefined ? maxY * height : height;
 
   const rng = seedRng(hashStr(`${seedId}-${harmonyMode}-starfield`));
   const defs: string[] = [];
@@ -1366,9 +1371,9 @@ export function starFieldBrick(params: BrickParams, options: StarFieldBrickOptio
   );
 
   const getY = (): number => {
-    if (distribution === "upper") return rng() * height * 0.55;
+    if (distribution === "upper") return rng() * Math.min(height * 0.55, yMax);
     if (distribution === "band") return (bandCy - bandHeight / 2 + rng() * bandHeight) * height;
-    return rng() * height;
+    return rng() * yMax;
   };
 
   const clusterCount = distribution === "full" ? 2 : distribution === "band" ? 3 : 4;
@@ -1387,7 +1392,7 @@ export function starFieldBrick(params: BrickParams, options: StarFieldBrickOptio
       const cluster = clusters[Math.floor(rng() * clusters.length)];
       return {
         x: clamp(cluster.x + organicCentered(rng) * cluster.rx * 2.4, 0, width),
-        y: clamp(cluster.y + organicCentered(rng) * cluster.ry * 2.2, 0, height),
+        y: clamp(cluster.y + organicCentered(rng) * cluster.ry * 2.2, 0, yMax),
       };
     }
 

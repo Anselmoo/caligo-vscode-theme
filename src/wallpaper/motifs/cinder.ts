@@ -210,53 +210,92 @@ function cinderDrift(p: BrickParams): ComposedWallpaper {
     opacity: 0.35,
   });
 
-  // ONE unified volcanic mass using terrainContourBrick — forms continuous
-  // mountain from peak (~35% height) all the way to the bottom of the canvas.
-  // No gaps, no floating layers. Bob Ross rule: mountain is one solid shape.
-  const volcano = terrainContourBrick(p, {
-    id: "ci-d-vol",
-    horizonY: 0.35,
-    layers: [
-      { color: colors.bgMid, opacity: 0.6, edgeBlur: 3 }, // far ridges, hazy
-      { color: colors.bgSoft, opacity: 0.8 }, // mid slopes
-      { color: colors.bg, opacity: 1.0 }, // near face, fully opaque
+  // Scene anchors — all element y-values derive from these
+  const HORIZON_Y = 0.38;
+  const GROUND_Y = 0.78;
+  // depth(baseY) = (baseY - HORIZON_Y) / (GROUND_Y - HORIZON_Y)
+  // opacityScale = 0.45 + 0.55 * depth  →  far=lighter, near=heavier
+
+  // Lava glow renders behind all terrain — peeks through ridge gaps as lava rivers
+  const lavaGlow = radialGradientBrick(p, {
+    id: "ci-d-lg",
+    cx: 0.4,
+    cy: 0.68,
+    r: 0.4,
+    stops: [
+      { offset: "0%", color: colors.hueOrange, opacity: 0.4 },
+      { offset: "100%", color: colors.bg, opacity: 0 },
     ],
   });
 
-  // Lava rivers flow ON the visible mountain face (between far and near layers)
-  // startY begins where the far ridge emerges, endY at the near face
-  const lavaRiver = lavaRiverBrick(p, {
-    id: "ci-d-lv",
-    startY: 0.4,
-    endY: 0.82,
-    cx: 0.45,
-    spreadX: 0.4,
-    rivers: 3,
-    hotColor: "#ffdd44",
-    glowColor: "#ff4400",
-    opacity: 0.8,
-  });
-
-  // Summit smoke — rises from the peak area
-  const smokePlume = smokeRisingBrick(p, {
-    id: "ci-d-sm",
-    sourceY: 0.38,
-    riseHeight: 0.35,
-    spreadX: 0.4,
+  // Far layer — pulled toward horizon so it reads as distant, not floating at mid-canvas
+  // depth ≈ 0.15 → opacityScale ≈ 0.53
+  const volcanicBack = terrainBrick(p, {
+    id: "ci-d-vb",
+    baseY: 0.44,
+    roughness: 0.12,
+    points: 20,
     color: colors.bgMid,
-    opacity: 0.1,
-    columns: 2,
+    opacity: 0.55,
   });
 
-  // Ember sparks from lava channels
-  const emberSparks = sparksBrick(p, {
-    id: "ci-d-es",
-    count: 20,
-    color: colors.hueOrange,
-    opacity: 0.55,
-    direction: 1,
-    sourceCx: 0.45,
-    sourceSpread: 0.2,
+  // Atmospheric haze between far and mid layers — the "air" that creates depth
+  const fogBack = cloudBandBrick(p, {
+    id: "ci-d-fb",
+    cy: 0.53,
+    bandHeight: 0.10,
+    color: colors.bg,
+    opacity: 0.10,
+    frequency: 0.002,
+    seed: 5,
+  });
+
+  // Mid layer — depth ≈ 0.60 → opacityScale ≈ 0.78
+  const volcanicMid = terrainBrick(p, {
+    id: "ci-d-vm",
+    baseY: 0.62,
+    roughness: 0.10,
+    points: 22,
+    color: colors.bgSoft,
+    opacity: 0.75,
+  });
+
+  // Smoke drifting from lava between mid and front
+  const smoke1 = cloudBandBrick(p, {
+    id: "ci-d-sm1",
+    cy: 0.55,
+    bandHeight: 0.12,
+    color: colors.bgMid,
+    opacity: 0.07,
+  });
+
+  // Atmospheric haze between mid and front layers
+  const fogFront = cloudBandBrick(p, {
+    id: "ci-d-ff",
+    cy: 0.69,
+    bandHeight: 0.08,
+    color: colors.bg,
+    opacity: 0.08,
+    frequency: 0.003,
+    seed: 9,
+  });
+
+  // Near layer — depth ≈ 0.93 → opacityScale ≈ 0.96  (full visual weight)
+  const volcanicFront = terrainBrick(p, {
+    id: "ci-d-vf",
+    baseY: 0.75,
+    roughness: 0.08,
+    points: 18,
+    color: colors.bg,
+    opacity: 0.95,
+  });
+
+  const smoke2 = cloudBandBrick(p, {
+    id: "ci-d-sm2",
+    cy: 0.68,
+    bandHeight: 0.08,
+    color: colors.bgSoft,
+    opacity: 0.07,
   });
 
   const vignette = vignetteBrick(p, { id: "ci-d-vig", opacity: 0.5 });
@@ -266,10 +305,14 @@ function cinderDrift(p: BrickParams): ComposedWallpaper {
     bg,
     sky,
     stars,
-    volcano,
-    lavaRiver,
-    smokePlume,
-    emberSparks,
+    lavaGlow,
+    volcanicBack,
+    fogBack,
+    smoke1,
+    volcanicMid,
+    fogFront,
+    smoke2,
+    volcanicFront,
     vignette,
     noise,
   ]);

@@ -204,7 +204,25 @@ function mandarianDrift(p: BrickParams): ComposedWallpaper {
     opacity: 0.9,
   });
 
-  // Sparse stars appearing as dusk fades
+  // Dusk haze — centered above the dune tops (dune1 baseY: 0.55)
+  const haze = cloudBandBrick(p, {
+    id: "mn-d-hz",
+    cy: 0.45,
+    bandHeight: 0.12,
+    color: colors.hueOrange,
+    opacity: 0.08,
+    frequency: 0.004,
+    seed: 9,
+  });
+
+  const hGlow = horizonGlowBrick(p, {
+    id: "mn-d-hg",
+    y: 0.6,
+    color: colors.hueRed,
+    opacity: 0.12,
+    height: 0.1,
+  });
+
   const stars = starFieldBrick(p, {
     id: "mn-d-st",
     count: 150,
@@ -309,11 +327,14 @@ function mandarianBreak(p: BrickParams): ComposedWallpaper {
     columns: 3,
   });
 
-  // Sparks rising from behind the ridge
-  const sparks = sparksBrick(p, {
-    id: "mn-b-sp",
-    count: 25,
+  // Wildfire embers — capped above ridge horizon (horizonY: 0.45)
+  const embers = starFieldBrick(p, {
+    id: "mn-b-em",
+    count: 30,
+    brightCount: 8,
     color: colors.hueOrange,
+    distribution: "full",
+    maxY: 0.43,
     opacity: 0.5,
     direction: 1,
     sourceCx: 0.5,
@@ -458,15 +479,15 @@ function mandarianPulse(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  // Sparks rising from campfire — the PRIMARY vertical element and motion
-  const sparks = sparksBrick(p, {
-    id: "mn-p-sp",
-    count: 40,
-    color: colors.hueYellow,
-    opacity: 0.6,
-    direction: 1,
-    sourceCx: 0.5,
-    sourceSpread: 0.12,
+  // Fire dance embers — capped above dunes (dune1 baseY: 0.65)
+  const embers = starFieldBrick(p, {
+    id: "mn-p-em",
+    count: 45,
+    brightCount: 10,
+    color: colors.hueOrange,
+    distribution: "full",
+    maxY: 0.62,
+    opacity: 0.55,
   });
 
   // Smoke column rising from fire — gives height and breaks horizontals

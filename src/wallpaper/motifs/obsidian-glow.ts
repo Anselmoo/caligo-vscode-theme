@@ -259,13 +259,14 @@ function obsidianBreak(p: BrickParams): ComposedWallpaper {
     seed: 13,
   });
 
-  // Ember particles
+  // Eruption embers — capped above volcano base (baseY: 0.75, peak at 0.40)
   const embers = starFieldBrick(p, {
     id: "og-b-em",
     count: 35,
     brightCount: 10,
     color: colors.hueOrange,
     distribution: "full",
+    maxY: 0.38,
     opacity: 0.5,
   });
 

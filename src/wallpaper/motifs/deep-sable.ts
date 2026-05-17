@@ -184,12 +184,14 @@ function deepDrift(p: BrickParams): ComposedWallpaper {
     ],
   });
 
+  // Bioluminescent dust — capped above seafloor (terrain baseY: 0.74)
   const particles = starFieldBrick(p, {
     id: "ds-d-p",
     count: 50,
     brightCount: 4,
     color: colors.hueCyan,
     distribution: "full",
+    maxY: 0.72,
     opacity: 0.45,
   });
 
@@ -410,26 +412,15 @@ function deepPulse(p: BrickParams): ComposedWallpaper {
     ],
   });
 
-  // Vertical bioluminescent columns rising FROM reef — like smoke rising from fire.
-  // This is the key perspective element: things rise UP from the ground.
-  const bioColumns = smokeRisingBrick(p, {
-    id: "ds-p-sm",
-    sourceY: 0.72,
-    riseHeight: 0.5,
-    spreadX: 0.5,
-    color: colors.hueCyan,
-    opacity: 0.08,
-    columns: 3,
-  });
-
-  // A few particles rising = plankton released by the reef
+  // Rising bioluminescent particles — capped above reef (terrain baseY: 0.72)
   const particles = starFieldBrick(p, {
     id: "ds-p-bl",
     count: 30,
     brightCount: 4,
     color: colors.hueCyan,
     distribution: "full",
-    opacity: 0.4,
+    maxY: 0.70,
+    opacity: 0.5,
   });
 
   const coralAtmo = atmosphereBrick(p, {

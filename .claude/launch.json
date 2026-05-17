@@ -4,8 +4,8 @@
     {
       "name": "gallery",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["serve", "public", "--listen", "4321", "--no-clipboard"],
-      "port": 4321
+      "runtimeArgs": ["serve", "public", "--listen", "5050"],
+      "port": 5050
     }
   ]
 }
