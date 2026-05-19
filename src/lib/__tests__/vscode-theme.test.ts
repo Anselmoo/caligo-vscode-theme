@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, expect, it } from "vitest";
 import type { Seed } from "../constraints.js";
+import { wcagContrastRatio } from "../contrast.js";
 import { derivePalette } from "../palette.js";
 import { buildVscodeThemeJson } from "../vscode-theme.js";
 
@@ -180,5 +181,64 @@ describe("buildVscodeThemeJson", () => {
     for (const colorId of requiredColorIds) {
       expect(theme.colors[colorId], `Missing color ID ${colorId}`).toBeTruthy();
     }
+  });
+
+  it("should produce WCAG AA contrast (≥4.5) for button foreground against button background", () => {
+    // Dark-theme seed with a bright accent (worst case: light accent on dark bg)
+    const brightAccentSeed: Seed = {
+      id: "BrightAccent",
+      displayName: "Bright Accent",
+      background: { mode: "oklch", l: 0.18, c: 0.02, h: 220 },
+      accent: { mode: "oklch", l: 0.82, c: 0.18, h: 90 }, // bright lime-yellow accent
+    };
+
+    const palette = derivePalette(brightAccentSeed, "Balanced");
+    const theme = buildVscodeThemeJson(palette);
+
+    const btnBg = theme.colors["button.background"];
+    const btnFg = theme.colors["button.foreground"];
+    const contrast = wcagContrastRatio(btnFg, btnBg);
+
+    expect(contrast).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("should produce WCAG AA contrast (≥4.5) for button foreground on a mid-luminance accent via black/white fallback", () => {
+    // Mid-range accent (l=0.55): neither palette fg0 nor bg0 achieves WCAG AA
+    // against this background — the function must fall back to #000000 or #ffffff.
+    const seed: Seed = {
+      id: "MidAccent",
+      displayName: "Mid Accent",
+      background: { mode: "oklch", l: 0.18, c: 0.03, h: 220 },
+      accent: { mode: "oklch", l: 0.55, c: 0.15, h: 215 },
+    };
+
+    const palette = derivePalette(seed, "Balanced");
+    const theme = buildVscodeThemeJson(palette);
+
+    const btnBg = theme.colors["button.background"];
+    const btnFg = theme.colors["button.foreground"];
+    const chosenContrast = wcagContrastRatio(btnFg, btnBg);
+
+    // Both palette candidates (fg0, bg0) fail WCAG AA for this accent; the
+    // fallback to #000000 / #ffffff must push the ratio to ≥4.5.
+    expect(chosenContrast).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("should produce WCAG AA contrast (≥4.5) for secondary button foreground against secondary button background", () => {
+    const seed: Seed = {
+      id: "TestSeed",
+      displayName: "Test Seed",
+      background: { mode: "oklch", l: 0.18, c: 0.03, h: 220 },
+      accent: { mode: "oklch", l: 0.7, c: 0.15, h: 215 },
+    };
+
+    const palette = derivePalette(seed, "Balanced");
+    const theme = buildVscodeThemeJson(palette);
+
+    const secBg = theme.colors["button.secondaryBackground"];
+    const secFg = theme.colors["button.secondaryForeground"];
+    const contrast = wcagContrastRatio(secFg, secBg);
+
+    expect(contrast).toBeGreaterThanOrEqual(4.5);
   });
 });
