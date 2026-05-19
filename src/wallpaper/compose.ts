@@ -349,31 +349,6 @@ function composeDeepSable(p: BrickParams): ComposedWallpaper {
     ],
     glowBlur: 80,
     effects: [
-      // Stars — glass-white with alpha for an icy, crystalline look
-      starFieldBrick(p, {
-        id: "ds-sf1",
-        count: 900,
-        brightCount: 30,
-        color: "#e8f4ff",
-        distribution: "full",
-        opacity: 0.78,
-      }),
-      starFieldBrick(p, {
-        id: "ds-sf2",
-        count: 350,
-        brightCount: 14,
-        color: "#d0ecff",
-        distribution: "full",
-        opacity: 0.58,
-      }),
-      starFieldBrick(p, {
-        id: "ds-sf3",
-        count: 130,
-        brightCount: 7,
-        color: "#f0f8ff",
-        distribution: "full",
-        opacity: 0.42,
-      }),
       // Six liquid glass wave bands — cy 0.0→1.0, full canvas height coverage
       liquidWaveBands(p, "ds-lw", [
         { cy: 0.0, color: c.strings, opacity: 0.48, phase: 0.0 },
