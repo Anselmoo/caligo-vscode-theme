@@ -97,7 +97,7 @@ export function renderWallpaperSvg(options: RenderWallpaperOptions): string {
   // Optionally inject text
   let finalComposed = withMode;
   if (textVariant === "text") {
-    const topic = MODE_TOPICS[harmonyMode] ?? "Core";
+    const topic = MODE_TOPICS[harmonyMode] ?? "Balanced";
     const label = textBrick(params, {
       line1: "Caligo",
       line2: `${spec.seedDisplayName} · ${topic}`,
@@ -124,7 +124,7 @@ export function buildAllSpecs(
   const specs: WallpaperSpec[] = [];
 
   for (const seed of seeds) {
-    const topic = MODE_TOPICS[seed.harmonyMode] ?? "Core";
+    const topic = MODE_TOPICS[seed.harmonyMode] ?? "Balanced";
     for (const platform of platforms) {
       for (const textVariant of textVariants) {
         specs.push({

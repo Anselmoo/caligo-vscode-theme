@@ -68,15 +68,20 @@ export const PLATFORM_SCENE_TUNING: Record<Platform, PlatformSceneTuning> = {
 
 // ─── Mode → Topic ─────────────────────────────────────────────────────────────
 
-/** The five conceptual "topics" that make each harmony mode visually distinct. */
-export type ModeTopic = "Stillness" | "Drift" | "Break" | "Void" | "Pulse";
+/** Display label for each harmony mode — matches the folder/mode name exactly. */
+export type ModeTopic =
+  | "Balanced"
+  | "Analogous"
+  | "Split Complementary"
+  | "Monochromatic"
+  | "Triadic";
 
 export const MODE_TOPICS: Record<string, ModeTopic> = {
-  none: "Stillness",
-  analogous: "Drift",
-  "split-complementary": "Break",
-  monochromatic: "Void",
-  triadic: "Pulse",
+  none: "Balanced",
+  analogous: "Analogous",
+  "split-complementary": "Split Complementary",
+  monochromatic: "Monochromatic",
+  triadic: "Triadic",
 };
 
 // ─── Color palette (extracted from DerivedPalette) ────────────────────────────

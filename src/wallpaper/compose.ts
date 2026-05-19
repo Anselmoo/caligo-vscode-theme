@@ -8,7 +8,6 @@
 
 import {
   auroraAdvancedBrick,
-  curtainBrick,
   duneBrick,
   fractureBrick,
   lightningBrick,
@@ -16,6 +15,7 @@ import {
   nebulaGlowBrick,
   particlesBrick,
   sparksBrick,
+  starFieldBrick,
   terrainContourBrick,
   topologyBrick,
   voronoiBrick,
@@ -176,6 +176,16 @@ function composeDeepSable(p: BrickParams): ComposedWallpaper {
     ],
     glowBlur: 60,
     effects: [
+      // Night sky — stars fill the upper two-thirds so the canvas is never empty
+      starFieldBrick(p, {
+        id: "ds-sf",
+        count: 520,
+        brightCount: 18,
+        color: c.accentSoft,
+        distribution: "upper",
+        maxY: 0.55,
+        opacity: 0.65,
+      }),
       // Sky-horizon mountain silhouettes — 4 depth layers
       terrainContourBrick(p, {
         id: "ds-tc",
@@ -247,38 +257,43 @@ function composeDeepSable(p: BrickParams): ComposedWallpaper {
 function composeEclipse(p: BrickParams): ComposedWallpaper {
   const c = p.colors;
   return scaffold(p, "ec", {
-    glows: [
-      { cx: 0.42, cy: 0.38, rx: 0.35, ry: 0.3, color: c.strings, opacity: 0.32 },
-      { cx: 0.65, cy: 0.62, rx: 0.3, ry: 0.26, color: c.hueCyan, opacity: 0.22 },
-      { cx: 0.25, cy: 0.7, rx: 0.22, ry: 0.18, color: c.keywords, opacity: 0.18 },
-    ],
+    // No partial glow blobs — pure void background, full-canvas crack field only
     glowBlur: 50,
     effects: [
-      // Dense primary fracture network — bright, fills canvas
+      // Bold thick veins — highly visible primary color
+      icecrackBrick(p, {
+        id: "ec-i0",
+        crackCount: 30,
+        branchProbability: 0.28,
+        color: c.constants,
+        opacity: 0.72,
+        strokeWidth: 3.2,
+      }),
+      // Dense primary fracture network
       icecrackBrick(p, {
         id: "ec-i1",
         crackCount: 100,
         branchProbability: 0.62,
         color: c.strings,
-        opacity: 0.78,
+        opacity: 0.82,
         strokeWidth: 1.8,
       }),
-      // Secondary finer cracks — different color for depth
+      // Secondary cracks — different color, clearly visible
       icecrackBrick(p, {
         id: "ec-i2",
         crackCount: 65,
         branchProbability: 0.5,
         color: c.hueCyan,
-        opacity: 0.42,
-        strokeWidth: 0.9,
+        opacity: 0.58,
+        strokeWidth: 1.0,
       }),
-      // Accent micro-cracks — very fine texture layer
+      // Fine detail cracks — third distinct color
       icecrackBrick(p, {
         id: "ec-i3",
         crackCount: 40,
         branchProbability: 0.38,
         color: c.keywords,
-        opacity: 0.28,
+        opacity: 0.44,
         strokeWidth: 0.55,
       }),
     ],
@@ -405,25 +420,6 @@ function composeMidnightAtelier(p: BrickParams): ComposedWallpaper {
     ],
     glowBlur: 60,
     effects: [
-      // Storm cloud banks — two deep curtain washes behind the bolts
-      curtainBrick(p, {
-        id: "ma-c1",
-        color: c.accentMuted,
-        opacity: 0.3,
-        cy: 0.22,
-        amplitude: 0.15,
-        phase: 0,
-        strokeWidth: 320,
-      }),
-      curtainBrick(p, {
-        id: "ma-c2",
-        color: c.huePurple,
-        opacity: 0.18,
-        cy: 0.72,
-        amplitude: 0.12,
-        phase: 90,
-        strokeWidth: 260,
-      }),
       // Primary bolt — centre canvas, main strike, bright accent
       lightningBrick(p, {
         id: "ma-l1",
