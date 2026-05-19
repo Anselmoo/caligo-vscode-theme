@@ -165,6 +165,83 @@ function terrainNoise(rng: () => number, count: number, amp: number): number[] {
   return values;
 }
 
+// ─── Terrain Profile (reusable ridgeline query) ─────────────────────────────────
+
+export interface TerrainProfileParams {
+  seedId: string;
+  harmonyMode: string;
+  seedSuffix: string;
+  baseY: number;
+  roughness: number;
+  points: number;
+  viewBox: { width: number; height: number };
+}
+
+export interface TerrainProfile {
+  ridgeY: number[];
+  getY(normalizedX: number): number;
+}
+
+/**
+ * Generate a terrain ridgeline profile without rendering SVG.
+ * Returns interpolatable Y-values matching the exact same noise that
+ * terrainBrick produces with identical parameters.
+ */
+export function terrainProfile(opts: TerrainProfileParams): TerrainProfile {
+  const { seedId, harmonyMode, seedSuffix, baseY, roughness, points, viewBox } = opts;
+  const { height } = viewBox;
+
+  const rng = seedRng(hashStr(`${seedId}-${harmonyMode}-${seedSuffix}`));
+  const amp = roughness * height;
+  const by = baseY * height;
+  const noise = terrainNoise(rng, points + 1, amp);
+
+  const ridgeY = noise.map(n => Math.max(0, Math.min(height, by + n)));
+
+  return {
+    ridgeY,
+    getY(normalizedX: number): number {
+      const idx = normalizedX * points;
+      const i0 = Math.max(0, Math.floor(idx));
+      const i1 = Math.min(points, i0 + 1);
+      const frac = idx - i0;
+      return ridgeY[i0] * (1 - frac) + ridgeY[i1] * frac;
+    },
+  };
+}
+
+// ─── Depth Scaling Utilities ────────────────────────────────────────────────────
+
+/**
+ * Map a baseY position (0–1) to a depth factor (0–1) where:
+ *   0 = at horizon (infinitely far)
+ *   1 = at near plane (closest foreground)
+ *
+ * Used to scale terrain amplitude, tree height, and element sizes
+ * so distant objects appear proportionally smaller/flatter.
+ */
+export function depthFactor(baseY: number, horizonY = 0.35, nearY = 0.85): number {
+  if (nearY <= horizonY) return 1;
+  return Math.max(0, Math.min(1, (baseY - horizonY) / (nearY - horizonY)));
+}
+
+/**
+ * Scale roughness (vertical amplitude) by depth to produce foreshortening.
+ * Far layers (near horizon) get compressed; near layers stay at full amplitude.
+ */
+export function perspectiveRoughness(
+  roughness: number,
+  baseY: number,
+  horizonY = 0.35,
+  nearY = 0.85,
+  farScale = 0.35,
+  nearScale = 1.0
+): number {
+  const d = depthFactor(baseY, horizonY, nearY);
+  const scale = farScale + d * (nearScale - farScale);
+  return roughness * scale;
+}
+
 // ─── Terrain Brick ──────────────────────────────────────────────────────────────
 
 export interface TerrainBrickOptions {
@@ -365,6 +442,12 @@ export interface TerrainStackBrickOptions {
     gradient?: { topColor: string; bottomColor: string };
   }>;
   points?: number;
+  /**
+   * Enable perspective foreshortening. Far layers (near horizon) get compressed
+   * vertical amplitude; near layers stay at full roughness.
+   * Pass `true` for defaults, or an object to customize horizon/near positions.
+   */
+  perspective?: boolean | { horizonY?: number; nearY?: number };
 }
 
 /**
@@ -373,25 +456,47 @@ export interface TerrainStackBrickOptions {
  *   far layers (i=0): smooth macro ridgelines (roughness 0.04)
  *   mid layers (i=1): moderate (0.08)
  *   close layers (i≥2): detailed crags (0.14+)
+ *
+ * When `perspective` is enabled, roughness is additionally scaled by depth
+ * so far layers appear flatter (compressed vertically) and near layers
+ * retain full dramatic amplitude — proper 3D foreshortening.
  */
 export function terrainStackBrick(
   params: BrickParams,
   options: TerrainStackBrickOptions
 ): BrickOutput {
   // More control points for crisper ridgeline detail
-  const { layers, points = 60, id = "terrain-stack" } = options;
+  const { layers, points = 60, id = "terrain-stack", perspective } = options;
   const allDefs: string[] = [];
   const allElems: string[] = [];
 
   const { height, width } = params.viewBox;
 
+  const perspCfg =
+    perspective === true
+      ? { horizonY: 0.35, nearY: 0.85 }
+      : perspective
+        ? { horizonY: perspective.horizonY ?? 0.35, nearY: perspective.nearY ?? 0.85 }
+        : null;
+
   layers.forEach((layer, i) => {
     // Default roughness increases from far (smooth silhouette) → near (rugged crags)
     const defaultRoughness = i === 0 ? 0.04 : i === 1 ? 0.08 : Math.min(0.06 + i * 0.04, 0.18);
+    let layerRoughness = layer.roughness ?? defaultRoughness;
+
+    if (perspCfg) {
+      layerRoughness = perspectiveRoughness(
+        layerRoughness,
+        layer.baseY,
+        perspCfg.horizonY,
+        perspCfg.nearY
+      );
+    }
+
     const t = terrainBrick(params, {
       id: `${id}-${i}`,
       baseY: layer.baseY,
-      roughness: layer.roughness ?? defaultRoughness,
+      roughness: layerRoughness,
       points,
       color: layer.color,
       opacity: layer.opacity ?? 0.5 + i * 0.15,
@@ -692,6 +797,13 @@ export interface CelestialBrickOptions {
    *  Only appropriate for solar eclipses where the sun's corona is visible
    *  behind the moon disc. Moons have a soft atmospheric halo, not a ring. */
   coronaRing?: boolean;
+  /** Apply feTurbulence displacement to break the perfect circle edge.
+   *  Scale as fraction of body radius (0.015-0.03 typical). Default: 0. */
+  edgeDisplacement?: number;
+  /** Add second low-frequency maria layer (0.011 Hz) for large visible dark patches. */
+  largeScaleMaria?: boolean;
+  /** Baily's beads: bright limb points at these angles (degrees) where corona peeks through. */
+  baileyBeads?: number[];
 }
 
 /**
@@ -718,6 +830,9 @@ export function celestialBrick(params: BrickParams, options: CelestialBrickOptio
     texture = true, // texture is now always on for realism
     specular = true,
     coronaRing = false,
+    edgeDisplacement = 0,
+    largeScaleMaria = false,
+    baileyBeads,
     id = "celestial",
   } = options;
 
@@ -789,25 +904,36 @@ export function celestialBrick(params: BrickParams, options: CelestialBrickOptio
   }
   const maskAttr = crescent ? ` mask="url(#${id}-msk)"` : "";
 
-  // ── 3. SPHERICAL BODY with TERMINATOR shading ──────────────────────────────
-  // Off-center radial gradient: brightest at upper-left, fading to slightly darker
-  // at lower-right — this is the photographic key to making a flat circle read as
-  // a sphere illuminated from the side.
+  // ── 3. EDGE DISPLACEMENT FILTER (organic limb) ─────────────────────────────
+  // When edgeDisplacement > 0, apply feTurbulence + feDisplacementMap to break
+  // the perfect circle edge. All body layers share this filter for coherence.
+  const hasEdgeDisp = edgeDisplacement > 0;
+  if (hasEdgeDisp) {
+    const edgId = `${id}-edg`;
+    const edgScale = (edgeDisplacement * pr).toFixed(1);
+    defs.push(`<filter id="${edgId}" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
+  <feTurbulence type="fractalNoise" baseFrequency="0.025" numOctaves="3" seed="${tSeed + 50}" result="n"/>
+  <feDisplacementMap in="SourceGraphic" in2="n" scale="${edgScale}" xChannelSelector="R" yChannelSelector="G"/>
+</filter>`);
+  }
+
+  // Collect body-layer elements separately so they can be wrapped in the
+  // displacement group when edgeDisplacement is active.
+  const bodyElems: string[] = [];
+
+  // ── 4. SPHERICAL BODY with TERMINATOR shading ──────────────────────────────
   const bodyId = `${id}-body`;
-  // Light source offset: upper-left by default (35% from centre)
   defs.push(`<radialGradient id="${bodyId}" cx="35%" cy="32%" r="78%">
   <stop offset="0%" stop-color="${color}" stop-opacity="1"/>
   <stop offset="55%" stop-color="${color}" stop-opacity="0.95"/>
   <stop offset="92%" stop-color="${color}" stop-opacity="0.78"/>
   <stop offset="100%" stop-color="${color}" stop-opacity="0.55"/>
 </radialGradient>`);
-  elems.push(
+  bodyElems.push(
     `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${pr.toFixed(1)}" fill="url(#${bodyId})"${maskAttr}/>`
   );
 
-  // ── 4. MARIA TEXTURE (dark surface patches) ────────────────────────────────
-  // Always rendered for realism — subtle dark patches on the lit side break up
-  // the uniform colour. feTurbulence threshold + soft-light blend.
+  // ── 5. MARIA TEXTURE (fine dark surface patches) ──────────────────────────
   if (texture) {
     const texId = `${id}-tex`;
     defs.push(`<filter id="${texId}" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
@@ -816,27 +942,37 @@ export function celestialBrick(params: BrickParams, options: CelestialBrickOptio
   <feGaussianBlur in="dark" stdDeviation="${(pr * 0.05).toFixed(1)}" result="softDark"/>
   <feComposite in="softDark" in2="SourceGraphic" operator="in"/>
 </filter>`);
-    elems.push(
+    bodyElems.push(
       `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${pr.toFixed(1)}" fill="${color}" opacity="0.22" filter="url(#${texId})"${maskAttr}/>`
     );
   }
 
-  // ── 5. LIMB DARKENING (subtle dark outer ring) ─────────────────────────────
-  // Real spheres have darker edges due to the angle of light. A thin radial
-  // gradient ring at 88-100% creates this micro-effect.
+  // ── 5b. LARGE-SCALE MARIA (visible dark seas) ─────────────────────────────
+  if (largeScaleMaria && texture) {
+    const tex2Id = `${id}-tex2`;
+    defs.push(`<filter id="${tex2Id}" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+  <feTurbulence type="fractalNoise" baseFrequency="0.011" numOctaves="3" seed="${tSeed + 37}" result="n"/>
+  <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  2.5 0 0 0 -1.0" result="dark"/>
+  <feGaussianBlur in="dark" stdDeviation="${(pr * 0.08).toFixed(1)}" result="softDark"/>
+  <feComposite in="softDark" in2="SourceGraphic" operator="in"/>
+</filter>`);
+    bodyElems.push(
+      `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${pr.toFixed(1)}" fill="${color}" opacity="0.35" filter="url(#${tex2Id})"${maskAttr}/>`
+    );
+  }
+
+  // ── 6. LIMB DARKENING (subtle dark outer ring) ─────────────────────────────
   const limbId = `${id}-limb`;
   defs.push(`<radialGradient id="${limbId}" cx="50%" cy="50%" r="50%">
   <stop offset="0%" stop-color="#000000" stop-opacity="0"/>
   <stop offset="80%" stop-color="#000000" stop-opacity="0"/>
   <stop offset="100%" stop-color="#000000" stop-opacity="0.15"/>
 </radialGradient>`);
-  elems.push(
+  bodyElems.push(
     `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${pr.toFixed(1)}" fill="url(#${limbId})"${maskAttr}/>`
   );
 
-  // ── 6. BRIGHT TERMINATOR HIGHLIGHT (specular point) ────────────────────────
-  // Tiny bright spot at the brightest illumination point — sells the spherical look.
-  // Disabled for eclipse moon discs where the surface must be completely dark.
+  // ── 7. BRIGHT TERMINATOR HIGHLIGHT (specular point) ────────────────────────
   if (specular) {
     const hlX = px - pr * 0.34;
     const hlY = py - pr * 0.4;
@@ -847,9 +983,37 @@ export function celestialBrick(params: BrickParams, options: CelestialBrickOptio
   <stop offset="60%" stop-color="#ffffff" stop-opacity="0.08"/>
   <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
 </radialGradient>`);
-    elems.push(
+    bodyElems.push(
       `<circle cx="${hlX.toFixed(1)}" cy="${hlY.toFixed(1)}" r="${hlR.toFixed(1)}" fill="url(#${hlId})"${maskAttr}/>`
     );
+  }
+
+  // Wrap body layers in displacement group or emit directly
+  if (hasEdgeDisp) {
+    elems.push(`<g filter="url(#${id}-edg)">${bodyElems.join("")}</g>`);
+  } else {
+    elems.push(...bodyElems);
+  }
+
+  // ── 8. BAILY'S BEADS (bright limb points) ─────────────────────────────────
+  if (baileyBeads && baileyBeads.length > 0) {
+    for (let bi = 0; bi < baileyBeads.length; bi++) {
+      const ba = (baileyBeads[bi] * Math.PI) / 180;
+      const bx = px + Math.cos(ba) * pr;
+      const by = py + Math.sin(ba) * pr;
+      const bgId = `${id}-bb${bi}`;
+      defs.push(`<radialGradient id="${bgId}" cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="${(pr * 0.12).toFixed(1)}" gradientUnits="userSpaceOnUse">
+  <stop offset="0%" stop-color="#ffffff" stop-opacity="0.85"/>
+  <stop offset="40%" stop-color="#ffffff" stop-opacity="0.3"/>
+  <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+</radialGradient>`);
+      elems.push(
+        `<circle cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="${(pr * 0.12).toFixed(1)}" fill="url(#${bgId})"/>`
+      );
+      elems.push(
+        `<circle cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="${(pr * 0.02).toFixed(1)}" fill="#ffffff" opacity="0.9"/>`
+      );
+    }
   }
 
   return { defs: defs.join("\n"), elements: elems.join("\n") };
@@ -1504,6 +1668,22 @@ export interface TreelineBrickOptions {
   seedSuffix?: string;
   /** Max tree height as fraction of viewport height */
   maxHeight?: number;
+  /**
+   * Terrain surface to follow. When provided, tree bases snap to the
+   * ridgeline instead of the flat baseY line.
+   */
+  terrainSurface?: {
+    seedSuffix: string;
+    roughness: number;
+    points?: number;
+    /** Override baseY for the terrain layer (defaults to the treeline's baseY) */
+    baseY?: number;
+  };
+  /**
+   * Perspective depth config. When provided, tree heights are scaled by
+   * depth factor so distant trees appear proportionally smaller.
+   */
+  perspective?: boolean | { horizonY?: number; nearY?: number };
 }
 
 /**
@@ -1517,6 +1697,9 @@ export interface TreelineBrickOptions {
  *
  * Depth via opacity ramp — distant trees lighter, foreground trees opaque.
  * Subtle width variation + asymmetric lean gives the row natural irregularity.
+ *
+ * When `terrainSurface` is provided, trees follow the actual terrain ridgeline.
+ * When `perspective` is enabled, tree size scales with depth (smaller at horizon).
  */
 export function treelineBrick(params: BrickParams, options: TreelineBrickOptions): BrickOutput {
   const { viewBox, seedId, harmonyMode } = params;
@@ -1529,15 +1712,46 @@ export function treelineBrick(params: BrickParams, options: TreelineBrickOptions
     seedSuffix = "trees",
     maxHeight = 0.12,
     id = "treeline",
+    terrainSurface,
+    perspective,
   } = options;
 
   const rng = seedRng(hashStr(`${seedId}-${harmonyMode}-${seedSuffix}`));
-  const by = baseY * height;
   const elems: string[] = [];
 
+  // Terrain-following: reconstruct the ridgeline this treeline sits on
+  let getSurfaceY: (normalizedX: number) => number;
+  if (terrainSurface) {
+    const profile = terrainProfile({
+      seedId,
+      harmonyMode,
+      seedSuffix: terrainSurface.seedSuffix,
+      baseY: terrainSurface.baseY ?? baseY,
+      roughness: terrainSurface.roughness,
+      points: terrainSurface.points ?? 60,
+      viewBox,
+    });
+    getSurfaceY = nx => profile.getY(nx);
+  } else {
+    const flatY = baseY * height;
+    getSurfaceY = () => flatY;
+  }
+
+  // Depth-proportional sizing
+  const perspCfg =
+    perspective === true
+      ? { horizonY: 0.35, nearY: 0.85 }
+      : perspective
+        ? { horizonY: perspective.horizonY ?? 0.35, nearY: perspective.nearY ?? 0.85 }
+        : null;
+  const d = perspCfg ? depthFactor(baseY, perspCfg.horizonY, perspCfg.nearY) : 1;
+  const heightScale = 0.25 + 0.75 * d;
+
   for (let i = 0; i < count; i++) {
-    const x = (rng() * 1.1 - 0.05) * width;
-    const treeH = (0.03 + rng() * maxHeight) * height;
+    const xNorm = rng() * 1.1 - 0.05;
+    const x = xNorm * width;
+    const by = getSurfaceY(Math.max(0, Math.min(1, xNorm)));
+    const treeH = (0.03 * d + rng() * maxHeight * heightScale) * height;
     const treeW = treeH * (0.25 + rng() * 0.3);
     const tipY = by - treeH;
     const lean = (rng() - 0.5) * treeW * 0.3;
@@ -1545,8 +1759,8 @@ export function treelineBrick(params: BrickParams, options: TreelineBrickOptions
     const treeOp = opacity * (0.65 + rng() * 0.35);
 
     // Slight depth-darkening — trees from the back of the row a touch lighter
-    const depthFactor = 0.85 + rng() * 0.15;
-    const treeOpacity = (treeOp * depthFactor).toFixed(2);
+    const depthDarken = 0.85 + rng() * 0.15;
+    const treeOpacity = (treeOp * depthDarken).toFixed(2);
 
     // 70% conifer / 30% broadleaf
     const isConifer = rng() < 0.7;
@@ -1693,13 +1907,16 @@ export function treelineBrick(params: BrickParams, options: TreelineBrickOptions
 
   // Build the group with overlays
   const treeGroupContent = elems.join("\n");
+  const overlayBaseY = baseY * height;
+  const overlayH = maxHeight * height + 40;
+  const overlayTop = (overlayBaseY - maxHeight * height - 20).toFixed(0);
   const finalElems = [
     `<g id="${treeGrpId}">`,
     treeGroupContent,
     // Directional lit/shadow overlay on the entire treeline
-    `<rect x="0" y="${(by - maxHeight * height - 20).toFixed(0)}" width="${width}" height="${(maxHeight * height + 40).toFixed(0)}" fill="url(#${treeLitId})" opacity="1"/>`,
+    `<rect x="0" y="${overlayTop}" width="${width}" height="${overlayH.toFixed(0)}" fill="url(#${treeLitId})" opacity="1"/>`,
     // Surface texture overlay
-    `<rect x="0" y="${(by - maxHeight * height - 20).toFixed(0)}" width="${width}" height="${(maxHeight * height + 40).toFixed(0)}" fill="${color}" opacity="0.12" filter="url(#${treeSurfId})"/>`,
+    `<rect x="0" y="${overlayTop}" width="${width}" height="${overlayH.toFixed(0)}" fill="${color}" opacity="0.12" filter="url(#${treeSurfId})"/>`,
     "</g>",
   ];
 

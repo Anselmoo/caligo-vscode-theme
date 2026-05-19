@@ -7,23 +7,41 @@ export { atmosphereBrick, blendLayerBrick, toneCurveBrick } from "./atmosphere.j
 export { backgroundBrick } from "./background.js";
 export { solarCoronaBrick } from "./celestial.js";
 export { campfireFlameBrick, lavaRiverBrick, smokeRisingBrick } from "./fire.js";
+export {
+  attractorBrick,
+  cipherBrick,
+  concentricRingsBrick,
+  convolutionBrick,
+  erosionBrick,
+  flowFieldBrick,
+  fractureBrick,
+  gridBrick,
+  kaleidoscopeBrick,
+  moirePatternBrick,
+  penroseBrick,
+  topologyBrick,
+} from "./generative.js";
 export { voronoiBrick } from "./geometry.js";
 export { linearGradientBrick, radialGradientBrick } from "./gradient.js";
+export type { TerrainProfile, TerrainProfileParams } from "./landscape.js";
 export {
   auroraAdvancedBrick,
   celestialBrick,
   cloudBandBrick,
+  depthFactor,
   desertBrick,
   duneBrick,
   horizonGlowBrick,
   lightningBrick,
   nebulaGlowBrick,
+  perspectiveRoughness,
   ridgeHighlightBrick,
   shootingStarBrick,
   skyGradientBrick,
   starFieldBrick,
   terrainBrick,
   terrainContourBrick,
+  terrainProfile,
   terrainStackBrick,
   treelineBrick,
   volcanoBrick,

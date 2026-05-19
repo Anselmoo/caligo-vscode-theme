@@ -241,14 +241,14 @@ export function cityscapeBrick(params: BrickParams, options: CityscapeBrickOptio
     if (b.roofShape < 0.6) {
       renderBldgRect(b.x, b.y, b.w, b.h);
     } else if (b.roofShape < 0.85) {
-      const setH = b.setbackH!;
-      const setIn = b.setbackInset!;
+      const setH = b.setbackH ?? 0;
+      const setIn = b.setbackInset ?? 0;
       // Lower (wider) section
       renderBldgRect(b.x, b.y + setH, b.w, b.h - setH);
       // Upper (narrower) section
       renderBldgRect(b.x + setIn, b.y, b.w - setIn * 2, setH);
     } else {
-      const peakH = b.peakH!;
+      const peakH = b.peakH ?? 0;
       // Body
       renderBldgRect(b.x, b.y + peakH, b.w, b.h - peakH);
       // Triangular peak with directional gradient
@@ -354,11 +354,11 @@ export function cityscapeBrick(params: BrickParams, options: CityscapeBrickOptio
     if (b.antennaH) {
       const antennaSw = Math.max(0.8, width / 1500);
       elems.push(
-        `<line x1="${b.antennaX!.toFixed(1)}" y1="${b.y.toFixed(1)}" x2="${b.antennaX!.toFixed(1)}" y2="${(b.y - b.antennaH).toFixed(1)}" stroke="${color}" stroke-width="${antennaSw.toFixed(1)}" opacity="${bOp.toFixed(2)}"/>`
+        `<line x1="${(b.antennaX ?? b.x + b.w / 2).toFixed(1)}" y1="${b.y.toFixed(1)}" x2="${(b.antennaX ?? b.x + b.w / 2).toFixed(1)}" y2="${(b.y - b.antennaH).toFixed(1)}" stroke="${color}" stroke-width="${antennaSw.toFixed(1)}" opacity="${bOp.toFixed(2)}"/>`
       );
       if (b.hasBeacon) {
         elems.push(
-          `<circle cx="${b.antennaX!.toFixed(1)}" cy="${(b.y - b.antennaH).toFixed(1)}" r="${(antennaSw * 1.6).toFixed(1)}" fill="#ff5050" opacity="${(0.6 + rng() * 0.4).toFixed(2)}"/>`
+          `<circle cx="${(b.antennaX ?? b.x + b.w / 2).toFixed(1)}" cy="${(b.y - b.antennaH).toFixed(1)}" r="${(antennaSw * 1.6).toFixed(1)}" fill="#ff5050" opacity="${(0.6 + rng() * 0.4).toFixed(2)}"/>`
         );
       }
     }
@@ -367,8 +367,7 @@ export function cityscapeBrick(params: BrickParams, options: CityscapeBrickOptio
   // ─── Atmospheric haze between buildings and sky ──────────────────────────────
   // Semi-transparent fog band at the skyline horizon — depth separation
   const hazeH = height * 0.03;
-  const topBldgY =
-    buildings.length > 0 ? Math.min(...buildings.map(b => b.y)) : basePx - height * 0.15;
+  void (buildings.length > 0 ? Math.min(...buildings.map(b => b.y)) : basePx - height * 0.15); // topBldgY reserved for future use
   const hazeFilterId = `${id}-hazef`;
   defs.push(
     `<filter id="${hazeFilterId}" x="-5%" y="-50%" width="110%" height="200%"><feGaussianBlur stdDeviation="0 ${(hazeH * 0.5).toFixed(0)}"/></filter>`

@@ -2,39 +2,70 @@
  * Motifs index — maps seedId to its motif function.
  */
 import type { MotifFn } from "../types.js";
-import { auroraNoir } from "./aurora-noir.js";
-import { cinder } from "./cinder.js";
-import { deepSable } from "./deep-sable.js";
-import { eclipse } from "./eclipse.js";
-import { graphiteFlux } from "./graphite-flux.js";
-import { mandarian } from "./mandarian.js";
-import { midnightAtelier } from "./midnight-atelier.js";
-import { nebulaNight } from "./nebula-night.js";
-import { obsidianGlow } from "./obsidian-glow.js";
-import { voidEmber } from "./void-ember.js";
+
+import { attractor } from "./attractor.js";
+import { cipher } from "./cipher.js";
+import { convolution } from "./convolution.js";
+import { datamosh } from "./datamosh.js";
+import { driftField } from "./drift-field.js";
+import { erosion } from "./erosion.js";
+import { filament } from "./filament.js";
+import { fracture } from "./fracture.js";
+import { interference } from "./interference.js";
+import { kaleidoscope } from "./kaleidoscope.js";
+import { lattice } from "./lattice.js";
+import { orbital } from "./orbital.js";
+import { parallax } from "./parallax.js";
+import { penrose } from "./penrose.js";
+import { ripple } from "./ripple.js";
+import { scatter } from "./scatter.js";
+import { signal } from "./signal.js";
+import { stratum } from "./stratum.js";
+import { tessellate } from "./tessellate.js";
+import { topology } from "./topology.js";
 
 export const MOTIFS: Record<string, MotifFn> = {
-  AuroraNoir: auroraNoir,
-  Cinder: cinder,
-  DeepSable: deepSable,
-  Eclipse: eclipse,
-  GraphiteFlux: graphiteFlux,
-  Mandarian: mandarian,
-  MidnightAtelier: midnightAtelier,
-  NebulaNight: nebulaNight,
-  ObsidianGlow: obsidianGlow,
-  VoidEmber: voidEmber,
+  Attractor: attractor,
+  Cipher: cipher,
+  Convolution: convolution,
+  Datamosh: datamosh,
+  DriftField: driftField,
+  Erosion: erosion,
+  Filament: filament,
+  Fracture: fracture,
+  Interference: interference,
+  Kaleidoscope: kaleidoscope,
+  Lattice: lattice,
+  Orbital: orbital,
+  Parallax: parallax,
+  Penrose: penrose,
+  Ripple: ripple,
+  Scatter: scatter,
+  Signal: signal,
+  Stratum: stratum,
+  Tessellate: tessellate,
+  Topology: topology,
 };
 
 export {
-  auroraNoir,
-  cinder,
-  deepSable,
-  eclipse,
-  graphiteFlux,
-  mandarian,
-  midnightAtelier,
-  nebulaNight,
-  obsidianGlow,
-  voidEmber,
+  attractor,
+  cipher,
+  convolution,
+  datamosh,
+  driftField,
+  erosion,
+  filament,
+  fracture,
+  interference,
+  kaleidoscope,
+  lattice,
+  orbital,
+  parallax,
+  penrose,
+  ripple,
+  scatter,
+  signal,
+  stratum,
+  tessellate,
+  topology,
 };
