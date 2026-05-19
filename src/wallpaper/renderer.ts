@@ -30,6 +30,11 @@ import { MODE_TOPICS, PLATFORM_SIZES } from "./types.js";
 import type { DerivedPalette } from "../lib/palette.js";
 
 export function extractWallpaperColors(palette: DerivedPalette): WallpaperColors {
+  const h = palette.harmony;
+  // For non-"none" modes the decorative wheel hues cluster near the base hue
+  // (e.g. all within ±40° for analogous). Map hue* slots to the harmony
+  // palette instead so every layer gets a genuinely diverse color.
+  const isNone = h.mode === "none";
   return {
     bg: palette.bg0,
     bgSoft: palette.bg1,
@@ -37,18 +42,18 @@ export function extractWallpaperColors(palette: DerivedPalette): WallpaperColors
     accent: palette.accent,
     accentSoft: palette.accentSoft,
     accentMuted: palette.accentMuted,
-    hueRed: palette.hueRed,
-    hueOrange: palette.hueOrange,
-    hueYellow: palette.hueYellow,
-    hueGreen: palette.hueGreen,
-    hueCyan: palette.hueCyan,
-    hueBlue: palette.hueBlue,
-    huePurple: palette.huePurple,
-    strings: palette.harmony.strings,
-    keywords: palette.harmony.keywords,
-    functions: palette.harmony.functions,
-    types: palette.harmony.types,
-    variables: palette.harmony.variables,
+    hueRed: isNone ? palette.hueRed : h.tags,
+    hueOrange: isNone ? palette.hueOrange : h.numbers,
+    hueYellow: isNone ? palette.hueYellow : h.constants,
+    hueGreen: isNone ? palette.hueGreen : h.strings,
+    hueCyan: isNone ? palette.hueCyan : h.types,
+    hueBlue: isNone ? palette.hueBlue : h.functions,
+    huePurple: isNone ? palette.huePurple : h.keywords,
+    strings: h.strings,
+    keywords: h.keywords,
+    functions: h.functions,
+    types: h.types,
+    variables: h.variables,
   };
 }
 
