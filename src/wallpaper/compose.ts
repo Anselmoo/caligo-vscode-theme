@@ -211,15 +211,100 @@ function composeAuroraNoir(p: BrickParams): ComposedWallpaper {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 2. Cinder — Molten glass over magma
-//    Thermal topology lines form the lava-vein structure beneath the surface.
-//    Liquid glass wave bands in fire colours (yellow → orange → red) float on
-//    top — the heat-distorted, incandescent glass of a volcano. White glints
-//    on the wave edges read as superheated glass catching the light.
+// 2. Cinder — Cream thunder on magma
+//    Three topology fields share the same noise seed so the crisp contour line
+//    and its bloom twin trace identical paths. Each layer: thick cream/white
+//    stroke → gaussian blur → incandescent halo; then the crisp coloured line
+//    on top. Result = glowing lava veins that follow the terrain exactly —
+//    "cream thunder" — no horizontal bands cutting across the structure.
 // ═══════════════════════════════════════════════════════════════════════════
 
 function composeCinder(p: BrickParams): ComposedWallpaper {
   const c = p.colors;
+  const { height } = p.viewBox;
+  const sd1 = (height * 0.008).toFixed(1); // primary bloom radius  ~17 px at 2160p
+  const sd2 = (height * 0.005).toFixed(1); // secondary bloom radius ~11 px
+  const sd3 = (height * 0.003).toFixed(1); // fine detail bloom       ~6 px
+
+  // ── Topology contours — same id = same noise field = same paths ──────────
+  // Primary magma channels (22 levels, low frequency = broad landmass shapes)
+  const t1Bloom = topologyBrick(p, {
+    id: "ci-t1",
+    levels: 22,
+    frequency: 0.0032,
+    resolution: 200,
+    color: "#fff8e0", // warm cream-white for the bloom
+    opacity: 0.42,
+    strokeWidth: 8.5,
+    accentColor: "#ffffff",
+    accentLevel: 11,
+  });
+  const t1Crisp = topologyBrick(p, {
+    id: "ci-t1", // identical id → identical contours
+    levels: 22,
+    frequency: 0.0032,
+    resolution: 200,
+    color: c.hueOrange,
+    opacity: 0.75,
+    strokeWidth: 1.8,
+    accentColor: c.hueYellow,
+    accentLevel: 11,
+  });
+
+  // Secondary magma texture (finer frequency, red hue)
+  const t2Bloom = topologyBrick(p, {
+    id: "ci-t2",
+    levels: 14,
+    frequency: 0.0055,
+    resolution: 160,
+    color: "#ffe8c0", // amber-cream
+    opacity: 0.3,
+    strokeWidth: 5.5,
+  });
+  const t2Crisp = topologyBrick(p, {
+    id: "ci-t2",
+    levels: 14,
+    frequency: 0.0055,
+    resolution: 160,
+    color: c.hueRed,
+    opacity: 0.48,
+    strokeWidth: 1.1,
+  });
+
+  // Fine detail veins (highest frequency, strings hue)
+  const t3Bloom = topologyBrick(p, {
+    id: "ci-t3",
+    levels: 10,
+    frequency: 0.0082,
+    resolution: 130,
+    color: "#ffd8a0",
+    opacity: 0.22,
+    strokeWidth: 3.5,
+  });
+  const t3Crisp = topologyBrick(p, {
+    id: "ci-t3",
+    levels: 10,
+    frequency: 0.0082,
+    resolution: 130,
+    color: c.strings,
+    opacity: 0.35,
+    strokeWidth: 0.65,
+  });
+
+  // ── Wrap each bloom twin in a gaussian blur filter ────────────────────────
+  const bloom1: BrickOutput = {
+    defs: `<filter id="ci-gf1" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="${sd1}"/></filter>`,
+    elements: `<g filter="url(#ci-gf1)">${t1Bloom.elements}</g>`,
+  };
+  const bloom2: BrickOutput = {
+    defs: `<filter id="ci-gf2" x="-15%" y="-15%" width="130%" height="130%"><feGaussianBlur stdDeviation="${sd2}"/></filter>`,
+    elements: `<g filter="url(#ci-gf2)">${t2Bloom.elements}</g>`,
+  };
+  const bloom3: BrickOutput = {
+    defs: `<filter id="ci-gf3" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="${sd3}"/></filter>`,
+    elements: `<g filter="url(#ci-gf3)">${t3Bloom.elements}</g>`,
+  };
+
   return scaffold(p, "ci", {
     glows: [
       { cx: 0.5, cy: 0.55, rx: 0.52, ry: 0.45, color: c.hueRed, opacity: 0.38 },
@@ -228,36 +313,12 @@ function composeCinder(p: BrickParams): ComposedWallpaper {
     ],
     glowBlur: 50,
     effects: [
-      // Thermal topology — the magma vein structure beneath the glass
-      topologyBrick(p, {
-        id: "ci-t1",
-        levels: 22,
-        frequency: 0.0032,
-        resolution: 200,
-        color: c.hueOrange,
-        opacity: 0.65,
-        strokeWidth: 1.8,
-        accentColor: c.hueYellow,
-        accentLevel: 11,
-      }),
-      topologyBrick(p, {
-        id: "ci-t2",
-        levels: 14,
-        frequency: 0.0055,
-        resolution: 160,
-        color: c.hueRed,
-        opacity: 0.38,
-        strokeWidth: 1.0,
-      }),
-      // Molten glass surface — 5 fire-hued bands spanning full height
-      // Higher opacity + stronger white glint = incandescent glow
-      liquidWaveBands(p, "ci-lw", [
-        { cy: 0.0, color: c.hueYellow, opacity: 0.38, phase: 0.4 },
-        { cy: 0.22, color: c.hueOrange, opacity: 0.44, phase: 1.7 },
-        { cy: 0.44, color: c.hueRed, opacity: 0.48, phase: 2.9 },
-        { cy: 0.66, color: c.strings, opacity: 0.42, phase: 4.1 },
-        { cy: 0.88, color: c.hueOrange, opacity: 0.36, phase: 5.5 },
-      ]),
+      bloom1,
+      t1Crisp, // primary: cream bloom then crisp orange line
+      bloom2,
+      t2Crisp, // secondary: amber bloom then crisp red line
+      bloom3,
+      t3Crisp, // fine: warm bloom then crisp strings line
     ],
   });
 }
