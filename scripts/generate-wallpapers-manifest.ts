@@ -44,9 +44,9 @@ async function main() {
   console.log("📋 Generating wallpapers manifest…");
 
   if (!existsSync(WALLPAPERS_DIR)) {
-    console.error(`❌ wallpapers directory not found: ${WALLPAPERS_DIR}`);
-    console.error("   Run `npm run wallpapers:generate` first.");
-    process.exit(1);
+    console.warn("⚠️  public/wallpapers/ not found — skipping manifest generation.");
+    console.warn("   Run `npm run wallpapers:generate` to generate wallpaper files.");
+    process.exit(0);
   }
 
   // Build palette cache

@@ -443,9 +443,38 @@ jobs:
           path: ${{ steps.find_vsix.outputs.vsix }}
           retention-days: 30
 
+  build-wallpapers:
+    name: Build Wallpapers
+    needs: unit-tests
+    if: >
+      (github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
+      || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Mark workspace as a safe git directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.13.1
+          cache: npm
+      - run: npm ci
+      - name: Generate wallpapers (SVG only) + manifest + ZIP
+        run: npm run wallpapers:ci
+      - name: Upload wallpapers artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: wallpapers
+          path: |
+            public/wallpapers/
+            public/wallpapers-manifest.json
+            public/caligo-wallpapers.zip
+          if-no-files-found: error
+          retention-days: 30
+
   build-pages-main:
     name: Build Pages (main)
-    needs: [unit-tests, screenshots]
+    needs: [unit-tests, screenshots, build-wallpapers]
     if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
     runs-on: ubuntu-latest
     steps:
@@ -464,6 +493,11 @@ jobs:
         with:
           name: screenshots
           path: public/screenshots/
+      - name: Download Wallpapers
+        uses: actions/download-artifact@v7
+        with:
+          name: wallpapers
+          path: public/
       - name: Build pages
         run: npm run pages:build
         env:
@@ -543,7 +577,7 @@ jobs:
   release-github:
     name: Release - GitHub
     if: ${{ needs.release-gate.outputs.ready == 'true' }}
-    needs: [release-gate, build-sbom]
+    needs: [release-gate, build-sbom, build-wallpapers]
     runs-on: ubuntu-latest
     environment:
       name: github-release
@@ -566,6 +600,11 @@ jobs:
         with:
           name: vsix
           path: artifacts/vsix
+      - name: Download Wallpapers artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: wallpapers
+          path: public/
       - name: Build source and themes release archives
         run: |
           SOURCE_BASENAME="caligo-vscode-theme-${{ github.ref_name }}-source"
@@ -609,7 +648,7 @@ jobs:
         with:
           name: sbom
           path: .
-      - name: Upload source, themes archives, and SBOMs to release
+      - name: Upload source, themes archives, wallpapers ZIP, and SBOMs to release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -618,6 +657,7 @@ jobs:
             caligo-vscode-theme-${{ github.ref_name }}-source.zip \
             caligo-vscode-theme-${{ github.ref_name }}-themes.tar.gz \
             caligo-vscode-theme-${{ github.ref_name }}-themes.zip \
+            public/caligo-wallpapers.zip \
             sbom-spdx.json \
             sbom-themes-spdx.json \
             --repo "${{ github.repository }}" \
@@ -771,7 +811,7 @@ jobs:
   release-pages:
     name: Release - Deploy Pages
     if: ${{ needs.release-gate.outputs.ready == 'true' }}
-    needs: [release-gate, build-sbom]
+    needs: [release-gate, build-sbom, build-wallpapers]
     runs-on: ubuntu-latest
     environment:
       name: github-pages-release
@@ -793,6 +833,11 @@ jobs:
         with:
           name: screenshots-release
           path: public/screenshots/
+      - name: Download Wallpapers
+        uses: actions/download-artifact@v7
+        with:
+          name: wallpapers
+          path: public/
       - name: Build pages
         run: npm run pages:build
         env:

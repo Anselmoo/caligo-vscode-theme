@@ -23,9 +23,9 @@ async function main() {
   console.log("📦 Bundling wallpapers into ZIP…");
 
   if (!existsSync(WALLPAPERS_DIR)) {
-    console.error(`❌ wallpapers directory not found: ${WALLPAPERS_DIR}`);
-    console.error("   Run `npm run wallpapers:generate` first.");
-    process.exit(1);
+    console.warn("⚠️  public/wallpapers/ not found — skipping ZIP bundle.");
+    console.warn("   Run `npm run wallpapers:generate` to generate wallpaper files.");
+    process.exit(0);
   }
 
   // Collect files to bundle
@@ -35,8 +35,8 @@ async function main() {
   const filtered = SVG_ONLY ? files.filter(f => f.endsWith(".svg")) : files;
 
   if (filtered.length === 0) {
-    console.error("❌ No wallpaper files found to bundle.");
-    process.exit(1);
+    console.warn("⚠️  No wallpaper files found to bundle — skipping.");
+    process.exit(0);
   }
 
   console.log(`  Found ${filtered.length} files to bundle`);
