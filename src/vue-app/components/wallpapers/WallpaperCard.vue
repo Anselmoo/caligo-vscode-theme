@@ -38,6 +38,12 @@ const pngUrl = computed(() => {
   const suffix = localTextVariant.value === "text" ? "-text" : "";
   return `${baseDir.value}/${localPlatform.value}${suffix}.png`;
 });
+
+// Silence biome: all vars below are used in the Vue template
+void platforms;
+void textVariants;
+void previewUrl;
+void pngUrl;
 </script>
 
 <template>
