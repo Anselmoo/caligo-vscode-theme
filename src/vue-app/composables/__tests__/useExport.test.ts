@@ -28,7 +28,7 @@ describe("useExport", () => {
 
   beforeEach(() => {
     currentTheme.value = {
-      seedId: "DeepSable",
+      seedId: "Signal",
       seedLabel: "Deep Sable",
       harmonyId: "balanced",
       oklch: {
@@ -65,7 +65,7 @@ describe("useExport", () => {
   ])("maps harmony '%s' to '%s'", (harmonyId, expectedHarmony) => {
     const deriveSpy = vi.spyOn(corePalette, "derivePalette");
     currentTheme.value = {
-      seedId: "DeepSable",
+      seedId: "Signal",
       seedLabel: "Deep Sable",
       harmonyId,
       oklch: {

@@ -42,15 +42,15 @@ describe("loadAllSeeds", () => {
 
 describe("loadSeedById", () => {
   it("should load a specific seed by id", async () => {
-    const seed = await loadSeedById("Eclipse");
+    const seed = await loadSeedById("Signal");
 
     expect(seed).toBeTruthy();
-    expect(seed?.id).toBe("Eclipse");
-    expect(seed?.displayName).toBe("Eclipse");
+    expect(seed?.id).toBe("Signal");
+    expect(seed?.displayName).toBe("Signal");
   });
 
-  it("should load updated Cinder background values", async () => {
-    const seed = await loadSeedById("Cinder");
+  it("should load updated Scatter background values", async () => {
+    const seed = await loadSeedById("Scatter");
 
     expect(seed).toBeTruthy();
     expect(seed?.background).toEqual({ mode: "oklch", l: 0.12, c: 0.05, h: 20 });
@@ -63,7 +63,7 @@ describe("loadSeedById", () => {
   });
 
   it("should be case-insensitive", async () => {
-    const seed1 = await loadSeedById("Eclipse");
+    const seed1 = await loadSeedById("Signal");
     const seed2 = await loadSeedById("eclipse");
     const seed3 = await loadSeedById("ECLIPSE");
 

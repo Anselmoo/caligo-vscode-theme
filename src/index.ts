@@ -107,7 +107,7 @@ async function main(): Promise<void> {
     const here = pathToFileURL(path.join(projectRoot, "README.md")).toString();
     // Keep output terse; callers can read README for full details.
     console.log(
-      `Caligo generator\n\nFlags:\n  --palette <id>   Generate a single palette (e.g. Mandarian)\n  --mode <name>     Theme mode (default: Balanced)\n  --list            List available palettes\n  --help            Show help\n\nDocs: ${here}`
+      `Caligo generator\n\nFlags:\n  --palette <id>   Generate a single palette (e.g. Signal)\n  --mode <name>     Theme mode (default: Balanced)\n  --list            List available palettes\n  --help            Show help\n\nDocs: ${here}`
     );
     return;
   }

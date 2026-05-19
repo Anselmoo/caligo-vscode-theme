@@ -11,9 +11,9 @@ vi.mock("@/composables/useTheme", () => {
         value: [
           {
             key: "caligo-aurora-noir-balanced",
-            seedId: "AuroraNoir",
+            seedId: "Lattice",
             harmonyId: "balanced",
-            displayName: "Aurora Noir — Balanced",
+            displayName: "Lattice — Balanced",
             colors: {
               accent: "#00c57c",
               strings: "#8e92f6",
@@ -35,7 +35,7 @@ vi.mock("@/composables/useTheme", () => {
       },
       setCurrentTheme: setCurrentThemeMock,
       seeds: {
-        value: [{ id: "AuroraNoir", slug: "auroranoir", label: "Aurora Noir" }],
+        value: [{ id: "Lattice", slug: "lattice", label: "Lattice" }],
       },
       harmonies: {
         value: [{ id: "balanced", label: "Balanced" }],
@@ -49,7 +49,7 @@ describe("ThemeSpectrum", () => {
     const wrapper = mount(ThemeSpectrum);
 
     expect(wrapper.find(".spectrum-title").text()).toBe("Theme Spectrum");
-    expect(wrapper.text()).toContain("Aurora Noir");
+    expect(wrapper.text()).toContain("Lattice");
     expect(wrapper.text()).toContain("Balanced");
 
     // The cell should be a button and clicking it should call setCurrentTheme
