@@ -39,22 +39,34 @@ function scaffold(
     glows?: GlowBlob[];
     glowBlur?: number;
     effects: BrickOutput[];
+    /** Skip the radial bgSoft gradient — use a pure flat bg colour only.
+     *  Use when the effect itself provides all the luminance and the lifted
+     *  centre glow would reduce contrast (e.g. aurora, deep-space scenes). */
+    flatBg?: boolean;
   }
 ): ComposedWallpaper {
   const { viewBox, colors } = p;
   const { width, height } = viewBox;
-  // Gradient background: flat bg + radial bgSoft bloom centred slightly high.
-  // Uses objectBoundingBox percentages so it works at any canvas size.
-  const bgGradId = `${prefix}-bg-grad`;
-  const bg: BrickOutput = {
-    defs: `<radialGradient id="${bgGradId}" cx="50%" cy="42%" r="72%">
+
+  let bg: BrickOutput;
+  if (opts.flatBg) {
+    bg = {
+      elements: `<rect width="${width}" height="${height}" fill="${colors.bg}"/>`,
+    };
+  } else {
+    // Radial bgSoft bloom centred slightly high — objectBoundingBox percentages
+    // so it scales correctly across all three canvas sizes.
+    const bgGradId = `${prefix}-bg-grad`;
+    bg = {
+      defs: `<radialGradient id="${bgGradId}" cx="50%" cy="42%" r="72%">
   <stop offset="0%"   stop-color="${colors.bgSoft}"/>
   <stop offset="58%"  stop-color="${colors.bgSoft}" stop-opacity="0.45"/>
   <stop offset="100%" stop-color="${colors.bg}"     stop-opacity="0"/>
 </radialGradient>`,
-    elements: `<rect width="${width}" height="${height}" fill="${colors.bg}"/>
+      elements: `<rect width="${width}" height="${height}" fill="${colors.bg}"/>
 <rect width="${width}" height="${height}" fill="url(#${bgGradId})"/>`,
-  };
+    };
+  }
   const layers: BrickOutput[] = [bg];
   if (opts.glows?.length) {
     layers.push(
@@ -175,52 +187,56 @@ export function composeSeedWallpaper(p: BrickParams): ComposedWallpaper {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 1. AuroraNoir — High-contrast aurora over star field
-//    Stars fill the dark sky so the eye reads "true dark" against the aurora.
-//    Glow blobs are kept dim to preserve that dark background.
-//    Three aurora layers at different heights + opacity give color depth:
-//    primary (accent/green), secondary (cyan/accent), tertiary (purple fringe).
+// 1. AuroraNoir — Maximum-contrast aurora
+//    flatBg = pure dark floor, no ambient gradient lift.
+//    Tighter zoneHeights mean dark sky is visible above and below the bands.
+//    Stars use "upper" distribution (4 clusters, less clumping than "full").
 // ═══════════════════════════════════════════════════════════════════════════
 
 function composeAuroraNoir(p: BrickParams): ComposedWallpaper {
   const c = p.colors;
   return scaffold(p, "an", {
-    // Near-zero ambient glow — let the bg stay truly dark between curtains
-    glows: [
-      { cx: 0.5, cy: 0.38, rx: 0.52, ry: 0.28, color: c.accent, opacity: 0.06 },
-      { cx: 0.38, cy: 0.28, rx: 0.28, ry: 0.14, color: c.hueGreen, opacity: 0.04 },
-    ],
-    glowBlur: 55,
+    flatBg: true, // pure dark bg — no radial lift between curtains
     effects: [
-      // Primary curtain — hero aurora, wide zone, full intensity
+      // Stars — few, upper sky only, 4-cluster distribution = no centre clump
+      starFieldBrick(p, {
+        id: "an-sf",
+        count: 180,
+        brightCount: 7,
+        color: c.accentSoft,
+        distribution: "upper",
+        opacity: 0.62,
+      }),
+      // Primary curtain — focused zone (0.50 height), maximum opacity
+      // Tighter zone = clear dark sky above and below, high local contrast
       auroraAdvancedBrick(p, {
         id: "an-a1",
         bands: 5,
-        cy: 0.38,
-        zoneHeight: 0.72,
+        cy: 0.45,
+        zoneHeight: 0.5,
         color: c.accent,
         color2: c.hueGreen,
-        opacity: 0.92,
+        opacity: 0.95,
       }),
-      // Secondary curtain — higher centre, different color pair, strong opacity
+      // Secondary curtain — clearly separated upper zone
       auroraAdvancedBrick(p, {
         id: "an-a2",
         bands: 4,
-        cy: 0.26,
-        zoneHeight: 0.42,
+        cy: 0.22,
+        zoneHeight: 0.28,
         color: c.hueCyan,
         color2: c.accent,
-        opacity: 0.72,
+        opacity: 0.78,
       }),
-      // Tertiary curtain — upper-sky violet fringe
+      // Tertiary — narrow violet fringe at the very top
       auroraAdvancedBrick(p, {
         id: "an-a3",
         bands: 2,
-        cy: 0.15,
-        zoneHeight: 0.26,
+        cy: 0.1,
+        zoneHeight: 0.16,
         color: c.huePurple,
         color2: c.hueCyan,
-        opacity: 0.42,
+        opacity: 0.48,
       }),
     ],
   });
@@ -560,78 +576,74 @@ function composeMandarian(p: BrickParams): ComposedWallpaper {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 7. MidnightAtelier — Bricks in the universe / cosmic web
-//    The large-scale structure of the universe: matter clusters into a foam
-//    of cells separated by glowing filaments. Three scales of Voronoi:
-//      • Macro bricks  — 28 pts, 8 Lloyd passes → near-hexagonal honeycomb,
-//                        thick glowing edges, semi-transparent faces
-//      • Mid structure — 90 pts, 5 passes → internal cell divisions, medium glow
-//      • Fine web      — 200-pt Delaunay → the cosmic mortar / thin filament lines
-//    Stars scatter behind the web; nebula dust fills the interstices.
+// 7. MidnightAtelier — Cosmic megalith bricks
+//    Large architectural stone-like faces floating in deep space.
+//    Key difference from Mandarian: FEWER cells (8 vs 55+), SOLID fills
+//    (0.28 vs 0.05), MINIMAL glow (1.5 vs 7–11) → reads as stone architecture,
+//    not a radioactive lattice. Stars only at top edge (upper distribution).
 // ═══════════════════════════════════════════════════════════════════════════
 
 function composeMidnightAtelier(p: BrickParams): ComposedWallpaper {
   const c = p.colors;
   return scaffold(p, "ma", {
     glows: [
-      // Vast cosmic filament glow — wide and diffuse, not a spotlight
-      { cx: 0.45, cy: 0.4, rx: 0.58, ry: 0.48, color: c.accent, opacity: 0.18 },
-      { cx: 0.22, cy: 0.28, rx: 0.32, ry: 0.28, color: c.keywords, opacity: 0.14 },
-      { cx: 0.74, cy: 0.65, rx: 0.3, ry: 0.24, color: c.functions, opacity: 0.12 },
+      { cx: 0.48, cy: 0.45, rx: 0.52, ry: 0.45, color: c.accent, opacity: 0.15 },
+      { cx: 0.25, cy: 0.32, rx: 0.3, ry: 0.26, color: c.keywords, opacity: 0.1 },
     ],
-    glowBlur: 60,
+    glowBlur: 65,
     effects: [
-      // Layer 1 — cosmic backdrop: faint scattered stars
+      // Stars near the top edge — frames the bricks, does not clutter centre
+      // "upper" distribution = 4 cluster centres across the top half
       starFieldBrick(p, {
         id: "ma-sf",
-        count: 500,
-        brightCount: 22,
+        count: 160,
+        brightCount: 6,
         color: c.accentSoft,
-        distribution: "full",
-        opacity: 0.52,
+        distribution: "upper",
+        opacity: 0.55,
       }),
-      // Layer 2 — fine Delaunay web: the thin cosmic filaments / mortar lines
+      // Thin Delaunay mortar — fine lines between the large stone faces
       voronoiBrick(p, {
         id: "ma-d1",
-        points: 220,
+        points: 160,
         mode: "delaunay",
         color: c.functions,
-        opacity: 0.32,
+        opacity: 0.2,
         fillOpacity: 0,
-        strokeWidth: 0.65,
-        glowRadius: 2.2,
+        strokeWidth: 0.55,
+        glowRadius: 1.2, // minimal glow — architectural, not neon
       }),
-      // Layer 3 — medium Voronoi: internal cell structure, moderate glow
+      // Medium brick subdivisions — secondary tiling
       voronoiBrick(p, {
         id: "ma-v2",
-        points: 90,
+        points: 22,
         color: c.keywords,
-        opacity: 0.5,
-        fillOpacity: 0.06,
-        strokeWidth: 1.9,
-        relaxIterations: 5,
-        glowRadius: 3.5,
+        opacity: 0.55,
+        fillOpacity: 0.16, // semi-solid face (much higher than Mandarian's 0.05)
+        strokeWidth: 2.2,
+        relaxIterations: 7,
+        glowRadius: 1.5, // stone, not radioactive
       }),
-      // Layer 4 — macro cosmic bricks: 8 Lloyd passes → near-hexagonal cells
-      //           thick glowing edges, semi-transparent faces catch the glow
+      // Macro bricks — only 8 cells, 10 Lloyd passes = near-perfect hexagons
+      // fillOpacity 0.28 → the faces are visibly solid cosmic blocks
       voronoiBrick(p, {
         id: "ma-v1",
-        points: 28,
+        points: 8,
         color: c.accent,
         opacity: 0.72,
-        fillOpacity: 0.14,
-        strokeWidth: 3.8,
-        relaxIterations: 8,
-        glowRadius: 4.5,
+        fillOpacity: 0.28,
+        strokeWidth: 5.0,
+        relaxIterations: 10,
+        glowRadius: 1.8, // barely any glow — edge is a crisp seam between blocks
       }),
-      // Layer 5 — nebula dust: fills the interior of cells with soft colour
+      // Nebula dust inside the block faces
       nebulaDustBrick(p, {
         id: "ma-nd1",
         tintColor: c.accentSoft,
-        opacity: 0.22,
+        opacity: 0.2,
         baseFrequency: 0.003,
         numOctaves: 4,
-        alphaStrength: 0.38,
+        alphaStrength: 0.32,
       }),
     ],
   });
