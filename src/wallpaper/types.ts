@@ -109,6 +109,10 @@ export interface WallpaperColors {
   functions: string;
   types: string;
   variables: string;
+  constants: string;
+  numbers: string;
+  tags: string;
+  attributes: string;
 }
 
 // ─── ViewBox ──────────────────────────────────────────────────────────────────

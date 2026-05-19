@@ -9,12 +9,14 @@
 import {
   auroraAdvancedBrick,
   curtainBrick,
-  flowFieldBrick,
+  duneBrick,
   fractureBrick,
+  lightningBrick,
   nebulaDustBrick,
   nebulaGlowBrick,
   particlesBrick,
   sparksBrick,
+  terrainContourBrick,
   topologyBrick,
   voronoiBrick,
 } from "./bricks/index.js";
@@ -156,80 +158,80 @@ function composeCinder(p: BrickParams): ComposedWallpaper {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 3. DeepSable — Silk wave curtains
-//    Five bold wavy bands layered across the canvas like iridescent silk or
-//    desert dunes from above. Each band is a different hue; overlapping
-//    amplitudes weave them together. Crisp, bold, unmistakably visible.
-//    A magnetic flow field adds fine grain between the bands.
+// 3. DeepSable — Desert dune sea at dusk
+//    Layered dune ridges recede to a horizon with terrain silhouettes.
+//    Warm atmospheric glow near the horizon; foreground dunes in accent hues.
+//    Sand-grain texture + sparse particle dust add tactile depth.
 // ═══════════════════════════════════════════════════════════════════════════
 
 function composeDeepSable(p: BrickParams): ComposedWallpaper {
   const c = p.colors;
   return scaffold(p, "ds", {
     glows: [
-      { cx: 0.5, cy: 0.45, rx: 0.58, ry: 0.5, color: c.accent, opacity: 0.62 },
-      { cx: 0.2, cy: 0.7, rx: 0.32, ry: 0.28, color: c.huePurple, opacity: 0.5 },
-      { cx: 0.82, cy: 0.28, rx: 0.28, ry: 0.24, color: c.hueBlue, opacity: 0.42 },
+      // Horizon warmth
+      { cx: 0.5, cy: 0.35, rx: 0.6, ry: 0.3, color: c.hueOrange, opacity: 0.35 },
+      { cx: 0.5, cy: 0.3, rx: 0.35, ry: 0.18, color: c.accent, opacity: 0.28 },
+      // Foreground warmth
+      { cx: 0.28, cy: 0.72, rx: 0.3, ry: 0.22, color: c.numbers, opacity: 0.22 },
     ],
-    glowBlur: 55,
+    glowBlur: 60,
     effects: [
-      // Five bold silk bands — each a different hue, overlapping amplitudes
-      curtainBrick(p, {
-        id: "ds-c1",
-        color: c.accent,
-        opacity: 0.92,
-        cy: 0.16,
-        amplitude: 0.13,
-        phase: 0,
-        strokeWidth: 130,
+      // Sky-horizon mountain silhouettes — 4 depth layers
+      terrainContourBrick(p, {
+        id: "ds-tc",
+        horizonY: 0.18,
+        gridW: 80,
+        gridH: 40,
+        layers: [
+          { color: c.hueBlue, opacity: 0.32, edgeBlur: 8 }, // far haze
+          { color: c.keywords, opacity: 0.45, edgeBlur: 3 }, // mid ridges
+          { color: c.huePurple, opacity: 0.55, edgeBlur: 1 }, // near ridges
+          { color: c.accent, opacity: 0.68 }, // foreground silhouette
+        ],
       }),
-      curtainBrick(p, {
-        id: "ds-c2",
-        color: c.huePurple,
-        opacity: 0.8,
-        cy: 0.36,
-        amplitude: 0.11,
-        phase: 72,
-        strokeWidth: 115,
+      // Dune sea — foreground, mid, and background layers of actual dunes
+      duneBrick(p, {
+        id: "ds-d1",
+        baseY: 0.52,
+        ridges: 5,
+        color: c.strings,
+        opacity: 0.45,
+        seedSuffix: "d1",
       }),
-      curtainBrick(p, {
-        id: "ds-c3",
-        color: c.keywords,
-        opacity: 0.75,
-        cy: 0.54,
-        amplitude: 0.14,
-        phase: 144,
-        strokeWidth: 120,
+      duneBrick(p, {
+        id: "ds-d2",
+        baseY: 0.64,
+        ridges: 4,
+        color: c.hueOrange,
+        opacity: 0.65,
+        seedSuffix: "d2",
       }),
-      curtainBrick(p, {
-        id: "ds-c4",
-        color: c.hueBlue,
-        opacity: 0.68,
-        cy: 0.72,
-        amplitude: 0.1,
-        phase: 216,
-        strokeWidth: 105,
+      duneBrick(p, {
+        id: "ds-d3",
+        baseY: 0.77,
+        ridges: 3,
+        color: c.numbers,
+        opacity: 0.82,
+        seedSuffix: "d3",
       }),
-      curtainBrick(p, {
-        id: "ds-c5",
-        color: c.functions,
-        opacity: 0.58,
-        cy: 0.88,
-        amplitude: 0.12,
-        phase: 288,
-        strokeWidth: 100,
+      // Sand-dust particles drifting across the dunes
+      particlesBrick(p, {
+        id: "ds-p1",
+        count: 280,
+        color: c.accentSoft,
+        opacity: 0.25,
+        minRadius: 0.5,
+        maxRadius: 1.8,
+        distribution: "lower",
       }),
-      // Fine magnetic grain between the bands
-      flowFieldBrick(p, {
-        id: "ds-f1",
-        cols: 100,
-        rows: 65,
-        frequency: 0.0016,
-        segmentLength: 0.026,
-        color: c.accent,
-        opacity: 0.38,
-        strokeWidth: 1.8,
-        region: { x: 0, y: 0, w: 1, h: 1 },
+      // Fine grain overlay for tactile texture
+      nebulaDustBrick(p, {
+        id: "ds-nd1",
+        tintColor: c.accentMuted,
+        opacity: 0.22,
+        baseFrequency: 0.005,
+        numOctaves: 3,
+        alphaStrength: 0.4,
       }),
     ],
   });
@@ -386,85 +388,83 @@ function composeMandarian(p: BrickParams): ComposedWallpaper {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 7. MidnightAtelier — Ink wash / brushwork studio
-//    Bold sweeping brushstrokes cross the canvas like ink on wet paper.
-//    Flowing curtain bands underneath act as watercolor washes. Cosmic dust
-//    adds grain. All standard bricks — no organic imports.
+// 7. MidnightAtelier — Electric storm / thunder scene
+//    Multiple lightning bolts erupt from a charged storm sky. Wide soft
+//    curtain bands simulate the cloud banks lit by the flashes. Atmospheric
+//    dust grain adds the heavy-air texture of a real thunderstorm.
 // ═══════════════════════════════════════════════════════════════════════════
 
 function composeMidnightAtelier(p: BrickParams): ComposedWallpaper {
   const c = p.colors;
   return scaffold(p, "ma", {
     glows: [
-      { cx: 0.45, cy: 0.4, rx: 0.42, ry: 0.36, color: c.accent, opacity: 0.28 },
-      { cx: 0.68, cy: 0.62, rx: 0.32, ry: 0.26, color: c.huePurple, opacity: 0.2 },
-      { cx: 0.22, cy: 0.7, rx: 0.22, ry: 0.18, color: c.hueBlue, opacity: 0.14 },
+      // Storm sky illumination — wide diffuse flash glow
+      { cx: 0.48, cy: 0.22, rx: 0.55, ry: 0.38, color: c.accent, opacity: 0.32 },
+      { cx: 0.28, cy: 0.18, rx: 0.32, ry: 0.22, color: c.constants, opacity: 0.22 },
+      { cx: 0.72, cy: 0.25, rx: 0.28, ry: 0.18, color: c.hueBlue, opacity: 0.18 },
     ],
-    glowBlur: 55,
+    glowBlur: 60,
     effects: [
-      // Watercolor wash base — two wide sine-wave bands as wet-paper backdrop
+      // Storm cloud banks — two deep curtain washes behind the bolts
       curtainBrick(p, {
         id: "ma-c1",
-        color: c.accent,
-        opacity: 0.22,
-        cy: 0.38,
-        amplitude: 0.22,
+        color: c.accentMuted,
+        opacity: 0.3,
+        cy: 0.22,
+        amplitude: 0.15,
         phase: 0,
-        strokeWidth: 280,
+        strokeWidth: 320,
       }),
       curtainBrick(p, {
         id: "ma-c2",
         color: c.huePurple,
-        opacity: 0.16,
-        cy: 0.64,
-        amplitude: 0.18,
-        phase: 130,
-        strokeWidth: 220,
+        opacity: 0.18,
+        cy: 0.72,
+        amplitude: 0.12,
+        phase: 90,
+        strokeWidth: 260,
       }),
-      // Flowing current field — low frequency, lazy organic arcs (no horizontal lines)
-      flowFieldBrick(p, {
-        id: "ma-f1",
-        cols: 80,
-        rows: 52,
-        frequency: 0.0012,
-        segmentLength: 0.032,
+      // Primary bolt — centre canvas, main strike, bright accent
+      lightningBrick(p, {
+        id: "ma-l1",
+        startX: 0.48,
+        startY: 0.0,
+        endX: 0.44,
+        endY: 1.0,
         color: c.accent,
-        opacity: 0.52,
-        strokeWidth: 2.2,
-        region: { x: 0, y: 0, w: 1, h: 1 },
+        opacity: 0.95,
+        branches: 5,
       }),
-      // Medium current — different color + frequency creates cross-grain texture
-      flowFieldBrick(p, {
-        id: "ma-f2",
-        cols: 60,
-        rows: 40,
-        frequency: 0.0022,
-        segmentLength: 0.028,
-        color: c.huePurple,
-        opacity: 0.36,
-        strokeWidth: 1.4,
-        region: { x: 0, y: 0, w: 1, h: 1 },
+      // Secondary bolt — left side, hits mid-canvas, different hue
+      lightningBrick(p, {
+        id: "ma-l2",
+        startX: 0.24,
+        startY: 0.02,
+        endX: 0.18,
+        endY: 0.88,
+        color: c.constants,
+        opacity: 0.72,
+        branches: 3,
       }),
-      // Fine detail field — adds texture without straight lines
-      flowFieldBrick(p, {
-        id: "ma-f3",
-        cols: 50,
-        rows: 33,
-        frequency: 0.0038,
-        segmentLength: 0.018,
+      // Tertiary bolt — right side, short burst
+      lightningBrick(p, {
+        id: "ma-l3",
+        startX: 0.72,
+        startY: 0.04,
+        endX: 0.76,
+        endY: 0.82,
         color: c.hueBlue,
-        opacity: 0.24,
-        strokeWidth: 0.8,
-        region: { x: 0, y: 0, w: 1, h: 1 },
+        opacity: 0.55,
+        branches: 2,
       }),
-      // Fine cosmic dust grain — replaces marble veins, adds studio texture
+      // Heavy storm-air grain
       nebulaDustBrick(p, {
         id: "ma-nd1",
         tintColor: c.accentSoft,
-        opacity: 0.28,
-        baseFrequency: 0.004,
+        opacity: 0.32,
+        baseFrequency: 0.003,
         numOctaves: 4,
-        alphaStrength: 0.45,
+        alphaStrength: 0.5,
       }),
     ],
   });

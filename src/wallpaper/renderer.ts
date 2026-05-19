@@ -54,6 +54,11 @@ export function extractWallpaperColors(palette: DerivedPalette): WallpaperColors
     functions: h.functions,
     types: h.types,
     variables: h.variables,
+    // These 4 roles always have well-spread hues regardless of harmony mode
+    constants: h.constants,
+    numbers: h.numbers,
+    tags: h.tags,
+    attributes: h.attributes,
   };
 }
 
