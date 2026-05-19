@@ -17,7 +17,7 @@ describe("useGalleryFilter", () => {
       exists: true,
     },
     {
-      themeName: "Signal Triadic",
+      themeName: "Eclipse Triadic",
       seedId: "eclipse",
       harmonyMode: "triadic",
       filename: "eclipse-triadic.png",
@@ -37,7 +37,7 @@ describe("useGalleryFilter", () => {
 
     setSearch("eclipse");
     expect(filteredScreenshots.value).toHaveLength(1);
-    expect(filteredScreenshots.value[0].themeName).toBe("Signal Triadic");
+    expect(filteredScreenshots.value[0].themeName).toBe("Eclipse Triadic");
   });
 
   it("should filter by seed", () => {
