@@ -2,7 +2,6 @@
  * Bricks index — re-exports all brick functions for convenient import.
  */
 
-export { cityscapeBrick } from "./architecture.js";
 export { atmosphereBrick, blendLayerBrick, toneCurveBrick } from "./atmosphere.js";
 export { backgroundBrick } from "./background.js";
 export { solarCoronaBrick } from "./celestial.js";
