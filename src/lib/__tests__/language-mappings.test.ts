@@ -3,7 +3,11 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { resolveIntent } from "../language-mappings/index.js";
+import {
+  getAvailableLanguages,
+  getLanguageDisplayName,
+  resolveIntent,
+} from "../language-mappings/index.js";
 
 describe("resolveIntent", () => {
   describe("Python-specific mappings", () => {
@@ -296,5 +300,44 @@ describe("resolveIntent", () => {
       assert.equal(goGoroutine, "controlFlow");
       assert.equal(luaCoroutine, "controlFlow");
     });
+  });
+});
+
+describe("resolveIntent — fallback paths", () => {
+  it("uses language mapper base tokenType when modifier key is not mapped", () => {
+    // "decorator.unknownmod" is not in Python mapper, but "decorator" is → hits line 135
+    const result = resolveIntent("decorator", ["unknownmod"], "python");
+    expect(result).toBe("meta");
+  });
+
+  it("uses default mapping base tokenType when modifier key is not mapped", () => {
+    // "keyword.unknownmod" is not in DEFAULT_INTENT_MAPPING, but "keyword" is → hits line 149
+    const result = resolveIntent("keyword", ["unknownmod"]);
+    expect(result).toBe("controlFlow");
+  });
+
+  it("returns 'usage' as ultimate fallback for unknown token and no language", () => {
+    expect(resolveIntent("completelyUnknownToken", ["mod"])).toBe("usage");
+  });
+});
+
+describe("getAvailableLanguages", () => {
+  it("returns an array of language identifiers", () => {
+    const langs = getAvailableLanguages();
+    expect(Array.isArray(langs)).toBe(true);
+    expect(langs.length).toBeGreaterThan(0);
+  });
+
+  it("includes common languages", () => {
+    const langs = getAvailableLanguages();
+    expect(langs).toContain("python");
+    expect(langs).toContain("rust");
+  });
+});
+
+describe("getLanguageDisplayName", () => {
+  it("returns the display name for a known language", () => {
+    expect(getLanguageDisplayName("python")).toBe("Python");
+    expect(getLanguageDisplayName("rust")).toBe("Rust");
   });
 });

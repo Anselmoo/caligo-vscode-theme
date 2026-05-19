@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { oklch, toHex, withAlpha } from "../color.js";
+import { clamp01, oklch, toHex, withAlpha } from "../color.js";
 
 describe("oklch", () => {
   it("should create OKLCH color object", () => {
@@ -68,5 +68,45 @@ describe("withAlpha", () => {
     assert.match(result, /^#[0-9a-f]{6}[0-9a-f]{2}$/i);
     // 0.28 * 255 ≈ 71 = 0x47
     expect(result.toLowerCase()).toMatch(/^#12345647$/i);
+  });
+
+  it("should throw for non-hex input", () => {
+    expect(() => withAlpha("invalid", 0.5)).toThrow("withAlpha: expected #RRGGBB");
+  });
+
+  it("should throw for short hex", () => {
+    expect(() => withAlpha("#fff", 0.5)).toThrow();
+  });
+});
+
+describe("toHex — alpha", () => {
+  it("produces 8-char hex when alpha < 1", () => {
+    const color = oklch(0.5, 0.1, 180, 0.5);
+    const hex = toHex(color);
+    expect(hex).toMatch(/^#[0-9a-f]{8}$/i);
+  });
+
+  it("produces 6-char hex when alpha is 1", () => {
+    const color = oklch(0.5, 0.1, 180, 1);
+    const hex = toHex(color);
+    expect(hex).toMatch(/^#[0-9a-f]{6}$/i);
+  });
+});
+
+describe("clamp01", () => {
+  it("clamps values below 0 to 0", () => {
+    expect(clamp01(-1)).toBe(0);
+    expect(clamp01(-0.001)).toBe(0);
+  });
+
+  it("clamps values above 1 to 1", () => {
+    expect(clamp01(2)).toBe(1);
+    expect(clamp01(1.001)).toBe(1);
+  });
+
+  it("passes through values within [0, 1]", () => {
+    expect(clamp01(0)).toBe(0);
+    expect(clamp01(0.5)).toBe(0.5);
+    expect(clamp01(1)).toBe(1);
   });
 });
