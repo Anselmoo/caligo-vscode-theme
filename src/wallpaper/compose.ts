@@ -9,6 +9,7 @@
 import {
   auroraAdvancedBrick,
   fractureBrick,
+  lightningBrick,
   nebulaDustBrick,
   nebulaGlowBrick,
   particlesBrick,
@@ -421,52 +422,102 @@ function composeDeepSable(p: BrickParams): ComposedWallpaper {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 4. Eclipse — Shattered glass / ice fracture field
-//    Dense branching crack patterns spanning the full canvas, like the
-//    shadow geometry of an eclipse. Jagged, dramatic, high-contrast —
-//    very different from all other organic/smooth effects.
+// 4. Eclipse — Ice fractures with prism split
+//    Same crack paths rendered 3× with slight ±translate offsets in warm /
+//    neutral / cool palette colours — the chromatic-aberration technique from
+//    examples/effects/069-prism-split.svg. Each fracture line appears to
+//    scatter light into its colour components, like ice catching a prism beam.
 // ═══════════════════════════════════════════════════════════════════════════
 
 function composeEclipse(p: BrickParams): ComposedWallpaper {
   const c = p.colors;
+  const { width, height } = p.viewBox;
+  // Prism offset — ~0.4% of canvas width / ~0.3% height, scales across platforms
+  const dx = Math.round(width * 0.004);
+  const dy = Math.round(height * 0.003);
+
+  // Same id = same crack paths. Render each crack set 3×:
+  //   warm shift (−dx, −dy)  ·  cool shift (+dx, +dy)  ·  crisp centre
+  const v0W = icecrackBrick(p, {
+    id: "ec-i0",
+    crackCount: 30,
+    branchProbability: 0.28,
+    color: c.hueOrange,
+    opacity: 0.5,
+    strokeWidth: 3.2,
+  });
+  const v0C = icecrackBrick(p, {
+    id: "ec-i0",
+    crackCount: 30,
+    branchProbability: 0.28,
+    color: c.hueCyan,
+    opacity: 0.5,
+    strokeWidth: 3.2,
+  });
+  const v0 = icecrackBrick(p, {
+    id: "ec-i0",
+    crackCount: 30,
+    branchProbability: 0.28,
+    color: c.constants,
+    opacity: 0.78,
+    strokeWidth: 3.2,
+  });
+
+  const v1W = icecrackBrick(p, {
+    id: "ec-i1",
+    crackCount: 100,
+    branchProbability: 0.62,
+    color: c.hueRed,
+    opacity: 0.35,
+    strokeWidth: 1.8,
+  });
+  const v1C = icecrackBrick(p, {
+    id: "ec-i1",
+    crackCount: 100,
+    branchProbability: 0.62,
+    color: c.hueBlue,
+    opacity: 0.35,
+    strokeWidth: 1.8,
+  });
+  const v1 = icecrackBrick(p, {
+    id: "ec-i1",
+    crackCount: 100,
+    branchProbability: 0.62,
+    color: c.strings,
+    opacity: 0.85,
+    strokeWidth: 1.8,
+  });
+
   return scaffold(p, "ec", {
-    // No partial glow blobs — pure void background, full-canvas crack field only
-    glowBlur: 50,
+    flatBg: true,
     effects: [
-      // Bold thick veins — highly visible primary color
-      icecrackBrick(p, {
-        id: "ec-i0",
-        crackCount: 30,
-        branchProbability: 0.28,
-        color: c.constants,
-        opacity: 0.72,
-        strokeWidth: 3.2,
-      }),
-      // Dense primary fracture network
-      icecrackBrick(p, {
-        id: "ec-i1",
-        crackCount: 100,
-        branchProbability: 0.62,
-        color: c.strings,
-        opacity: 0.82,
-        strokeWidth: 1.8,
-      }),
-      // Secondary cracks — different color, clearly visible
+      // Thick veins — prism split: warm behind left, cool behind right, crisp centre
+      { elements: `<g transform="translate(${-dx},${-dy})">${v0W.elements}</g>` },
+      { elements: `<g transform="translate(${dx},${dy})">${v0C.elements}</g>` },
+      v0,
+      // Dense fracture network — prism split (slightly smaller offset)
+      {
+        elements: `<g transform="translate(${-Math.round(dx * 0.7)},${-Math.round(dy * 0.7)})">${v1W.elements}</g>`,
+      },
+      {
+        elements: `<g transform="translate(${Math.round(dx * 0.7)},${Math.round(dy * 0.7)})">${v1C.elements}</g>`,
+      },
+      v1,
+      // Fine detail cracks — no split (too thin; fringe would blur with the line)
       icecrackBrick(p, {
         id: "ec-i2",
         crackCount: 65,
         branchProbability: 0.5,
         color: c.hueCyan,
-        opacity: 0.58,
+        opacity: 0.5,
         strokeWidth: 1.0,
       }),
-      // Fine detail cracks — third distinct color
       icecrackBrick(p, {
         id: "ec-i3",
         crackCount: 40,
         branchProbability: 0.38,
         color: c.keywords,
-        opacity: 0.44,
+        opacity: 0.4,
         strokeWidth: 0.55,
       }),
     ],
@@ -474,50 +525,92 @@ function composeEclipse(p: BrickParams): ComposedWallpaper {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 5. GraphiteFlux — Water caustic light curves
-//    Dense intersecting bezier curves simulate light refracted through water
-//    or energy flux lines. Bright glowing lines cross and intersect to fill
-//    the entire canvas — kinetic, energetic, "in flux".
+// 5. GraphiteFlux — Glowing caustic light curves
+//    Each caustic layer has a bloom twin: thick blurred stroke behind the
+//    crisp line (same id = same bezier paths). Wide outer aura → tight inner
+//    corona → sharp core. Three colour layers fill the full canvas.
 // ═══════════════════════════════════════════════════════════════════════════
 
 function composeGraphiteFlux(p: BrickParams): ComposedWallpaper {
   const c = p.colors;
+  const { height } = p.viewBox;
+  const sd1 = (height * 0.006).toFixed(1); // ~13 px at 2160p — wide neon aura
+  const sd2 = (height * 0.004).toFixed(1); //  ~9 px
+  const sd3 = (height * 0.003).toFixed(1); //  ~6 px
+
+  // Each layer: bloom twin (thick, blurred) + crisp line (same id = same paths)
+  const c1Bloom = causticBrick(p, {
+    id: "gf-c1",
+    lineCount: 120,
+    color: c.accent,
+    opacity: 0.4,
+    strokeWidth: 5.5,
+    region: [0, 0, 1, 1],
+  });
+  const c1Crisp = causticBrick(p, {
+    id: "gf-c1",
+    lineCount: 120,
+    color: c.accent,
+    opacity: 0.78,
+    strokeWidth: 1.5,
+    region: [0, 0, 1, 1],
+  });
+
+  const c2Bloom = causticBrick(p, {
+    id: "gf-c2",
+    lineCount: 80,
+    color: c.hueBlue,
+    opacity: 0.3,
+    strokeWidth: 4.0,
+    region: [0, 0, 1, 1],
+  });
+  const c2Crisp = causticBrick(p, {
+    id: "gf-c2",
+    lineCount: 80,
+    color: c.hueBlue,
+    opacity: 0.55,
+    strokeWidth: 0.85,
+    region: [0, 0, 1, 1],
+  });
+
+  const c3Bloom = causticBrick(p, {
+    id: "gf-c3",
+    lineCount: 50,
+    color: c.hueGreen,
+    opacity: 0.22,
+    strokeWidth: 3.0,
+    region: [0, 0, 1, 1],
+  });
+  const c3Crisp = causticBrick(p, {
+    id: "gf-c3",
+    lineCount: 50,
+    color: c.hueGreen,
+    opacity: 0.42,
+    strokeWidth: 0.55,
+    region: [0, 0, 1, 1],
+  });
+
+  const glow1: BrickOutput = {
+    defs: `<filter id="gf-gf1" x="-15%" y="-15%" width="130%" height="130%"><feGaussianBlur stdDeviation="${sd1}"/></filter>`,
+    elements: `<g filter="url(#gf-gf1)">${c1Bloom.elements}</g>`,
+  };
+  const glow2: BrickOutput = {
+    defs: `<filter id="gf-gf2" x="-12%" y="-12%" width="124%" height="124%"><feGaussianBlur stdDeviation="${sd2}"/></filter>`,
+    elements: `<g filter="url(#gf-gf2)">${c2Bloom.elements}</g>`,
+  };
+  const glow3: BrickOutput = {
+    defs: `<filter id="gf-gf3" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="${sd3}"/></filter>`,
+    elements: `<g filter="url(#gf-gf3)">${c3Bloom.elements}</g>`,
+  };
+
   return scaffold(p, "gf", {
     glows: [
-      { cx: 0.5, cy: 0.45, rx: 0.45, ry: 0.35, color: c.accent, opacity: 0.2 },
-      { cx: 0.25, cy: 0.35, rx: 0.25, ry: 0.2, color: c.hueBlue, opacity: 0.14 },
-      { cx: 0.75, cy: 0.6, rx: 0.22, ry: 0.18, color: c.hueGreen, opacity: 0.12 },
+      { cx: 0.5, cy: 0.45, rx: 0.45, ry: 0.35, color: c.accent, opacity: 0.18 },
+      { cx: 0.25, cy: 0.35, rx: 0.25, ry: 0.2, color: c.hueBlue, opacity: 0.12 },
+      { cx: 0.75, cy: 0.6, rx: 0.22, ry: 0.18, color: c.hueGreen, opacity: 0.1 },
     ],
     glowBlur: 50,
-    effects: [
-      // Dense primary caustic layer — bright intersecting curves
-      causticBrick(p, {
-        id: "gf-c1",
-        lineCount: 120,
-        color: c.accent,
-        opacity: 0.55,
-        strokeWidth: 1.5,
-        region: [0, 0, 1, 1],
-      }),
-      // Secondary caustic layer — different seed, different color
-      causticBrick(p, {
-        id: "gf-c2",
-        lineCount: 80,
-        color: c.hueBlue,
-        opacity: 0.32,
-        strokeWidth: 0.85,
-        region: [0, 0, 1, 1],
-      }),
-      // Fine accent layer
-      causticBrick(p, {
-        id: "gf-c3",
-        lineCount: 50,
-        color: c.hueGreen,
-        opacity: 0.2,
-        strokeWidth: 0.55,
-        region: [0, 0, 1, 1],
-      }),
-    ],
+    effects: [glow1, c1Crisp, glow2, c2Crisp, glow3, c3Crisp],
   });
 }
 
@@ -645,39 +738,137 @@ function composeMidnightAtelier(p: BrickParams): ComposedWallpaper {
         numOctaves: 4,
         alphaStrength: 0.32,
       }),
+      // Lightning — electricity channelled through the brick seams
+      // Positioned along diagonal seam directions, full canvas height
+      lightningBrick(p, {
+        id: "ma-l1",
+        startX: 0.46,
+        startY: 0.0,
+        endX: 0.5,
+        endY: 1.0,
+        color: c.accent,
+        opacity: 0.88,
+        branches: 4,
+      }),
+      lightningBrick(p, {
+        id: "ma-l2",
+        startX: 0.2,
+        startY: 0.04,
+        endX: 0.15,
+        endY: 0.92,
+        color: c.keywords,
+        opacity: 0.55,
+        branches: 2,
+      }),
     ],
   });
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 8. NebulaNight — Cosmic-scale topology map
-//    Very low frequency = continent-sized features. Looks like a star chart,
-//    elevation map of an alien planet, or nebula density contours.
+// 8. NebulaNight — Ice-shine topology map
+//    Same bloom-twin technique as Cinder but with cool ice colours instead of
+//    warm fire ones. Each topology layer gets a frozen-crystal halo: pale-blue
+//    stroke → gaussian blur → ice glint; crisp coloured line on top.
+//    No star particles — the ice-shine contours are the sparkle.
 // ═══════════════════════════════════════════════════════════════════════════
 
 function composeNebulaNight(p: BrickParams): ComposedWallpaper {
   const c = p.colors;
+  const { height } = p.viewBox;
+  const sd1 = (height * 0.004).toFixed(1); // ~9 px at 2160p — crisp ice edge
+  const sd2 = (height * 0.003).toFixed(1); // ~6 px
+  const sd3 = (height * 0.002).toFixed(1); // ~4 px — micro sparkle on fine lines
+
+  // ── Ice-shine bloom twins (same id = same noise field = same contours) ───
+  const t1Bloom = topologyBrick(p, {
+    id: "nn-t1",
+    levels: 18,
+    frequency: 0.00085,
+    resolution: 150,
+    color: "#e8f8ff",
+    opacity: 0.3,
+    strokeWidth: 5.0,
+    accentColor: "#ffffff",
+    accentLevel: 9,
+  });
+  const t1Crisp = topologyBrick(p, {
+    id: "nn-t1",
+    levels: 18,
+    frequency: 0.00085,
+    resolution: 150,
+    color: c.accent,
+    opacity: 0.58,
+    strokeWidth: 1.3,
+    accentColor: c.hueCyan,
+    accentLevel: 9,
+  });
+
+  const t3Bloom = topologyBrick(p, {
+    id: "nn-t3",
+    levels: 6,
+    frequency: 0.00115,
+    resolution: 130,
+    color: "#c4ecff",
+    opacity: 0.24,
+    strokeWidth: 9.0,
+  });
+  const t3Crisp = topologyBrick(p, {
+    id: "nn-t3",
+    levels: 6,
+    frequency: 0.00115,
+    resolution: 130,
+    color: c.hueYellow,
+    opacity: 0.58,
+    strokeWidth: 4.5,
+  });
+
+  const t4Bloom = topologyBrick(p, {
+    id: "nn-t4",
+    levels: 8,
+    frequency: 0.00065,
+    resolution: 120,
+    color: "#a8d8f8",
+    opacity: 0.2,
+    strokeWidth: 7.0,
+    accentColor: "#e0f6ff",
+    accentLevel: 4,
+  });
+  const t4Crisp = topologyBrick(p, {
+    id: "nn-t4",
+    levels: 8,
+    frequency: 0.00065,
+    resolution: 120,
+    color: c.hueBlue,
+    opacity: 0.42,
+    strokeWidth: 3.2,
+    accentColor: c.hueGreen,
+    accentLevel: 4,
+  });
+
+  const iceBloom1: BrickOutput = {
+    defs: `<filter id="nn-if1" x="-12%" y="-12%" width="124%" height="124%"><feGaussianBlur stdDeviation="${sd1}"/></filter>`,
+    elements: `<g filter="url(#nn-if1)">${t1Bloom.elements}</g>`,
+  };
+  const iceBloom3: BrickOutput = {
+    defs: `<filter id="nn-if3" x="-14%" y="-14%" width="128%" height="128%"><feGaussianBlur stdDeviation="${sd2}"/></filter>`,
+    elements: `<g filter="url(#nn-if3)">${t3Bloom.elements}</g>`,
+  };
+  const iceBloom4: BrickOutput = {
+    defs: `<filter id="nn-if4" x="-13%" y="-13%" width="126%" height="126%"><feGaussianBlur stdDeviation="${sd3}"/></filter>`,
+    elements: `<g filter="url(#nn-if4)">${t4Bloom.elements}</g>`,
+  };
+
   return scaffold(p, "nn", {
     glows: [
-      { cx: 0.45, cy: 0.4, rx: 0.5, ry: 0.4, color: c.accent, opacity: 0.28 },
-      { cx: 0.6, cy: 0.55, rx: 0.35, ry: 0.3, color: c.huePurple, opacity: 0.18 },
-      { cx: 0.3, cy: 0.35, rx: 0.25, ry: 0.2, color: c.hueCyan, opacity: 0.15 },
+      { cx: 0.45, cy: 0.4, rx: 0.5, ry: 0.4, color: c.accent, opacity: 0.22 },
+      { cx: 0.6, cy: 0.55, rx: 0.35, ry: 0.3, color: c.huePurple, opacity: 0.14 },
+      { cx: 0.3, cy: 0.35, rx: 0.25, ry: 0.2, color: c.hueCyan, opacity: 0.12 },
     ],
     glowBlur: 60,
     effects: [
-      // Large-scale contours — cosmic landmasses
-      topologyBrick(p, {
-        id: "nn-t1",
-        levels: 18,
-        frequency: 0.00085,
-        resolution: 150,
-        color: c.accent,
-        opacity: 0.45,
-        strokeWidth: 1.3,
-        accentColor: c.hueCyan,
-        accentLevel: 9,
-      }),
-      // Fine detail overlay — adds texture
+      iceBloom1,
+      t1Crisp,
+      // Fine detail overlay — no bloom needed, it's the texture layer
       topologyBrick(p, {
         id: "nn-t2",
         levels: 12,
@@ -687,46 +878,17 @@ function composeNebulaNight(p: BrickParams): ComposedWallpaper {
         opacity: 0.22,
         strokeWidth: 0.6,
       }),
-      // THICK major isobars — bold yellow/gold lines cutting through the fine ones
-      topologyBrick(p, {
-        id: "nn-t3",
-        levels: 6,
-        frequency: 0.00115,
-        resolution: 130,
-        color: c.hueYellow,
-        opacity: 0.52,
-        strokeWidth: 4.5,
-      }),
-      // Second bold color — blue isobars at a different scale/phase
-      topologyBrick(p, {
-        id: "nn-t4",
-        levels: 8,
-        frequency: 0.00065,
-        resolution: 120,
-        color: c.hueBlue,
-        opacity: 0.38,
-        strokeWidth: 3.2,
-        accentColor: c.hueGreen,
-        accentLevel: 4,
-      }),
-      // Cosmic dust — fractal noise overlay for nebula texture
+      iceBloom3,
+      t3Crisp,
+      iceBloom4,
+      t4Crisp,
       nebulaDustBrick(p, {
         id: "nn-d1",
         tintColor: c.accentSoft,
-        opacity: 0.32,
+        opacity: 0.28,
         baseFrequency: 0.0028,
         numOctaves: 4,
-        alphaStrength: 0.5,
-      }),
-      // Star field — scattered bright dots for space atmosphere
-      particlesBrick(p, {
-        id: "nn-p1",
-        count: 400,
-        color: c.hueYellow,
-        opacity: 0.55,
-        minRadius: 0.5,
-        maxRadius: 2,
-        distribution: "uniform",
+        alphaStrength: 0.45,
       }),
     ],
   });
