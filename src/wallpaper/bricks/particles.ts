@@ -131,6 +131,10 @@ export interface SparksBrickOptions {
   /** Fraction of width for the source zone centre */
   sourceCx?: number;
   sourceSpread?: number;
+  /** Y position of spark source as fraction of height (default: 0.85 rising / 0.15 falling) */
+  sourceCy?: number;
+  /** Multiplier for trail length — >1 makes sparks rise/fall farther across the canvas */
+  lengthScale?: number;
 }
 
 /** Rising or falling spark trails — embers/cinders with curved trajectory + bright head */
@@ -146,6 +150,8 @@ export function sparksBrick(params: BrickParams, options: SparksBrickOptions): B
     direction = 1,
     sourceCx = 0.5,
     sourceSpread = 0.4,
+    sourceCy,
+    lengthScale = 1.0,
     id = "sparks",
   } = options;
 
@@ -159,15 +165,15 @@ export function sparksBrick(params: BrickParams, options: SparksBrickOptions): B
     `<filter id="${headGlowId}" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="${(1.6 * sc).toFixed(1)}"/></filter>`
   );
 
-  // Per-spark gradient (head bright → tail transparent) — generate one shared definition
-  // and reuse via per-spark gradient with userSpaceOnUse coordinates.
-  const baseY = direction === 1 ? height * 0.85 : height * 0.15;
+  // Per-spark gradient (head bright → tail transparent)
+  const defaultSourceCy = direction === 1 ? 0.85 : 0.15;
+  const baseY = (sourceCy ?? defaultSourceCy) * height;
 
   for (let i = 0; i < count; i++) {
     const x0 = (sourceCx - sourceSpread / 2 + rng() * sourceSpread) * width;
     const y0 = baseY + (rng() - 0.5) * height * 0.16;
     // Trajectory: longer for some sparks (high-energy ones rise farther)
-    const len = (18 + rng() * 70) * sc;
+    const len = (18 + rng() * 70) * sc * lengthScale;
     // Curved trajectory — quadratic Bezier with control point offset for arc
     const arcX = (rng() - 0.5) * 18 * sc;
     const driftX = (rng() - 0.5) * 14 * sc;

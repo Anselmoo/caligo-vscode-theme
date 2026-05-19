@@ -27,6 +27,8 @@ export interface VoronoiBrickOptions {
   mode?: "voronoi" | "delaunay";
   yRange?: [number, number]; // constrain generation to this Y region (fractions)
   relaxIterations?: number; // Lloyd's relaxation for more uniform cells
+  /** Glow radius multiplier. Default 1.5 (subtle halo). Use 6–12 for neon/radioactive look. */
+  glowRadius?: number;
 }
 
 export function voronoiBrick(params: BrickParams, options: VoronoiBrickOptions): BrickOutput {
@@ -42,6 +44,7 @@ export function voronoiBrick(params: BrickParams, options: VoronoiBrickOptions):
     mode = "voronoi",
     yRange = [0, 1],
     relaxIterations = 0,
+    glowRadius = 1.5,
   } = options;
 
   const rng = seedRng(hashStrLocal(`${seedId}-${harmonyMode}-voronoi-${id}`));
@@ -77,34 +80,38 @@ export function voronoiBrick(params: BrickParams, options: VoronoiBrickOptions):
 
   const elems: string[] = [];
 
-  // Add a nice subtle glow/blur filter
-  const defs = `<filter id="${id}-glow" x="-20%" y="-20%" width="140%" height="140%">
-    <feGaussianBlur stdDeviation="${strokeWidth * 1.5}"/>
+  // Neon/radioactive multi-pass glow: wide outer aura + tight inner halo + crisp core
+  const outerSD = (strokeWidth * glowRadius).toFixed(2);
+  const innerSD = (strokeWidth * glowRadius * 0.22).toFixed(2);
+  const defs = `<filter id="${id}-glow-outer" x="-80%" y="-80%" width="260%" height="260%">
+    <feGaussianBlur stdDeviation="${outerSD}"/>
+  </filter>
+  <filter id="${id}-glow-inner" x="-30%" y="-30%" width="160%" height="160%">
+    <feGaussianBlur stdDeviation="${innerSD}"/>
   </filter>`;
 
+  function renderPaths(pathData: string) {
+    // Outer aura — wide diffuse halo (very dim)
+    elems.push(
+      `<path d="${pathData}" fill="none" stroke="${color}" stroke-width="${strokeWidth * 2.5}" opacity="${(opacity * 0.28).toFixed(3)}" filter="url(#${id}-glow-outer)"/>`
+    );
+    // Inner glow — tight bright corona
+    elems.push(
+      `<path d="${pathData}" fill="none" stroke="${color}" stroke-width="${strokeWidth * 1.4}" opacity="${(opacity * 0.65).toFixed(3)}" filter="url(#${id}-glow-inner)"/>`
+    );
+    // Crisp core line
+    elems.push(
+      `<path d="${pathData}" fill="${color}" fill-opacity="${fillOpacity}" stroke="${color}" stroke-width="${strokeWidth}" opacity="${opacity}"/>`
+    );
+  }
+
   if (mode === "delaunay") {
-    // Render triangles
     const pathData = delaunay.render();
-    if (pathData) {
-      elems.push(
-        `<path d="${pathData}" fill="none" stroke="${color}" stroke-width="${strokeWidth}" opacity="${opacity}" filter="url(#${id}-glow)"/>`
-      );
-      elems.push(
-        `<path d="${pathData}" fill="${color}" fill-opacity="${fillOpacity}" stroke="${color}" stroke-width="${strokeWidth}" opacity="${opacity}"/>`
-      );
-    }
+    if (pathData) renderPaths(pathData);
   } else {
-    // Render Voronoi cells
     const voronoi = delaunay.voronoi([0, 0, width, height]);
     const pathData = voronoi.render();
-    if (pathData) {
-      elems.push(
-        `<path d="${pathData}" fill="none" stroke="${color}" stroke-width="${strokeWidth}" opacity="${opacity}" filter="url(#${id}-glow)"/>`
-      );
-      elems.push(
-        `<path d="${pathData}" fill="${color}" fill-opacity="${fillOpacity}" stroke="${color}" stroke-width="${strokeWidth}" opacity="${opacity}"/>`
-      );
-    }
+    if (pathData) renderPaths(pathData);
   }
 
   return {

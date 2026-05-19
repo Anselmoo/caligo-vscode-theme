@@ -644,7 +644,7 @@ export interface SpectrumBrickOptions {
 export function spectrumBrick(params: BrickParams, options: SpectrumBrickOptions): BrickOutput {
   const { viewBox, seedId, harmonyMode } = params;
   const { width, height } = viewBox;
-  const scale = Math.max(width, height);
+  const _scale = Math.max(width, height);
   const {
     id = "spectrum",
     barCount = 32,

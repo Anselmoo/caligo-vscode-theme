@@ -9,6 +9,8 @@
 import {
   auroraAdvancedBrick,
   brushStrokeBrick,
+  curtainBrick,
+  flowFieldBrick,
   fractureBrick,
   nebulaDustBrick,
   nebulaGlowBrick,
@@ -17,8 +19,7 @@ import {
   topologyBrick,
   voronoiBrick,
 } from "./bricks/index.js";
-import { causticBrick, icecrackBrick, marbleBrick, smokeWispBrick } from "./bricks/organic.js";
-import { guillocheBrick } from "./bricks/patterns.js";
+import { causticBrick, icecrackBrick, smokeWispBrick } from "./bricks/organic.js";
 import { mergeBricks } from "./composer.js";
 import type { BrickOutput, BrickParams, ComposedWallpaper } from "./types.js";
 
@@ -156,61 +157,80 @@ function composeCinder(p: BrickParams): ComposedWallpaper {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 3. DeepSable — Guilloche engravings
-//    Dozens of overlapping precision sine-wave lines spanning full width.
-//    Looks like sand dunes, Lissajous engravings, or wind currents.
+// 3. DeepSable — Silk wave curtains
+//    Five bold wavy bands layered across the canvas like iridescent silk or
+//    desert dunes from above. Each band is a different hue; overlapping
+//    amplitudes weave them together. Crisp, bold, unmistakably visible.
+//    A magnetic flow field adds fine grain between the bands.
 // ═══════════════════════════════════════════════════════════════════════════
 
 function composeDeepSable(p: BrickParams): ComposedWallpaper {
   const c = p.colors;
   return scaffold(p, "ds", {
     glows: [
-      // Neon glow zones — bright blobs create colored light behind the waves
-      { cx: 0.5, cy: 0.5, rx: 0.55, ry: 0.45, color: c.huePurple, opacity: 0.4 },
-      { cx: 0.2, cy: 0.65, rx: 0.3, ry: 0.28, color: c.hueBlue, opacity: 0.3 },
-      { cx: 0.8, cy: 0.3, rx: 0.28, ry: 0.24, color: c.accent, opacity: 0.25 },
+      { cx: 0.5, cy: 0.45, rx: 0.58, ry: 0.5, color: c.accent, opacity: 0.62 },
+      { cx: 0.2, cy: 0.7, rx: 0.32, ry: 0.28, color: c.huePurple, opacity: 0.5 },
+      { cx: 0.82, cy: 0.28, rx: 0.28, ry: 0.24, color: c.hueBlue, opacity: 0.42 },
     ],
     glowBlur: 55,
     effects: [
-      // Background layer — wide slow purple waves for depth/second color
-      guillocheBrick(p, {
-        id: "ds-g0",
-        lineCount: 40,
-        amplitude: 62,
-        frequency: 3.5,
-        color: c.huePurple,
-        opacity: 0.65,
-        strokeWidth: 3.2,
-      }),
-      // Primary engraving — main wave structure, crisp and bold
-      guillocheBrick(p, {
-        id: "ds-g1",
-        lineCount: 55,
-        amplitude: 38,
-        frequency: 7,
+      // Five bold silk bands — each a different hue, overlapping amplitudes
+      curtainBrick(p, {
+        id: "ds-c1",
         color: c.accent,
-        opacity: 0.82,
-        strokeWidth: 2.5,
+        opacity: 0.92,
+        cy: 0.16,
+        amplitude: 0.13,
+        phase: 0,
+        strokeWidth: 130,
       }),
-      // Secondary — different frequency creates neon interference bands
-      guillocheBrick(p, {
-        id: "ds-g2",
-        lineCount: 35,
-        amplitude: 22,
-        frequency: 11,
+      curtainBrick(p, {
+        id: "ds-c2",
+        color: c.huePurple,
+        opacity: 0.8,
+        cy: 0.36,
+        amplitude: 0.11,
+        phase: 72,
+        strokeWidth: 115,
+      }),
+      curtainBrick(p, {
+        id: "ds-c3",
         color: c.keywords,
-        opacity: 0.48,
-        strokeWidth: 1.4,
+        opacity: 0.75,
+        cy: 0.54,
+        amplitude: 0.14,
+        phase: 144,
+        strokeWidth: 120,
       }),
-      // Fine high-frequency accent layer
-      guillocheBrick(p, {
-        id: "ds-g3",
-        lineCount: 20,
-        amplitude: 12,
-        frequency: 18,
+      curtainBrick(p, {
+        id: "ds-c4",
+        color: c.hueBlue,
+        opacity: 0.68,
+        cy: 0.72,
+        amplitude: 0.1,
+        phase: 216,
+        strokeWidth: 105,
+      }),
+      curtainBrick(p, {
+        id: "ds-c5",
         color: c.functions,
-        opacity: 0.3,
-        strokeWidth: 0.8,
+        opacity: 0.58,
+        cy: 0.88,
+        amplitude: 0.12,
+        phase: 288,
+        strokeWidth: 100,
+      }),
+      // Fine magnetic grain between the bands
+      flowFieldBrick(p, {
+        id: "ds-f1",
+        cols: 100,
+        rows: 65,
+        frequency: 0.0016,
+        segmentLength: 0.026,
+        color: c.accent,
+        opacity: 0.38,
+        strokeWidth: 1.8,
+        region: { x: 0, y: 0, w: 1, h: 1 },
       }),
     ],
   });
@@ -313,40 +333,54 @@ function composeGraphiteFlux(p: BrickParams): ComposedWallpaper {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 6. Mandarian — Full-canvas Voronoi tessellation
-//    Organic cellular pattern covering the whole canvas. Warm filled cells
-//    with bright edges look like cracked earth, stained glass, or coral.
+// 6. Mandarian — Radioactive neon cell lattice
+//    Voronoi cells with multi-pass glow: wide outer aura + tight inner halo +
+//    crisp core line — looks like radioactive/nuclear stained glass. Delaunay
+//    triangulation underneath adds angular density. Three layers, three colors.
 // ═══════════════════════════════════════════════════════════════════════════
 
 function composeMandarian(p: BrickParams): ComposedWallpaper {
   const c = p.colors;
   return scaffold(p, "mn", {
     glows: [
-      { cx: 0.5, cy: 0.45, rx: 0.45, ry: 0.4, color: c.accent, opacity: 0.25 },
-      { cx: 0.3, cy: 0.3, rx: 0.25, ry: 0.2, color: c.hueOrange, opacity: 0.18 },
-      { cx: 0.7, cy: 0.65, rx: 0.2, ry: 0.18, color: c.hueYellow, opacity: 0.15 },
+      { cx: 0.45, cy: 0.42, rx: 0.5, ry: 0.48, color: c.hueGreen, opacity: 0.45 },
+      { cx: 0.24, cy: 0.3, rx: 0.3, ry: 0.26, color: c.accent, opacity: 0.32 },
+      { cx: 0.74, cy: 0.64, rx: 0.26, ry: 0.22, color: c.hueCyan, opacity: 0.24 },
     ],
-    glowBlur: 55,
+    glowBlur: 50,
     effects: [
-      // Structured primary cells — high relaxation → near-hexagonal grid
+      // Delaunay triangulation baseline — angular fine grain, dim
       voronoiBrick(p, {
-        id: "mn-v1",
-        points: 80,
-        color: c.accent,
-        opacity: 0.72,
-        fillOpacity: 0.25,
-        strokeWidth: 2.2,
-        relaxIterations: 6,
+        id: "mn-d1",
+        points: 140,
+        mode: "delaunay",
+        color: c.hueCyan,
+        opacity: 0.42,
+        fillOpacity: 0.03,
+        strokeWidth: 0.9,
+        glowRadius: 5,
       }),
-      // Fine secondary overlay — denser, adds texture depth
+      // Medium density Voronoi — warm accent mid-layer
       voronoiBrick(p, {
         id: "mn-v2",
-        points: 280,
-        color: c.hueOrange,
-        opacity: 0.28,
-        fillOpacity: 0.06,
-        strokeWidth: 0.8,
+        points: 200,
+        color: c.accent,
+        opacity: 0.6,
+        fillOpacity: 0.05,
+        strokeWidth: 1.8,
         relaxIterations: 3,
+        glowRadius: 7,
+      }),
+      // Primary sparse cells — bold radioactive green, thick neon glow
+      voronoiBrick(p, {
+        id: "mn-v1",
+        points: 55,
+        color: c.hueGreen,
+        opacity: 0.92,
+        fillOpacity: 0.1,
+        strokeWidth: 4.2,
+        relaxIterations: 6,
+        glowRadius: 11,
       }),
     ],
   });
@@ -354,9 +388,9 @@ function composeMandarian(p: BrickParams): ComposedWallpaper {
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 7. MidnightAtelier — Ink wash / brushwork studio
-//    Big sweeping brushstrokes cross the canvas like paint on wet paper,
-//    underscored by fine flowing marble veins. Feels like a night studio:
-//    spontaneous, layered, expressive. Wide organic arcs, not straight bolts.
+//    Bold sweeping brushstrokes cross the canvas like ink on wet paper.
+//    Flowing curtain bands underneath act as watercolor washes. Cosmic dust
+//    adds grain. All standard bricks — no organic imports.
 // ═══════════════════════════════════════════════════════════════════════════
 
 function composeMidnightAtelier(p: BrickParams): ComposedWallpaper {
@@ -369,78 +403,100 @@ function composeMidnightAtelier(p: BrickParams): ComposedWallpaper {
     ],
     glowBlur: 55,
     effects: [
-      // Primary bold brushstrokes — wide sweeping arcs, like ink wash painting
+      // Watercolor wash base — two wide sine-wave bands as wet-paper backdrop
+      curtainBrick(p, {
+        id: "ma-c1",
+        color: c.accent,
+        opacity: 0.22,
+        cy: 0.38,
+        amplitude: 0.22,
+        phase: 0,
+        strokeWidth: 280,
+      }),
+      curtainBrick(p, {
+        id: "ma-c2",
+        color: c.huePurple,
+        opacity: 0.16,
+        cy: 0.64,
+        amplitude: 0.18,
+        phase: 130,
+        strokeWidth: 220,
+      }),
+      // Bold primary brushstrokes — wide sweeping arcs spanning the canvas
       brushStrokeBrick(p, {
         id: "ma-b1",
         color: c.accent,
-        opacity: 0.78,
+        opacity: 0.82,
         x1: 0.0,
-        y1: 0.36,
-        x2: 0.98,
-        y2: 0.42,
-        strokeWidth: 0.038,
+        y1: 0.34,
+        x2: 0.99,
+        y2: 0.41,
+        strokeWidth: 0.042,
         roughness: 0.07,
       }),
       brushStrokeBrick(p, {
         id: "ma-b2",
         color: c.huePurple,
-        opacity: 0.58,
-        x1: 0.04,
-        y1: 0.64,
+        opacity: 0.62,
+        x1: 0.02,
+        y1: 0.62,
         x2: 1.0,
-        y2: 0.56,
-        strokeWidth: 0.026,
+        y2: 0.55,
+        strokeWidth: 0.028,
         roughness: 0.09,
       }),
       brushStrokeBrick(p, {
         id: "ma-b3",
         color: c.accentSoft,
-        opacity: 0.38,
-        x1: 0.08,
-        y1: 0.22,
-        x2: 0.88,
-        y2: 0.26,
-        strokeWidth: 0.019,
+        opacity: 0.44,
+        x1: 0.06,
+        y1: 0.2,
+        x2: 0.9,
+        y2: 0.25,
+        strokeWidth: 0.022,
         roughness: 0.06,
       }),
       brushStrokeBrick(p, {
         id: "ma-b4",
         color: c.hueBlue,
-        opacity: 0.3,
+        opacity: 0.35,
         x1: 0.0,
-        y1: 0.76,
-        x2: 0.72,
-        y2: 0.74,
-        strokeWidth: 0.014,
+        y1: 0.75,
+        x2: 0.74,
+        y2: 0.78,
+        strokeWidth: 0.016,
         roughness: 0.05,
       }),
       brushStrokeBrick(p, {
         id: "ma-b5",
         color: c.strings,
-        opacity: 0.22,
-        x1: 0.3,
-        y1: 0.1,
-        x2: 0.95,
-        y2: 0.14,
-        strokeWidth: 0.011,
+        opacity: 0.26,
+        x1: 0.28,
+        y1: 0.09,
+        x2: 0.96,
+        y2: 0.12,
+        strokeWidth: 0.013,
         roughness: 0.04,
       }),
-      // Fine flowing veins between strokes — organic studio texture
-      marbleBrick(p, {
-        id: "ma-m1",
-        veinCount: 22,
-        color: c.strings,
-        opacity: 0.32,
-        strokeWidth: 2.0,
-        curviness: 0.72,
-      }),
-      marbleBrick(p, {
-        id: "ma-m2",
-        veinCount: 15,
-        color: c.accent,
+      brushStrokeBrick(p, {
+        id: "ma-b6",
+        color: c.keywords,
         opacity: 0.2,
-        strokeWidth: 1.1,
-        curviness: 0.85,
+        x1: 0.0,
+        y1: 0.88,
+        x2: 0.55,
+        y2: 0.86,
+        strokeWidth: 0.01,
+        roughness: 0.04,
+      }),
+      // Fine cosmic dust grain — replaces marble veins, adds studio texture
+      nebulaDustBrick(p, {
+        id: "ma-nd1",
+        tintColor: c.accentSoft,
+        opacity: 0.28,
+        baseFrequency: 0.004,
+        numOctaves: 4,
+        alphaStrength: 0.45,
       }),
     ],
   });
@@ -593,35 +649,41 @@ function composeVoidEmber(p: BrickParams): ComposedWallpaper {
     ],
     glowBlur: 12,
     effects: [
-      // Primary rising sparks — bright ember trails curving upward
+      // Dense ember base — many sparks rising from the bottom third
       sparksBrick(p, {
         id: "ve-s1",
-        count: 200,
+        count: 220,
         color: c.hueRed,
         opacity: 0.88,
         direction: 1,
         sourceCx: 0.5,
-        sourceSpread: 0.65,
+        sourceSpread: 0.7,
+        sourceCy: 0.9,
+        lengthScale: 1.2,
       }),
-      // Secondary sparks — different color, tighter cluster
+      // Mid-canvas sparks — launch from center-bottom, reach the upper half
       sparksBrick(p, {
         id: "ve-s2",
-        count: 120,
+        count: 130,
         color: c.hueOrange,
         opacity: 0.68,
         direction: 1,
         sourceCx: 0.5,
-        sourceSpread: 0.4,
+        sourceSpread: 0.5,
+        sourceCy: 0.65,
+        lengthScale: 2.2,
       }),
-      // Tertiary accent sparks
+      // High-energy sparks — launch from upper-middle, streak to the very top
       sparksBrick(p, {
         id: "ve-s3",
-        count: 60,
+        count: 65,
         color: c.hueYellow,
         opacity: 0.5,
         direction: 1,
         sourceCx: 0.5,
-        sourceSpread: 0.25,
+        sourceSpread: 0.35,
+        sourceCy: 0.38,
+        lengthScale: 3.0,
       }),
       // Ember bed — glowing particle pool at the base
       particlesBrick(p, {

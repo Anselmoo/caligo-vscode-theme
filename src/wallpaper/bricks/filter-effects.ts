@@ -461,7 +461,7 @@ export interface MetallicBrickOptions {
 export function metallicBrick(params: BrickParams, options: MetallicBrickOptions): BrickOutput {
   const { viewBox } = params;
   const { width: vw, height: vh } = viewBox;
-  const scale = Math.max(vw, vh);
+  const _scale = Math.max(vw, vh);
   const {
     id = "metallic",
     color,

@@ -1040,7 +1040,7 @@ export function skyGradientBrick(
 ): BrickOutput {
   const { viewBox, seedId, harmonyMode } = params;
   const { width, height } = viewBox;
-  const scale = Math.max(width, height);
+  const _scale = Math.max(width, height);
   const { stops, id = "sky" } = options;
 
   const stopElems = stops
@@ -1125,7 +1125,7 @@ export interface CloudBandBrickOptions {
 export function cloudBandBrick(params: BrickParams, options: CloudBandBrickOptions): BrickOutput {
   const { viewBox } = params;
   const { width, height } = viewBox;
-  const scale = Math.max(width, height);
+  const _scale = Math.max(width, height);
   const {
     cy,
     bandHeight = 0.15,
@@ -1195,7 +1195,7 @@ export function cloudBandBrick(params: BrickParams, options: CloudBandBrickOptio
 </linearGradient>`;
 
   return {
-    defs: defs + "\n" + litDefs,
+    defs: `${defs}\n${litDefs}`,
     elements: [
       `<rect id="${id}" x="0" y="0" width="${width}" height="${height}" fill="${color}" opacity="${opacity}" filter="url(#${id}-turb)" mask="url(#${id}-m)"/>`,
       // Warm highlight on top edge of cloud band
@@ -1903,7 +1903,7 @@ export function treelineBrick(params: BrickParams, options: TreelineBrickOptions
 </filter>`);
 
   // Clip the entire tree group
-  const treeClipId = `${id}-tclip`;
+  const _treeClipId = `${id}-tclip`;
 
   // Build the group with overlays
   const treeGroupContent = elems.join("\n");
@@ -2633,7 +2633,7 @@ export function desertBrick(params: BrickParams, options: DesertBrickOptions): B
     // Two overlapping grids: coarse primary cracks + dense secondary cracks.
     // Both use heavy jitter and multi-point Bézier curves for irregular, natural feel.
     const floorH = height - by;
-    const saltNoise = createNoise2D(seedRng(hashStr(`${seedId}-${id}-saltcrack`)));
+    const _saltNoise = createNoise2D(seedRng(hashStr(`${seedId}-${id}-saltcrack`)));
 
     // ── Primary cracks (large polygons — the dominant structural pattern) ──
     const pCellsX = 12;
@@ -2664,7 +2664,7 @@ export function desertBrick(params: BrickParams, options: DesertBrickOptions): B
       const neighborCount = 3 + Math.floor(rng() * 3);
       for (let j = 0; j < Math.min(neighborCount, dists.length); j++) {
         const ni = dists[j].ni;
-        const edgeKey = Math.min(i, ni) + "-" + Math.max(i, ni);
+        const edgeKey = `${Math.min(i, ni)}-${Math.max(i, ni)}`;
         if (drawnEdges.has(edgeKey)) continue;
         drawnEdges.add(edgeKey);
         const n = pCenters[ni];
@@ -2715,7 +2715,7 @@ export function desertBrick(params: BrickParams, options: DesertBrickOptions): B
       const neighborCount = 2 + Math.floor(rng() * 2);
       for (let j = 0; j < Math.min(neighborCount, dists.length); j++) {
         const ni = dists[j].ni;
-        const edgeKey = Math.min(i, ni) + "-" + Math.max(i, ni);
+        const edgeKey = `${Math.min(i, ni)}-${Math.max(i, ni)}`;
         if (drawnEdges2.has(edgeKey)) continue;
         drawnEdges2.add(edgeKey);
         const n = sCenters[ni];
@@ -3423,7 +3423,7 @@ export function volcanoBrick(params: BrickParams, options: VolcanoBrickOptions):
     lavaColor,
     opacity = 0.95,
     id = "volcano",
-    rocky = false,
+    rocky: _rocky = false,
     rockColor = "#2a1a12",
   } = options;
 
@@ -3518,12 +3518,12 @@ export function volcanoBrick(params: BrickParams, options: VolcanoBrickOptions):
     .slice(1)
     .map(p => `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`)
     .join(" ");
-  const rightPath = rightPts
+  const _rightPath = rightPts
     .slice(1)
     .map((p, i) => {
       if (i === 0) return `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
-      const prev = rightPts[i];
-      const cur = rightPts[i + 1];
+      const _prev = rightPts[i];
+      const _cur = rightPts[i + 1];
       return `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
     })
     .join(" ");
