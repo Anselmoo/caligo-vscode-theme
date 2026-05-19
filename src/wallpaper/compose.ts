@@ -175,36 +175,61 @@ export function composeSeedWallpaper(p: BrickParams): ComposedWallpaper {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 1. AuroraNoir — Full-screen aurora curtains
-//    Two overlapping curtain bands of different hue filling the canvas.
+// 1. AuroraNoir — High-contrast aurora over star field
+//    Stars fill the dark sky so the eye reads "true dark" against the aurora.
+//    Glow blobs are kept dim to preserve that dark background.
+//    Three aurora layers at different heights + opacity give color depth:
+//    primary (accent/green), secondary (cyan/accent), tertiary (purple fringe).
 // ═══════════════════════════════════════════════════════════════════════════
 
 function composeAuroraNoir(p: BrickParams): ComposedWallpaper {
   const c = p.colors;
   return scaffold(p, "an", {
+    // Dim glows — keep the sky dark so the aurora has somewhere to contrast against
     glows: [
-      { cx: 0.5, cy: 0.35, rx: 0.55, ry: 0.3, color: c.accent, opacity: 0.25 },
-      { cx: 0.35, cy: 0.25, rx: 0.3, ry: 0.15, color: c.hueGreen, opacity: 0.12 },
+      { cx: 0.5, cy: 0.38, rx: 0.52, ry: 0.28, color: c.accent, opacity: 0.12 },
+      { cx: 0.38, cy: 0.28, rx: 0.28, ry: 0.14, color: c.hueGreen, opacity: 0.07 },
     ],
-    glowBlur: 50,
+    glowBlur: 55,
     effects: [
+      // Stars — deep-space backdrop; the aurora punches against these
+      starFieldBrick(p, {
+        id: "an-sf",
+        count: 600,
+        brightCount: 22,
+        color: c.accentSoft,
+        distribution: "full",
+        opacity: 0.68,
+      }),
+      // Primary curtain — hero aurora, wide zone, full intensity
       auroraAdvancedBrick(p, {
         id: "an-a1",
         bands: 5,
-        cy: 0.35,
-        zoneHeight: 0.65,
+        cy: 0.38,
+        zoneHeight: 0.72,
         color: c.accent,
         color2: c.hueGreen,
-        opacity: 0.85,
+        opacity: 0.92,
       }),
+      // Secondary curtain — higher, narrower, strong cyan contrast
       auroraAdvancedBrick(p, {
         id: "an-a2",
-        bands: 2,
-        cy: 0.25,
-        zoneHeight: 0.35,
+        bands: 4,
+        cy: 0.26,
+        zoneHeight: 0.42,
         color: c.hueCyan,
         color2: c.accent,
-        opacity: 0.4,
+        opacity: 0.72,
+      }),
+      // Tertiary curtain — upper-sky purple/violet fringe for color depth
+      auroraAdvancedBrick(p, {
+        id: "an-a3",
+        bands: 2,
+        cy: 0.15,
+        zoneHeight: 0.26,
+        color: c.huePurple,
+        color2: c.hueCyan,
+        opacity: 0.42,
       }),
     ],
   });
