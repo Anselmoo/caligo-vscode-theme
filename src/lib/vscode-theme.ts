@@ -393,7 +393,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
           types: p.hueCyan,
           variables: p.harmony.variables,
           constants: p.hueYellow,
-          attributes: p.huePurple,
+          attributes: p.hueYellow, // decorators/annotations → yellow (distinct from keywords)
           tags: p.hueRed,
         }
       : {

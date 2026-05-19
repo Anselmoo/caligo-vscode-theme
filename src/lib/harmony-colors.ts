@@ -173,8 +173,8 @@ function mapHuesToSyntaxRoles(
   const h = harmonyHues;
   const n = h.length;
 
-  // For 'none' mode, use legacy offsets relative to base
-  if (n === 1) {
+  // For 'none' mode, use legacy offsets spanning the full color wheel
+  if (n === 1 && mode === "none") {
     return {
       strings: normalizeHue(baseHue + 120), // Shifted green-ish
       numbers: normalizeHue(baseHue - 15), // Shifted orange-ish
@@ -185,68 +185,90 @@ function mapHuesToSyntaxRoles(
       constants: normalizeHue(baseHue + 40), // Shifted yellow-ish
       operators: baseHue, // Base hue, very muted
       comments: baseHue, // Base hue, very muted
-      attributes: normalizeHue(baseHue + 280), // Shifted magenta-ish
+      attributes: normalizeHue(baseHue + 280), // Shifted magenta-ish (distinct from keywords!)
       tags: normalizeHue(baseHue + 200), // Shifted blue-cyan
     };
   }
 
-  // For analogous (3 hues): distribute across roles
+  // For 'monochromatic': true single-hue — all roles share baseHue,
+  // visual differentiation comes from L/C variations in SYNTAX_LC_DEFAULTS
+  if (n === 1 && mode === "monochromatic") {
+    return {
+      strings: baseHue,
+      numbers: baseHue,
+      keywords: baseHue,
+      functions: baseHue,
+      types: baseHue,
+      variables: baseHue,
+      constants: baseHue,
+      operators: baseHue,
+      comments: baseHue,
+      attributes: baseHue,
+      tags: baseHue,
+    };
+  }
+
+  // For analogous (3 hues within ±30°):
+  // Data tokens (strings/numbers/constants) stay in the analog cluster for warmth;
+  // structural tokens (keywords/types/functions/attributes) use contrast hues so
+  // they pop against each other — guarantees 6+ visually distinct colors.
   if (n === 3 && mode === "analogous") {
-    const hLow = midpointHue(h[0], h[1]);
-    const hHigh = midpointHue(h[1], h[2]);
+    const [, h1] = h; // h0=-30, h1=base, h2=+30
     return {
-      strings: h[2], // +30 from base
-      numbers: h[0], // -30 from base
-      keywords: h[1], // base
-      functions: hHigh, // midpoint between base and +30
-      types: hLow, // midpoint between -30 and base
-      variables: h[1], // base (neutral)
-      constants: h[2], // +30 from base
-      operators: hLow, // keep subtle but distinct from base
-      comments: h[1], // base (muted)
-      attributes: h[0], // -30 from base
-      tags: hHigh, // midpoint toward warm side
+      strings: h[2], // +30 from base (analog warm)
+      numbers: normalizeHue(h1 + 60), // +60 (warm-adjacent, numeric warmth)
+      keywords: normalizeHue(h1 + 180), // +180 (complement — keywords must pop)
+      functions: normalizeHue(h1 + 150), // +150 (split flank — callable items)
+      types: normalizeHue(h1 + 210), // +210 (split flank — types contrast)
+      variables: h1, // base (neutral)
+      constants: h[0], // -30 (analog cool — subtle from strings)
+      operators: h1, // base (operators are subtle)
+      comments: h1, // base (comments muted)
+      attributes: normalizeHue(h1 + 240), // +240 (triadic — decorators distinct)
+      tags: normalizeHue(h1 + 120), // +120 (triadic — markup distinct)
     };
   }
 
-  // For triadic (3 hues): maximally different
-  // IMPORTANT: Keywords use h[1] to avoid collision with accent (which uses baseHue = h[0])
+  // For triadic (3 hues at 0°, +120°, +240°):
+  // Each main syntax role gets a unique hue — no exact duplicates across the 9 roles.
   if (mode === "triadic") {
-    const h01 = midpointHue(h[0], h[1]);
-    const h12 = midpointHue(h[1], h[2]);
-    const h20 = midpointHue(h[2], h[0]);
+    const h01 = midpointHue(h[0], h[1]); // +60
+    const h12 = midpointHue(h[1], h[2]); // +180
+    const h20 = midpointHue(h[2], h[0]); // +300
     return {
-      strings: h12, // midpoint between +120 and +240
-      numbers: h20, // midpoint between +240 and base
-      keywords: h[2], // +240 degrees
-      functions: h[1], // +120 degrees
-      types: h01, // midpoint between base and +120
+      strings: h12, // +180 (complement)
+      numbers: h20, // +300
+      keywords: h[2], // +240
+      functions: h[1], // +120
+      types: h01, // +60
       variables: h[0], // base (neutral)
-      constants: h20, // complementary midpoint for contrast from keywords
-      operators: h01, // muted, but different from variables/comments
+      constants: normalizeHue(h[1] + 40), // +160 (between functions and strings)
+      operators: h01, // +60 (= types, subtle)
       comments: h[0], // base (muted)
-      attributes: h[2], // +240 degrees
-      tags: h12, // midpoint to prevent keyword/function collisions
+      attributes: normalizeHue(h[2] + 40), // +280 (between keywords and numbers)
+      tags: normalizeHue(h12 + 40), // +220 (between strings and keywords)
     };
   }
 
-  // For split-complementary (3 hues)
+  // For split-complementary (3 hues at 0°, +150°, +210°):
+  // Each main role gets a unique hue — constants, attributes, and tags use
+  // offset positions so nothing collides with the 3 anchor hues or each other.
   if (mode === "split-complementary") {
-    const h01 = midpointHue(h[0], h[1]);
-    const h12 = midpointHue(h[1], h[2]);
-    const h20 = midpointHue(h[2], h[0]);
+    const h01 = midpointHue(h[0], h[1]); // +75
+    const h12 = midpointHue(h[1], h[2]); // +180
+    const h20 = midpointHue(h[2], h[0]); // +285
     return {
-      strings: h01, // midpoint between base and +150
-      numbers: h12, // midpoint between +150 and +210
+      strings: h01, // +75 (between base and first flank)
+      numbers: h12, // +180
       keywords: h[0], // base
       functions: h[1], // +150
       types: h[2], // +210
-      variables: h20, // midpoint between +210 and base
-      constants: h[1], // +150
-      operators: h20, // muted and distinct from keywords
+      variables: h20, // +285
+      constants: normalizeHue(h20 + 30), // +315 (past h20, distinct)
+      operators: h20, // +285 (= variables, subtle)
       comments: h[0], // base (muted)
-      attributes: h[2], // +210
-      tags: h12, // midpoint toward cool flank
+      attributes: normalizeHue(h[1] - 40), // +110 (before first flank, distinct)
+      tags: normalizeHue(h[2] + 40), // +250 (past second flank, distinct)
     };
   }
 
