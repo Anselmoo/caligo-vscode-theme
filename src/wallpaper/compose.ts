@@ -264,42 +264,42 @@ function composeCinder(p: BrickParams): ComposedWallpaper {
 
   const t1Bloom = topologyBrick(p, {
     id: "ci-t1",
-    levels: 5, // ← only 5 major isobars glow (not all 22)
-    frequency: 0.0032,
+    levels: 3,
+    frequency: 0.0016,
     resolution: 200,
     color: "#fff8e0",
-    opacity: 0.55,
-    strokeWidth: 7.0,
+    opacity: 0.28,
+    strokeWidth: 4.5,
   });
   const t1Crisp = topologyBrick(p, {
     id: "ci-t1",
-    levels: 15,
-    frequency: 0.0032,
+    levels: 6,
+    frequency: 0.0016,
     resolution: 200,
     color: c.hueOrange,
-    opacity: 0.68,
-    strokeWidth: 1.8,
+    opacity: 0.52,
+    strokeWidth: 1.6,
     accentColor: c.hueYellow,
-    accentLevel: 8,
+    accentLevel: 3,
   });
 
   const t2Bloom = topologyBrick(p, {
     id: "ci-t2",
-    levels: 4, // ← 4 major isobars glow
-    frequency: 0.0055,
+    levels: 2,
+    frequency: 0.0028,
     resolution: 160,
     color: "#ffe8c0",
-    opacity: 0.4,
-    strokeWidth: 5.0,
+    opacity: 0.18,
+    strokeWidth: 3.0,
   });
   const t2Crisp = topologyBrick(p, {
     id: "ci-t2",
-    levels: 14,
-    frequency: 0.0055,
+    levels: 4,
+    frequency: 0.0028,
     resolution: 160,
     color: c.hueRed,
-    opacity: 0.55,
-    strokeWidth: 1.1,
+    opacity: 0.35,
+    strokeWidth: 1.0,
   });
 
   const bloom1: BrickOutput = {
@@ -312,23 +312,8 @@ function composeCinder(p: BrickParams): ComposedWallpaper {
   };
 
   return scaffold(p, "ci", {
-    flatBg: true, // pure dark floor — no ambient gradient lifting the background
-    effects: [
-      bloom1,
-      t1Crisp,
-      bloom2,
-      t2Crisp,
-      // Fine strings layer — no bloom, just crisp lines for texture
-      topologyBrick(p, {
-        id: "ci-t3",
-        levels: 10,
-        frequency: 0.0082,
-        resolution: 130,
-        color: c.strings,
-        opacity: 0.5,
-        strokeWidth: 0.65,
-      }),
-    ],
+    flatBg: true,
+    effects: [bloom1, t1Crisp, bloom2, t2Crisp],
   });
 }
 
