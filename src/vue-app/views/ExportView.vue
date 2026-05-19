@@ -305,6 +305,31 @@ void classifyTokenGroup;
 
     <section class="section section--tight">
       <div class="container">
+        <article class="export-card export-card--wallpapers">
+          <div class="wallpapers-header">
+            <div>
+              <h2>Wallpapers</h2>
+              <p class="text-subtle wallpapers-desc">
+                300 SVG wallpapers — 10 seeds × 5 harmony modes × 3 platforms × 2 text variants.
+                Each wallpaper is tuned to the active theme palette.
+              </p>
+            </div>
+            <a href="./caligo-wallpapers.zip" download="caligo-wallpapers.zip" class="wallpapers-download-btn">
+              ⬇ Download ZIP
+            </a>
+          </div>
+          <div class="wallpapers-meta">
+            <span class="wallpapers-chip">300 wallpapers</span>
+            <span class="wallpapers-chip">Monitor · Tablet · Mobile</span>
+            <span class="wallpapers-chip">SVG · lossless</span>
+            <span class="wallpapers-chip">~58 MB</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section section--tight">
+      <div class="container">
         <article class="export-card export-card--payload">
           <div class="export-actions">
             <h2>Standards-based output</h2>
@@ -477,6 +502,64 @@ void classifyTokenGroup;
 
 .details-grid__code:last-child {
   margin-bottom: 0;
+}
+
+.export-card--wallpapers {
+  gap: var(--space-md);
+}
+
+.wallpapers-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+.wallpapers-header h2 {
+  margin: 0 0 var(--space-xs);
+}
+
+.wallpapers-desc {
+  margin: 0;
+  font-size: var(--text-sm);
+  max-width: 480px;
+}
+
+.wallpapers-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  font-size: var(--text-md);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.wallpapers-download-btn:hover {
+  background: var(--accent);
+  color: var(--bg0);
+}
+
+.wallpapers-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.wallpapers-chip {
+  padding: 2px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  color: var(--fg2);
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
 }
 
 .export-card--payload {
