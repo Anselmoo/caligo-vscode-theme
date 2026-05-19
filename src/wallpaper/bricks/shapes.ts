@@ -328,3 +328,101 @@ export function brushStrokeBrick(
     elements: `<path id="${id}" d="M ${px1.toFixed(1)} ${py1.toFixed(1)} Q ${cpx.toFixed(1)} ${cpy.toFixed(1)} ${px2.toFixed(1)} ${py2.toFixed(1)}" fill="none" stroke="${color}" stroke-width="${sw.toFixed(1)}" stroke-linecap="round" opacity="${opacity}"/>`,
   };
 }
+
+// ─── Radial spectrum (pulsar chart) ───────────────────────────────────────────
+// Each ray = gradient line + perpendicular tick marks. Pass one ray per palette
+// color to produce a full-spectrum starburst that shows every Caligo color.
+
+export interface RadialSpectrumRay {
+  color: string;
+  /** Ray length as fraction of Math.min(width, height) */
+  length: number;
+  /** Angle in radians from positive X-axis */
+  angle: number;
+  opacity?: number;
+  strokeWidth?: number;
+  /** Number of tick marks along the ray (default 7) */
+  tickCount?: number;
+}
+
+export interface RadialSpectrumBrickOptions {
+  id?: string;
+  /** Center X as fraction of width (default 0.5) */
+  cx?: number;
+  /** Center Y as fraction of height (default 0.45) */
+  cy?: number;
+  rays: RadialSpectrumRay[];
+  /** Tick half-length as fraction of Math.min(width, height) (default 0.005) */
+  tickLength?: number;
+}
+
+export function radialSpectrumBrick(
+  params: BrickParams,
+  options: RadialSpectrumBrickOptions
+): BrickOutput {
+  const { viewBox } = params;
+  const { width, height } = viewBox;
+  // Use max so rays span the full landscape canvas, clipping at edges naturally
+  const scale = Math.max(width, height);
+
+  const { id = "rsp", cx = 0.5, cy = 0.45, rays, tickLength = 0.005 } = options;
+
+  const ocx = cx * width;
+  const ocy = cy * height;
+  const tBase = tickLength * scale;
+  // Scale factor so strokeWidth:1 = 1px at 1080p — matches all other bricks
+  const scaleF = scale / 1080;
+
+  const defs: string[] = [];
+  const elems: string[] = [];
+
+  rays.forEach((ray, i) => {
+    const { color, angle, length, opacity = 0.85, strokeWidth = 1.0, tickCount = 7 } = ray;
+
+    const rayLen = length * scale;
+    const ex = ocx + Math.cos(angle) * rayLen;
+    const ey = ocy + Math.sin(angle) * rayLen;
+
+    // Perpendicular unit vector for tick marks
+    const perpX = -Math.sin(angle);
+    const perpY = Math.cos(angle);
+
+    // Gradient: slight fade near center → full brightness → fades at tip
+    const gradId = `${id}-g${i}`;
+    defs.push(
+      `<linearGradient id="${gradId}" x1="${ocx.toFixed(1)}" y1="${ocy.toFixed(1)}" x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}" gradientUnits="userSpaceOnUse">
+  <stop offset="0%" stop-color="${color}" stop-opacity="0"/>
+  <stop offset="6%" stop-color="${color}" stop-opacity="${opacity.toFixed(2)}"/>
+  <stop offset="75%" stop-color="${color}" stop-opacity="${(opacity * 0.6).toFixed(2)}"/>
+  <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+</linearGradient>`
+    );
+
+    const sw = (strokeWidth * scaleF).toFixed(1);
+    elems.push(
+      `<line x1="${ocx.toFixed(1)}" y1="${ocy.toFixed(1)}" x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}" stroke="url(#${gradId})" stroke-width="${sw}"/>`
+    );
+
+    // Tick marks at evenly-spaced intervals, starting past the center cluster
+    const tsw = (strokeWidth * scaleF * 0.6).toFixed(1);
+    for (let t = 1; t <= tickCount; t++) {
+      const frac = 0.1 + (t / (tickCount + 1)) * 0.88;
+      const tx = ocx + Math.cos(angle) * rayLen * frac;
+      const ty = ocy + Math.sin(angle) * rayLen * frac;
+      const isMajor = t % 3 === 0;
+      const tLen = isMajor ? tBase * 1.8 : tBase;
+      const tickOp = (opacity * (0.85 - frac * 0.4)).toFixed(2);
+      elems.push(
+        `<line x1="${(tx - perpX * tLen).toFixed(1)}" y1="${(ty - perpY * tLen).toFixed(1)}" x2="${(tx + perpX * tLen).toFixed(1)}" y2="${(ty + perpY * tLen).toFixed(1)}" stroke="${color}" stroke-opacity="${tickOp}" stroke-width="${tsw}"/>`
+      );
+    }
+  });
+
+  // Small white anchor dot at center
+  const dotR = (scale * 0.003).toFixed(1);
+  elems.push(
+    `<circle cx="${ocx.toFixed(1)}" cy="${ocy.toFixed(1)}" r="${dotR}" fill="white" opacity="0.65"/>`
+  );
+
+  return { defs: defs.join("\n"), elements: elems.join("\n") };
+}

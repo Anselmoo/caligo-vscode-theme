@@ -244,76 +244,64 @@ function composeAuroraNoir(p: BrickParams): ComposedWallpaper {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 2. Cinder — Cream thunder on magma
-//    Three topology fields share the same noise seed so the crisp contour line
-//    and its bloom twin trace identical paths. Each layer: thick cream/white
-//    stroke → gaussian blur → incandescent halo; then the crisp coloured line
-//    on top. Result = glowing lava veins that follow the terrain exactly —
-//    "cream thunder" — no horizontal bands cutting across the structure.
+// 2. Cinder — Million stars full screen
+//    Dense multi-layer starfield. Tiny stars blanket the entire canvas.
+//    Three layers at different sizes and opacities create depth:
+//    micro background haze → mid-field points → foreground bright stars.
+//    Palette colors tint each layer so every harmony mode looks distinct.
 // ═══════════════════════════════════════════════════════════════════════════
 
 function composeCinder(p: BrickParams): ComposedWallpaper {
   const c = p.colors;
-  const { height } = p.viewBox;
-  // Bloom twins use FEWER levels than the crisp pass.
-  // 22-level crisp pass = dense fine contours everywhere.
-  // 5-level bloom twin  = only the 5 major ridges get a cream halo.
-  // Result: dark valleys between fine lines, glowing peaks on the big ridges.
-  const sd1 = (height * 0.005).toFixed(1); // ~11 px — visible cream halo on ridges
-  const sd2 = (height * 0.003).toFixed(1); //  ~6 px
-
-  const t1Bloom = topologyBrick(p, {
-    id: "ci-t1",
-    levels: 3,
-    frequency: 0.0016,
-    resolution: 200,
-    color: "#fff8e0",
-    opacity: 0.28,
-    strokeWidth: 4.5,
-  });
-  const t1Crisp = topologyBrick(p, {
-    id: "ci-t1",
-    levels: 6,
-    frequency: 0.0016,
-    resolution: 200,
-    color: c.hueOrange,
-    opacity: 0.52,
-    strokeWidth: 1.6,
-    accentColor: c.hueYellow,
-    accentLevel: 3,
-  });
-
-  const t2Bloom = topologyBrick(p, {
-    id: "ci-t2",
-    levels: 2,
-    frequency: 0.0028,
-    resolution: 160,
-    color: "#ffe8c0",
-    opacity: 0.18,
-    strokeWidth: 3.0,
-  });
-  const t2Crisp = topologyBrick(p, {
-    id: "ci-t2",
-    levels: 4,
-    frequency: 0.0028,
-    resolution: 160,
-    color: c.hueRed,
-    opacity: 0.35,
-    strokeWidth: 1.0,
-  });
-
-  const bloom1: BrickOutput = {
-    defs: `<filter id="ci-gf1" x="-14%" y="-14%" width="128%" height="128%"><feGaussianBlur stdDeviation="${sd1}"/></filter>`,
-    elements: `<g filter="url(#ci-gf1)">${t1Bloom.elements}</g>`,
-  };
-  const bloom2: BrickOutput = {
-    defs: `<filter id="ci-gf2" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="${sd2}"/></filter>`,
-    elements: `<g filter="url(#ci-gf2)">${t2Bloom.elements}</g>`,
-  };
-
   return scaffold(p, "ci", {
     flatBg: true,
-    effects: [bloom1, t1Crisp, bloom2, t2Crisp],
+    effects: [
+      // Micro background haze — 3000 sub-pixel dots, near-white
+      starFieldBrick(p, {
+        id: "ci-s1",
+        count: 3000,
+        brightCount: 0,
+        color: "#f0eee8",
+        distribution: "full",
+        opacity: 0.45,
+      }),
+      // Mid-field — accent tinted
+      starFieldBrick(p, {
+        id: "ci-s2",
+        count: 1800,
+        brightCount: 20,
+        color: c.accentSoft,
+        distribution: "full",
+        opacity: 0.62,
+      }),
+      // Warm layer — hueOrange sparse
+      starFieldBrick(p, {
+        id: "ci-s3",
+        count: 900,
+        brightCount: 18,
+        color: c.hueOrange,
+        distribution: "full",
+        opacity: 0.7,
+      }),
+      // Foreground bright — accent, largest stars
+      starFieldBrick(p, {
+        id: "ci-s4",
+        count: 400,
+        brightCount: 40,
+        color: c.accent,
+        distribution: "full",
+        opacity: 0.88,
+      }),
+      // Rare cool highlights
+      starFieldBrick(p, {
+        id: "ci-s5",
+        count: 180,
+        brightCount: 22,
+        color: c.hueCyan,
+        distribution: "full",
+        opacity: 0.72,
+      }),
+    ],
   });
 }
 

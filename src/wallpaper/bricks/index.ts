@@ -49,12 +49,14 @@ export {
 export { nebulaDustBrick, noiseBrick, turbulenceBrick } from "./noise.js";
 export { beachBrick, jellyfishBrick, waterCurrentBrick } from "./ocean.js";
 export { particlesBrick, sparksBrick } from "./particles.js";
+export type { RadialSpectrumRay } from "./shapes.js";
 // (textBrick exports below - keep aligned)
 export {
   arcBrick,
   bandBrick,
   brushStrokeBrick,
   curtainBrick,
+  radialSpectrumBrick,
   raysBrick,
   ringBrick,
 } from "./shapes.js";
