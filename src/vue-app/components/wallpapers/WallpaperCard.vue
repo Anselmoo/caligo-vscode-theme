@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import type { WallpaperFilter, WallpaperManifestEntry } from "../../composables/useWallpapers";
+import { computed, ref } from "vue";
+import type { WallpaperManifestEntry } from "../../composables/useWallpapers";
 
 const props = defineProps<{
   entry: WallpaperManifestEntry;
@@ -8,18 +8,10 @@ const props = defineProps<{
   activeTextVariant: "text" | "no-text";
 }>();
 
-// Find sibling entries (same seed + mode, different platform / text variant)
-const emit = defineEmits<{
-  "set-filter": [patch: Partial<WallpaperFilter>];
-}>();
-
-const previewUrl = computed(() => props.entry.svgPath);
-const pngUrl = computed(() => props.entry.pngPath);
-
 const platforms = [
-  { id: "monitor", label: "Monitor", icon: "🖥" },
-  { id: "tablet", label: "Tablet", icon: "📱" },
-  { id: "mobile", label: "Mobile", icon: "📲" },
+  { id: "monitor", label: "Monitor", icon: "pi pi-desktop" },
+  { id: "tablet", label: "Tablet", icon: "pi pi-tablet" },
+  { id: "mobile", label: "Mobile", icon: "pi pi-mobile" },
 ] as const;
 
 const textVariants = [
@@ -27,12 +19,25 @@ const textVariants = [
   { id: "text", label: "With text" },
 ] as const;
 
-// Silence biome: all vars below are used in the Vue template
-void emit;
-void previewUrl;
-void pngUrl;
-void platforms;
-void textVariants;
+// Local per-card state — independent of global filter
+const localPlatform = ref<"monitor" | "tablet" | "mobile">(props.activePlatform);
+const localTextVariant = ref<"text" | "no-text">(props.activeTextVariant);
+
+// Base dir: wallpapers/{seedId}/{harmonyMode}/
+const baseDir = computed(() => {
+  const { seedId, harmonyMode } = props.entry;
+  return `wallpapers/${seedId}/${harmonyMode}`;
+});
+
+const previewUrl = computed(() => {
+  const suffix = localTextVariant.value === "text" ? "-text" : "";
+  return `${baseDir.value}/${localPlatform.value}${suffix}.svg`;
+});
+
+const pngUrl = computed(() => {
+  const suffix = localTextVariant.value === "text" ? "-text" : "";
+  return `${baseDir.value}/${localPlatform.value}${suffix}.png`;
+});
 </script>
 
 <template>
@@ -41,7 +46,7 @@ void textVariants;
     <div class="preview-wrap">
       <img
         :src="previewUrl"
-        :alt="`${entry.displayName} wallpaper preview (${activePlatform})`"
+        :alt="`${entry.displayName} wallpaper preview (${localPlatform})`"
         class="preview-img"
         loading="lazy"
       />
@@ -58,9 +63,9 @@ void textVariants;
           v-for="p in platforms"
           :key="p.id"
           class="toggle-btn"
-          :class="{ active: activePlatform === p.id }"
-          @click="emit('set-filter', { platform: p.id })"
-        >{{ p.icon }} {{ p.label }}</button>
+          :class="{ active: localPlatform === p.id }"
+          @click="localPlatform = p.id"
+        ><i :class="p.icon" /> {{ p.label }}</button>
       </div>
 
       <!-- Text variant tabs -->
@@ -69,14 +74,14 @@ void textVariants;
           v-for="v in textVariants"
           :key="v.id"
           class="toggle-btn"
-          :class="{ active: activeTextVariant === v.id }"
-          @click="emit('set-filter', { textVariant: v.id })"
+          :class="{ active: localTextVariant === v.id }"
+          @click="localTextVariant = v.id"
         >{{ v.label }}</button>
       </div>
 
       <!-- Download -->
-      <a :href="pngUrl" :download="`caligo-${entry.seedId}-${entry.harmonyMode}-${activePlatform}.png`" class="download-btn">
-        ⬇ Download PNG
+      <a :href="pngUrl" :download="`caligo-${entry.seedId}-${entry.harmonyMode}-${localPlatform}${localTextVariant === 'text' ? '-text' : ''}.png`" class="download-btn">
+        <i class="pi pi-download" /> Download PNG
       </a>
     </div>
   </article>
@@ -156,7 +161,9 @@ void textVariants;
 }
 
 .download-btn {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: var(--space-xs) var(--space-md);
   border-radius: var(--radius-sm);
   border: 1px solid var(--accent);

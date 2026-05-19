@@ -273,14 +273,14 @@ function composeCinder(p: BrickParams): ComposedWallpaper {
   });
   const t1Crisp = topologyBrick(p, {
     id: "ci-t1",
-    levels: 22,
+    levels: 15,
     frequency: 0.0032,
     resolution: 200,
     color: c.hueOrange,
-    opacity: 0.95,
+    opacity: 0.68,
     strokeWidth: 1.8,
     accentColor: c.hueYellow,
-    accentLevel: 11,
+    accentLevel: 8,
   });
 
   const t2Bloom = topologyBrick(p, {
@@ -298,7 +298,7 @@ function composeCinder(p: BrickParams): ComposedWallpaper {
     frequency: 0.0055,
     resolution: 160,
     color: c.hueRed,
-    opacity: 0.78,
+    opacity: 0.55,
     strokeWidth: 1.1,
   });
 
@@ -349,30 +349,30 @@ function composeDeepSable(p: BrickParams): ComposedWallpaper {
     ],
     glowBlur: 80,
     effects: [
-      // Stars — dense and bright, clearly visible behind the glass layers
+      // Stars — glass-white with alpha for an icy, crystalline look
       starFieldBrick(p, {
         id: "ds-sf1",
-        count: 1400,
-        brightCount: 55,
-        color: c.accentSoft,
+        count: 900,
+        brightCount: 30,
+        color: "#e8f4ff",
         distribution: "full",
-        opacity: 0.92,
+        opacity: 0.78,
       }),
       starFieldBrick(p, {
         id: "ds-sf2",
-        count: 500,
-        brightCount: 20,
-        color: c.keywords,
+        count: 350,
+        brightCount: 14,
+        color: "#d0ecff",
         distribution: "full",
-        opacity: 0.72,
+        opacity: 0.58,
       }),
       starFieldBrick(p, {
         id: "ds-sf3",
-        count: 200,
-        brightCount: 10,
-        color: c.strings,
+        count: 130,
+        brightCount: 7,
+        color: "#f0f8ff",
         distribution: "full",
-        opacity: 0.55,
+        opacity: 0.42,
       }),
       // Six liquid glass wave bands — cy 0.0→1.0, full canvas height coverage
       liquidWaveBands(p, "ds-lw", [
@@ -676,6 +676,7 @@ function composeMidnightAtelier(p: BrickParams): ComposedWallpaper {
         color: c.accent,
         opacity: 0.92,
         branches: 4,
+        skyFlashOpacity: 0.04,
       }),
       // Left bolt — diagonal, accent-2 colour
       lightningBrick(p, {
@@ -687,6 +688,7 @@ function composeMidnightAtelier(p: BrickParams): ComposedWallpaper {
         color: c.keywords,
         opacity: 0.62,
         branches: 3,
+        skyFlashOpacity: 0.04,
       }),
       // Right bolt — subtle, functions colour
       lightningBrick(p, {
@@ -698,6 +700,7 @@ function composeMidnightAtelier(p: BrickParams): ComposedWallpaper {
         color: c.functions,
         opacity: 0.45,
         branches: 2,
+        skyFlashOpacity: 0.04,
       }),
     ],
   });

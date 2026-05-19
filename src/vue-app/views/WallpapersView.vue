@@ -50,7 +50,7 @@ void gridEntries;
         </p>
       </div>
       <a :href="downloadAllUrl" download="caligo-wallpapers.zip" class="download-all-btn">
-        ⬇ Download All (ZIP)
+        <i class="pi pi-download" /> Download All (ZIP)
       </a>
     </header>
 
@@ -87,7 +87,6 @@ void gridEntries;
         :entry="entry"
         :active-platform="filter.platform ?? 'monitor'"
         :active-text-variant="filter.textVariant ?? 'no-text'"
-        @set-filter="setFilter"
       />
     </div>
 

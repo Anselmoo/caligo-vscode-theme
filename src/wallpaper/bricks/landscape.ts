@@ -3158,6 +3158,8 @@ export interface LightningBrickOptions {
   segments?: number;
   /** Number of primary branch forks (default 3) */
   branches?: number;
+  /** Multiplier for the sky-flash halo at bolt origin (0 = no ball, default 0.22) */
+  skyFlashOpacity?: number;
 }
 
 /**
@@ -3184,6 +3186,7 @@ export function lightningBrick(params: BrickParams, options: LightningBrickOptio
     opacity = 0.85,
     branches = 3,
     id = "lightning",
+    skyFlashOpacity = 0.22,
   } = options;
 
   const rng = seedRng(hashStr(`${seedId}-${harmonyMode}-bolt`));
@@ -3250,21 +3253,24 @@ export function lightningBrick(params: BrickParams, options: LightningBrickOptio
 
   // ── 1. Sky flash — atmospheric cloud illumination ─────────────────────────
   // The cloud base and surrounding atmosphere "lights up" white before thunder.
+  // skyFlashOpacity=0 suppresses the halo entirely.
   const flashCx = (sx + ex) / 2;
   const flashCy = sy + (ey - sy) * 0.22;
-  const flashFId = `${id}-ff`;
-  const flashGId = `${id}-fg`;
-  defs.push(
-    `<filter id="${flashFId}" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="${(scale * 0.038).toFixed(0)}"/></filter>
+  if (skyFlashOpacity > 0) {
+    const flashFId = `${id}-ff`;
+    const flashGId = `${id}-fg`;
+    defs.push(
+      `<filter id="${flashFId}" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="${(scale * 0.038).toFixed(0)}"/></filter>
 <radialGradient id="${flashGId}" cx="${flashCx.toFixed(0)}" cy="${flashCy.toFixed(0)}" r="${(scale * 0.2).toFixed(0)}" gradientUnits="userSpaceOnUse">
-  <stop offset="0%" stop-color="${color}" stop-opacity="${(opacity * 0.22).toFixed(2)}"/>
-  <stop offset="50%" stop-color="${color}" stop-opacity="${(opacity * 0.05).toFixed(2)}"/>
+  <stop offset="0%" stop-color="${color}" stop-opacity="${(opacity * skyFlashOpacity).toFixed(2)}"/>
+  <stop offset="50%" stop-color="${color}" stop-opacity="${(opacity * skyFlashOpacity * 0.23).toFixed(2)}"/>
   <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
 </radialGradient>`
-  );
-  elems.push(
-    `<ellipse cx="${flashCx.toFixed(0)}" cy="${flashCy.toFixed(0)}" rx="${(scale * 0.2).toFixed(0)}" ry="${(scale * 0.15).toFixed(0)}" fill="url(#${flashGId})" filter="url(#${flashFId})"/>`
-  );
+    );
+    elems.push(
+      `<ellipse cx="${flashCx.toFixed(0)}" cy="${flashCy.toFixed(0)}" rx="${(scale * 0.2).toFixed(0)}" ry="${(scale * 0.15).toFixed(0)}" fill="url(#${flashGId})" filter="url(#${flashFId})"/>`
+    );
+  }
 
   // ── 2. Generate fractal bolt paths ────────────────────────────────────────
   const mainPts = fractalBolt(sx, sy, ex, ey, 5); // depth 5 → 32 angular segments

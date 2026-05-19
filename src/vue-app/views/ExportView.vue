@@ -315,7 +315,7 @@ void classifyTokenGroup;
               </p>
             </div>
             <a href="./caligo-wallpapers.zip" download="caligo-wallpapers.zip" class="wallpapers-download-btn">
-              ⬇ Download ZIP
+              <i class="pi pi-download" /> Download ZIP
             </a>
           </div>
           <div class="wallpapers-meta">
