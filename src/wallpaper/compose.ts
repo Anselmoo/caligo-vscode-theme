@@ -8,7 +8,6 @@
 
 import {
   auroraAdvancedBrick,
-  duneBrick,
   fractureBrick,
   lightningBrick,
   nebulaDustBrick,
@@ -16,7 +15,6 @@ import {
   particlesBrick,
   sparksBrick,
   starFieldBrick,
-  terrainContourBrick,
   topologyBrick,
   voronoiBrick,
 } from "./bricks/index.js";
@@ -45,8 +43,18 @@ function scaffold(
   }
 ): ComposedWallpaper {
   const { viewBox, colors } = p;
+  const { width, height } = viewBox;
+  // Gradient background: flat bg + radial bgSoft bloom centred slightly high.
+  // Uses objectBoundingBox percentages so it works at any canvas size.
+  const bgGradId = `${prefix}-bg-grad`;
   const bg: BrickOutput = {
-    elements: `<rect width="${viewBox.width}" height="${viewBox.height}" fill="${colors.bg}"/>`,
+    defs: `<radialGradient id="${bgGradId}" cx="50%" cy="42%" r="72%">
+  <stop offset="0%"   stop-color="${colors.bgSoft}"/>
+  <stop offset="58%"  stop-color="${colors.bgSoft}" stop-opacity="0.45"/>
+  <stop offset="100%" stop-color="${colors.bg}"     stop-opacity="0"/>
+</radialGradient>`,
+    elements: `<rect width="${width}" height="${height}" fill="${colors.bg}"/>
+<rect width="${width}" height="${height}" fill="url(#${bgGradId})"/>`,
   };
   const layers: BrickOutput[] = [bg];
   if (opts.glows?.length) {
@@ -56,6 +64,94 @@ function scaffold(
   }
   layers.push(...opts.effects);
   return mergeBricks(layers);
+}
+
+// ─── Liquid glass wave bands ─────────────────────────────────────────────────
+// Renders N overlapping translucent wave bands spanning the full canvas height.
+// Each band has a blurred frosted-glass fill + a crisp white highlight stroke
+// on its top edge + a thin coloured outline — producing a liquid-glass optic.
+
+interface LiquidWaveBand {
+  cy: number; // centre Y as fraction of height
+  color: string;
+  opacity: number;
+  phase: number; // wave phase offset in radians
+}
+
+function liquidWaveBands(p: BrickParams, id: string, bands: LiquidWaveBand[]): BrickOutput {
+  const { viewBox } = p;
+  const { width, height } = viewBox;
+
+  const defs: string[] = [];
+  const elems: string[] = [];
+
+  const blurId = `${id}-blur`;
+  const blurSd = (height * 0.009).toFixed(1); // ~10 px at 1080p
+  defs.push(
+    `<filter id="${blurId}" x="-5%" y="-30%" width="110%" height="160%"><feGaussianBlur stdDeviation="${blurSd}"/></filter>`
+  );
+
+  const bandH = height * 0.38; // 38 % height — heavy overlap between layers
+  const amp = height * 0.075; // ±7.5 % wave amplitude
+  const steps = 100;
+
+  for (let i = 0; i < bands.length; i++) {
+    const { cy, color, opacity, phase } = bands[i];
+    const cyPx = cy * height;
+    const minY = cyPx - bandH / 2 - amp;
+    const maxY = cyPx + bandH / 2 + amp;
+
+    const topPts: string[] = [];
+    const botRevPts: string[] = [];
+
+    for (let j = 0; j <= steps; j++) {
+      const t = j / steps;
+      const x = (t * width).toFixed(1);
+      const topY = (
+        cyPx -
+        bandH / 2 +
+        Math.sin(t * Math.PI * 3.1 + phase) * amp * 0.62 +
+        Math.sin(t * Math.PI * 6.7 + phase * 1.3) * amp * 0.38
+      ).toFixed(1);
+      const botY = (
+        cyPx +
+        bandH / 2 +
+        Math.sin(t * Math.PI * 2.8 + phase + 2.0) * amp * 0.68 +
+        Math.sin(t * Math.PI * 5.3 + phase * 0.7) * amp * 0.32
+      ).toFixed(1);
+      topPts.push(`${j === 0 ? "M" : "L"} ${x},${topY}`);
+      botRevPts.unshift(`L ${x},${botY}`);
+    }
+
+    const bodyPath = `${topPts.join(" ")} ${botRevPts.join(" ")} Z`;
+    const topPath = topPts.join(" ");
+
+    // Vertical gradient: white glint → colour body → transparent
+    const gradId = `${id}-g${i}`;
+    defs.push(
+      `<linearGradient id="${gradId}" x1="0" y1="${minY.toFixed(1)}" x2="0" y2="${maxY.toFixed(1)}" gradientUnits="userSpaceOnUse">
+  <stop offset="0%"   stop-color="#ffffff" stop-opacity="${(opacity * 0.55).toFixed(2)}"/>
+  <stop offset="12%"  stop-color="${color}" stop-opacity="${opacity.toFixed(2)}"/>
+  <stop offset="52%"  stop-color="${color}" stop-opacity="${(opacity * 0.38).toFixed(2)}"/>
+  <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+</linearGradient>`
+    );
+
+    elems.push(`<path d="${bodyPath}" fill="url(#${gradId})" filter="url(#${blurId})"/>`);
+    // White glass glint on top edge
+    elems.push(
+      `<path d="${topPath}" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="${(opacity * 0.55).toFixed(2)}" stroke-linecap="round"/>`
+    );
+    // Coloured outline — subtle refraction edge
+    elems.push(
+      `<path d="${bodyPath}" fill="none" stroke="${color}" stroke-width="0.7" opacity="${(opacity * 0.5).toFixed(2)}"/>`
+    );
+  }
+
+  return {
+    defs: defs.join("\n"),
+    elements: `<g id="${id}">${elems.join("\n")}</g>`,
+  };
 }
 
 // ─── Registry ────────────────────────────────────────────────────────────────
@@ -158,90 +254,56 @@ function composeCinder(p: BrickParams): ComposedWallpaper {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 3. DeepSable — Desert dune sea at dusk
-//    Layered dune ridges recede to a horizon with terrain silhouettes.
-//    Warm atmospheric glow near the horizon; foreground dunes in accent hues.
-//    Sand-grain texture + sparse particle dust add tactile depth.
+// 3. DeepSable — Liquid glass over starfield
+//    Dense star field fills the entire canvas. Six liquid-glass wave bands
+//    span the full height (heavily overlapping) giving a frosted-glass optic.
+//    Each band: blurred fill + white glint stroke + coloured outline.
+//    Gradient background gives depth for the transparent layers to read against.
 // ═══════════════════════════════════════════════════════════════════════════
 
 function composeDeepSable(p: BrickParams): ComposedWallpaper {
   const c = p.colors;
   return scaffold(p, "ds", {
     glows: [
-      // Horizon warmth
-      { cx: 0.5, cy: 0.35, rx: 0.6, ry: 0.3, color: c.hueOrange, opacity: 0.35 },
-      { cx: 0.5, cy: 0.3, rx: 0.35, ry: 0.18, color: c.accent, opacity: 0.28 },
-      // Foreground warmth
-      { cx: 0.28, cy: 0.72, rx: 0.3, ry: 0.22, color: c.numbers, opacity: 0.22 },
+      { cx: 0.5, cy: 0.45, rx: 0.55, ry: 0.4, color: c.strings, opacity: 0.12 },
+      { cx: 0.3, cy: 0.6, rx: 0.3, ry: 0.22, color: c.types, opacity: 0.09 },
     ],
-    glowBlur: 60,
+    glowBlur: 80,
     effects: [
-      // Night sky — stars fill the upper two-thirds so the canvas is never empty
+      // Stars behind the glass — full canvas
       starFieldBrick(p, {
-        id: "ds-sf",
-        count: 520,
-        brightCount: 18,
+        id: "ds-sf1",
+        count: 700,
+        brightCount: 24,
         color: c.accentSoft,
-        distribution: "upper",
-        maxY: 0.55,
-        opacity: 0.65,
+        distribution: "full",
+        opacity: 0.72,
       }),
-      // Sky-horizon mountain silhouettes — 4 depth layers
-      terrainContourBrick(p, {
-        id: "ds-tc",
-        horizonY: 0.18,
-        gridW: 80,
-        gridH: 40,
-        layers: [
-          { color: c.hueBlue, opacity: 0.32, edgeBlur: 8 }, // far haze
-          { color: c.keywords, opacity: 0.45, edgeBlur: 3 }, // mid ridges
-          { color: c.huePurple, opacity: 0.55, edgeBlur: 1 }, // near ridges
-          { color: c.accent, opacity: 0.68 }, // foreground silhouette
-        ],
-      }),
-      // Dune sea — foreground, mid, and background layers of actual dunes
-      duneBrick(p, {
-        id: "ds-d1",
-        baseY: 0.52,
-        ridges: 5,
-        color: c.strings,
+      starFieldBrick(p, {
+        id: "ds-sf2",
+        count: 220,
+        brightCount: 7,
+        color: c.keywords,
+        distribution: "full",
         opacity: 0.45,
-        seedSuffix: "d1",
       }),
-      duneBrick(p, {
-        id: "ds-d2",
-        baseY: 0.64,
-        ridges: 4,
-        color: c.hueOrange,
-        opacity: 0.65,
-        seedSuffix: "d2",
-      }),
-      duneBrick(p, {
-        id: "ds-d3",
-        baseY: 0.77,
-        ridges: 3,
-        color: c.numbers,
-        opacity: 0.82,
-        seedSuffix: "d3",
-      }),
-      // Sand-dust particles drifting across the dunes
-      particlesBrick(p, {
-        id: "ds-p1",
-        count: 280,
-        color: c.accentSoft,
-        opacity: 0.25,
-        minRadius: 0.5,
-        maxRadius: 1.8,
-        distribution: "lower",
-      }),
-      // Fine grain overlay for tactile texture
+      // Six liquid glass wave bands — cy 0.0→1.0, full canvas height coverage
+      liquidWaveBands(p, "ds-lw", [
+        { cy: 0.0, color: c.strings, opacity: 0.48, phase: 0.0 },
+        { cy: 0.2, color: c.types, opacity: 0.52, phase: 1.1 },
+        { cy: 0.4, color: c.functions, opacity: 0.5, phase: 2.3 },
+        { cy: 0.6, color: c.keywords, opacity: 0.52, phase: 3.5 },
+        { cy: 0.8, color: c.huePurple, opacity: 0.48, phase: 4.7 },
+        { cy: 1.0, color: c.hueBlue, opacity: 0.44, phase: 5.9 },
+      ]),
+      // Fine cosmic dust behind the glass
       nebulaDustBrick(p, {
         id: "ds-nd1",
-        tintColor: c.accentMuted,
-        opacity: 0.22,
-        baseFrequency: 0.005,
-        numOctaves: 3,
-        alphaStrength: 0.4,
+        tintColor: c.strings,
+        opacity: 0.12,
+        baseFrequency: 0.003,
+        numOctaves: 4,
+        alphaStrength: 0.28,
       }),
     ],
   });
