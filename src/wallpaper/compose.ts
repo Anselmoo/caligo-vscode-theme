@@ -185,22 +185,13 @@ export function composeSeedWallpaper(p: BrickParams): ComposedWallpaper {
 function composeAuroraNoir(p: BrickParams): ComposedWallpaper {
   const c = p.colors;
   return scaffold(p, "an", {
-    // Dim glows — keep the sky dark so the aurora has somewhere to contrast against
+    // Near-zero ambient glow — let the bg stay truly dark between curtains
     glows: [
-      { cx: 0.5, cy: 0.38, rx: 0.52, ry: 0.28, color: c.accent, opacity: 0.12 },
-      { cx: 0.38, cy: 0.28, rx: 0.28, ry: 0.14, color: c.hueGreen, opacity: 0.07 },
+      { cx: 0.5, cy: 0.38, rx: 0.52, ry: 0.28, color: c.accent, opacity: 0.06 },
+      { cx: 0.38, cy: 0.28, rx: 0.28, ry: 0.14, color: c.hueGreen, opacity: 0.04 },
     ],
     glowBlur: 55,
     effects: [
-      // Stars — deep-space backdrop; the aurora punches against these
-      starFieldBrick(p, {
-        id: "an-sf",
-        count: 600,
-        brightCount: 22,
-        color: c.accentSoft,
-        distribution: "full",
-        opacity: 0.68,
-      }),
       // Primary curtain — hero aurora, wide zone, full intensity
       auroraAdvancedBrick(p, {
         id: "an-a1",
@@ -211,7 +202,7 @@ function composeAuroraNoir(p: BrickParams): ComposedWallpaper {
         color2: c.hueGreen,
         opacity: 0.92,
       }),
-      // Secondary curtain — higher, narrower, strong cyan contrast
+      // Secondary curtain — higher centre, different color pair, strong opacity
       auroraAdvancedBrick(p, {
         id: "an-a2",
         bands: 4,
@@ -221,7 +212,7 @@ function composeAuroraNoir(p: BrickParams): ComposedWallpaper {
         color2: c.accent,
         opacity: 0.72,
       }),
-      // Tertiary curtain — upper-sky purple/violet fringe for color depth
+      // Tertiary curtain — upper-sky violet fringe
       auroraAdvancedBrick(p, {
         id: "an-a3",
         bands: 2,
@@ -247,9 +238,10 @@ function composeAuroraNoir(p: BrickParams): ComposedWallpaper {
 function composeCinder(p: BrickParams): ComposedWallpaper {
   const c = p.colors;
   const { height } = p.viewBox;
-  const sd1 = (height * 0.008).toFixed(1); // primary bloom radius  ~17 px at 2160p
-  const sd2 = (height * 0.005).toFixed(1); // secondary bloom radius ~11 px
-  const sd3 = (height * 0.003).toFixed(1); // fine detail bloom       ~6 px
+  // Tight halos — small radius keeps the glow ON the line, not filling the gaps
+  const sd1 = (height * 0.0038).toFixed(1); // primary bloom   ~8 px at 2160p
+  const sd2 = (height * 0.0024).toFixed(1); // secondary bloom  ~5 px
+  const sd3 = (height * 0.0014).toFixed(1); // fine detail      ~3 px
 
   // ── Topology contours — same id = same noise field = same paths ──────────
   // Primary magma channels (22 levels, low frequency = broad landmass shapes)
@@ -258,19 +250,19 @@ function composeCinder(p: BrickParams): ComposedWallpaper {
     levels: 22,
     frequency: 0.0032,
     resolution: 200,
-    color: "#fff8e0", // warm cream-white for the bloom
-    opacity: 0.42,
-    strokeWidth: 8.5,
+    color: "#fff8e0",
+    opacity: 0.26, // lower so the gap between lines stays dark
+    strokeWidth: 5.5,
     accentColor: "#ffffff",
     accentLevel: 11,
   });
   const t1Crisp = topologyBrick(p, {
-    id: "ci-t1", // identical id → identical contours
+    id: "ci-t1",
     levels: 22,
     frequency: 0.0032,
     resolution: 200,
     color: c.hueOrange,
-    opacity: 0.75,
+    opacity: 0.92, // crisp line fully visible
     strokeWidth: 1.8,
     accentColor: c.hueYellow,
     accentLevel: 11,
@@ -282,9 +274,9 @@ function composeCinder(p: BrickParams): ComposedWallpaper {
     levels: 14,
     frequency: 0.0055,
     resolution: 160,
-    color: "#ffe8c0", // amber-cream
-    opacity: 0.3,
-    strokeWidth: 5.5,
+    color: "#ffe8c0",
+    opacity: 0.18,
+    strokeWidth: 3.8,
   });
   const t2Crisp = topologyBrick(p, {
     id: "ci-t2",
@@ -292,7 +284,7 @@ function composeCinder(p: BrickParams): ComposedWallpaper {
     frequency: 0.0055,
     resolution: 160,
     color: c.hueRed,
-    opacity: 0.48,
+    opacity: 0.72,
     strokeWidth: 1.1,
   });
 
@@ -303,8 +295,8 @@ function composeCinder(p: BrickParams): ComposedWallpaper {
     frequency: 0.0082,
     resolution: 130,
     color: "#ffd8a0",
-    opacity: 0.22,
-    strokeWidth: 3.5,
+    opacity: 0.14,
+    strokeWidth: 2.5,
   });
   const t3Crisp = topologyBrick(p, {
     id: "ci-t3",
@@ -312,29 +304,29 @@ function composeCinder(p: BrickParams): ComposedWallpaper {
     frequency: 0.0082,
     resolution: 130,
     color: c.strings,
-    opacity: 0.35,
+    opacity: 0.55,
     strokeWidth: 0.65,
   });
 
   // ── Wrap each bloom twin in a gaussian blur filter ────────────────────────
   const bloom1: BrickOutput = {
-    defs: `<filter id="ci-gf1" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="${sd1}"/></filter>`,
+    defs: `<filter id="ci-gf1" x="-12%" y="-12%" width="124%" height="124%"><feGaussianBlur stdDeviation="${sd1}"/></filter>`,
     elements: `<g filter="url(#ci-gf1)">${t1Bloom.elements}</g>`,
   };
   const bloom2: BrickOutput = {
-    defs: `<filter id="ci-gf2" x="-15%" y="-15%" width="130%" height="130%"><feGaussianBlur stdDeviation="${sd2}"/></filter>`,
+    defs: `<filter id="ci-gf2" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="${sd2}"/></filter>`,
     elements: `<g filter="url(#ci-gf2)">${t2Bloom.elements}</g>`,
   };
   const bloom3: BrickOutput = {
-    defs: `<filter id="ci-gf3" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="${sd3}"/></filter>`,
+    defs: `<filter id="ci-gf3" x="-8%" y="-8%" width="116%" height="116%"><feGaussianBlur stdDeviation="${sd3}"/></filter>`,
     elements: `<g filter="url(#ci-gf3)">${t3Bloom.elements}</g>`,
   };
 
   return scaffold(p, "ci", {
     glows: [
-      { cx: 0.5, cy: 0.55, rx: 0.52, ry: 0.45, color: c.hueRed, opacity: 0.38 },
-      { cx: 0.3, cy: 0.35, rx: 0.28, ry: 0.22, color: c.hueOrange, opacity: 0.28 },
-      { cx: 0.72, cy: 0.42, rx: 0.22, ry: 0.18, color: c.hueYellow, opacity: 0.22 },
+      { cx: 0.5, cy: 0.55, rx: 0.52, ry: 0.45, color: c.hueRed, opacity: 0.14 },
+      { cx: 0.3, cy: 0.35, rx: 0.28, ry: 0.22, color: c.hueOrange, opacity: 0.09 },
+      { cx: 0.72, cy: 0.42, rx: 0.22, ry: 0.18, color: c.hueYellow, opacity: 0.07 },
     ],
     glowBlur: 50,
     effects: [
