@@ -9,7 +9,6 @@
 import {
   auroraAdvancedBrick,
   fractureBrick,
-  lightningBrick,
   nebulaDustBrick,
   nebulaGlowBrick,
   particlesBrick,
@@ -212,43 +211,53 @@ function composeAuroraNoir(p: BrickParams): ComposedWallpaper {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 2. Cinder — Thermal topology map
-//    Dense contour lines at high frequency look like heat-imaging or fire maps.
-//    Accent level glows hot orange/red.
+// 2. Cinder — Molten glass over magma
+//    Thermal topology lines form the lava-vein structure beneath the surface.
+//    Liquid glass wave bands in fire colours (yellow → orange → red) float on
+//    top — the heat-distorted, incandescent glass of a volcano. White glints
+//    on the wave edges read as superheated glass catching the light.
 // ═══════════════════════════════════════════════════════════════════════════
 
 function composeCinder(p: BrickParams): ComposedWallpaper {
   const c = p.colors;
   return scaffold(p, "ci", {
     glows: [
-      { cx: 0.5, cy: 0.55, rx: 0.45, ry: 0.4, color: c.hueRed, opacity: 0.3 },
-      { cx: 0.3, cy: 0.35, rx: 0.25, ry: 0.2, color: c.hueOrange, opacity: 0.2 },
-      { cx: 0.7, cy: 0.4, rx: 0.2, ry: 0.15, color: c.hueYellow, opacity: 0.16 },
+      { cx: 0.5, cy: 0.55, rx: 0.52, ry: 0.45, color: c.hueRed, opacity: 0.38 },
+      { cx: 0.3, cy: 0.35, rx: 0.28, ry: 0.22, color: c.hueOrange, opacity: 0.28 },
+      { cx: 0.72, cy: 0.42, rx: 0.22, ry: 0.18, color: c.hueYellow, opacity: 0.22 },
     ],
-    glowBlur: 55,
+    glowBlur: 50,
     effects: [
-      // Dense high-frequency topology at maximum resolution for crisp lines
+      // Thermal topology — the magma vein structure beneath the glass
       topologyBrick(p, {
         id: "ci-t1",
         levels: 22,
         frequency: 0.0032,
         resolution: 200,
         color: c.hueOrange,
-        opacity: 0.68,
+        opacity: 0.65,
         strokeWidth: 1.8,
         accentColor: c.hueYellow,
         accentLevel: 11,
       }),
-      // Second layer — finer detail overlay
       topologyBrick(p, {
         id: "ci-t2",
         levels: 14,
         frequency: 0.0055,
         resolution: 160,
         color: c.hueRed,
-        opacity: 0.42,
-        strokeWidth: 1.1,
+        opacity: 0.38,
+        strokeWidth: 1.0,
       }),
+      // Molten glass surface — 5 fire-hued bands spanning full height
+      // Higher opacity + stronger white glint = incandescent glow
+      liquidWaveBands(p, "ci-lw", [
+        { cy: 0.0, color: c.hueYellow, opacity: 0.38, phase: 0.4 },
+        { cy: 0.22, color: c.hueOrange, opacity: 0.44, phase: 1.7 },
+        { cy: 0.44, color: c.hueRed, opacity: 0.48, phase: 2.9 },
+        { cy: 0.66, color: c.strings, opacity: 0.42, phase: 4.1 },
+        { cy: 0.88, color: c.hueOrange, opacity: 0.36, phase: 5.5 },
+      ]),
     ],
   });
 }
@@ -270,22 +279,30 @@ function composeDeepSable(p: BrickParams): ComposedWallpaper {
     ],
     glowBlur: 80,
     effects: [
-      // Stars behind the glass — full canvas
+      // Stars — dense and bright, clearly visible behind the glass layers
       starFieldBrick(p, {
         id: "ds-sf1",
-        count: 700,
-        brightCount: 24,
+        count: 1400,
+        brightCount: 55,
         color: c.accentSoft,
+        distribution: "full",
+        opacity: 0.92,
+      }),
+      starFieldBrick(p, {
+        id: "ds-sf2",
+        count: 500,
+        brightCount: 20,
+        color: c.keywords,
         distribution: "full",
         opacity: 0.72,
       }),
       starFieldBrick(p, {
-        id: "ds-sf2",
-        count: 220,
-        brightCount: 7,
-        color: c.keywords,
+        id: "ds-sf3",
+        count: 200,
+        brightCount: 10,
+        color: c.strings,
         distribution: "full",
-        opacity: 0.45,
+        opacity: 0.55,
       }),
       // Six liquid glass wave bands — cy 0.0→1.0, full canvas height coverage
       liquidWaveBands(p, "ds-lw", [
@@ -465,64 +482,78 @@ function composeMandarian(p: BrickParams): ComposedWallpaper {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 7. MidnightAtelier — Electric storm / thunder scene
-//    Multiple lightning bolts erupt from a charged storm sky. Wide soft
-//    curtain bands simulate the cloud banks lit by the flashes. Atmospheric
-//    dust grain adds the heavy-air texture of a real thunderstorm.
+// 7. MidnightAtelier — Bricks in the universe / cosmic web
+//    The large-scale structure of the universe: matter clusters into a foam
+//    of cells separated by glowing filaments. Three scales of Voronoi:
+//      • Macro bricks  — 28 pts, 8 Lloyd passes → near-hexagonal honeycomb,
+//                        thick glowing edges, semi-transparent faces
+//      • Mid structure — 90 pts, 5 passes → internal cell divisions, medium glow
+//      • Fine web      — 200-pt Delaunay → the cosmic mortar / thin filament lines
+//    Stars scatter behind the web; nebula dust fills the interstices.
 // ═══════════════════════════════════════════════════════════════════════════
 
 function composeMidnightAtelier(p: BrickParams): ComposedWallpaper {
   const c = p.colors;
   return scaffold(p, "ma", {
     glows: [
-      // Storm sky illumination — wide diffuse flash glow
-      { cx: 0.48, cy: 0.22, rx: 0.55, ry: 0.38, color: c.accent, opacity: 0.32 },
-      { cx: 0.28, cy: 0.18, rx: 0.32, ry: 0.22, color: c.constants, opacity: 0.22 },
-      { cx: 0.72, cy: 0.25, rx: 0.28, ry: 0.18, color: c.hueBlue, opacity: 0.18 },
+      // Vast cosmic filament glow — wide and diffuse, not a spotlight
+      { cx: 0.45, cy: 0.4, rx: 0.58, ry: 0.48, color: c.accent, opacity: 0.18 },
+      { cx: 0.22, cy: 0.28, rx: 0.32, ry: 0.28, color: c.keywords, opacity: 0.14 },
+      { cx: 0.74, cy: 0.65, rx: 0.3, ry: 0.24, color: c.functions, opacity: 0.12 },
     ],
     glowBlur: 60,
     effects: [
-      // Primary bolt — centre canvas, main strike, bright accent
-      lightningBrick(p, {
-        id: "ma-l1",
-        startX: 0.48,
-        startY: 0.0,
-        endX: 0.44,
-        endY: 1.0,
+      // Layer 1 — cosmic backdrop: faint scattered stars
+      starFieldBrick(p, {
+        id: "ma-sf",
+        count: 500,
+        brightCount: 22,
+        color: c.accentSoft,
+        distribution: "full",
+        opacity: 0.52,
+      }),
+      // Layer 2 — fine Delaunay web: the thin cosmic filaments / mortar lines
+      voronoiBrick(p, {
+        id: "ma-d1",
+        points: 220,
+        mode: "delaunay",
+        color: c.functions,
+        opacity: 0.32,
+        fillOpacity: 0,
+        strokeWidth: 0.65,
+        glowRadius: 2.2,
+      }),
+      // Layer 3 — medium Voronoi: internal cell structure, moderate glow
+      voronoiBrick(p, {
+        id: "ma-v2",
+        points: 90,
+        color: c.keywords,
+        opacity: 0.5,
+        fillOpacity: 0.06,
+        strokeWidth: 1.9,
+        relaxIterations: 5,
+        glowRadius: 3.5,
+      }),
+      // Layer 4 — macro cosmic bricks: 8 Lloyd passes → near-hexagonal cells
+      //           thick glowing edges, semi-transparent faces catch the glow
+      voronoiBrick(p, {
+        id: "ma-v1",
+        points: 28,
         color: c.accent,
-        opacity: 0.95,
-        branches: 5,
-      }),
-      // Secondary bolt — left side, hits mid-canvas, different hue
-      lightningBrick(p, {
-        id: "ma-l2",
-        startX: 0.24,
-        startY: 0.02,
-        endX: 0.18,
-        endY: 0.88,
-        color: c.constants,
         opacity: 0.72,
-        branches: 3,
+        fillOpacity: 0.14,
+        strokeWidth: 3.8,
+        relaxIterations: 8,
+        glowRadius: 4.5,
       }),
-      // Tertiary bolt — right side, short burst
-      lightningBrick(p, {
-        id: "ma-l3",
-        startX: 0.72,
-        startY: 0.04,
-        endX: 0.76,
-        endY: 0.82,
-        color: c.hueBlue,
-        opacity: 0.55,
-        branches: 2,
-      }),
-      // Heavy storm-air grain
+      // Layer 5 — nebula dust: fills the interior of cells with soft colour
       nebulaDustBrick(p, {
         id: "ma-nd1",
         tintColor: c.accentSoft,
-        opacity: 0.32,
+        opacity: 0.22,
         baseFrequency: 0.003,
         numOctaves: 4,
-        alphaStrength: 0.5,
+        alphaStrength: 0.38,
       }),
     ],
   });
@@ -675,60 +706,60 @@ function composeVoidEmber(p: BrickParams): ComposedWallpaper {
     ],
     glowBlur: 12,
     effects: [
-      // Dense ember base — many sparks rising from the bottom third
+      // Dense ember base — full-width sparks rising from the bottom
       sparksBrick(p, {
         id: "ve-s1",
-        count: 220,
+        count: 280,
         color: c.hueRed,
         opacity: 0.88,
         direction: 1,
         sourceCx: 0.5,
-        sourceSpread: 0.7,
+        sourceSpread: 1.0,
         sourceCy: 0.9,
         lengthScale: 1.2,
       }),
-      // Mid-canvas sparks — launch from center-bottom, reach the upper half
+      // Mid-canvas sparks — full-width, reach the upper half
       sparksBrick(p, {
         id: "ve-s2",
-        count: 130,
+        count: 160,
         color: c.hueOrange,
         opacity: 0.68,
         direction: 1,
         sourceCx: 0.5,
-        sourceSpread: 0.5,
+        sourceSpread: 1.0,
         sourceCy: 0.65,
         lengthScale: 2.2,
       }),
-      // High-energy sparks — launch from upper-middle, streak to the very top
+      // High-energy sparks — full-width, streak to the very top
       sparksBrick(p, {
         id: "ve-s3",
-        count: 65,
+        count: 80,
         color: c.hueYellow,
         opacity: 0.5,
         direction: 1,
         sourceCx: 0.5,
-        sourceSpread: 0.35,
+        sourceSpread: 1.0,
         sourceCy: 0.38,
         lengthScale: 3.0,
       }),
-      // Ember bed — glowing particle pool at the base
+      // Ember particles — uniform across entire canvas, not just the base
       particlesBrick(p, {
         id: "ve-p1",
-        count: 350,
+        count: 500,
         color: c.hueOrange,
-        opacity: 0.5,
+        opacity: 0.48,
         minRadius: 1.5,
         maxRadius: 5,
-        distribution: "lower",
+        distribution: "uniform",
       }),
       particlesBrick(p, {
         id: "ve-p2",
-        count: 180,
+        count: 250,
         color: c.hueRed,
-        opacity: 0.65,
+        opacity: 0.62,
         minRadius: 2,
         maxRadius: 7,
-        distribution: "lower",
+        distribution: "uniform",
       }),
       // Smoke wisps rising from the ember bed
       smokeWispBrick(p, {
