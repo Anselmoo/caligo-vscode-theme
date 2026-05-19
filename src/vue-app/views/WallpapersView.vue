@@ -171,7 +171,7 @@ void gridEntries;
 }
 
 .state-message.error {
-  color: var(--hue-red, #e06c75);
+  color: var(--hue-red);
 }
 
 .spinner {
