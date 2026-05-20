@@ -75,22 +75,45 @@ function scaffold(
     );
   }
   layers.push(...opts.effects);
+
+  // ── Global 3D depth lighting ─────────────────────────────────────────────
+  // Directional key light: top-left highlight → bottom-right shadow.
+  // Simulates an overhead light source at ~135° and adds perceived volume.
+  const lgtId = `${prefix}-lgt`;
+  layers.push({
+    defs: `<linearGradient id="${lgtId}" x1="14%" y1="0%" x2="86%" y2="100%">
+  <stop offset="0%"   stop-color="#ffffff" stop-opacity="0.060"/>
+  <stop offset="40%"  stop-color="#ffffff" stop-opacity="0.010"/>
+  <stop offset="60%"  stop-color="#000000" stop-opacity="0.010"/>
+  <stop offset="100%" stop-color="#000000" stop-opacity="0.068"/>
+</linearGradient>`,
+    elements: `<rect width="${width}" height="${height}" fill="url(#${lgtId})"/>`,
+  });
+  // Atmospheric vignette: transparent centre → dark corners.
+  // Focuses the eye on the centre and makes the scene feel deep.
+  const vigId = `${prefix}-vig`;
+  layers.push({
+    defs: `<radialGradient id="${vigId}" cx="50%" cy="50%" r="72%">
+  <stop offset="0%"   stop-color="#000000" stop-opacity="0"/>
+  <stop offset="56%"  stop-color="#000000" stop-opacity="0"/>
+  <stop offset="100%" stop-color="#000000" stop-opacity="0.54"/>
+</radialGradient>`,
+    elements: `<rect width="${width}" height="${height}" fill="url(#${vigId})"/>`,
+  });
+
   return mergeBricks(layers);
 }
 
-// ─── Liquid glass wave bands ─────────────────────────────────────────────────
-// Renders N overlapping translucent wave bands spanning the full canvas height.
-// Each band has a blurred frosted-glass fill + a crisp white highlight stroke
-// on its top edge + a thin coloured outline — producing a liquid-glass optic.
+// ─── Liquid glass wave bands (kept for reference — not currently used) ───────
 
 interface LiquidWaveBand {
-  cy: number; // centre Y as fraction of height
+  cy: number;
   color: string;
   opacity: number;
-  phase: number; // wave phase offset in radians
+  phase: number;
 }
 
-function liquidWaveBands(p: BrickParams, id: string, bands: LiquidWaveBand[]): BrickOutput {
+function _liquidWaveBands(p: BrickParams, id: string, bands: LiquidWaveBand[]): BrickOutput {
   const { viewBox } = p;
   const { width, height } = viewBox;
 
@@ -164,6 +187,88 @@ function liquidWaveBands(p: BrickParams, id: string, bands: LiquidWaveBand[]): B
     defs: defs.join("\n"),
     elements: `<g id="${id}">${elems.join("\n")}</g>`,
   };
+}
+
+// ─── Chocolate-bar segment grid ──────────────────────────────────────────────
+// Responsive grid of raised rectangular panels with dark grooves between them.
+// Landscape: 6 cols × 5 rows. Portrait: 4 cols × 7 rows.
+// Each panel: row-tinted base fill → objectBoundingBox bevel (top-left highlight /
+// bottom-right shadow) → gloss specular oval at top-center.
+// Intense palette colors at near-full opacity for a rich confection look.
+
+function chocolateBar(p: BrickParams, id: string): BrickOutput {
+  const { viewBox, colors: c } = p;
+  const { width, height } = viewBox;
+
+  const landscape = width >= height;
+  const cols = landscape ? 6 : 4;
+  const rows = landscape ? 5 : 7;
+  const groove = Math.max(4, Math.round(Math.min(width, height) * 0.0028));
+  const segW = (width - groove * (cols + 1)) / cols;
+  const segH = (height - groove * (rows + 1)) / rows;
+  const r = Math.max(3, Math.round(Math.min(segW, segH) * 0.055));
+
+  // One intense hue per row — warm (red/orange) → mid (yellow/functions) → cool (accent)
+  const rowColors = [
+    c.hueRed,
+    c.hueOrange,
+    c.hueYellow,
+    c.functions,
+    c.accent,
+    c.hueBlue,
+    c.huePurple,
+  ];
+
+  const defs: string[] = [];
+  const elems: string[] = [];
+
+  // Bevel — objectBoundingBox so every rect gets its own top-left highlight / bottom-right shadow
+  const bevelId = `${id}-bv`;
+  defs.push(
+    `<linearGradient id="${bevelId}" x1="0%" y1="0%" x2="100%" y2="100%" gradientUnits="objectBoundingBox">
+  <stop offset="0%"   stop-color="#ffffff" stop-opacity="0.38"/>
+  <stop offset="40%"  stop-color="#ffffff" stop-opacity="0.05"/>
+  <stop offset="60%"  stop-color="#000000" stop-opacity="0.05"/>
+  <stop offset="100%" stop-color="#000000" stop-opacity="0.56"/>
+</linearGradient>`
+  );
+
+  // Gloss — specular oval at top-center of each segment
+  const glossId = `${id}-gl`;
+  defs.push(
+    `<radialGradient id="${glossId}" cx="42%" cy="26%" r="50%" gradientUnits="objectBoundingBox">
+  <stop offset="0%"   stop-color="#ffffff" stop-opacity="0.44"/>
+  <stop offset="52%"  stop-color="#ffffff" stop-opacity="0.09"/>
+  <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+</radialGradient>`
+  );
+
+  for (let row = 0; row < rows; row++) {
+    const fill = rowColors[row % rowColors.length];
+
+    // Per-row base: slight top-to-bottom darkening adds inner warmth
+    const rgId = `${id}-r${row}`;
+    defs.push(
+      `<linearGradient id="${rgId}" x1="0%" y1="0%" x2="0%" y2="100%" gradientUnits="objectBoundingBox">
+  <stop offset="0%"   stop-color="${fill}" stop-opacity="0.96"/>
+  <stop offset="100%" stop-color="${fill}" stop-opacity="0.76"/>
+</linearGradient>`
+    );
+
+    for (let col = 0; col < cols; col++) {
+      const x = (groove + col * (segW + groove)).toFixed(1);
+      const y = (groove + row * (segH + groove)).toFixed(1);
+      const w = segW.toFixed(1);
+      const h = segH.toFixed(1);
+      elems.push(
+        `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="url(#${rgId})"/>`,
+        `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="url(#${bevelId})"/>`,
+        `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="url(#${glossId})"/>`
+      );
+    }
+  }
+
+  return { defs: defs.join("\n"), elements: `<g id="${id}">${elems.join("\n")}</g>` };
 }
 
 // ─── Registry ────────────────────────────────────────────────────────────────
@@ -306,39 +411,30 @@ function composeCinder(p: BrickParams): ComposedWallpaper {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 3. DeepSable — Liquid glass over starfield
-//    Dense star field fills the entire canvas. Six liquid-glass wave bands
-//    span the full height (heavily overlapping) giving a frosted-glass optic.
-//    Each band: blurred fill + white glint stroke + coloured outline.
-//    Gradient background gives depth for the transparent layers to read against.
+// 3. DeepSable — Chocolate bar segment grid
+//    Responsive grid of raised rectangular panels (6×5 landscape, 4×7 portrait)
+//    separated by crisp dark grooves. Each panel has a full-spectrum bevel
+//    (top-left highlight / bottom-right shadow via objectBoundingBox gradient)
+//    and a specular gloss oval — reads as solid moulded chocolate.
+//    Five intense palette hues (one per row) at near-full opacity give the
+//    "more intense colors" the design calls for. flatBg keeps the grooves jet-
+//    black so the raised faces have maximum pop against the void floor.
 // ═══════════════════════════════════════════════════════════════════════════
 
 function composeDeepSable(p: BrickParams): ComposedWallpaper {
   const c = p.colors;
   return scaffold(p, "ds", {
-    glows: [
-      { cx: 0.5, cy: 0.45, rx: 0.55, ry: 0.4, color: c.strings, opacity: 0.12 },
-      { cx: 0.3, cy: 0.6, rx: 0.3, ry: 0.22, color: c.types, opacity: 0.09 },
-    ],
-    glowBlur: 80,
+    flatBg: true,
     effects: [
-      // Six liquid glass wave bands — cy 0.0→1.0, full canvas height coverage
-      liquidWaveBands(p, "ds-lw", [
-        { cy: 0.0, color: c.strings, opacity: 0.48, phase: 0.0 },
-        { cy: 0.2, color: c.types, opacity: 0.52, phase: 1.1 },
-        { cy: 0.4, color: c.functions, opacity: 0.5, phase: 2.3 },
-        { cy: 0.6, color: c.keywords, opacity: 0.52, phase: 3.5 },
-        { cy: 0.8, color: c.huePurple, opacity: 0.48, phase: 4.7 },
-        { cy: 1.0, color: c.hueBlue, opacity: 0.44, phase: 5.9 },
-      ]),
-      // Fine cosmic dust behind the glass
+      chocolateBar(p, "ds-cb"),
+      // Subtle noise overlay — takes the "printed" look off the segments
       nebulaDustBrick(p, {
         id: "ds-nd1",
-        tintColor: c.strings,
-        opacity: 0.12,
-        baseFrequency: 0.003,
-        numOctaves: 4,
-        alphaStrength: 0.28,
+        tintColor: c.bgMid,
+        opacity: 0.14,
+        baseFrequency: 0.004,
+        numOctaves: 3,
+        alphaStrength: 0.22,
       }),
     ],
   });
