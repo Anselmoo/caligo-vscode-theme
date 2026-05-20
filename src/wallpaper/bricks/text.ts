@@ -26,9 +26,12 @@ export function textBrick(params: BrickParams, options: TextBrickOptions): Brick
   const pillPadV = Math.round(20 * scale);
   const pillRadius = Math.round(12 * scale);
 
-  // Estimate pill width (approximately 0.6ch per px at given font-size)
+  // JetBrains Mono advances ≈ 0.600 em per glyph; use 0.62 for a safety margin
+  // so long harmony-mode names like "Split Complementary" never clip the pill edge.
   const maxChars = Math.max(line1.length, line2.length);
-  const pillW = Math.round(maxChars * fontSize2 * 0.58 + pillPadH * 2);
+  const rawPillW = Math.round(maxChars * fontSize2 * 0.62 + pillPadH * 2);
+  // Never wider than 90% of the canvas so the pill always fits.
+  const pillW = Math.min(rawPillW, Math.round(width * 0.9));
   const pillH = Math.round(fontSize1 + fontSize2 + lineGap + pillPadV * 2);
 
   let x: number;

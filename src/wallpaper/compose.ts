@@ -189,86 +189,157 @@ function _liquidWaveBands(p: BrickParams, id: string, bands: LiquidWaveBand[]): 
   };
 }
 
-// ─── Chocolate-bar segment grid ──────────────────────────────────────────────
-// Responsive grid of raised rectangular panels with dark grooves between them.
-// Landscape: 6 cols × 5 rows. Portrait: 4 cols × 7 rows.
-// Each panel: row-tinted base fill → objectBoundingBox bevel (top-left highlight /
-// bottom-right shadow) → gloss specular oval at top-center.
-// Intense palette colors at near-full opacity for a rich confection look.
+// ─── Seeded PRNG (mulberry32) ────────────────────────────────────────────────
 
-function chocolateBar(p: BrickParams, id: string): BrickOutput {
-  const { viewBox, colors: c } = p;
+function _seedRng(seed: number) {
+  let s = seed;
+  return () => {
+    s += 0x6d2b79f5;
+    let t = s;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 0x100000000;
+  };
+}
+
+function _hashStr(str: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h;
+}
+
+// ─── Full-canvas energy orb ───────────────────────────────────────────────────
+// The orb is scaled so its sphere radius equals the canvas diagonal — meaning
+// the rim clips at all four canvas edges and the interior fills the frame.
+// You are looking at the inside of an energy sphere.
+//
+// Layers (bottom → top):
+//   1. Hot-spot radial gradient at canvas centre
+//   2. Wide neon ribbons (thick bezier arcs, blurred) — the glow body
+//   3. Crisp neon tendrils (thin bezier arcs with white hot-core line)
+//   4. Sphere rim ring (large circle whose stroke clips at canvas boundary)
+//   5. Inner rim (slightly smaller, coloured)
+
+function energyOrb(p: BrickParams, id: string): BrickOutput {
+  const { viewBox, colors: c, seedId, harmonyMode } = p;
   const { width, height } = viewBox;
+  const sc = Math.max(width, height) / 2160;
+  const rng = _seedRng(_hashStr(`${seedId}-${harmonyMode}-eo-${id}`));
 
-  const landscape = width >= height;
-  const cols = landscape ? 6 : 4;
-  const rows = landscape ? 5 : 7;
-  const groove = Math.max(4, Math.round(Math.min(width, height) * 0.0028));
-  const segW = (width - groove * (cols + 1)) / cols;
-  const segH = (height - groove * (rows + 1)) / rows;
-  const r = Math.max(3, Math.round(Math.min(segW, segH) * 0.055));
-
-  // One intense hue per row — warm (red/orange) → mid (yellow/functions) → cool (accent)
-  const rowColors = [
-    c.hueRed,
-    c.hueOrange,
-    c.hueYellow,
-    c.functions,
-    c.accent,
-    c.hueBlue,
-    c.huePurple,
-  ];
+  const cx = width / 2;
+  const cy = height / 2;
+  // Sphere radius = diagonal/2 so the circumference passes through all 4 corners
+  const R = Math.sqrt(width * width + height * height) / 2;
 
   const defs: string[] = [];
   const elems: string[] = [];
 
-  // Bevel — objectBoundingBox so every rect gets its own top-left highlight / bottom-right shadow
-  const bevelId = `${id}-bv`;
+  // ── Central hot spot (radial gradient filling the sphere interior) ──────────
+  const hotId = `${id}-hot`;
   defs.push(
-    `<linearGradient id="${bevelId}" x1="0%" y1="0%" x2="100%" y2="100%" gradientUnits="objectBoundingBox">
-  <stop offset="0%"   stop-color="#ffffff" stop-opacity="0.38"/>
-  <stop offset="40%"  stop-color="#ffffff" stop-opacity="0.05"/>
-  <stop offset="60%"  stop-color="#000000" stop-opacity="0.05"/>
-  <stop offset="100%" stop-color="#000000" stop-opacity="0.56"/>
-</linearGradient>`
-  );
-
-  // Gloss — specular oval at top-center of each segment
-  const glossId = `${id}-gl`;
-  defs.push(
-    `<radialGradient id="${glossId}" cx="42%" cy="26%" r="50%" gradientUnits="objectBoundingBox">
-  <stop offset="0%"   stop-color="#ffffff" stop-opacity="0.44"/>
-  <stop offset="52%"  stop-color="#ffffff" stop-opacity="0.09"/>
-  <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    `<radialGradient id="${hotId}" cx="50%" cy="50%" r="50%">
+  <stop offset="0%"   stop-color="#ffffff"     stop-opacity="0.52"/>
+  <stop offset="18%"  stop-color="${c.hueCyan}" stop-opacity="0.38"/>
+  <stop offset="45%"  stop-color="${c.accent}"  stop-opacity="0.18"/>
+  <stop offset="100%" stop-color="${c.accent}"  stop-opacity="0"/>
 </radialGradient>`
   );
+  elems.push(
+    `<ellipse cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" rx="${(width * 0.42).toFixed(1)}" ry="${(height * 0.42).toFixed(1)}" fill="url(#${hotId})"/>`
+  );
 
-  for (let row = 0; row < rows; row++) {
-    const fill = rowColors[row % rowColors.length];
+  // ── Ribbon blur filters ──────────────────────────────────────────────────────
+  const wideBlurId = `${id}-wb`;
+  defs.push(
+    `<filter id="${wideBlurId}" x="-8%" y="-8%" width="116%" height="116%"><feGaussianBlur stdDeviation="${(11 * sc).toFixed(1)}"/></filter>`
+  );
+  const thinBlurId = `${id}-tb`;
+  defs.push(
+    `<filter id="${thinBlurId}" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="${(3.5 * sc).toFixed(1)}"/></filter>`
+  );
 
-    // Per-row base: slight top-to-bottom darkening adds inner warmth
-    const rgId = `${id}-r${row}`;
-    defs.push(
-      `<linearGradient id="${rgId}" x1="0%" y1="0%" x2="0%" y2="100%" gradientUnits="objectBoundingBox">
-  <stop offset="0%"   stop-color="${fill}" stop-opacity="0.96"/>
-  <stop offset="100%" stop-color="${fill}" stop-opacity="0.76"/>
-</linearGradient>`
+  const palette = [c.accent, c.hueBlue, c.hueCyan, c.huePurple, c.hueGreen, c.hueRed, c.hueOrange];
+
+  // ── Wide glowing ribbons (6) — sweep edge-to-edge through the interior ───────
+  for (let i = 0; i < 6; i++) {
+    const color = palette[i % palette.length];
+    const op = 0.3 + rng() * 0.28;
+    const sw = (4.5 + rng() * 6.0) * sc;
+
+    // Endpoints on the sphere rim (canvas edge region), control points near centre
+    const a1 = rng() * Math.PI * 2;
+    const a2 = a1 + Math.PI * (0.45 + rng() * 0.65);
+    const x1 = cx + Math.cos(a1) * R * 0.92;
+    const y1 = cy + Math.sin(a1) * R * 0.92;
+    const x2 = cx + Math.cos(a2) * R * 0.92;
+    const y2 = cy + Math.sin(a2) * R * 0.92;
+    const off = R * (0.08 + rng() * 0.28);
+    const ca1 = a1 + (rng() - 0.5) * 1.1;
+    const ca2 = a2 + (rng() - 0.5) * 1.1;
+    const cp1x = cx + Math.cos(ca1) * off;
+    const cp1y = cy + Math.sin(ca1) * off;
+    const cp2x = cx + Math.cos(ca2) * off;
+    const cp2y = cy + Math.sin(ca2) * off;
+    const d = `M ${x1.toFixed(1)} ${y1.toFixed(1)} C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)} ${cp2x.toFixed(1)} ${cp2y.toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}`;
+
+    elems.push(
+      `<path d="${d}" fill="none" stroke="${color}" stroke-width="${(sw * 4.5).toFixed(1)}" stroke-opacity="${(op * 0.28).toFixed(3)}" stroke-linecap="round" filter="url(#${wideBlurId})"/>`
     );
-
-    for (let col = 0; col < cols; col++) {
-      const x = (groove + col * (segW + groove)).toFixed(1);
-      const y = (groove + row * (segH + groove)).toFixed(1);
-      const w = segW.toFixed(1);
-      const h = segH.toFixed(1);
-      elems.push(
-        `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="url(#${rgId})"/>`,
-        `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="url(#${bevelId})"/>`,
-        `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="url(#${glossId})"/>`
-      );
-    }
+    elems.push(
+      `<path d="${d}" fill="none" stroke="${color}" stroke-width="${sw.toFixed(1)}" stroke-opacity="${op.toFixed(3)}" stroke-linecap="round"/>`
+    );
   }
 
-  return { defs: defs.join("\n"), elements: `<g id="${id}">${elems.join("\n")}</g>` };
+  // ── Thin crisp tendrils (14) — white hot-core + coloured outer line ──────────
+  for (let i = 0; i < 14; i++) {
+    const color = palette[i % palette.length];
+    const op = 0.5 + rng() * 0.42;
+    const sw = (0.9 + rng() * 1.4) * sc;
+
+    const a1 = rng() * Math.PI * 2;
+    const a2 = a1 + Math.PI * (0.28 + rng() * 0.85);
+    const x1 = cx + Math.cos(a1) * R * (0.65 + rng() * 0.28);
+    const y1 = cy + Math.sin(a1) * R * (0.65 + rng() * 0.28);
+    const x2 = cx + Math.cos(a2) * R * (0.65 + rng() * 0.28);
+    const y2 = cy + Math.sin(a2) * R * (0.65 + rng() * 0.28);
+    const off = R * (0.04 + rng() * 0.2);
+    const cp1x = cx + (rng() - 0.5) * off * 2;
+    const cp1y = cy + (rng() - 0.5) * off * 2;
+    const cp2x = cx + (rng() - 0.5) * off * 2;
+    const cp2y = cy + (rng() - 0.5) * off * 2;
+    const d = `M ${x1.toFixed(1)} ${y1.toFixed(1)} C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)} ${cp2x.toFixed(1)} ${cp2y.toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}`;
+
+    elems.push(
+      `<path d="${d}" fill="none" stroke="${color}" stroke-width="${(sw * 3.2).toFixed(1)}" stroke-opacity="${(op * 0.22).toFixed(3)}" stroke-linecap="round" filter="url(#${thinBlurId})"/>`
+    );
+    elems.push(
+      `<path d="${d}" fill="none" stroke="#ffffff" stroke-width="${(sw * 0.55).toFixed(1)}" stroke-opacity="${(op * 0.55).toFixed(3)}" stroke-linecap="round"/>`
+    );
+    elems.push(
+      `<path d="${d}" fill="none" stroke="${color}" stroke-width="${sw.toFixed(1)}" stroke-opacity="${op.toFixed(3)}" stroke-linecap="round"/>`
+    );
+  }
+
+  // ── Sphere rim ring — clips at canvas edges, creating the orb boundary ───────
+  const rimGlow1Id = `${id}-rg1`;
+  const rimGlow2Id = `${id}-rg2`;
+  defs.push(
+    `<filter id="${rimGlow1Id}" x="-4%" y="-4%" width="108%" height="108%"><feGaussianBlur stdDeviation="${(28 * sc).toFixed(1)}"/></filter>`,
+    `<filter id="${rimGlow2Id}" x="-2%" y="-2%" width="104%" height="104%"><feGaussianBlur stdDeviation="${(8 * sc).toFixed(1)}"/></filter>`
+  );
+  elems.push(
+    `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${R.toFixed(1)}" fill="none" stroke="${c.accent}" stroke-width="${(22 * sc).toFixed(1)}" stroke-opacity="0.45" filter="url(#${rimGlow1Id})"/>`,
+    `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${R.toFixed(1)}" fill="none" stroke="${c.hueBlue}" stroke-width="${(9 * sc).toFixed(1)}" stroke-opacity="0.55" filter="url(#${rimGlow2Id})"/>`,
+    `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${R.toFixed(1)}" fill="none" stroke="#ffffff" stroke-width="${(2.2 * sc).toFixed(1)}" stroke-opacity="0.60"/>`
+  );
+
+  return {
+    defs: defs.join("\n"),
+    elements: `<g id="${id}">${elems.join("\n")}</g>`,
+  };
 }
 
 // ─── Registry ────────────────────────────────────────────────────────────────
@@ -411,14 +482,12 @@ function composeCinder(p: BrickParams): ComposedWallpaper {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 3. DeepSable — Chocolate bar segment grid
-//    Responsive grid of raised rectangular panels (6×5 landscape, 4×7 portrait)
-//    separated by crisp dark grooves. Each panel has a full-spectrum bevel
-//    (top-left highlight / bottom-right shadow via objectBoundingBox gradient)
-//    and a specular gloss oval — reads as solid moulded chocolate.
-//    Five intense palette hues (one per row) at near-full opacity give the
-//    "more intense colors" the design calls for. flatBg keeps the grooves jet-
-//    black so the raised faces have maximum pop against the void floor.
+// 3. DeepSable — Full-canvas energy orb
+//    The sphere radius equals the canvas diagonal so its rim clips at all
+//    four canvas edges — you are looking at the interior of the orb.
+//    Wide blurred ribbons sweep edge-to-edge; thin crisp tendrils with
+//    white hot-cores overlay them. A bright central hot-spot and a glowing
+//    rim ring (whose stroke clips at the canvas boundary) complete the look.
 // ═══════════════════════════════════════════════════════════════════════════
 
 function composeDeepSable(p: BrickParams): ComposedWallpaper {
@@ -426,16 +495,18 @@ function composeDeepSable(p: BrickParams): ComposedWallpaper {
   return scaffold(p, "ds", {
     flatBg: true,
     effects: [
-      chocolateBar(p, "ds-cb"),
-      // Subtle noise overlay — takes the "printed" look off the segments
+      // Faint deep-space dust — just enough grain to prevent the black from
+      // looking perfectly flat without brightening the dark areas
       nebulaDustBrick(p, {
         id: "ds-nd1",
-        tintColor: c.bgMid,
+        tintColor: c.accentSoft,
         opacity: 0.14,
-        baseFrequency: 0.004,
-        numOctaves: 3,
-        alphaStrength: 0.22,
+        baseFrequency: 0.003,
+        numOctaves: 4,
+        alphaStrength: 0.28,
       }),
+      // Energy orb — fills the entire canvas
+      energyOrb(p, "ds-eo"),
     ],
   });
 }
