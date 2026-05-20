@@ -223,118 +223,110 @@ function _hashStr(str: string): number {
 //   4. Sphere rim ring (large circle whose stroke clips at canvas boundary)
 //   5. Inner rim (slightly smaller, coloured)
 
-function energyOrb(p: BrickParams, id: string): BrickOutput {
-  const { viewBox, colors: c, seedId, harmonyMode } = p;
-  const { width, height } = viewBox;
-  const sc = Math.max(width, height) / 2160;
-  const rng = _seedRng(_hashStr(`${seedId}-${harmonyMode}-eo-${id}`));
+// ─── Stellar nursery cloud (DeepSable) ───────────────────────────────────────
+// Large billowing plasma clouds with star-forming cores — like the Pillars of
+// Creation or Orion Nebula: vast gas columns, dark voids between them, and 3
+// bright proto-stellar hotspots buried inside the densest cloud regions.
+//
+// Key parameters that produce real cloud look (not grain):
+//   • type="fractalNoise" → smooth, organic cloud shapes (not chaotic turbulence)
+//   • baseFrequency ~0.002 → feature size ~500 px at 4 K; 3-4 large pillars
+//   • feComponentTransfer alpha table cuts off below ~60 % noise → clear dark voids
+//   • Only 2 palette colours per layer → no muddy colour mixing
+//   • Stars rendered BEFORE the cloud so they show through the transparent gaps
+//
+// Layer order (back → front):
+//   stars (behind cloud, visible through voids)
+//   L1  giant cloud pillars    — huePurple → hueCyan body (fractalNoise 0.002)
+//   L2  emission glow          — hueBlue → accent inside bright regions (0.005)
+//   L3  hot-core filaments     — accent → white, top-15 % peaks only (0.010)
+//   3× proto-stellar hotspots  — off-centre radial glows
 
-  const cx = width / 2;
-  const cy = height / 2;
-  // Sphere radius = diagonal/2 so the circumference passes through all 4 corners
-  const R = Math.sqrt(width * width + height * height) / 2;
+function plasmaField(p: BrickParams, id: string): BrickOutput {
+  const { viewBox, colors: c } = p;
+  const { width, height } = viewBox;
 
   const defs: string[] = [];
   const elems: string[] = [];
 
-  // ── Central hot spot (radial gradient filling the sphere interior) ──────────
-  const hotId = `${id}-hot`;
-  defs.push(
-    `<radialGradient id="${hotId}" cx="50%" cy="50%" r="50%">
-  <stop offset="0%"   stop-color="#ffffff"     stop-opacity="0.52"/>
-  <stop offset="18%"  stop-color="${c.hueCyan}" stop-opacity="0.38"/>
-  <stop offset="45%"  stop-color="${c.accent}"  stop-opacity="0.18"/>
-  <stop offset="100%" stop-color="${c.accent}"  stop-opacity="0"/>
+  function rgb(hex: string): [number, number, number] {
+    const h = hex.replace("#", "");
+    return [
+      parseInt(h.slice(0, 2), 16) / 255,
+      parseInt(h.slice(2, 4), 16) / 255,
+      parseInt(h.slice(4, 6), 16) / 255,
+    ];
+  }
+
+  // Cloud layer: fractalNoise (smooth pillar shapes) at a LOW base frequency
+  // so feature size is hundreds of pixels — actual cloud masses, not grain.
+  // alphaTable: 6 control points covering [0, 0.2, 0.4, 0.6, 0.8, 1.0].
+  // Setting the first 3 stops to 0 means everything below ~60 % intensity is
+  // fully transparent → real dark void between cloud pillars.
+  function cloudLayer(
+    lid: string,
+    seed: number,
+    bfx: number,
+    bfy: number,
+    octaves: number,
+    colLow: string, // colour at ~60 % intensity (cloud body)
+    colHigh: string, // colour at 100 % intensity (cloud peak / emission)
+    alphaTable: string, // 6-stop table: "0 0 0 a3 a4 a5"
+    opacity: number
+  ): void {
+    const [rl, gl, bl] = rgb(colLow);
+    const [rh, gh, bh] = rgb(colHigh);
+    const fId = `${lid}-f`;
+    defs.push(
+      `<filter id="${fId}" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+  <feTurbulence type="fractalNoise" baseFrequency="${bfx.toFixed(5)} ${bfy.toFixed(5)}" numOctaves="${octaves}" seed="${seed}" result="t"/>
+  <feColorMatrix type="matrix" in="t" values=".333 .333 .333 0 0 .333 .333 .333 0 0 .333 .333 .333 0 0 0 0 0 1 0" result="gray"/>
+  <feComponentTransfer in="gray">
+    <feFuncR type="table" tableValues="0 0 0 ${rl.toFixed(3)} ${((rl + rh) / 2).toFixed(3)} ${rh.toFixed(3)}"/>
+    <feFuncG type="table" tableValues="0 0 0 ${gl.toFixed(3)} ${((gl + gh) / 2).toFixed(3)} ${gh.toFixed(3)}"/>
+    <feFuncB type="table" tableValues="0 0 0 ${bl.toFixed(3)} ${((bl + bh) / 2).toFixed(3)} ${bh.toFixed(3)}"/>
+    <feFuncA type="table" tableValues="${alphaTable}"/>
+  </feComponentTransfer>
+</filter>`
+    );
+    elems.push(
+      `<rect width="${width}" height="${height}" filter="url(#${fId})" opacity="${opacity}"/>`
+    );
+  }
+
+  // L1: giant cloud pillars — very large scale, smooth, deep colour
+  cloudLayer(`${id}-l1`, 4, 0.002, 0.0028, 4, c.huePurple, c.hueBlue, "0 0 0 0.30 0.72 0.92", 0.9);
+
+  // L2: emission glow — medium scale, shows only inside brightest cloud cores
+  cloudLayer(`${id}-l2`, 19, 0.0055, 0.007, 4, c.hueBlue, c.hueCyan, "0 0 0 0 0.55 0.90", 0.72);
+
+  // L3: hot filaments — fine detail, only the top ~15 % of noise range
+  cloudLayer(`${id}-l3`, 37, 0.01, 0.012, 3, c.hueCyan, c.accent, "0 0 0 0 0 1.0", 0.55);
+
+  // Proto-stellar forming cores — bright hotspots at irregular off-centre positions
+  // White core → palette colour → transparent; placed inside the cloud mass area
+  const cores: { cx: number; cy: number; rx: number; ry: number; inner: string; outer: string }[] =
+    [
+      { cx: 0.36, cy: 0.4, rx: 0.13, ry: 0.11, inner: c.accent, outer: c.hueBlue },
+      { cx: 0.61, cy: 0.57, rx: 0.09, ry: 0.09, inner: c.hueCyan, outer: c.hueBlue },
+      { cx: 0.74, cy: 0.3, rx: 0.07, ry: 0.07, inner: c.accent, outer: c.huePurple },
+    ];
+
+  for (let i = 0; i < cores.length; i++) {
+    const { cx, cy, rx, ry, inner, outer } = cores[i];
+    const gId = `${id}-core${i}`;
+    defs.push(
+      `<radialGradient id="${gId}" cx="50%" cy="50%" r="50%" gradientUnits="objectBoundingBox">
+  <stop offset="0%"   stop-color="#ffffff"  stop-opacity="0.95"/>
+  <stop offset="18%"  stop-color="${inner}" stop-opacity="0.80"/>
+  <stop offset="50%"  stop-color="${outer}" stop-opacity="0.38"/>
+  <stop offset="100%" stop-color="${outer}" stop-opacity="0"/>
 </radialGradient>`
-  );
-  elems.push(
-    `<ellipse cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" rx="${(width * 0.42).toFixed(1)}" ry="${(height * 0.42).toFixed(1)}" fill="url(#${hotId})"/>`
-  );
-
-  // ── Ribbon blur filters ──────────────────────────────────────────────────────
-  const wideBlurId = `${id}-wb`;
-  defs.push(
-    `<filter id="${wideBlurId}" x="-8%" y="-8%" width="116%" height="116%"><feGaussianBlur stdDeviation="${(11 * sc).toFixed(1)}"/></filter>`
-  );
-  const thinBlurId = `${id}-tb`;
-  defs.push(
-    `<filter id="${thinBlurId}" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="${(3.5 * sc).toFixed(1)}"/></filter>`
-  );
-
-  const palette = [c.accent, c.hueBlue, c.hueCyan, c.huePurple, c.hueGreen, c.hueRed, c.hueOrange];
-
-  // ── Wide glowing ribbons (6) — sweep edge-to-edge through the interior ───────
-  for (let i = 0; i < 6; i++) {
-    const color = palette[i % palette.length];
-    const op = 0.3 + rng() * 0.28;
-    const sw = (4.5 + rng() * 6.0) * sc;
-
-    // Endpoints on the sphere rim (canvas edge region), control points near centre
-    const a1 = rng() * Math.PI * 2;
-    const a2 = a1 + Math.PI * (0.45 + rng() * 0.65);
-    const x1 = cx + Math.cos(a1) * R * 0.92;
-    const y1 = cy + Math.sin(a1) * R * 0.92;
-    const x2 = cx + Math.cos(a2) * R * 0.92;
-    const y2 = cy + Math.sin(a2) * R * 0.92;
-    const off = R * (0.08 + rng() * 0.28);
-    const ca1 = a1 + (rng() - 0.5) * 1.1;
-    const ca2 = a2 + (rng() - 0.5) * 1.1;
-    const cp1x = cx + Math.cos(ca1) * off;
-    const cp1y = cy + Math.sin(ca1) * off;
-    const cp2x = cx + Math.cos(ca2) * off;
-    const cp2y = cy + Math.sin(ca2) * off;
-    const d = `M ${x1.toFixed(1)} ${y1.toFixed(1)} C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)} ${cp2x.toFixed(1)} ${cp2y.toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}`;
-
-    elems.push(
-      `<path d="${d}" fill="none" stroke="${color}" stroke-width="${(sw * 4.5).toFixed(1)}" stroke-opacity="${(op * 0.28).toFixed(3)}" stroke-linecap="round" filter="url(#${wideBlurId})"/>`
     );
     elems.push(
-      `<path d="${d}" fill="none" stroke="${color}" stroke-width="${sw.toFixed(1)}" stroke-opacity="${op.toFixed(3)}" stroke-linecap="round"/>`
+      `<ellipse cx="${(cx * width).toFixed(1)}" cy="${(cy * height).toFixed(1)}" rx="${(rx * width).toFixed(1)}" ry="${(ry * height).toFixed(1)}" fill="url(#${gId})"/>`
     );
   }
-
-  // ── Thin crisp tendrils (14) — white hot-core + coloured outer line ──────────
-  for (let i = 0; i < 14; i++) {
-    const color = palette[i % palette.length];
-    const op = 0.5 + rng() * 0.42;
-    const sw = (0.9 + rng() * 1.4) * sc;
-
-    const a1 = rng() * Math.PI * 2;
-    const a2 = a1 + Math.PI * (0.28 + rng() * 0.85);
-    const x1 = cx + Math.cos(a1) * R * (0.65 + rng() * 0.28);
-    const y1 = cy + Math.sin(a1) * R * (0.65 + rng() * 0.28);
-    const x2 = cx + Math.cos(a2) * R * (0.65 + rng() * 0.28);
-    const y2 = cy + Math.sin(a2) * R * (0.65 + rng() * 0.28);
-    const off = R * (0.04 + rng() * 0.2);
-    const cp1x = cx + (rng() - 0.5) * off * 2;
-    const cp1y = cy + (rng() - 0.5) * off * 2;
-    const cp2x = cx + (rng() - 0.5) * off * 2;
-    const cp2y = cy + (rng() - 0.5) * off * 2;
-    const d = `M ${x1.toFixed(1)} ${y1.toFixed(1)} C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)} ${cp2x.toFixed(1)} ${cp2y.toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}`;
-
-    elems.push(
-      `<path d="${d}" fill="none" stroke="${color}" stroke-width="${(sw * 3.2).toFixed(1)}" stroke-opacity="${(op * 0.22).toFixed(3)}" stroke-linecap="round" filter="url(#${thinBlurId})"/>`
-    );
-    elems.push(
-      `<path d="${d}" fill="none" stroke="#ffffff" stroke-width="${(sw * 0.55).toFixed(1)}" stroke-opacity="${(op * 0.55).toFixed(3)}" stroke-linecap="round"/>`
-    );
-    elems.push(
-      `<path d="${d}" fill="none" stroke="${color}" stroke-width="${sw.toFixed(1)}" stroke-opacity="${op.toFixed(3)}" stroke-linecap="round"/>`
-    );
-  }
-
-  // ── Sphere rim ring — clips at canvas edges, creating the orb boundary ───────
-  const rimGlow1Id = `${id}-rg1`;
-  const rimGlow2Id = `${id}-rg2`;
-  defs.push(
-    `<filter id="${rimGlow1Id}" x="-4%" y="-4%" width="108%" height="108%"><feGaussianBlur stdDeviation="${(28 * sc).toFixed(1)}"/></filter>`,
-    `<filter id="${rimGlow2Id}" x="-2%" y="-2%" width="104%" height="104%"><feGaussianBlur stdDeviation="${(8 * sc).toFixed(1)}"/></filter>`
-  );
-  elems.push(
-    `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${R.toFixed(1)}" fill="none" stroke="${c.accent}" stroke-width="${(22 * sc).toFixed(1)}" stroke-opacity="0.45" filter="url(#${rimGlow1Id})"/>`,
-    `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${R.toFixed(1)}" fill="none" stroke="${c.hueBlue}" stroke-width="${(9 * sc).toFixed(1)}" stroke-opacity="0.55" filter="url(#${rimGlow2Id})"/>`,
-    `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${R.toFixed(1)}" fill="none" stroke="#ffffff" stroke-width="${(2.2 * sc).toFixed(1)}" stroke-opacity="0.60"/>`
-  );
 
   return {
     defs: defs.join("\n"),
@@ -482,31 +474,30 @@ function composeCinder(p: BrickParams): ComposedWallpaper {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 3. DeepSable — Full-canvas energy orb
-//    The sphere radius equals the canvas diagonal so its rim clips at all
-//    four canvas edges — you are looking at the interior of the orb.
-//    Wide blurred ribbons sweep edge-to-edge; thin crisp tendrils with
-//    white hot-cores overlay them. A bright central hot-spot and a glowing
-//    rim ring (whose stroke clips at the canvas boundary) complete the look.
+// 3. DeepSable — Full-screen plasma field
+//    Five feTurbulence layers at staggered frequencies and seeds fill the
+//    canvas wall-to-wall with glowing plasma. Each layer uses a threshold
+//    alpha-extract to pull only the brightest turbulence peaks, colourised
+//    with a distinct palette hue and soft-blurred into glowing bands.
+//    A bright radial hot-spot sits at the canvas centre. Particle sparkles
+//    dot the field. Dark void floor keeps the palette colours vivid.
 // ═══════════════════════════════════════════════════════════════════════════
 
 function composeDeepSable(p: BrickParams): ComposedWallpaper {
-  const c = p.colors;
   return scaffold(p, "ds", {
-    flatBg: true,
+    flatBg: true, // pure black — shows through the cloud voids as dark space
     effects: [
-      // Faint deep-space dust — just enough grain to prevent the black from
-      // looking perfectly flat without brightening the dark areas
-      nebulaDustBrick(p, {
-        id: "ds-nd1",
-        tintColor: c.accentSoft,
-        opacity: 0.14,
-        baseFrequency: 0.003,
-        numOctaves: 4,
-        alphaStrength: 0.28,
+      // Background stars visible through the transparent cloud gaps
+      starFieldBrick(p, {
+        id: "ds-sf",
+        count: 180,
+        brightCount: 6,
+        color: "#ffffff",
+        distribution: "full",
+        opacity: 0.72,
       }),
-      // Energy orb — fills the entire canvas
-      energyOrb(p, "ds-eo"),
+      // Stellar nursery cloud pillars with proto-star cores
+      plasmaField(p, "ds-pf"),
     ],
   });
 }
