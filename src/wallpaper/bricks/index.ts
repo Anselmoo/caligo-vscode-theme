@@ -1,0 +1,64 @@
+/**
+ * Bricks index — re-exports all brick functions for convenient import.
+ */
+
+export { atmosphereBrick, blendLayerBrick, toneCurveBrick } from "./atmosphere.js";
+export { backgroundBrick } from "./background.js";
+export { solarCoronaBrick } from "./celestial.js";
+export { campfireFlameBrick, lavaRiverBrick, smokeRisingBrick } from "./fire.js";
+export {
+  attractorBrick,
+  cipherBrick,
+  concentricRingsBrick,
+  convolutionBrick,
+  erosionBrick,
+  flowFieldBrick,
+  fractureBrick,
+  gridBrick,
+  kaleidoscopeBrick,
+  moirePatternBrick,
+  penroseBrick,
+  topologyBrick,
+} from "./generative.js";
+export { voronoiBrick } from "./geometry.js";
+export { linearGradientBrick, radialGradientBrick } from "./gradient.js";
+export type { TerrainProfile, TerrainProfileParams } from "./landscape.js";
+export {
+  auroraAdvancedBrick,
+  celestialBrick,
+  cloudBandBrick,
+  depthFactor,
+  desertBrick,
+  duneBrick,
+  horizonGlowBrick,
+  lightningBrick,
+  nebulaGlowBrick,
+  perspectiveRoughness,
+  ridgeHighlightBrick,
+  shootingStarBrick,
+  skyGradientBrick,
+  starFieldBrick,
+  terrainBrick,
+  terrainContourBrick,
+  terrainProfile,
+  terrainStackBrick,
+  treelineBrick,
+  volcanoBrick,
+  waterReflectionBrick,
+} from "./landscape.js";
+export { nebulaDustBrick, noiseBrick, turbulenceBrick } from "./noise.js";
+export { beachBrick, jellyfishBrick, waterCurrentBrick } from "./ocean.js";
+export { particlesBrick, sparksBrick } from "./particles.js";
+export type { RadialSpectrumRay } from "./shapes.js";
+// (textBrick exports below - keep aligned)
+export {
+  arcBrick,
+  bandBrick,
+  brushStrokeBrick,
+  curtainBrick,
+  radialSpectrumBrick,
+  raysBrick,
+  ringBrick,
+} from "./shapes.js";
+export { textBrick } from "./text.js";
+export { vignetteBrick } from "./vignette.js";

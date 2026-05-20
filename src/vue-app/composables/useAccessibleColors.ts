@@ -5,9 +5,9 @@
  * Ensures all color combinations meet minimum contrast requirements.
  */
 
-import { APCAcontrast, sRGBtoY } from "apca-w3";
 import { computed } from "vue";
-import { hexToSRGB } from "../utils/color-utils.js";
+import { APCAcontrast, sRGBtoY } from "../../lib/apca-wrapper.js";
+import { hexToRgbTuple } from "../utils/color-utils.js";
 import { useTheme } from "./useTheme.js";
 
 /**
@@ -43,8 +43,8 @@ export interface ContrastResult {
  */
 export function checkContrast(textColor: string, backgroundColor: string): ContrastResult {
   try {
-    const textRGB = hexToSRGB(textColor);
-    const bgRGB = hexToSRGB(backgroundColor);
+    const textRGB = hexToRgbTuple(textColor);
+    const bgRGB = hexToRgbTuple(backgroundColor);
 
     // Calculate APCA contrast
     const textY = sRGBtoY(textRGB);

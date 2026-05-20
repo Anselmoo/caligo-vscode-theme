@@ -24,16 +24,26 @@ import type { PreviewHarmonyMode, PreviewPalette, PreviewThemeSeed } from "../..
 
 // Seed palette metadata sourced from seeds-manifest.json (accent hue as base)
 export const THEME_SEEDS: PreviewThemeSeed[] = [
-  { name: "AuroraNoir", baseHue: 160, description: "Aurora Noir" },
-  { name: "Cinder", baseHue: 35, description: "Cinder" },
-  { name: "DeepSable", baseHue: 250, description: "Deep Sable" },
-  { name: "Eclipse", baseHue: 215, description: "Eclipse" },
-  { name: "GraphiteFlux", baseHue: 175, description: "Graphite Flux" },
-  { name: "Mandarian", baseHue: 55, description: "Mandarian" },
-  { name: "MidnightAtelier", baseHue: 320, description: "Midnight Atelier" },
-  { name: "NebulaNight", baseHue: 285, description: "Nebula Night" },
-  { name: "ObsidianGlow", baseHue: 195, description: "Obsidian Glow" },
-  { name: "VoidEmber", baseHue: 10, description: "Void Ember" },
+  { name: "Attractor", baseHue: 10, description: "Attractor" },
+  { name: "Cipher", baseHue: 240, description: "Cipher" },
+  { name: "Convolution", baseHue: 90, description: "Convolution" },
+  { name: "Datamosh", baseHue: 160, description: "Datamosh" },
+  { name: "DriftField", baseHue: 140, description: "Drift Field" },
+  { name: "Erosion", baseHue: 210, description: "Erosion" },
+  { name: "Filament", baseHue: 195, description: "Filament" },
+  { name: "Fracture", baseHue: 120, description: "Fracture" },
+  { name: "Interference", baseHue: 280, description: "Interference" },
+  { name: "Kaleidoscope", baseHue: 290, description: "Kaleidoscope" },
+  { name: "Lattice", baseHue: 160, description: "Lattice" },
+  { name: "Orbital", baseHue: 320, description: "Orbital" },
+  { name: "Parallax", baseHue: 345, description: "Parallax" },
+  { name: "Penrose", baseHue: 50, description: "Penrose" },
+  { name: "Ripple", baseHue: 200, description: "Ripple" },
+  { name: "Scatter", baseHue: 28, description: "Scatter" },
+  { name: "Signal", baseHue: 250, description: "Signal" },
+  { name: "Stratum", baseHue: 78, description: "Stratum" },
+  { name: "Tessellate", baseHue: 175, description: "Tessellate" },
+  { name: "Topology", baseHue: 100, description: "Topology" },
 ];
 
 export const HARMONY_MODES: PreviewHarmonyMode[] = [

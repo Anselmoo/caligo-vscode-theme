@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "vue-dev",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite", "dev", "--host", "--port", "4173"],
+      "port": 4173
+    },
+    {
+      "name": "gallery",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "public", "--listen", "5050"],
+      "port": 5050
+    },
+    {
+      "name": "wallpaper-dev",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["tsx", "scripts/wallpaper-dev.ts", "--motif=VoidEmber", "--mode=analogous"],
+      "port": 5051
+    }
+  ]
+}

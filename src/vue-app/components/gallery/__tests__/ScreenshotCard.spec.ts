@@ -6,9 +6,9 @@ describe("ScreenshotCard", () => {
   it("renders as a button and emits open on click", async () => {
     const wrapper = mount(ScreenshotCard, {
       props: {
-        themeName: "Aurora Noir — Balanced",
+        themeName: "Lattice — Balanced",
         filename: "/screenshots/test.png",
-        seedId: "AuroraNoir",
+        seedId: "Lattice",
         harmonyMode: "balanced",
       },
     });
@@ -27,9 +27,9 @@ describe("ScreenshotCard", () => {
 
     const wrapper = mount(ScreenshotCard, {
       props: {
-        themeName: "Aurora Noir — Balanced",
+        themeName: "Lattice — Balanced",
         filename: "test.png",
-        seedId: "AuroraNoir",
+        seedId: "Lattice",
         harmonyMode: "balanced",
       },
     });

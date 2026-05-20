@@ -66,7 +66,14 @@ describe("router/index", () => {
 
     expect(state.capturedConfig).not.toBeNull();
     const routeNames = (state.capturedConfig?.routes ?? []).map(route => route.name);
-    expect(routeNames).toEqual(["home", "gallery", "analysis", "export", "not-found"]);
+    expect(routeNames).toEqual([
+      "home",
+      "gallery",
+      "analysis",
+      "export",
+      "wallpapers",
+      "not-found",
+    ]);
   });
 
   it("resolves all lazy route components", async () => {
@@ -76,7 +83,7 @@ describe("router/index", () => {
       .filter((component): component is () => Promise<unknown> => typeof component === "function");
 
     const loaded = await Promise.all(lazyComponents.map(component => component()));
-    expect(loaded).toHaveLength(5);
+    expect(loaded).toHaveLength(6);
   });
 
   it("uses saved scroll position and defaults to top when absent", () => {

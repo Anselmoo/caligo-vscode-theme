@@ -17,7 +17,8 @@
       "!**/test-results",
       "!**/coverage",
       "!**/public",
-      "!**/.vscode-test"
+      "!**/.vscode-test",
+      "!**/.claude/worktrees"
     ]
   },
   "formatter": {

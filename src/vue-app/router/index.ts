@@ -48,6 +48,16 @@ const routes: RouteRecordRaw[] = [
     },
   },
   {
+    path: "/wallpapers",
+    name: "wallpapers",
+    component: () => import(/* webpackChunkName: "wallpapers" */ "../views/WallpapersView.vue"),
+    meta: {
+      title: "Wallpapers — Caligo Themes",
+      description: "50 unique wallpapers for monitor, tablet, and mobile",
+      transition: "slide-left",
+    },
+  },
+  {
     path: "/:pathMatch(.*)*",
     name: "not-found",
     component: () => import(/* webpackChunkName: "not-found" */ "../views/NotFoundView.vue"),
