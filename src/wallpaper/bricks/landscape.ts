@@ -2357,7 +2357,7 @@ export function desertBrick(params: BrickParams, options: DesertBrickOptions): B
     pyramidCount = 3,
   } = options;
 
-  const rng = seedRng(hashStr(`${seedId}-${harmonyMode}-${seedSuffix}`));
+  const rng = seedRng(hashStr(`${seedId}-${harmonyMode}-${seedSuffix}-${variant}`));
   const by = baseY * height;
 
   const defs: string[] = [];
@@ -3189,7 +3189,7 @@ export function lightningBrick(params: BrickParams, options: LightningBrickOptio
     skyFlashOpacity = 0.22,
   } = options;
 
-  const rng = seedRng(hashStr(`${seedId}-${harmonyMode}-bolt`));
+  const rng = seedRng(hashStr(`${seedId}-${harmonyMode}-bolt-${id}`));
   const sc = scale / 3840; // scale factor (1.0 at 4K)
 
   // Terminus defaults: ground strike near base, slightly offset from start

@@ -224,27 +224,33 @@ function _hashStr(str: string): number {
 //   5. Inner rim (slightly smaller, coloured)
 
 // ─── Stellar nursery cloud (DeepSable) ───────────────────────────────────────
-// Large billowing plasma clouds with star-forming cores — like the Pillars of
-// Creation or Orion Nebula: vast gas columns, dark voids between them, and 3
-// bright proto-stellar hotspots buried inside the densest cloud regions.
+// Three fractalNoise cloud layers with seeds derived from seedId+harmonyMode —
+// the same deterministic-random pattern used by starFieldBrick — so every one
+// of the 50 seed×harmony combinations produces a genuinely different cloud layout.
 //
-// Key parameters that produce real cloud look (not grain):
-//   • type="fractalNoise" → smooth, organic cloud shapes (not chaotic turbulence)
-//   • baseFrequency ~0.002 → feature size ~500 px at 4 K; 3-4 large pillars
-//   • feComponentTransfer alpha table cuts off below ~60 % noise → clear dark voids
-//   • Only 2 palette colours per layer → no muddy colour mixing
-//   • Stars rendered BEFORE the cloud so they show through the transparent gaps
-//
-// Layer order (back → front):
-//   stars (behind cloud, visible through voids)
-//   L1  giant cloud pillars    — huePurple → hueCyan body (fractalNoise 0.002)
-//   L2  emission glow          — hueBlue → accent inside bright regions (0.005)
-//   L3  hot-core filaments     — accent → white, top-15 % peaks only (0.010)
-//   3× proto-stellar hotspots  — off-centre radial glows
+// Key parameters:
+//   • type="fractalNoise" → smooth organic cloud masses (not grain)
+//   • baseFrequency 0.002–0.012 → feature size 200–500 px at 4 K
+//   • alpha table "0 0 0 …" → everything below ~60 % intensity is transparent
+//   • 2 palette colours per layer → no muddy mixing across layers
+//   • Slight baseFrequency jitter per harmonyMode → unique cloud silhouettes
 
 function plasmaField(p: BrickParams, id: string): BrickOutput {
-  const { viewBox, colors: c } = p;
+  const { viewBox, colors: c, seedId, harmonyMode } = p;
   const { width, height } = viewBox;
+
+  // Derive per-wallpaper seeds from the identity string — same technique as
+  // starFieldBrick: deterministic but unique for every seed × harmony combo.
+  const base = _hashStr(`${seedId}-${harmonyMode}-cloud`);
+  const rng = _seedRng(base);
+  // Three independent integer seeds for the three feTurbulence elements
+  const s1 = (base & 0xff) + 1; // 1–256
+  const s2 = ((base >> 8) & 0xff) + 1;
+  const s3 = ((base >> 16) & 0xff) + 1;
+  // Small frequency jitter (±15 %) so cloud shape varies across harmony modes
+  const j1 = 0.85 + rng() * 0.3;
+  const j2 = 0.85 + rng() * 0.3;
+  const j3 = 0.85 + rng() * 0.3;
 
   const defs: string[] = [];
   const elems: string[] = [];
@@ -258,20 +264,19 @@ function plasmaField(p: BrickParams, id: string): BrickOutput {
     ];
   }
 
-  // Cloud layer: fractalNoise (smooth pillar shapes) at a LOW base frequency
-  // so feature size is hundreds of pixels — actual cloud masses, not grain.
-  // alphaTable: 6 control points covering [0, 0.2, 0.4, 0.6, 0.8, 1.0].
-  // Setting the first 3 stops to 0 means everything below ~60 % intensity is
-  // fully transparent → real dark void between cloud pillars.
+  // One cloud layer: fractalNoise at low baseFrequency → grayscale average →
+  // feComponentTransfer colour table. alphaTable has 6 stops covering [0..1];
+  // the first 3 are 0 so everything below ~60 % noise intensity stays transparent,
+  // exposing the black background as the void between cloud pillars.
   function cloudLayer(
     lid: string,
     seed: number,
     bfx: number,
     bfy: number,
     octaves: number,
-    colLow: string, // colour at ~60 % intensity (cloud body)
-    colHigh: string, // colour at 100 % intensity (cloud peak / emission)
-    alphaTable: string, // 6-stop table: "0 0 0 a3 a4 a5"
+    colLow: string,
+    colHigh: string,
+    alphaTable: string,
     opacity: number
   ): void {
     const [rl, gl, bl] = rgb(colLow);
@@ -294,39 +299,32 @@ function plasmaField(p: BrickParams, id: string): BrickOutput {
     );
   }
 
-  // L1: giant cloud pillars — very large scale, smooth, deep colour
-  cloudLayer(`${id}-l1`, 4, 0.002, 0.0028, 4, c.huePurple, c.hueBlue, "0 0 0 0.30 0.72 0.92", 0.9);
-
-  // L2: emission glow — medium scale, shows only inside brightest cloud cores
-  cloudLayer(`${id}-l2`, 19, 0.0055, 0.007, 4, c.hueBlue, c.hueCyan, "0 0 0 0 0.55 0.90", 0.72);
-
-  // L3: hot filaments — fine detail, only the top ~15 % of noise range
-  cloudLayer(`${id}-l3`, 37, 0.01, 0.012, 3, c.hueCyan, c.accent, "0 0 0 0 0 1.0", 0.55);
-
-  // Proto-stellar forming cores — bright hotspots at irregular off-centre positions
-  // White core → palette colour → transparent; placed inside the cloud mass area
-  const cores: { cx: number; cy: number; rx: number; ry: number; inner: string; outer: string }[] =
-    [
-      { cx: 0.36, cy: 0.4, rx: 0.13, ry: 0.11, inner: c.accent, outer: c.hueBlue },
-      { cx: 0.61, cy: 0.57, rx: 0.09, ry: 0.09, inner: c.hueCyan, outer: c.hueBlue },
-      { cx: 0.74, cy: 0.3, rx: 0.07, ry: 0.07, inner: c.accent, outer: c.huePurple },
-    ];
-
-  for (let i = 0; i < cores.length; i++) {
-    const { cx, cy, rx, ry, inner, outer } = cores[i];
-    const gId = `${id}-core${i}`;
-    defs.push(
-      `<radialGradient id="${gId}" cx="50%" cy="50%" r="50%" gradientUnits="objectBoundingBox">
-  <stop offset="0%"   stop-color="#ffffff"  stop-opacity="0.95"/>
-  <stop offset="18%"  stop-color="${inner}" stop-opacity="0.80"/>
-  <stop offset="50%"  stop-color="${outer}" stop-opacity="0.38"/>
-  <stop offset="100%" stop-color="${outer}" stop-opacity="0"/>
-</radialGradient>`
-    );
-    elems.push(
-      `<ellipse cx="${(cx * width).toFixed(1)}" cy="${(cy * height).toFixed(1)}" rx="${(rx * width).toFixed(1)}" ry="${(ry * height).toFixed(1)}" fill="url(#${gId})"/>`
-    );
-  }
+  // L1: giant cloud pillars — very large scale, deep colour, unique per wallpaper
+  cloudLayer(
+    `${id}-l1`,
+    s1,
+    0.002 * j1,
+    0.0028 * j1,
+    4,
+    c.huePurple,
+    c.hueBlue,
+    "0 0 0 0.30 0.72 0.92",
+    0.9
+  );
+  // L2: emission glow — medium scale, shows only inside the brightest cloud cores
+  cloudLayer(
+    `${id}-l2`,
+    s2,
+    0.0055 * j2,
+    0.007 * j2,
+    4,
+    c.hueBlue,
+    c.hueCyan,
+    "0 0 0 0 0.55 0.90",
+    0.72
+  );
+  // L3: hot filaments — fine detail, only the top ~15 % of the noise range
+  cloudLayer(`${id}-l3`, s3, 0.01 * j3, 0.012 * j3, 3, c.hueCyan, c.accent, "0 0 0 0 0 1.0", 0.55);
 
   return {
     defs: defs.join("\n"),
@@ -484,19 +482,45 @@ function composeCinder(p: BrickParams): ComposedWallpaper {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function composeDeepSable(p: BrickParams): ComposedWallpaper {
+  const c = p.colors;
   return scaffold(p, "ds", {
-    flatBg: true, // pure black — shows through the cloud voids as dark space
+    flatBg: true, // pure black shows through the cloud voids as deep space
     effects: [
-      // Background stars visible through the transparent cloud gaps
+      // Coloured background stars — no highlights (brightCount:0), visible
+      // through the transparent cloud voids as plain coloured points.
       starFieldBrick(p, {
-        id: "ds-sf",
-        count: 180,
-        brightCount: 6,
+        id: "ds-s1",
+        count: 140,
+        brightCount: 0,
         color: "#ffffff",
         distribution: "full",
-        opacity: 0.72,
+        opacity: 0.82,
       }),
-      // Stellar nursery cloud pillars with proto-star cores
+      starFieldBrick(p, {
+        id: "ds-s2",
+        count: 50,
+        brightCount: 0,
+        color: c.hueCyan,
+        distribution: "full",
+        opacity: 0.68,
+      }),
+      starFieldBrick(p, {
+        id: "ds-s3",
+        count: 30,
+        brightCount: 0,
+        color: c.accent,
+        distribution: "full",
+        opacity: 0.6,
+      }),
+      starFieldBrick(p, {
+        id: "ds-s4",
+        count: 30,
+        brightCount: 0,
+        color: c.huePurple,
+        distribution: "full",
+        opacity: 0.6,
+      }),
+      // Nebula cloud pillars on top
       plasmaField(p, "ds-pf"),
     ],
   });
@@ -807,6 +831,75 @@ function composeMidnightAtelier(p: BrickParams): ComposedWallpaper {
         opacity: 0.45,
         branches: 2,
         skyFlashOpacity: 0.04,
+      }),
+      // Background far set — many faint, sparse bolts
+      lightningBrick(p, {
+        id: "ma-bg1-l1",
+        startX: 0.12,
+        startY: 0.08,
+        endX: 0.18,
+        endY: 0.9,
+        color: c.hueCyan,
+        opacity: 0.18,
+        branches: 1,
+        skyFlashOpacity: 0.02,
+      }),
+      lightningBrick(p, {
+        id: "ma-bg1-l2",
+        startX: 0.35,
+        startY: 0.06,
+        endX: 0.38,
+        endY: 0.94,
+        color: c.huePurple,
+        opacity: 0.16,
+        branches: 1,
+        skyFlashOpacity: 0.02,
+      }),
+      lightningBrick(p, {
+        id: "ma-bg1-l3",
+        startX: 0.78,
+        startY: 0.04,
+        endX: 0.82,
+        endY: 0.9,
+        color: c.hueBlue,
+        opacity: 0.14,
+        branches: 1,
+        skyFlashOpacity: 0.02,
+      }),
+
+      // Background mid set — slightly stronger, still behind main bolts
+      lightningBrick(p, {
+        id: "ma-bg2-l1",
+        startX: 0.08,
+        startY: 0.02,
+        endX: 0.14,
+        endY: 0.88,
+        color: c.accentSoft,
+        opacity: 0.32,
+        branches: 2,
+        skyFlashOpacity: 0.03,
+      }),
+      lightningBrick(p, {
+        id: "ma-bg2-l2",
+        startX: 0.28,
+        startY: 0.05,
+        endX: 0.22,
+        endY: 0.9,
+        color: c.hueOrange,
+        opacity: 0.28,
+        branches: 2,
+        skyFlashOpacity: 0.03,
+      }),
+      lightningBrick(p, {
+        id: "ma-bg2-l3",
+        startX: 0.66,
+        startY: 0.03,
+        endX: 0.7,
+        endY: 0.86,
+        color: c.hueGreen,
+        opacity: 0.26,
+        branches: 2,
+        skyFlashOpacity: 0.03,
       }),
     ],
   });
