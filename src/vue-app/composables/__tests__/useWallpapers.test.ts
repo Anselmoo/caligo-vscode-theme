@@ -3,8 +3,34 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { WallpapersManifest } from "../../../../wallpaper/types.js";
+import type { WallpapersManifest } from "../../../wallpaper/types.js";
 import { useWallpapers } from "../useWallpapers";
+
+/** Matches WallpaperColors so fixtures mirror real generator output. */
+const mockColors = {
+  bg: "#0b0c10",
+  bgSoft: "#141425",
+  bgMid: "#19182a",
+  accent: "#7aa2f7",
+  accentSoft: "#9ab8f9",
+  accentMuted: "#5a7fc4",
+  hueRed: "#f7768e",
+  hueOrange: "#ff9e64",
+  hueYellow: "#e0af68",
+  hueGreen: "#9ece6a",
+  hueCyan: "#7dcfff",
+  hueBlue: "#7aa2f7",
+  huePurple: "#bb9af7",
+  strings: "#9ece6a",
+  keywords: "#bb9af7",
+  functions: "#7aa2f7",
+  types: "#7dcfff",
+  variables: "#c0caf5",
+  constants: "#ff9e64",
+  numbers: "#ff9e64",
+  tags: "#f7768e",
+  attributes: "#e0af68",
+};
 
 const mockEntries: WallpapersManifest["entries"] = [
   {
@@ -12,48 +38,52 @@ const mockEntries: WallpapersManifest["entries"] = [
     seedDisplayName: "Eclipse",
     harmonyMode: "balanced",
     harmonyLabel: "Balanced",
-    topic: "Ice fractures",
+    topic: "Balanced",
     platform: "monitor",
     textVariant: "no-text",
     svgPath: "wallpapers/Eclipse/balanced/monitor.svg",
     pngPath: "wallpapers/Eclipse/balanced/monitor.png",
     displayName: "Eclipse — Balanced",
+    colors: mockColors,
   },
   {
     seedId: "Eclipse",
     seedDisplayName: "Eclipse",
     harmonyMode: "analogous",
     harmonyLabel: "Analogous",
-    topic: "Ice fractures",
+    topic: "Analogous",
     platform: "monitor",
     textVariant: "no-text",
     svgPath: "wallpapers/Eclipse/analogous/monitor.svg",
     pngPath: "wallpapers/Eclipse/analogous/monitor.png",
     displayName: "Eclipse — Analogous",
+    colors: mockColors,
   },
   {
     seedId: "Cinder",
     seedDisplayName: "Cinder",
     harmonyMode: "balanced",
     harmonyLabel: "Balanced",
-    topic: "Starfield",
+    topic: "Balanced",
     platform: "monitor",
     textVariant: "no-text",
     svgPath: "wallpapers/Cinder/balanced/monitor.svg",
     pngPath: "wallpapers/Cinder/balanced/monitor.png",
     displayName: "Cinder — Balanced",
+    colors: mockColors,
   },
   {
     seedId: "Cinder",
     seedDisplayName: "Cinder",
     harmonyMode: "balanced",
     harmonyLabel: "Balanced",
-    topic: "Starfield",
+    topic: "Balanced",
     platform: "tablet",
     textVariant: "no-text",
     svgPath: "wallpapers/Cinder/balanced/tablet.svg",
     pngPath: "wallpapers/Cinder/balanced/tablet.png",
     displayName: "Cinder — Balanced",
+    colors: mockColors,
   },
 ];
 
@@ -78,7 +108,7 @@ describe("useWallpapers", () => {
   });
 
   it("loadManifest — populates entries on success", async () => {
-    const manifest: WallpapersManifest = { version: 1, entries: mockEntries };
+    const manifest: WallpapersManifest = { total: mockEntries.length, entries: mockEntries };
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue({
@@ -244,5 +274,85 @@ describe("useWallpapers", () => {
     expect(filter.value.harmonyMode).toBeNull();
     expect(filter.value.platform).toBe("monitor");
     expect(filter.value.textVariant).toBe("no-text");
+  });
+});
+
+/**
+ * Regression: the Balanced harmony is stored as harmonyMode "none" in the
+ * manifest, but its files live in a folder named "balanced". Deriving an asset
+ * path from harmonyMode therefore 404s for 20% of the gallery. Paths must come
+ * from the manifest's svgPath/pngPath.
+ *
+ * These fixtures deliberately mirror real generator output ("none"), unlike the
+ * older mocks above which used "balanced" and so could not catch the drift.
+ */
+const realShapedEntries: WallpapersManifest["entries"] = [
+  {
+    seedId: "AuroraNoir",
+    seedDisplayName: "Aurora Noir",
+    harmonyMode: "none",
+    harmonyLabel: "Balanced",
+    topic: "Balanced",
+    platform: "monitor",
+    textVariant: "no-text",
+    svgPath: "wallpapers/AuroraNoir/balanced/monitor.svg",
+    pngPath: "wallpapers/AuroraNoir/balanced/monitor.png",
+    displayName: "Aurora Noir · Starfield",
+    colors: mockColors,
+  },
+  {
+    seedId: "AuroraNoir",
+    seedDisplayName: "Aurora Noir",
+    harmonyMode: "none",
+    harmonyLabel: "Balanced",
+    topic: "Balanced",
+    platform: "mobile",
+    textVariant: "text",
+    svgPath: "wallpapers/AuroraNoir/balanced/mobile-text.svg",
+    pngPath: "wallpapers/AuroraNoir/balanced/mobile-text.png",
+    displayName: "Aurora Noir · Starfield",
+    colors: mockColors,
+  },
+];
+
+describe("useWallpapers — balanced/none path regression", () => {
+  beforeEach(() => {
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ total: realShapedEntries.length, entries: realShapedEntries }),
+    }) as unknown as typeof fetch;
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("resolves the Balanced variant to its 'balanced' folder, never 'none'", async () => {
+    const { loadManifest, findVariant } = useWallpapers();
+    await loadManifest();
+
+    const entry = findVariant("AuroraNoir", "none", "monitor", "no-text");
+
+    expect(entry).not.toBeNull();
+    expect(entry?.svgPath).toBe("wallpapers/AuroraNoir/balanced/monitor.svg");
+    expect(entry?.pngPath).toBe("wallpapers/AuroraNoir/balanced/monitor.png");
+    // The bug shipped exactly this path:
+    expect(entry?.svgPath).not.toContain("/none/");
+  });
+
+  it("resolves each platform/textVariant combination independently", async () => {
+    const { loadManifest, findVariant } = useWallpapers();
+    await loadManifest();
+
+    expect(findVariant("AuroraNoir", "none", "mobile", "text")?.svgPath).toBe(
+      "wallpapers/AuroraNoir/balanced/mobile-text.svg"
+    );
+  });
+
+  it("returns null for a variant absent from the manifest", async () => {
+    const { loadManifest, findVariant } = useWallpapers();
+    await loadManifest();
+
+    expect(findVariant("AuroraNoir", "none", "tablet", "text")).toBeNull();
   });
 });

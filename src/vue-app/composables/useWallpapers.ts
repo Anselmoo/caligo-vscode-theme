@@ -8,6 +8,9 @@
 import { computed, readonly, ref } from "vue";
 import type { WallpaperManifestEntry, WallpapersManifest } from "../../wallpaper/types.js";
 
+// Re-exported so consumers (e.g. WallpaperCard) can import the entry type from here.
+export type { WallpaperManifestEntry } from "../../wallpaper/types.js";
+
 export type WallpaperFilter = {
   seedId: string | null;
   harmonyMode: string | null;
@@ -16,6 +19,15 @@ export type WallpaperFilter = {
 };
 
 const MANIFEST_URL = "./wallpapers-manifest.json";
+
+function variantKey(
+  seedId: string,
+  harmonyMode: string,
+  platform: string,
+  textVariant: string
+): string {
+  return `${seedId}|${harmonyMode}|${platform}|${textVariant}`;
+}
 
 export function useWallpapers() {
   const entries = ref<WallpaperManifestEntry[]>([]);
@@ -64,6 +76,30 @@ export function useWallpapers() {
     });
   });
 
+  /**
+   * Index every manifest entry by its full variant coordinates so consumers can
+   * resolve a concrete entry — and therefore its authoritative svgPath/pngPath —
+   * instead of re-deriving asset paths from harmonyMode. The on-disk folder for
+   * harmonyMode "none" is "balanced", so any re-derivation silently 404s.
+   */
+  const variantIndex = computed(() => {
+    const index = new Map<string, WallpaperManifestEntry>();
+    for (const e of entries.value) {
+      index.set(variantKey(e.seedId, e.harmonyMode, e.platform, e.textVariant), e);
+    }
+    return index;
+  });
+
+  /** Resolve the manifest entry for a specific variant, or null when absent. */
+  function findVariant(
+    seedId: string,
+    harmonyMode: string,
+    platform: "monitor" | "tablet" | "mobile",
+    textVariant: "text" | "no-text"
+  ): WallpaperManifestEntry | null {
+    return variantIndex.value.get(variantKey(seedId, harmonyMode, platform, textVariant)) ?? null;
+  }
+
   async function loadManifest() {
     if (entries.value.length > 0) return; // already loaded
     loading.value = true;
@@ -94,6 +130,7 @@ export function useWallpapers() {
     error: readonly(error),
     filter,
     filteredEntries,
+    findVariant,
     allSeeds,
     allModes,
     loadManifest,
