@@ -21,7 +21,7 @@ it("ci integration: full theme run should use single electron launch", async () 
   );
   expect(res.code === 0 || res.code === null).toBeTruthy();
   expect(res.instrumentation).toBeDefined();
-  expect(res.instrumentation.electronLaunchCount).toBe(1);
+  expect(res.instrumentation?.electronLaunchCount).toBe(1);
 
   // Upload artifact step will pick up screenshots separately; here just validate report exists
   const reportPath = path.join(process.cwd(), "build", "screenshots-report.json");

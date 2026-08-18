@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { ThemeIndexEntry } from "@types/theme";
 import { computed } from "vue";
+import type { ThemeIndexEntry } from "@/types/theme";
 
 interface Props {
   theme: ThemeIndexEntry;

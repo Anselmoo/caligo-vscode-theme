@@ -16,7 +16,7 @@ it("local smoke: reuse-mode produces single electron launch and screenshots", as
   const res = await runScript(["--aurora-demo", "--lang", "typescript", "--output", outDir]);
   expect(res.code === 0 || res.code === null).toBeTruthy();
   expect(res.instrumentation).toBeDefined();
-  expect(res.instrumentation.electronLaunchCount).toBe(1);
+  expect(res.instrumentation?.electronLaunchCount).toBe(1);
 
   // expect 3 PNGs for the aurora-demo
   const files = fs.existsSync(outDir) ? fs.readdirSync(outDir).filter(f => f.endsWith(".png")) : [];

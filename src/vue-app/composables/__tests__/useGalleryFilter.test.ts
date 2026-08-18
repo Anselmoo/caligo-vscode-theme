@@ -2,9 +2,9 @@
  * Unit tests for useGalleryFilter composable
  */
 
-import type { ThemeScreenshot } from "@types/gallery";
 import { describe, expect, it } from "vitest";
 import { ref } from "vue";
+import type { ThemeScreenshot } from "@/types/gallery";
 import { useGalleryFilter } from "../useGalleryFilter";
 
 describe("useGalleryFilter", () => {

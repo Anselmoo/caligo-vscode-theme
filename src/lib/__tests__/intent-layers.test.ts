@@ -134,8 +134,8 @@ describe("intent-layers", () => {
 
   describe("calculateDeltaE", () => {
     it("should calculate perceptual distance between colors", () => {
-      const color1 = { l: 0.5, c: 0.1, h: 0 };
-      const color2 = { l: 0.6, c: 0.1, h: 0 };
+      const color1 = { mode: "oklch" as const, l: 0.5, c: 0.1, h: 0 };
+      const color2 = { mode: "oklch" as const, l: 0.6, c: 0.1, h: 0 };
 
       const deltaE = calculateDeltaE(color1, color2);
 
@@ -144,7 +144,7 @@ describe("intent-layers", () => {
     });
 
     it("should return 0 for identical colors", () => {
-      const color = { l: 0.5, c: 0.1, h: 180 };
+      const color = { mode: "oklch" as const, l: 0.5, c: 0.1, h: 180 };
 
       const deltaE = calculateDeltaE(color, color);
 
@@ -152,8 +152,8 @@ describe("intent-layers", () => {
     });
 
     it("should account for hue differences", () => {
-      const color1 = { l: 0.5, c: 0.1, h: 0 };
-      const color2 = { l: 0.5, c: 0.1, h: 180 };
+      const color1 = { mode: "oklch" as const, l: 0.5, c: 0.1, h: 0 };
+      const color2 = { mode: "oklch" as const, l: 0.5, c: 0.1, h: 180 };
 
       const deltaE = calculateDeltaE(color1, color2);
 
@@ -161,8 +161,8 @@ describe("intent-layers", () => {
     });
 
     it("should account for chroma differences", () => {
-      const color1 = { l: 0.5, c: 0.1, h: 0 };
-      const color2 = { l: 0.5, c: 0.2, h: 0 };
+      const color1 = { mode: "oklch" as const, l: 0.5, c: 0.1, h: 0 };
+      const color2 = { mode: "oklch" as const, l: 0.5, c: 0.2, h: 0 };
 
       const deltaE = calculateDeltaE(color1, color2);
 

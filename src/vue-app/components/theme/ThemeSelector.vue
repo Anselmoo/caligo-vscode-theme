@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useTheme } from "@/composables/useTheme";
-import type { CaligoTheme } from "@/types/theme";
 
 const { currentTheme, themes, setTheme, themeIndex } = useTheme();
 
@@ -15,7 +14,7 @@ function handleSeedChange(event: Event) {
   // Find theme with new seed and current harmony mode
   const currentHarmony = currentTheme.value?.harmonyId || "balanced";
   const matchingTheme = themes.value.find(
-    (t: CaligoTheme) => t.seedId === newSeedId && t.harmonyId === currentHarmony
+    t => t.seedId === newSeedId && t.harmonyId === currentHarmony
   );
 
   if (matchingTheme) {

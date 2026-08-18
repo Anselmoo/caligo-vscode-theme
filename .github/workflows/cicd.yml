@@ -33,6 +33,8 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run lint:colors
+      - name: Type-check the Vue web app and test suites
+        run: npm run typecheck
       - name: Lint summary
         if: always()
         run: |
