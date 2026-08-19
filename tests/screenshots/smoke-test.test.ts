@@ -23,6 +23,19 @@ suite("Screenshot Method Smoke Test", () => {
 
     try {
       // Define proper types for the global object
+      interface ElectronCapturedImage {
+        toPNG: () => Buffer;
+      }
+      interface ElectronWindow {
+        webContents: { capturePage: () => Promise<ElectronCapturedImage> };
+      }
+      interface ElectronBrowserWindow {
+        getFocusedWindow?: () => ElectronWindow | undefined;
+        getAllWindows?: () => ElectronWindow[];
+      }
+      interface ElectronModule {
+        BrowserWindow?: ElectronBrowserWindow;
+      }
       interface ElectronGlobal {
         require?: (module: string) => unknown;
         process?: {
@@ -39,7 +52,7 @@ suite("Screenshot Method Smoke Test", () => {
         console.log("❌ Method 1 FAILED: Electron module not accessible");
         return;
       }
-      const { BrowserWindow } = electron;
+      const { BrowserWindow } = electron as ElectronModule;
       const win = BrowserWindow?.getFocusedWindow?.() || BrowserWindow?.getAllWindows?.()?.[0];
 
       if (!win) {

@@ -1,11 +1,24 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
+import { PLATFORM_SIZES } from "../../../wallpaper/types.js";
 import type { WallpaperManifestEntry } from "../../composables/useWallpapers";
+import { rasterizeSvgToPng, triggerDownload } from "../../utils/rasterize-svg.js";
 
 const props = defineProps<{
   entry: WallpaperManifestEntry;
   activePlatform: "monitor" | "tablet" | "mobile";
   activeTextVariant: "text" | "no-text";
+  /**
+   * Resolves a variant to its manifest entry. Paths MUST come from the manifest:
+   * the on-disk folder for harmonyMode "none" is "balanced", so re-deriving a
+   * path from harmonyMode produces a 404 for every Balanced wallpaper.
+   */
+  resolve: (
+    seedId: string,
+    harmonyMode: string,
+    platform: "monitor" | "tablet" | "mobile",
+    textVariant: "text" | "no-text"
+  ) => WallpaperManifestEntry | null;
 }>();
 
 const platforms = [
@@ -23,27 +36,56 @@ const textVariants = [
 const localPlatform = ref<"monitor" | "tablet" | "mobile">(props.activePlatform);
 const localTextVariant = ref<"text" | "no-text">(props.activeTextVariant);
 
-// Base dir: wallpapers/{seedId}/{harmonyMode}/
-const baseDir = computed(() => {
-  const { seedId, harmonyMode } = props.entry;
-  return `wallpapers/${seedId}/${harmonyMode}`;
+// Resolve the currently selected variant straight from the manifest.
+const activeVariant = computed(() =>
+  props.resolve(
+    props.entry.seedId,
+    props.entry.harmonyMode,
+    localPlatform.value,
+    localTextVariant.value
+  )
+);
+
+const previewUrl = computed(() => activeVariant.value?.svgPath ?? props.entry.svgPath);
+
+const downloadState = ref<"idle" | "working" | "error">("idle");
+
+const downloadLabel = computed(() => {
+  if (downloadState.value === "working") return "Rendering PNG…";
+  if (downloadState.value === "error") return "Retry download";
+  return "Download PNG";
 });
 
-const previewUrl = computed(() => {
-  const suffix = localTextVariant.value === "text" ? "-text" : "";
-  return `${baseDir.value}/${localPlatform.value}${suffix}.svg`;
-});
-
-const pngUrl = computed(() => {
-  const suffix = localTextVariant.value === "text" ? "-text" : "";
-  return `${baseDir.value}/${localPlatform.value}${suffix}.png`;
-});
+/**
+ * Rasterise the selected SVG to a full-resolution PNG in the browser.
+ * PNGs are not deployed: the complete 4K set is ~2 GB, over the 1 GB
+ * GitHub Pages limit, so we generate on demand instead.
+ */
+async function downloadPng() {
+  if (downloadState.value === "working") return;
+  downloadState.value = "working";
+  try {
+    const { width, height } = PLATFORM_SIZES[localPlatform.value];
+    const blob = await rasterizeSvgToPng(previewUrl.value, width, height);
+    const textSuffix = localTextVariant.value === "text" ? "-text" : "";
+    triggerDownload(
+      blob,
+      `caligo-${props.entry.seedId}-${props.entry.harmonyMode}-${localPlatform.value}${textSuffix}.png`
+    );
+    downloadState.value = "idle";
+  } catch (e) {
+    console.error("Wallpaper PNG export failed", e);
+    downloadState.value = "error";
+  }
+}
 
 // Silence biome: all vars below are used in the Vue template
 void platforms;
 void textVariants;
 void previewUrl;
-void pngUrl;
+void activeVariant;
+void downloadLabel;
+void downloadPng;
 </script>
 
 <template>
@@ -86,9 +128,22 @@ void pngUrl;
       </div>
 
       <!-- Download -->
-      <a :href="pngUrl" :download="`caligo-${entry.seedId}-${entry.harmonyMode}-${localPlatform}${localTextVariant === 'text' ? '-text' : ''}.png`" class="download-btn">
-        <i class="pi pi-download" /> Download PNG
-      </a>
+      <button
+        type="button"
+        class="download-btn"
+        :class="{ 'is-error': downloadState === 'error' }"
+        :disabled="downloadState === 'working'"
+        @click="downloadPng"
+      >
+        <i
+          :class="downloadState === 'working' ? 'pi pi-spinner pi-spin' : 'pi pi-download'"
+          aria-hidden="true"
+        />
+        {{ downloadLabel }}
+      </button>
+      <p v-if="downloadState === 'error'" class="download-error" role="alert">
+        Could not render the PNG. Please try again.
+      </p>
     </div>
   </article>
 </template>
@@ -167,6 +222,11 @@ void pngUrl;
 }
 
 .download-btn {
+  font-family: inherit;
+  cursor: pointer;
+  background: transparent;
+  width: 100%;
+  justify-content: center;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -180,8 +240,24 @@ void pngUrl;
   transition: background 0.15s, color 0.15s;
 }
 
-.download-btn:hover {
+.download-btn:hover:not(:disabled) {
   background: var(--accent);
   color: var(--bg0);
+}
+
+.download-btn:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.download-btn.is-error {
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.download-error {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--color-error);
 }
 </style>

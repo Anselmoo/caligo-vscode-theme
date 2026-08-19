@@ -1,0 +1,29 @@
+{
+  // Type-checks test files. Separate from tsconfig.web.json so that Node and
+  // test-only globals stay out of the shipped browser app's scope.
+  "extends": "./tsconfig.web.json",
+  "compilerOptions": {
+    "types": ["node"],
+    // The base config roots at src/; tests also live under tests/.
+    "rootDir": ".",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "noEmit": true
+  },
+  // Scoped to exactly the suites vitest.config.ts runs. tests/screenshots/**
+  // are Mocha/VS Code extension tests (suite/suiteSetup) covered by
+  // tsconfig.tests.json, and tests/e2e/** are Playwright specs — neither
+  // belongs in a Vitest type-check.
+  "include": [
+    "src/types/**/*",
+    // Vite's ImportMeta.env augmentation, needed by app modules pulled in by tests.
+    "src/vue-app/env.d.ts",
+    "src/**/__tests__/**/*",
+    "src/**/*.test.ts",
+    "src/**/*.spec.ts",
+    "tests/setup.ts",
+    "tests/integration/**/*.ts",
+    "tests/verification/**/*.ts",
+    "tests/types/**/*.d.ts"
+  ],
+  "exclude": ["node_modules", "build", "dist"]
+}

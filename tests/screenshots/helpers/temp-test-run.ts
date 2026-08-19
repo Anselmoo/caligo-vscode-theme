@@ -2,12 +2,20 @@ import { spawn } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
+/** Shape of build/screenshots-report.json, as read back by the smoke tests. */
+export interface ScreenshotInstrumentation {
+  electronLaunchCount?: number;
+  [key: string]: unknown;
+}
+
 export function runScript(
   args: string[],
   cwd = process.cwd(),
   timeout = 5 * 60 * 1000
 ): Promise<
-  { code: number | null; stdout: string; stderr: string } & { instrumentation?: unknown }
+  { code: number | null; stdout: string; stderr: string } & {
+    instrumentation?: ScreenshotInstrumentation;
+  }
 > {
   return new Promise((resolve, _reject) => {
     const cp = spawn("npx", ["tsx", "scripts/capture-vscode-screenshots-reuse.ts", ...args], {
@@ -34,10 +42,12 @@ export function runScript(
     cp.on("close", code => {
       clearTimeout(timer);
       const reportPath = path.join(process.cwd(), "build", "screenshots-report.json");
-      let instrumentation: unknown;
+      let instrumentation: ScreenshotInstrumentation | undefined;
       try {
         if (fs.existsSync(reportPath))
-          instrumentation = JSON.parse(fs.readFileSync(reportPath, "utf-8"));
+          instrumentation = JSON.parse(
+            fs.readFileSync(reportPath, "utf-8")
+          ) as ScreenshotInstrumentation;
       } catch (_e) {
         instrumentation = undefined;
       }

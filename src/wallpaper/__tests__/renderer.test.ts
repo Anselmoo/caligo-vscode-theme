@@ -119,7 +119,7 @@ describe("wallpaperFilename", () => {
         platform: "monitor",
         textVariant: "no-text",
         seedDisplayName: "Eclipse",
-        topic: "",
+        topic: "Balanced",
         displayName: "",
       },
       "svg"
@@ -135,7 +135,7 @@ describe("wallpaperFilename", () => {
         platform: "tablet",
         textVariant: "text",
         seedDisplayName: "Cinder",
-        topic: "",
+        topic: "Balanced",
         displayName: "",
       },
       "png"
@@ -151,7 +151,7 @@ describe("wallpaperFilename", () => {
         platform: "mobile",
         textVariant: "no-text",
         seedDisplayName: "AuroraNoir",
-        topic: "",
+        topic: "Balanced",
         displayName: "",
       },
       "svg"

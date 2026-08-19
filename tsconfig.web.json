@@ -1,16 +1,22 @@
 {
+  // Type-checks the Vue browser app. The base tsconfig targets the Node
+  // build (module: NodeNext); the browser app is bundled by Vite, so it needs
+  // ESNext modules + bundler resolution. "module" MUST be overridden here —
+  // "moduleResolution": "bundler" is illegal against an inherited NodeNext.
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "composite": true,
     "jsx": "preserve",
+    "module": "esnext",
     "moduleResolution": "bundler",
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": [],
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "paths": {
       "@/*": ["./src/vue-app/*"],
-      "@types/*": ["./src/vue-app/types/*"],
       "@components/*": ["./src/vue-app/components/*"],
       "@composables/*": ["./src/vue-app/composables/*"],
       "@views/*": ["./src/vue-app/views/*"],
@@ -19,6 +25,19 @@
       "@palettes/*": ["./build/palettes/*"]
     }
   },
-  "include": ["src/vue-app/**/*", "src/vue-app/**/*.d.ts", "index.html"],
-  "exclude": ["node_modules", "build", "dist"]
+  // Roots only. TypeScript follows imports transitively, so shared modules the
+  // app actually uses (src/lib, src/wallpaper) are checked without dragging in
+  // Node-only siblings such as seeds.ts. src/types carries the `declare module`
+  // shims for culori / apca-w3, without which those imports report TS7016.
+  "include": ["src/vue-app/**/*", "src/types/**/*"],
+  // Co-located tests are excluded here, matching the base tsconfig. They need
+  // Vitest globals, which this browser-app config deliberately does not load.
+  "exclude": [
+    "node_modules",
+    "build",
+    "dist",
+    "src/**/__tests__/**",
+    "src/**/*.test.ts",
+    "src/**/*.spec.ts"
+  ]
 }

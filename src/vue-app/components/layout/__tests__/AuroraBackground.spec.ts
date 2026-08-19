@@ -14,7 +14,7 @@ function mockMatchMedia(matches = false) {
         removeEventListener: () => {},
         addListener: () => {},
         removeListener: () => {},
-      }) as MediaQueryList,
+      }) as unknown as MediaQueryList,
   });
 }
 

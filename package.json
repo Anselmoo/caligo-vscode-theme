@@ -85,10 +85,14 @@
     "marketplace:publish": "vsce publish --no-dependencies",
     "package:theme-data:prepare": "node ./scripts/prepare-theme-data-package.mjs",
     "vscode:prepublish": "npm run build && npm run generate && npm run test",
-    "ci": "npm run lint && npm run lint:colors && npm run check:underscores && npm run test && npm run generate",
+    "ci": "npm run lint && npm run lint:colors && npm run typecheck && npm run check:underscores && npm run test && npm run generate",
     "release": "standard-version",
     "release:ci": "npm run build && npm run generate && npm run marketplace:package",
-    "prepare": "lefthook install"
+    "prepare": "lefthook install",
+    "typecheck:web": "vue-tsc -p tsconfig.web.json --noEmit",
+    "typecheck:tests": "vue-tsc -p tsconfig.spec.json --noEmit",
+    "typecheck": "npm run typecheck:web && npm run typecheck:tests && npm run typecheck:screenshots",
+    "typecheck:screenshots": "tsc -p tsconfig.tests.json --noEmit"
   },
   "dependencies": {
     "apca-w3": "^0.1.9",
@@ -135,7 +139,8 @@
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vite": "^7.3.3",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "vue-tsc": "^3.3.10"
   },
   "categories": [
     "Themes"

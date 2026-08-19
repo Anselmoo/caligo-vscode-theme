@@ -15,7 +15,6 @@ export default defineConfig(() => {
     resolve: {
       alias: {
         "@": fileURLToPath(new URL("./src/vue-app", import.meta.url)),
-        "@types": fileURLToPath(new URL("./src/vue-app/types", import.meta.url)),
         "@components": fileURLToPath(new URL("./src/vue-app/components", import.meta.url)),
         "@composables": fileURLToPath(new URL("./src/vue-app/composables", import.meta.url)),
         "@views": fileURLToPath(new URL("./src/vue-app/views", import.meta.url)),

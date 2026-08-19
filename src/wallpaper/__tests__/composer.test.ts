@@ -38,7 +38,7 @@ describe("mergeBricks", () => {
   });
 
   it("handles bricks with no elements", () => {
-    const result = mergeBricks([{ defs: '<filter id="f1"/>' }]);
+    const result = mergeBricks([{ defs: '<filter id="f1"/>', elements: "" }]);
     expect(result.elements).toBe("");
   });
 

@@ -12,6 +12,7 @@ const {
   error,
   filter,
   filteredEntries,
+  findVariant,
   allSeeds,
   allModes,
   loadManifest,
@@ -36,6 +37,7 @@ void setFilter;
 void resetFilter;
 void downloadAllUrl;
 void gridEntries;
+void findVariant;
 </script>
 
 <template>
@@ -85,6 +87,7 @@ void gridEntries;
         v-for="entry in gridEntries"
         :key="`${entry.seedId}-${entry.harmonyMode}-${entry.platform}-${entry.textVariant}`"
         :entry="entry"
+        :resolve="findVariant"
         :active-platform="filter.platform ?? 'monitor'"
         :active-text-variant="filter.textVariant ?? 'no-text'"
       />

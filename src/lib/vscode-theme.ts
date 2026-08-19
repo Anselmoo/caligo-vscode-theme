@@ -4,6 +4,7 @@ import { deriveIntentSemanticTokenColors } from "./intent-layers.js";
 import type { DerivedPalette } from "./palette.js";
 import { SEMANTIC_COLOR_KEYS } from "./semantic-colors.js";
 import { deriveSemanticTokenColors, type SemanticTokenColors } from "./semantic-tokens.js";
+import { buildExtendedColors } from "./vscode-theme-extended.js";
 
 export type VscodeThemeJson = {
   $schema: string;
@@ -948,7 +949,9 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     $schema: "vscode://schemas/color-theme",
     name,
     type: "dark",
-    colors,
+    // Extended coverage fills the surfaces the base map leaves unset; the
+    // hand-tuned base colors above always win on conflict.
+    colors: { ...buildExtendedColors(p), ...colors },
     tokenColors,
     semanticHighlighting: true,
     semanticTokenColors: p.intent

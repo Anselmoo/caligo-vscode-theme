@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { ThemeHarmony } from "@/types/theme";
 import {
   getHarmonyLabel,
   HARMONY_ICONS,
@@ -73,7 +74,7 @@ describe("normalizeHarmonyLabel", () => {
 
 describe("sortHarmonies", () => {
   it("sorts harmonies by canonical order", () => {
-    const unsorted = [
+    const unsorted: ThemeHarmony[] = [
       { id: "triadic", label: "Triadic" },
       { id: "balanced", label: "Balanced" },
       { id: "analogous", label: "Analogous" },
@@ -85,17 +86,19 @@ describe("sortHarmonies", () => {
   });
 
   it("places unknown modes after known ones", () => {
+    // "unknown" is intentionally outside ThemeHarmonyId: this test asserts how
+    // sortHarmonies copes with an id it does not recognise.
     const harmonies = [
       { id: "unknown", label: "Unknown" },
       { id: "balanced", label: "Balanced" },
-    ];
+    ] as unknown as ThemeHarmony[];
     const sorted = sortHarmonies(harmonies);
     expect(sorted[0].id).toBe("balanced");
     expect(sorted[1].id).toBe("unknown");
   });
 
   it("does not mutate the original array", () => {
-    const original = [
+    const original: ThemeHarmony[] = [
       { id: "triadic", label: "Triadic" },
       { id: "balanced", label: "Balanced" },
     ];
