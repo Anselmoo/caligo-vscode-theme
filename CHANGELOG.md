@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased]
+
+## [0.6.0] - 2026-08-19
+
+### Fixed
+- untrack accidentally committed worktree gitlink
+- repair wallpaper gallery, extend VS Code color coverage to 99.7%, and restore the TypeScript gates (#149)
+
+
 All notable changes to Caligo will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
