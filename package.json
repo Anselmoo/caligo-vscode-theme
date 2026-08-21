@@ -117,7 +117,7 @@
     "@types/d3-delaunay": "^6.0.4",
     "@types/d3-geo": "^3.1.0",
     "@types/d3-scale": "^4.0.9",
-    "@types/d3-shape": "^3.1.7",
+    "@types/d3-shape": "^3.2.0",
     "@types/node": "^24.10.13",
     "@types/vscode": "^1.108.0",
     "@vitejs/plugin-vue": "^6.0.7",
