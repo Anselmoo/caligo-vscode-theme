@@ -46,19 +46,27 @@ const activeVariant = computed(() =>
   )
 );
 
+/**
+ * The entry every asset URL is read from.
+ *
+ * Resolved once so preview and download can never disagree about which variant
+ * they describe. Falling back field-by-field across entries would let a card
+ * show one platform's thumbnail while offering another's download.
+ */
+const displayedEntry = computed(() => activeVariant.value ?? props.entry);
+
 /** Full-resolution SVG — the download source, never the preview source. */
-const sourceSvgUrl = computed(() => activeVariant.value?.svgPath ?? props.entry.svgPath);
+const sourceSvgUrl = computed(() => displayedEntry.value.svgPath);
 
 /**
  * Preview source for the card image.
  *
  * Prefers the build-time WebP thumbnail (~30 KB) over the wallpaper SVG
- * (~455 KB, up to 8,700 nodes, 3840x2160 intrinsic). Falls back to the SVG when
- * thumbnails have not been generated, so a local checkout still shows previews.
+ * (~455 KB, up to 8,700 nodes, 3840x2160 intrinsic). Falls back to the SVG of
+ * *the same variant* when its thumbnail is missing — never to another
+ * variant's thumbnail, which would silently show the wrong artwork.
  */
-const previewUrl = computed(
-  () => activeVariant.value?.thumbPath ?? props.entry.thumbPath ?? sourceSvgUrl.value
-);
+const previewUrl = computed(() => displayedEntry.value.thumbPath ?? sourceSvgUrl.value);
 
 /** Intrinsic thumbnail box, so the grid reserves space before the image lands. */
 const previewSize = computed(() => thumbnailSize(localPlatform.value));
@@ -100,6 +108,7 @@ void textVariants;
 void previewUrl;
 void previewSize;
 void sourceSvgUrl;
+void displayedEntry;
 void activeVariant;
 void downloadLabel;
 void downloadPng;

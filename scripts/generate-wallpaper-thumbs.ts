@@ -23,7 +23,7 @@ import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
-import type { Platform } from "../src/wallpaper/types.js";
+import { matchesSeed, parseQuality, platformFromPath } from "../src/wallpaper/thumbs.js";
 import { THUMBNAIL_LONG_EDGE, thumbnailSize } from "../src/wallpaper/types.js";
 
 // ─── Paths ────────────────────────────────────────────────────────────────────
@@ -35,7 +35,7 @@ const WALLPAPERS_DIR = join(PROJECT_ROOT, "public", "wallpapers");
 // ─── CLI args ─────────────────────────────────────────────────────────────────
 
 const args = process.argv.slice(2);
-const QUALITY = Number(args.find(a => a.startsWith("--quality="))?.split("=")[1] ?? "0.8");
+const QUALITY = parseQuality(args.find(a => a.startsWith("--quality="))?.split("=")[1]);
 const FILTER_SEED = args.find(a => a.startsWith("--seed="))?.split("=")[1];
 
 // ─── Discovery ────────────────────────────────────────────────────────────────
@@ -48,17 +48,6 @@ function collectSvgs(dir: string, out: string[] = []): string[] {
     else if (entry.name.endsWith(".svg")) out.push(full);
   }
   return out;
-}
-
-/**
- * The platform a wallpaper file belongs to, from its basename
- * ("monitor.svg" / "mobile-text.svg" → "monitor" / "mobile").
- */
-function platformOf(svgFile: string): Platform {
-  const base = svgFile.replace(/\.svg$/, "").replace(/-text$/, "");
-  const name = base.slice(base.lastIndexOf("/") + 1);
-  if (name === "monitor" || name === "tablet" || name === "mobile") return name;
-  throw new Error(`Unrecognised wallpaper platform in "${svgFile}"`);
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
@@ -75,8 +64,7 @@ async function main() {
 
   let svgs = collectSvgs(WALLPAPERS_DIR).sort();
   if (FILTER_SEED) {
-    const needle = `/${FILTER_SEED}/`;
-    svgs = svgs.filter(f => f.includes(needle));
+    svgs = svgs.filter(f => matchesSeed(f, FILTER_SEED));
   }
 
   if (svgs.length === 0) {
@@ -94,7 +82,7 @@ async function main() {
 
   try {
     for (const svgFile of svgs) {
-      const platform = platformOf(svgFile);
+      const platform = platformFromPath(svgFile);
       const { width, height } = thumbnailSize(platform);
       const svgText = readFileSync(svgFile, "utf-8");
 

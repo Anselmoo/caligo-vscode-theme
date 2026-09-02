@@ -111,6 +111,27 @@ describe("WallpaperCard preview source", () => {
     );
   });
 
+  it("falls back to the selected variant's own SVG, never another variant's thumbnail", async () => {
+    // A partially-generated thumbnail set must not make the card show a
+    // different platform's artwork: the fallback has to stay inside the
+    // selected variant.
+    const monitor = makeEntry();
+    const mobile = makeEntry({
+      platform: "mobile",
+      svgPath: "wallpapers/Eclipse/balanced/mobile.svg",
+      pngPath: "wallpapers/Eclipse/balanced/mobile.png",
+      thumbPath: undefined,
+    });
+    const wrapper = mountCard(monitor, [monitor, mobile]);
+
+    const mobileBtn = wrapper.findAll("button.toggle-btn").find(b => b.text().includes("Mobile"));
+    await mobileBtn?.trigger("click");
+
+    expect(wrapper.get("img.preview-img").attributes("src")).toBe(
+      "wallpapers/Eclipse/balanced/mobile.svg"
+    );
+  });
+
   it("gives the preview intrinsic dimensions so the grid reserves space before load", () => {
     const img = mountCard(makeEntry()).get("img.preview-img");
     expect(img.attributes("width")).toBe("640");
