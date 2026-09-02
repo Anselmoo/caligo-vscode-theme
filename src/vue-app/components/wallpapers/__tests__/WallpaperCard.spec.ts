@@ -12,31 +12,6 @@ import { describe, expect, it } from "vitest";
 import type { WallpaperManifestEntry } from "../../../../wallpaper/types.js";
 import WallpaperCard from "../WallpaperCard.vue";
 
-const colors = {
-  bg: "#0b0c10",
-  bgSoft: "#141425",
-  bgMid: "#19182a",
-  accent: "#7aa2f7",
-  accentSoft: "#9ab8f9",
-  accentMuted: "#5a7fc4",
-  hueRed: "#f7768e",
-  hueOrange: "#ff9e64",
-  hueYellow: "#e0af68",
-  hueGreen: "#9ece6a",
-  hueCyan: "#7dcfff",
-  hueBlue: "#7aa2f7",
-  huePurple: "#bb9af7",
-  strings: "#9ece6a",
-  keywords: "#bb9af7",
-  functions: "#7aa2f7",
-  types: "#7dcfff",
-  variables: "#c0caf5",
-  constants: "#ff9e64",
-  numbers: "#ff9e64",
-  tags: "#f7768e",
-  attributes: "#e0af68",
-};
-
 function makeEntry(over: Partial<WallpaperManifestEntry> = {}): WallpaperManifestEntry {
   return {
     seedId: "Eclipse",
@@ -50,7 +25,6 @@ function makeEntry(over: Partial<WallpaperManifestEntry> = {}): WallpaperManifes
     svgPath: "wallpapers/Eclipse/balanced/monitor.svg",
     pngPath: "wallpapers/Eclipse/balanced/monitor.png",
     thumbPath: "wallpapers/Eclipse/balanced/monitor.webp",
-    colors,
     ...over,
   };
 }

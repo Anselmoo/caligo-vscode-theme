@@ -229,7 +229,6 @@ export interface WallpaperManifestEntry extends WallpaperSpec {
    * Consumers must fall back to svgPath rather than render a broken image.
    */
   thumbPath?: string;
-  colors: WallpaperColors;
 }
 
 export interface WallpapersManifest {
