@@ -13,6 +13,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { derivePalette } from "../src/lib/palette.js";
 import { expandSeedVariants, loadAllSeeds } from "../src/lib/seeds.js";
+import { resolveThumbPath } from "../src/wallpaper/manifest.js";
 import { extractWallpaperColors } from "../src/wallpaper/renderer.js";
 import type { WallpaperManifestEntry, WallpapersManifest } from "../src/wallpaper/types.js";
 import { MODE_TOPICS } from "../src/wallpaper/types.js";
@@ -100,6 +101,11 @@ async function main() {
         const svgPath = `wallpapers/${seedId}/${modeFolder}/${file}`;
         const pngPath = `wallpapers/${seedId}/${modeFolder}/${base}.png`;
         const topic = MODE_TOPICS[harmonyMode] ?? "Core";
+        // Thumbnails are rasterised in CI and not committed; omit the field
+        // entirely when absent so the gallery falls back to the SVG.
+        const thumbPath = resolveThumbPath(svgPath, rel =>
+          existsSync(join(PROJECT_ROOT, "public", rel))
+        );
 
         entries.push({
           seedId,
@@ -112,6 +118,7 @@ async function main() {
           displayName: `${seedDisplayName} · ${topic}`,
           svgPath,
           pngPath,
+          ...(thumbPath ? { thumbPath } : {}),
           colors,
         });
       }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { PLATFORM_SIZES } from "../../../wallpaper/types.js";
+import { PLATFORM_SIZES, thumbnailSize } from "../../../wallpaper/types.js";
 import type { WallpaperManifestEntry } from "../../composables/useWallpapers";
 import { rasterizeSvgToPng, triggerDownload } from "../../utils/rasterize-svg.js";
 
@@ -46,7 +46,22 @@ const activeVariant = computed(() =>
   )
 );
 
-const previewUrl = computed(() => activeVariant.value?.svgPath ?? props.entry.svgPath);
+/** Full-resolution SVG — the download source, never the preview source. */
+const sourceSvgUrl = computed(() => activeVariant.value?.svgPath ?? props.entry.svgPath);
+
+/**
+ * Preview source for the card image.
+ *
+ * Prefers the build-time WebP thumbnail (~30 KB) over the wallpaper SVG
+ * (~455 KB, up to 8,700 nodes, 3840x2160 intrinsic). Falls back to the SVG when
+ * thumbnails have not been generated, so a local checkout still shows previews.
+ */
+const previewUrl = computed(
+  () => activeVariant.value?.thumbPath ?? props.entry.thumbPath ?? sourceSvgUrl.value
+);
+
+/** Intrinsic thumbnail box, so the grid reserves space before the image lands. */
+const previewSize = computed(() => thumbnailSize(localPlatform.value));
 
 const downloadState = ref<"idle" | "working" | "error">("idle");
 
@@ -66,7 +81,7 @@ async function downloadPng() {
   downloadState.value = "working";
   try {
     const { width, height } = PLATFORM_SIZES[localPlatform.value];
-    const blob = await rasterizeSvgToPng(previewUrl.value, width, height);
+    const blob = await rasterizeSvgToPng(sourceSvgUrl.value, width, height);
     const textSuffix = localTextVariant.value === "text" ? "-text" : "";
     triggerDownload(
       blob,
@@ -83,6 +98,8 @@ async function downloadPng() {
 void platforms;
 void textVariants;
 void previewUrl;
+void previewSize;
+void sourceSvgUrl;
 void activeVariant;
 void downloadLabel;
 void downloadPng;
@@ -96,7 +113,10 @@ void downloadPng;
         :src="previewUrl"
         :alt="`${entry.displayName} wallpaper preview (${localPlatform})`"
         class="preview-img"
+        :width="previewSize.width"
+        :height="previewSize.height"
         loading="lazy"
+        decoding="async"
       />
     </div>
 

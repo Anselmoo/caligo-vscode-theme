@@ -461,7 +461,11 @@ jobs:
           node-version: 24.13.1
           cache: npm
       - run: npm ci
-      - name: Generate wallpapers (SVG only) + manifest + ZIP
+      # Thumbnail rasterisation renders each wallpaper in headless Chromium.
+      # The SVGs themselves are pure string generation and need no browser.
+      - name: Install Chromium for thumbnail rasterisation
+        run: npx playwright install --with-deps chromium
+      - name: Generate wallpapers (SVG only) + thumbnails + manifest + ZIP
         run: npm run wallpapers:ci
       - name: Upload wallpapers artifact
         uses: actions/upload-artifact@v6

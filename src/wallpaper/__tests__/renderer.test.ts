@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import type { DerivedPalette } from "../../lib/palette.js";
-import { buildAllSpecs, extractWallpaperColors, wallpaperFilename } from "../renderer.js";
+import {
+  buildAllSpecs,
+  extractWallpaperColors,
+  thumbnailFilename,
+  thumbnailSize,
+  wallpaperFilename,
+} from "../renderer.js";
 
 // Minimal palette fixture — only the fields extractWallpaperColors reads
 function makePalette(overrides: Partial<DerivedPalette> = {}): DerivedPalette {
@@ -187,5 +193,70 @@ describe("buildAllSpecs", () => {
 
   it("returns empty array for empty seeds", () => {
     expect(buildAllSpecs([])).toHaveLength(0);
+  });
+});
+
+// ─── Thumbnails ───────────────────────────────────────────────────────────────
+
+describe("thumbnailFilename", () => {
+  const base = {
+    seedId: "Eclipse",
+    seedDisplayName: "Eclipse",
+    topic: "Balanced" as const,
+    displayName: "Eclipse · Balanced",
+  };
+
+  it("emits a .webp path alongside the SVG", () => {
+    expect(
+      thumbnailFilename({
+        ...base,
+        harmonyMode: "analogous",
+        platform: "monitor",
+        textVariant: "no-text",
+      })
+    ).toBe("Eclipse/analogous/monitor.webp");
+  });
+
+  it("maps harmonyMode 'none' onto the 'balanced' folder, matching wallpaperFilename", () => {
+    const spec = {
+      ...base,
+      harmonyMode: "none",
+      platform: "monitor" as const,
+      textVariant: "no-text" as const,
+    };
+    expect(thumbnailFilename(spec)).toBe("Eclipse/balanced/monitor.webp");
+    expect(thumbnailFilename(spec)).toBe(wallpaperFilename(spec, "svg").replace(".svg", ".webp"));
+  });
+
+  it("keeps the -text suffix for the text variant", () => {
+    expect(
+      thumbnailFilename({
+        ...base,
+        harmonyMode: "triadic",
+        platform: "mobile",
+        textVariant: "text",
+      })
+    ).toBe("Eclipse/triadic/mobile-text.webp");
+  });
+});
+
+describe("thumbnailSize", () => {
+  it("scales a landscape monitor wallpaper to the long-edge budget", () => {
+    expect(thumbnailSize("monitor", 640)).toEqual({ width: 640, height: 360 });
+  });
+
+  it("scales a portrait mobile wallpaper by its height, not its width", () => {
+    // 1290x2796 is portrait — capping width at 640 would make a 1387px-tall thumb.
+    expect(thumbnailSize("mobile", 640)).toEqual({ width: 295, height: 640 });
+  });
+
+  it("preserves the tablet aspect ratio", () => {
+    expect(thumbnailSize("tablet", 640)).toEqual({ width: 640, height: 480 });
+  });
+
+  it("never rounds a dimension down to zero", () => {
+    const { width, height } = thumbnailSize("mobile", 1);
+    expect(width).toBeGreaterThanOrEqual(1);
+    expect(height).toBeGreaterThanOrEqual(1);
   });
 });
