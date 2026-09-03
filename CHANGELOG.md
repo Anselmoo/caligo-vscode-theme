@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-09-03
+
+### Fixed
+- **colors**: restore hue identity and enforce perceptual separation across all 50 themes (#154)
+
+### Changed
+- **wallpapers**: preview gallery with CI-built WebP thumbnails (#153)
+
 ## [0.6.0] - 2026-08-19
 
 ### Fixed
