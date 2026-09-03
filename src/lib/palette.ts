@@ -461,7 +461,18 @@ export function derivePalette(seed: Seed, mode: ThemeMode): DerivedPalette {
       id: `bracket${i + 1}`,
       hue: (((accent.h + 60 * i) % 360) + 360) % 360,
     })),
-    [...reservedColors, ...SYNTAX_ROLE_IDS.map(r => codeBudget.colors[r])],
+    // Reserved: semantic, every syntax ink, AND the accent ramp. The accent is
+    // excluded from the code surface because on a single-hue theme it shares the
+    // syntax hue and reserving it collapses the palette -- but brackets get six
+    // free hues, so reserving it here costs nothing and stops a bracket landing
+    // on `focusBorder`, which the palette inspector found at 0.023 apart.
+    [
+      ...reservedColors,
+      ...SYNTAX_ROLE_IDS.map(r => codeBudget.colors[r]),
+      accent,
+      accentSoft,
+      accentMuted,
+    ],
     bg0Hex
   );
 

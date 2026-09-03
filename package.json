@@ -95,7 +95,8 @@
     "typecheck:screenshots": "tsc -p tsconfig.tests.json --noEmit",
     "sync:themes": "tsx scripts/sync-theme-contributions.ts",
     "check:themes": "tsx scripts/sync-theme-contributions.ts --check",
-    "test:separation": "tsx scripts/separation-gate.ts"
+    "test:separation": "tsx scripts/separation-gate.ts",
+    "inspect:palette": "tsx scripts/palette-inspector.ts"
   },
   "dependencies": {
     "apca-w3": "^0.1.9",
