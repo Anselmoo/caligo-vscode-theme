@@ -7,6 +7,12 @@ declare module "culori" {
     alpha?: number;
   };
 
+  /**
+   * Gamut-map by reducing chroma only, holding lightness and hue fixed.
+   * Prefer this over `clampRgb`, which clamps R/G/B independently and
+   * therefore alters lightness and hue as a side effect.
+   */
+  export function clampChroma(color: unknown, mode?: string, rgbGamut?: string): Oklch;
   export function clampRgb(color: unknown): unknown;
   export function converter(mode: string): (color: unknown) => unknown;
   export function differenceEuclidean(

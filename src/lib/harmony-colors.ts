@@ -18,6 +18,8 @@
 
 import type { HarmonyMode } from "../types/harmony.js";
 import { type OkLch, oklch, toHex } from "./color.js";
+import { SEMANTIC_HUES } from "./semantic-colors.js";
+import { type LadderRole, placeOnLadder, resolveRungs } from "./separation-ladder.js";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // HARMONY MODE TYPE
@@ -103,6 +105,23 @@ export const SYNTAX_LC_DEFAULTS = {
 export type DerivedHarmonyPalette = {
   mode: HarmonyMode;
   baseHue: number;
+
+  /** The hue each syntax role resolved to, for the shared budget allocator. */
+  roleHues: Record<keyof typeof SYNTAX_LC_DEFAULTS, number>;
+
+  /**
+   * How many distinct colours this palette actually carries.
+   *
+   * `deriveHarmonyPalette` sets this from hue geometry alone, but it is NOT the
+   * final word: `derivePalette` overwrites it with the shared budget's own
+   * `distinctCount`, which is measured against the real background and the
+   * reserved colours and is usually lower. Read it as "what shipped", and
+   * expect the value on a fully-derived palette rather than this one.
+   *
+   * It reaches a reader directly -- single-hue themes put it in their picker
+   * label -- so it must never claim more than was delivered.
+   */
+  weightCount: number;
 
   // Raw harmony hues (for debugging)
   harmonyHues: number[];
@@ -320,7 +339,8 @@ function mapHuesToSyntaxRoles(
 export function deriveHarmonyPalette(
   baseHue: number,
   mode: HarmonyMode = "none",
-  baseChroma: number = 0.15
+  baseChroma: number = 0.15,
+  backgroundHex?: string
 ): DerivedHarmonyPalette {
   // Get harmony hues
   const harmonyHues = getHarmonyHues(baseHue, mode);
@@ -331,11 +351,39 @@ export function deriveHarmonyPalette(
   // Scale factor based on accent chroma (vivid accents → vivid syntax)
   const chromaScale = Math.max(0.8, Math.min(1.2, baseChroma / 0.15));
 
-  // Helper to create OKLCH color for a role
+  // Place each role on the separation ladder.
+  //
+  // Previously each role took a fixed (l, c) from SYNTAX_LC_DEFAULTS, where nine
+  // of eleven roles sat inside L 0.68-0.78 and C 0.11-0.14. Separation was
+  // carried by hue alone, so it evaporated exactly where the hue span narrowed:
+  // monochromatic themes measured 91-107 confusable pairs against 5-13 for
+  // full-wheel themes.
+  //
+  // The ladder spreads roles across L 0.55-0.90 and C 0.02-0.28 with alternating
+  // chroma, so any two roles differ on both axes and no pair depends on hue to
+  // stay apart. Monochromatic additionally collapses roles into declared groups:
+  // at a single hue eleven roles do not fit the feasible box with the separation
+  // floor between every pair, and merging them openly beats shipping eleven
+  // roles that are secretly six.
+  const { rungs, weightCount } = resolveRungs(mode === "monochromatic", baseHue, backgroundHex);
+
   const mkColor = (role: keyof typeof SYNTAX_LC_DEFAULTS): OkLch => {
-    const { l, c } = SYNTAX_LC_DEFAULTS[role];
     const hue = roleHues[role];
-    return oklch(l, c * chromaScale, hue);
+    const rung = rungs[role as LadderRole];
+
+    // Without a background there is nothing to solve contrast against, so fall
+    // back to the rung's nominal values. Callers that generate real themes pass
+    // one; this path exists for unit tests and for the debug wheel.
+    if (!backgroundHex) {
+      return oklch(rung.l, Math.min(rung.chromaCeiling, rung.chromaCeiling * chromaScale), hue);
+    }
+
+    const placed = placeOnLadder(
+      { l: rung.l, chromaCeiling: rung.chromaCeiling * chromaScale },
+      hue,
+      backgroundHex
+    );
+    return placed.color;
   };
 
   const strings = mkColor("strings");
@@ -351,6 +399,8 @@ export function deriveHarmonyPalette(
   return {
     mode,
     baseHue,
+    weightCount,
+    roleHues,
     harmonyHues,
 
     debug: {
@@ -741,11 +791,19 @@ export interface HarmonySemanticHues {
 /**
  * Base semantic hues (standard values when no harmony is applied)
  */
+/**
+ * Re-exported from `semantic-colors.ts`, not redeclared.
+ *
+ * These were two separate literal tables holding the same four numbers, and
+ * this copy was the one actually reaching generated themes -- so editing the
+ * other had no effect at all. One source of truth, so a change to a semantic
+ * hue cannot silently apply to half the system.
+ */
 export const BASE_SEMANTIC_HUES: HarmonySemanticHues = {
-  error: 29,
-  warning: 60,
-  success: 145,
-  info: 220,
+  error: SEMANTIC_HUES.error,
+  warning: SEMANTIC_HUES.warning,
+  success: SEMANTIC_HUES.success,
+  info: SEMANTIC_HUES.info,
 };
 
 /**
@@ -753,7 +811,8 @@ export const BASE_SEMANTIC_HUES: HarmonySemanticHues = {
  */
 const SEMANTIC_HUE_RANGES = {
   error: { min: 15, max: 45 }, // Red range
-  warning: { min: 40, max: 80 }, // Yellow/Orange range
+  warning: { min: 55, max: 100 }, // Yellow range (was 40-80, which clamped
+  // warning back into orange and kept it within 31 degrees of error)
   success: { min: 130, max: 170 }, // Green range
   info: { min: 200, max: 260 }, // Blue range
 };
@@ -806,9 +865,15 @@ export function deriveHarmonySemanticHues(mode: HarmonyMode): HarmonySemanticHue
     case "split-complementary":
       // Split-complementary: high contrast semantic positioning
       // Maximize the spread within each safe range
+      // Error and warning must shift in the SAME direction here, not toward
+      // each other. Shifting error +12 and warning -15 put them at 41 and 45
+      // degrees -- four degrees apart, rendering as the same orange. That
+      // collision was invisible while both colors were being flattened to white
+      // by the old contrast loop; with hue preserved it is the single worst
+      // semantic pair in the whole matrix.
       return {
-        error: clampToSemanticRange(base.error + 12, "error"), // 41° (orange-red)
-        warning: clampToSemanticRange(base.warning - 15, "warning"), // 45° (yellow-orange)
+        error: clampToSemanticRange(base.error - 9, "error"), // 20° (deep red)
+        warning: clampToSemanticRange(base.warning + 15, "warning"), // 75° (yellow-orange)
         success: clampToSemanticRange(base.success + 18, "success"), // 163° (teal)
         info: clampToSemanticRange(base.info - 18, "info"), // 202° (cyan-blue)
       };

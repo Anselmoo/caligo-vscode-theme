@@ -1,4 +1,4 @@
-import { clampRgb, converter, formatHex, formatHex8 } from "culori";
+import { clampChroma, converter, formatHex, formatHex8 } from "culori";
 
 export type OkLch = {
   mode: "oklch";
@@ -14,8 +14,18 @@ export function oklch(l: number, c: number, h: number, alpha = 1): OkLch {
   return { mode: "oklch", l, c, h, alpha };
 }
 
+/**
+ * Convert an OKLCH color to hex, gamut-mapping by chroma reduction.
+ *
+ * Uses `clampChroma` rather than `clampRgb`. The difference is not cosmetic:
+ * `clampRgb` clamps R, G and B independently, so it alters lightness and hue as
+ * a side effect. Asked for OKLCH(0.98, 0.6, 29) it returns #ff0000 -- a color at
+ * L ~0.63, two thirds of a lightness scale away from what was requested.
+ * `clampChroma` holds L and H fixed and surrenders only chroma, which is the
+ * one axis that has to yield when a color falls outside sRGB.
+ */
 export function toHex(color: OkLch): string {
-  const rgb = clampRgb(toRgb(color));
+  const rgb = toRgb(clampChroma(color, "oklch"));
 
   // culori exports both `formatHex` and `formatHex8` in modern versions.
   // Prefer hex8 when alpha is present.
