@@ -18,10 +18,35 @@ import {
 import { type DerivedIntentPalette, deriveIntentPaletteWithHarmony } from "./intent-layers.js";
 import {
   DEFAULT_SEMANTIC_COLORS,
+  type DerivedAnsiPalette,
   type DerivedSemanticPalette,
+  deriveAnsiPalette,
   deriveSemanticPalette,
   type SemanticColors,
 } from "./semantic-colors.js";
+import {
+  DECORATIVE_LADDER,
+  type DecorativeHue,
+  fitRungs,
+  type LadderRole,
+  placeOnLadder,
+  SINGLE_INK_PRESENTATION,
+} from "./separation-ladder.js";
+
+/** The nine syntax roles the shared budget allocates, in priority order. */
+const SYNTAX_ROLE_IDS = [
+  "keywords",
+  "functions",
+  "strings",
+  "types",
+  "numbers",
+  "variables",
+  "constants",
+  "tags",
+  "attributes",
+] as const satisfies readonly LadderRole[];
+
+import { allocateSharedBudget } from "./shared-budget.js";
 
 /**
  * Chroma multipliers for different syntax styles.
@@ -141,11 +166,23 @@ export type DerivedPalette = {
   hueBlue: string;
   huePurple: string;
 
+  // Terminal ANSI, on FIXED hues. Never derived from the decorative wheel:
+  // a program writing red means red regardless of the theme's accent.
+  ansi: DerivedAnsiPalette;
+
   // SEMANTIC colors (FIXED hues - never shift with accent!)
   semantic: DerivedSemanticPalette;
 
   // HARMONY colors (when harmony mode is enabled)
   harmony: DerivedHarmonyPalette;
+
+  /**
+   * Per-role weight and slope, populated only for a single-hue theme.
+   *
+   * Empty for every other mode: hue carries role identity there, and adding
+   * italics on top would be decoration rather than information.
+   */
+  syntaxEmphasis: Partial<Record<string, "italic" | "bold" | "bold italic">>;
 
   // INTENT colors (when intentEmphasis is enabled)
   intent?: DerivedIntentPalette;
@@ -242,19 +279,53 @@ export function derivePalette(seed: Seed, mode: ThemeMode): DerivedPalette {
   // the fundamental hue relationships change, not just syntax colors.
   // ═══════════════════════════════════════════════════════════════════════════
   const harmonyWheel = deriveHarmonyDecorativeWheel(accent.h, harmonyMode);
-  const mk = (hh: number, l: number, c: number) =>
-    oklch(l, c * chromaMult, ((hh % 360) + 360) % 360);
 
-  // Slightly increased lightness values to improve terminal ANSI contrast on
-  // dark backgrounds (helps meet APCA thresholds for terminal text).
-  // Slightly increased lightness to improve terminal and semantic contrast
-  const hueRed = mk(harmonyWheel.hueRed, 0.84, Math.max(accent.c * 1.0, 0.16));
-  const hueOrange = mk(harmonyWheel.hueOrange, 0.74, Math.max(accent.c * 0.9, 0.14));
-  const hueYellow = mk(harmonyWheel.hueYellow, 0.82, Math.max(accent.c * 0.8, 0.14));
-  const hueGreen = mk(harmonyWheel.hueGreen, 0.8, Math.max(accent.c * 0.8, 0.14));
-  const hueCyan = mk(harmonyWheel.hueCyan, 0.8, Math.max(accent.c * 0.75, 0.14));
-  const hueBlue = mk(harmonyWheel.hueBlue, 0.86, Math.max(accent.c * 0.95, 0.16));
-  const huePurple = mk(harmonyWheel.huePurple, 0.78, Math.max(accent.c * 0.9, 0.14));
+  // Place the wheel on its own ladder rather than on seven hand-picked
+  // lightness values.
+  //
+  // The previous constants spanned 0.74-0.86 with green and cyan both at 0.80,
+  // and gave every member a chroma of `Math.max(accent.c * k, 0.14)` -- which
+  // is near enough to constant that hue was doing all the separating. That held
+  // up in `none` mode and collapsed everywhere the hue span narrowed: in a
+  // single-hue theme these were seven copies of one color, and they were the
+  // source of every worst-measuring pair left after the syntax ladder landed
+  // (Markup Links against Regex Escapes, String Escapes against Storage
+  // Imports, and so on).
+  //
+  // `placeOnLadder` also means the wheel now clears the readability floor by
+  // construction instead of by the hand-tuned lightness bumps these constants
+  // had accreted for terminal contrast.
+  const bg0Hex = toHex(bg0);
+
+  // Order matters: members adjacent in this list are the ones that merge when
+  // the hue span is too narrow to keep them all apart. Hue-adjacent members are
+  // deliberately NOT adjacent here, so a merge folds together colours that were
+  // already close rather than collapsing red into orange first.
+  const WHEEL_ORDER = [
+    "huePurple",
+    "hueRed",
+    "hueCyan",
+    "hueYellow",
+    "hueOrange",
+    "hueBlue",
+    "hueGreen",
+  ] as const satisfies readonly DecorativeHue[];
+
+  const wheelHues = WHEEL_ORDER.map(k => ((harmonyWheel[k] % 360) + 360) % 360);
+  const wheelBounds = {
+    lMin: Math.min(...WHEEL_ORDER.map(k => DECORATIVE_LADDER[k].l)),
+    lMax: Math.max(...WHEEL_ORDER.map(k => DECORATIVE_LADDER[k].l)),
+    cMin: Math.min(...WHEEL_ORDER.map(k => DECORATIVE_LADDER[k].chromaCeiling)) * chromaMult,
+    cMax: Math.max(...WHEEL_ORDER.map(k => DECORATIVE_LADDER[k].chromaCeiling)) * chromaMult,
+  };
+  const wheelFit = fitRungs(wheelHues, bg0Hex, wheelBounds);
+
+  const wheelColors = {} as Record<DecorativeHue, OkLch>;
+  WHEEL_ORDER.forEach((key, i) => {
+    wheelColors[key] = placeOnLadder(wheelFit[i].rung, wheelFit[i].hue, bg0Hex).color;
+  });
+
+  const { hueRed, hueOrange, hueYellow, hueGreen, hueCyan, hueBlue, huePurple } = wheelColors;
 
   // ═══════════════════════════════════════════════════════════════════════════
   // HARMONY-SHIFTED SEMANTIC COLORS
@@ -269,19 +340,183 @@ export function derivePalette(seed: Seed, mode: ThemeMode): DerivedPalette {
   // - Success stays GREEN (130-170°), Info stays BLUE (200-260°)
   // ═══════════════════════════════════════════════════════════════════════════
   const semanticConfig = buildSemanticConfig(seed.semantic, harmonyMode);
-  const semantic = deriveSemanticPalette(semanticConfig, bg0);
+  const semantic = deriveSemanticPalette(semanticConfig, bg0, [accent, accentSoft, accentMuted]);
 
   // ═══════════════════════════════════════════════════════════════════════════
   // HARMONY COLORS (for advanced syntax highlighting)
   // Uses color theory harmony modes when specified in seed
   // ═══════════════════════════════════════════════════════════════════════════
-  const harmony = deriveHarmonyPalette(accent.h, harmonyMode, accent.c);
+  const harmony = deriveHarmonyPalette(accent.h, harmonyMode, accent.c, toHex(bg0));
 
   // ═══════════════════════════════════════════════════════════════════════════
   // INTENT COLORS (revolutionary intent-based semantic coloring)
   // NOW HARMONY-AWARE: Uses harmony-derived hue offsets for intent layers
   // This ensures ~90%+ color differentiation between harmony modes
   // ═══════════════════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SHARED COLOUR BUDGET
+  //
+  // Up to this point the syntax ladder, the decorative wheel and the accent
+  // variants have each been placed well WITHIN themselves and in ignorance of
+  // each other. Measured, that left 88% of all remaining collisions between
+  // layers rather than inside any one of them.
+  //
+  // This re-places all three against a single ledger, with the semantic palette
+  // reserved: semantic colours are the ones a reader cannot opt out of, so they
+  // spend from the budget first and everything else fits around them.
+  //
+  // Priority order below is a claim about what a reader most needs to tell
+  // apart. Keywords, calls and strings lead; comments and operators are
+  // deliberately near the end because they are meant to recede and are the
+  // cheapest to fold; the decorative wheel and accent tints come last because
+  // nothing about reading code depends on `hueOrange` differing from `hueRed`.
+  // ═══════════════════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SHARED COLOUR BUDGET, SCOPED BY SURFACE
+  //
+  // Two colours need to be tellable apart only if a reader can see them at the
+  // same time. Requiring all nineteen to differ from all the others solved a
+  // harder problem than the product has: it drove the affordable palette down
+  // to about seven colours and, at a single hue, to two.
+  //
+  // So the floor is applied per surface:
+  //
+  //   CODE  - the nine syntax roles. These render together in every source file
+  //           and are what a reader scans, so they get the strictest treatment.
+  //   DECOR - the seven decorative wheel colours, which drive markup, regex,
+  //           git decorations and symbol icons. They occupy different scope
+  //           families from the code roles and are told apart by position as
+  //           much as by hue.
+  //
+  // Both surfaces are allocated against the same RESERVED set -- the semantic
+  // four and the accent ramp -- because those appear over everything and a
+  // reader cannot opt out of an error being distinguishable. What is no longer
+  // required is that a markup heading differ from a keyword: they belong to
+  // different surfaces, and forcing them apart was costing colour everywhere
+  // for a collision almost nobody can be shown.
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Only the semantic four. The accent ramp is deliberately absent: it is
+  // chrome -- cursor, borders, selection, badges -- sitting beside code rather
+  // than among it, and reserving it collapsed every single-hue theme, since
+  // there the accent shares the syntax hue and nothing can get clear of it.
+  // The semantic colours go the other way: `deriveSemanticPalette` already
+  // steps them clear of the accent, so the accent is respected once, at the
+  // layer that genuinely shares a surface with it.
+  const reservedColors = [
+    semantic.debug.error,
+    semantic.debug.warning,
+    semantic.debug.success,
+    semantic.debug.info,
+  ];
+
+  // Priority order is a claim about what a reader most needs to pick out:
+  // keywords, calls and strings lead, and the roles nobody distinguishes by
+  // name fold first when the surface cannot afford them all.
+  const codeBudget = allocateSharedBudget(
+    [
+      { id: "keywords", hue: harmony.roleHues.keywords },
+      { id: "functions", hue: harmony.roleHues.functions },
+      { id: "strings", hue: harmony.roleHues.strings },
+      { id: "types", hue: harmony.roleHues.types },
+      { id: "numbers", hue: harmony.roleHues.numbers },
+      { id: "variables", hue: harmony.roleHues.variables },
+      { id: "constants", hue: harmony.roleHues.constants },
+      { id: "tags", hue: harmony.roleHues.tags },
+      { id: "attributes", hue: harmony.roleHues.attributes },
+    ],
+    reservedColors,
+    bg0Hex
+  );
+
+  const decorBudget = allocateSharedBudget(
+    WHEEL_ORDER.map((key, i) => ({ id: key, hue: wheelFit[i].hue })),
+    reservedColors,
+    bg0Hex
+  );
+
+  const budget = {
+    colors: { ...codeBudget.colors, ...decorBudget.colors },
+    distinctCount: codeBudget.distinctCount,
+    merged: [...codeBudget.merged, ...decorBudget.merged],
+  };
+
+  const budgeted = <T extends OkLch>(id: string, fallback: T): OkLch =>
+    budget.colors[id] ?? fallback;
+
+  // Rebuild the syntax palette from the shared allocation. `deriveHarmonyPalette`
+  // still owns the hue geometry and the weight count; only the placement moves.
+  // Single-ink themes take their role colours from the declared presentation
+  // table rather than from the allocator's own bucketing. The allocator
+  // optimises separation and has no view on which roles should share a tone;
+  // with only two tones available that put keywords alone against eight roles
+  // sharing one colour. The table splits them deliberately and lets weight and
+  // slope carry the rest.
+  const isSingleInk = harmony.mode === "monochromatic";
+  const singleInkTones = isSingleInk
+    ? [
+        ...new Map(SYNTAX_ROLE_IDS.map(r => [toHex(budget.colors[r]), budget.colors[r]])).values(),
+      ].sort((a, b) => a.l - b.l)
+    : [];
+
+  const inkFor = (role: LadderRole, fallback: OkLch): OkLch => {
+    if (!isSingleInk || singleInkTones.length === 0) return budget.colors[role] ?? fallback;
+    const { tone } = SINGLE_INK_PRESENTATION[role];
+    // tone 0 is the brighter of the two; the sort above is ascending.
+    const index = tone === 0 ? singleInkTones.length - 1 : 0;
+    return singleInkTones[index];
+  };
+
+  const syntaxEmphasis: Partial<Record<string, "italic" | "bold" | "bold italic">> = {};
+  if (isSingleInk) {
+    for (const role of SYNTAX_ROLE_IDS) {
+      const style = SINGLE_INK_PRESENTATION[role].fontStyle;
+      if (style) syntaxEmphasis[role] = style;
+    }
+  }
+
+  const budgetedHarmony: DerivedHarmonyPalette = {
+    ...harmony,
+    // Report what the allocation actually delivered, not what the ladder hoped
+    // for. `deriveWeightGroups` computes a target from hue geometry alone; the
+    // shared budget then places against the real background and the reserved
+    // colours and can afford fewer. A single-ink theme labelled "4 weights"
+    // while rendering three is a label that lies to the picker.
+    weightCount: codeBudget.distinctCount,
+    debug: {
+      strings: inkFor("strings", harmony.debug.strings),
+      numbers: inkFor("numbers", harmony.debug.numbers),
+      keywords: inkFor("keywords", harmony.debug.keywords),
+      functions: inkFor("functions", harmony.debug.functions),
+      types: inkFor("types", harmony.debug.types),
+      variables: inkFor("variables", harmony.debug.variables),
+      constants: inkFor("constants", harmony.debug.constants),
+      attributes: inkFor("attributes", harmony.debug.attributes),
+      tags: inkFor("tags", harmony.debug.tags),
+    },
+    strings: toHex(inkFor("strings", harmony.debug.strings)),
+    numbers: toHex(inkFor("numbers", harmony.debug.numbers)),
+    keywords: toHex(inkFor("keywords", harmony.debug.keywords)),
+    functions: toHex(inkFor("functions", harmony.debug.functions)),
+    types: toHex(inkFor("types", harmony.debug.types)),
+    variables: toHex(inkFor("variables", harmony.debug.variables)),
+    constants: toHex(inkFor("constants", harmony.debug.constants)),
+    attributes: toHex(inkFor("attributes", harmony.debug.attributes)),
+    tags: toHex(inkFor("tags", harmony.debug.tags)),
+  };
+
+  const wheelFinal = {
+    hueRed: budgeted("hueRed", hueRed),
+    hueOrange: budgeted("hueOrange", hueOrange),
+    hueYellow: budgeted("hueYellow", hueYellow),
+    hueGreen: budgeted("hueGreen", hueGreen),
+    hueCyan: budgeted("hueCyan", hueCyan),
+    hueBlue: budgeted("hueBlue", hueBlue),
+    huePurple: budgeted("huePurple", huePurple),
+  };
+
+  const accentSoftFinal = accentSoft;
+  const accentMutedFinal = accentMuted;
+
   const intentEnabled = seed.intentMode ?? Boolean(seed.intentEmphasis);
   const intentEmphasis = seed.intentEmphasis ?? "balanced";
   const harmonyIntentOffsets = deriveHarmonyIntentOffsets(accent.h, harmonyMode);
@@ -308,16 +543,16 @@ export function derivePalette(seed: Seed, mode: ThemeMode): DerivedPalette {
         fg1,
         fgMuted,
         accent,
-        accentSoft,
-        accentMuted,
+        accentSoft: accentSoftFinal,
+        accentMuted: accentMutedFinal,
         accentSubtle,
-        hueRed,
-        hueOrange,
-        hueYellow,
-        hueGreen,
-        hueCyan,
-        hueBlue,
-        huePurple,
+        hueRed: wheelFinal.hueRed,
+        hueOrange: wheelFinal.hueOrange,
+        hueYellow: wheelFinal.hueYellow,
+        hueGreen: wheelFinal.hueGreen,
+        hueCyan: wheelFinal.hueCyan,
+        hueBlue: wheelFinal.hueBlue,
+        huePurple: wheelFinal.huePurple,
         border: borderOk,
         selectionBase,
       },
@@ -336,18 +571,20 @@ export function derivePalette(seed: Seed, mode: ThemeMode): DerivedPalette {
     fg1: toHex(fg1),
     fgMuted: toHex(fgMuted),
     accent: toHex(accent),
-    accentSoft: toHex(accentSoft),
-    accentMuted: toHex(accentMuted),
+    accentSoft: toHex(accentSoftFinal),
+    accentMuted: toHex(accentMutedFinal),
     accentSubtle: toHex(accentSubtle),
-    hueRed: toHex(hueRed),
-    hueOrange: toHex(hueOrange),
-    hueYellow: toHex(hueYellow),
-    hueGreen: toHex(hueGreen),
-    hueCyan: toHex(hueCyan),
-    hueBlue: toHex(hueBlue),
-    huePurple: toHex(huePurple),
+    hueRed: toHex(wheelFinal.hueRed),
+    ansi: deriveAnsiPalette(bg0),
+    hueOrange: toHex(wheelFinal.hueOrange),
+    hueYellow: toHex(wheelFinal.hueYellow),
+    hueGreen: toHex(wheelFinal.hueGreen),
+    hueCyan: toHex(wheelFinal.hueCyan),
+    hueBlue: toHex(wheelFinal.hueBlue),
+    huePurple: toHex(wheelFinal.huePurple),
     semantic,
-    harmony,
+    harmony: budgetedHarmony,
+    syntaxEmphasis,
     intent,
     border,
     selection,

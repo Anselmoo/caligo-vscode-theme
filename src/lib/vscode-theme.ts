@@ -23,7 +23,22 @@ export type VscodeThemeJson = {
 
 export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
   const modeSuffix = p.mode && p.mode !== "Balanced" ? ` — ${p.mode}` : "";
-  const name = `Caligo (${p.seed.displayName}${modeSuffix})`;
+
+  // A single-hue theme states how many weights it actually carries.
+  //
+  // "Monochromatic" describes how the theme is made; it says nothing about what
+  // it gives you, and it implied eleven distinguishable roles that one hue can
+  // never hold. The weight count is what a reader actually gets, and it is not
+  // a constant: measured across the shipped backgrounds, sRGB affords four
+  // weights at most hues and three in the narrow cyan band. Naming it turns the
+  // constraint into the point, the way a letterpress broadside is not a colour
+  // print that failed.
+  const weightSuffix =
+    p.harmony.mode === "monochromatic"
+      ? ` · ${p.harmony.weightCount} ${p.harmony.weightCount === 1 ? "weight" : "weights"}`
+      : "";
+
+  const name = `Caligo (${p.seed.displayName}${modeSuffix}${weightSuffix})`;
 
   // ═══════════════════════════════════════════════════════════════════════════
   // BASE COLORS (UI elements, surfaces, text)
@@ -221,20 +236,20 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     "terminal.foreground": p.fg0,
     "terminal.background": p.bg0,
     "terminal.ansiBlack": p.bg2,
-    "terminal.ansiRed": p.hueRed,
-    "terminal.ansiGreen": p.hueGreen,
-    "terminal.ansiYellow": p.hueYellow,
-    "terminal.ansiBlue": p.hueBlue,
-    "terminal.ansiMagenta": p.huePurple,
-    "terminal.ansiCyan": p.hueCyan,
+    "terminal.ansiRed": p.ansi.red,
+    "terminal.ansiGreen": p.ansi.green,
+    "terminal.ansiYellow": p.ansi.yellow,
+    "terminal.ansiBlue": p.ansi.blue,
+    "terminal.ansiMagenta": p.ansi.magenta,
+    "terminal.ansiCyan": p.ansi.cyan,
     "terminal.ansiWhite": p.fg0,
     "terminal.ansiBrightBlack": withAlpha(p.fgMuted, 0.65),
-    "terminal.ansiBrightRed": p.hueRed,
-    "terminal.ansiBrightGreen": p.hueGreen,
-    "terminal.ansiBrightYellow": p.hueYellow,
-    "terminal.ansiBrightBlue": p.hueBlue,
-    "terminal.ansiBrightMagenta": p.huePurple,
-    "terminal.ansiBrightCyan": p.hueCyan,
+    "terminal.ansiBrightRed": p.ansi.redBright,
+    "terminal.ansiBrightGreen": p.ansi.greenBright,
+    "terminal.ansiBrightYellow": p.ansi.yellowBright,
+    "terminal.ansiBrightBlue": p.ansi.blueBright,
+    "terminal.ansiBrightMagenta": p.ansi.magentaBright,
+    "terminal.ansiBrightCyan": p.ansi.cyanBright,
     "terminal.ansiBrightWhite": p.fg0,
     "terminal.findMatchBackground": withAlpha(p.accentMuted, 0.5),
     "terminal.findMatchBorder": p.accent,
@@ -411,6 +426,25 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
           tags: p.harmony.tags,
         };
 
+  /**
+   * Settings for a primary syntax role.
+   *
+   * On a single-hue theme the role's weight and slope come from the presentation
+   * table, because two tones cannot identify nine roles on their own. On every
+   * other theme this returns the colour alone -- hue already carries identity
+   * there, and italics on top would be decoration, not information.
+   *
+   * An explicit `style` argument always wins: a rule that already had a reason
+   * for its own styling keeps it.
+   */
+  const ink = (
+    role: keyof typeof syntax,
+    style?: string
+  ): { foreground: string; fontStyle?: string } => {
+    const fontStyle = style ?? p.syntaxEmphasis[role];
+    return fontStyle ? { foreground: syntax[role], fontStyle } : { foreground: syntax[role] };
+  };
+
   const tokenColors: VscodeThemeJson["tokenColors"] = [
     {
       name: "Comments",
@@ -423,7 +457,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     {
       name: "Doc Comment Keywords",
       scope: ["comment.block.documentation keyword", "comment.block.documentation storage.type"],
-      settings: { foreground: syntax.attributes },
+      settings: ink("attributes"),
     },
     {
       name: "Doc Comment Types",
@@ -432,7 +466,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
         "comment.block.documentation entity.name.class",
         "comment.block.documentation entity.name.interface",
       ],
-      settings: { foreground: syntax.types, fontStyle: "italic" },
+      settings: ink("types", "italic"),
     },
     {
       name: "Doc Comment Parameters",
@@ -440,17 +474,17 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
         "comment.block.documentation variable",
         "comment.block.documentation entity.name.variable",
       ],
-      settings: { foreground: syntax.variables, fontStyle: "italic" },
+      settings: ink("variables", "italic"),
     },
     {
       name: "Doc Comment Type Brackets",
       scope: ["comment.block.documentation entity.name.type punctuation.definition.bracket"],
-      settings: { foreground: syntax.types },
+      settings: ink("types"),
     },
     {
       name: "Strings",
       scope: ["string"],
-      settings: { foreground: syntax.strings },
+      settings: ink("strings"),
     },
     {
       name: "String Punctuation",
@@ -464,12 +498,12 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     {
       name: "String Interpolation",
       scope: ["string variable", "variable.other.interpolation"],
-      settings: { foreground: syntax.variables },
+      settings: ink("variables"),
     },
     {
       name: "String Escapes",
       scope: ["constant.character.escape", "constant.character.escape.regexp"],
-      settings: { foreground: syntax.constants },
+      settings: ink("constants"),
     },
     {
       name: "Template Interpolation",
@@ -488,12 +522,12 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     {
       name: "Regex",
       scope: ["source.regexp", "string.regexp"],
-      settings: { foreground: syntax.strings },
+      settings: ink("strings"),
     },
     {
       name: "Regex Character Classes",
       scope: ["string.regexp.character-class", "constant.other.character-class.regexp"],
-      settings: { foreground: syntax.types },
+      settings: ink("types"),
     },
     {
       name: "Regex Escapes",
@@ -503,7 +537,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     {
       name: "Regex Groups",
       scope: ["punctuation.definition.group.regexp"],
-      settings: { foreground: syntax.constants },
+      settings: ink("constants"),
     },
     {
       name: "Regex Assertions",
@@ -513,7 +547,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     {
       name: "Regex Character Class Punctuation",
       scope: ["punctuation.definition.character-class.regexp"],
-      settings: { foreground: syntax.types },
+      settings: ink("types"),
     },
     {
       name: "Regex Delimiters",
@@ -531,7 +565,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     {
       name: "Numbers",
       scope: ["constant.numeric", "constant.character.numeric"],
-      settings: { foreground: syntax.numbers },
+      settings: ink("numbers"),
     },
     {
       name: "Keywords",
@@ -548,12 +582,12 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
         "storage.type.struct",
         "storage.type.enum",
       ],
-      settings: { foreground: syntax.keywords },
+      settings: ink("keywords"),
     },
     {
       name: "New Keyword",
       scope: ["keyword.control.new", "keyword.operator.new"],
-      settings: { foreground: syntax.keywords, fontStyle: "bold" },
+      settings: ink("keywords", "bold"),
     },
     {
       name: "Storage Imports",
@@ -571,7 +605,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
         "meta.function-call",
         "meta.function-call.generic",
       ],
-      settings: { foreground: syntax.functions },
+      settings: ink("functions"),
     },
     {
       name: "Function Parameters",
@@ -580,7 +614,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
         "variable.parameter.function",
         "entity.name.variable.parameter",
       ],
-      settings: { foreground: syntax.variables, fontStyle: "italic" },
+      settings: ink("variables", "italic"),
     },
     {
       name: "Decorators",
@@ -589,7 +623,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
         "meta.decorator variable.other.property",
         "meta.decorator punctuation.definition",
       ],
-      settings: { foreground: syntax.attributes, fontStyle: "italic" },
+      settings: ink("attributes", "italic"),
     },
     {
       name: "Types",
@@ -601,12 +635,12 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
         "entity.name.interface",
         "entity.name.trait",
       ],
-      settings: { foreground: syntax.types },
+      settings: ink("types"),
     },
     {
       name: "Inherited Classes",
       scope: ["entity.other.inherited-class"],
-      settings: { foreground: syntax.types, fontStyle: "italic" },
+      settings: ink("types", "italic"),
     },
     {
       name: "Type Parameters",
@@ -616,7 +650,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     {
       name: "Type Annotations",
       scope: ["storage.type.annotation", "meta.type.annotation", "meta.return-type"],
-      settings: { foreground: syntax.types, fontStyle: "italic" },
+      settings: ink("types", "italic"),
     },
     {
       name: "Variables",
@@ -626,12 +660,12 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
         "meta.definition.variable",
         "entity.name.variable",
       ],
-      settings: { foreground: syntax.variables },
+      settings: ink("variables"),
     },
     {
       name: "this/self/super",
       scope: ["variable.language", "keyword.other.this"],
-      settings: { foreground: syntax.keywords, fontStyle: "italic" },
+      settings: ink("keywords", "italic"),
     },
     {
       name: "Constants",
@@ -643,27 +677,27 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
         "variable.other.enummember",
         "support.constant",
       ],
-      settings: { foreground: syntax.constants },
+      settings: ink("constants"),
     },
     {
       name: "Support Types",
       scope: ["support", "support.type", "support.class", "support.other.namespace"],
-      settings: { foreground: syntax.types, fontStyle: "italic" },
+      settings: ink("types", "italic"),
     },
     {
       name: "Support Functions",
       scope: ["support.function", "support.method", "support.function.any-method"],
-      settings: { foreground: syntax.functions },
+      settings: ink("functions"),
     },
     {
       name: "Support Constants",
       scope: ["support.constant"],
-      settings: { foreground: syntax.constants },
+      settings: ink("constants"),
     },
     {
       name: "Support Variables",
       scope: ["support.variable"],
-      settings: { foreground: syntax.variables },
+      settings: ink("variables"),
     },
     {
       name: "Operators",
@@ -694,7 +728,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
         "entity.name.tag.tsx",
         "meta.tag",
       ],
-      settings: { foreground: syntax.tags },
+      settings: ink("tags"),
     },
     {
       name: "Attributes",
@@ -706,7 +740,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
         "entity.other.attribute-name.tsx",
         "meta.attribute",
       ],
-      settings: { foreground: syntax.attributes },
+      settings: ink("attributes"),
     },
     {
       name: "Property Names",
@@ -718,7 +752,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
         "meta.property-name.scss",
         "meta.module-reference",
       ],
-      settings: { foreground: syntax.attributes },
+      settings: ink("attributes"),
     },
     {
       name: "Markup Headings",
@@ -753,7 +787,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     {
       name: "Markup Inline Code",
       scope: ["markup.inline.raw", "markup.raw.inline"],
-      settings: { foreground: syntax.strings },
+      settings: ink("strings"),
     },
     {
       name: "Markup Quotes",
@@ -793,12 +827,12 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     {
       name: "Serialization Keys",
       scope: ["entity.name.tag.yaml", "variable.other.key.toml"],
-      settings: { foreground: syntax.types },
+      settings: ink("types"),
     },
     {
       name: "Serialization Dates",
       scope: ["constant.other.date", "constant.other.timestamp"],
-      settings: { foreground: syntax.numbers },
+      settings: ink("numbers"),
     },
     {
       name: "Serialization Aliases",
@@ -808,7 +842,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     {
       name: "Makefile Targets",
       scope: ["entity.name.function.target.makefile"],
-      settings: { foreground: syntax.functions },
+      settings: ink("functions"),
     },
     {
       name: "Invalid",

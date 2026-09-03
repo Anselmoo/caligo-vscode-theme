@@ -44,7 +44,7 @@
     "lint:colors": "tsx scripts/lint-hardcoded-colors.ts",
     "check:underscores": "node ./scripts/check-underscores.cjs",
     "pretest": "node ./scripts/ensure-themes.js",
-    "test": "vitest run && tsx scripts/test-contrast.ts",
+    "test": "vitest run && tsx scripts/test-contrast.ts && tsx scripts/separation-gate.ts",
     "posttest": "node ./scripts/cleanup-themes.js",
     "test:watch": "vitest",
     "test:unit": "vitest run --coverage=false",
@@ -56,7 +56,7 @@
     "test:e2e:all": "ALL_BROWSERS=1 playwright test",
     "test:e2e:ui": "playwright test --ui",
     "build": "tsc -p .",
-    "generate": "npm run build && node ./build/index.js",
+    "generate": "npm run build && node ./build/index.js && npm run sync:themes",
     "copy:manifests": "npx tsx scripts/copy-manifests.ts",
     "wallpapers:dev": "npx tsx scripts/wallpaper-dev.ts",
     "wallpapers:generate": "npx tsx scripts/generate-wallpapers.ts",
@@ -92,7 +92,10 @@
     "typecheck:web": "vue-tsc -p tsconfig.web.json --noEmit",
     "typecheck:tests": "vue-tsc -p tsconfig.spec.json --noEmit",
     "typecheck": "npm run typecheck:web && npm run typecheck:tests && npm run typecheck:screenshots",
-    "typecheck:screenshots": "tsc -p tsconfig.tests.json --noEmit"
+    "typecheck:screenshots": "tsc -p tsconfig.tests.json --noEmit",
+    "sync:themes": "tsx scripts/sync-theme-contributions.ts",
+    "check:themes": "tsx scripts/sync-theme-contributions.ts --check",
+    "test:separation": "tsx scripts/separation-gate.ts"
   },
   "dependencies": {
     "apca-w3": "^0.1.9",
@@ -182,7 +185,7 @@
         "path": "./themes/Caligo-AuroraNoirAnalogous.json"
       },
       {
-        "label": "Caligo (Aurora Noir — Monochromatic)",
+        "label": "Caligo (Aurora Noir — Monochromatic · 2 weights)",
         "uiTheme": "vs-dark",
         "path": "./themes/Caligo-AuroraNoirMonochromatic.json"
       },
@@ -207,7 +210,7 @@
         "path": "./themes/Caligo-CinderAnalogous.json"
       },
       {
-        "label": "Caligo (Cinder — Monochromatic)",
+        "label": "Caligo (Cinder — Monochromatic · 2 weights)",
         "uiTheme": "vs-dark",
         "path": "./themes/Caligo-CinderMonochromatic.json"
       },
@@ -232,7 +235,7 @@
         "path": "./themes/Caligo-DeepSableAnalogous.json"
       },
       {
-        "label": "Caligo (Deep Sable — Monochromatic)",
+        "label": "Caligo (Deep Sable — Monochromatic · 2 weights)",
         "uiTheme": "vs-dark",
         "path": "./themes/Caligo-DeepSableMonochromatic.json"
       },
@@ -257,7 +260,7 @@
         "path": "./themes/Caligo-EclipseAnalogous.json"
       },
       {
-        "label": "Caligo (Eclipse — Monochromatic)",
+        "label": "Caligo (Eclipse — Monochromatic · 2 weights)",
         "uiTheme": "vs-dark",
         "path": "./themes/Caligo-EclipseMonochromatic.json"
       },
@@ -282,7 +285,7 @@
         "path": "./themes/Caligo-GraphiteFluxAnalogous.json"
       },
       {
-        "label": "Caligo (Graphite Flux — Monochromatic)",
+        "label": "Caligo (Graphite Flux — Monochromatic · 2 weights)",
         "uiTheme": "vs-dark",
         "path": "./themes/Caligo-GraphiteFluxMonochromatic.json"
       },
@@ -307,7 +310,7 @@
         "path": "./themes/Caligo-MandarianAnalogous.json"
       },
       {
-        "label": "Caligo (Mandarian — Monochromatic)",
+        "label": "Caligo (Mandarian — Monochromatic · 2 weights)",
         "uiTheme": "vs-dark",
         "path": "./themes/Caligo-MandarianMonochromatic.json"
       },
@@ -332,7 +335,7 @@
         "path": "./themes/Caligo-MidnightAtelierAnalogous.json"
       },
       {
-        "label": "Caligo (Midnight Atelier — Monochromatic)",
+        "label": "Caligo (Midnight Atelier — Monochromatic · 2 weights)",
         "uiTheme": "vs-dark",
         "path": "./themes/Caligo-MidnightAtelierMonochromatic.json"
       },
@@ -357,7 +360,7 @@
         "path": "./themes/Caligo-NebulaNightAnalogous.json"
       },
       {
-        "label": "Caligo (Nebula Night — Monochromatic)",
+        "label": "Caligo (Nebula Night — Monochromatic · 2 weights)",
         "uiTheme": "vs-dark",
         "path": "./themes/Caligo-NebulaNightMonochromatic.json"
       },
@@ -382,7 +385,7 @@
         "path": "./themes/Caligo-ObsidianGlowAnalogous.json"
       },
       {
-        "label": "Caligo (Obsidian Glow — Monochromatic)",
+        "label": "Caligo (Obsidian Glow — Monochromatic · 2 weights)",
         "uiTheme": "vs-dark",
         "path": "./themes/Caligo-ObsidianGlowMonochromatic.json"
       },
@@ -407,7 +410,7 @@
         "path": "./themes/Caligo-VoidEmberAnalogous.json"
       },
       {
-        "label": "Caligo (Void Ember — Monochromatic)",
+        "label": "Caligo (Void Ember — Monochromatic · 2 weights)",
         "uiTheme": "vs-dark",
         "path": "./themes/Caligo-VoidEmberMonochromatic.json"
       },
