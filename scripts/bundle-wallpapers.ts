@@ -50,6 +50,14 @@ async function main() {
   console.log(`✅ Created ${OUTPUT_ZIP} (${sizeMb} MB, ${filtered.length} files)`);
 }
 
+/**
+ * Collect the wallpaper files to ship in the download ZIP.
+ *
+ * Deliberately a whitelist, not a "skip junk" blacklist: public/wallpapers also
+ * holds the gallery's .webp thumbnails (640 px, generated in CI beside each
+ * SVG), and nobody downloading a wallpaper pack wants those. Do not widen this
+ * to .webp without splitting thumbnails into their own directory first.
+ */
 function collectFiles(dir: string, out: string[]): void {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name);

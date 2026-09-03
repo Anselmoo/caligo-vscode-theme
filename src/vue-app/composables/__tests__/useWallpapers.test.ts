@@ -6,32 +6,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { WallpapersManifest } from "../../../wallpaper/types.js";
 import { useWallpapers } from "../useWallpapers";
 
-/** Matches WallpaperColors so fixtures mirror real generator output. */
-const mockColors = {
-  bg: "#0b0c10",
-  bgSoft: "#141425",
-  bgMid: "#19182a",
-  accent: "#7aa2f7",
-  accentSoft: "#9ab8f9",
-  accentMuted: "#5a7fc4",
-  hueRed: "#f7768e",
-  hueOrange: "#ff9e64",
-  hueYellow: "#e0af68",
-  hueGreen: "#9ece6a",
-  hueCyan: "#7dcfff",
-  hueBlue: "#7aa2f7",
-  huePurple: "#bb9af7",
-  strings: "#9ece6a",
-  keywords: "#bb9af7",
-  functions: "#7aa2f7",
-  types: "#7dcfff",
-  variables: "#c0caf5",
-  constants: "#ff9e64",
-  numbers: "#ff9e64",
-  tags: "#f7768e",
-  attributes: "#e0af68",
-};
-
 const mockEntries: WallpapersManifest["entries"] = [
   {
     seedId: "Eclipse",
@@ -44,7 +18,6 @@ const mockEntries: WallpapersManifest["entries"] = [
     svgPath: "wallpapers/Eclipse/balanced/monitor.svg",
     pngPath: "wallpapers/Eclipse/balanced/monitor.png",
     displayName: "Eclipse — Balanced",
-    colors: mockColors,
   },
   {
     seedId: "Eclipse",
@@ -57,7 +30,6 @@ const mockEntries: WallpapersManifest["entries"] = [
     svgPath: "wallpapers/Eclipse/analogous/monitor.svg",
     pngPath: "wallpapers/Eclipse/analogous/monitor.png",
     displayName: "Eclipse — Analogous",
-    colors: mockColors,
   },
   {
     seedId: "Cinder",
@@ -70,7 +42,6 @@ const mockEntries: WallpapersManifest["entries"] = [
     svgPath: "wallpapers/Cinder/balanced/monitor.svg",
     pngPath: "wallpapers/Cinder/balanced/monitor.png",
     displayName: "Cinder — Balanced",
-    colors: mockColors,
   },
   {
     seedId: "Cinder",
@@ -83,7 +54,6 @@ const mockEntries: WallpapersManifest["entries"] = [
     svgPath: "wallpapers/Cinder/balanced/tablet.svg",
     pngPath: "wallpapers/Cinder/balanced/tablet.png",
     displayName: "Cinder — Balanced",
-    colors: mockColors,
   },
 ];
 
@@ -298,7 +268,6 @@ const realShapedEntries: WallpapersManifest["entries"] = [
     svgPath: "wallpapers/AuroraNoir/balanced/monitor.svg",
     pngPath: "wallpapers/AuroraNoir/balanced/monitor.png",
     displayName: "Aurora Noir · Starfield",
-    colors: mockColors,
   },
   {
     seedId: "AuroraNoir",
@@ -311,7 +280,6 @@ const realShapedEntries: WallpapersManifest["entries"] = [
     svgPath: "wallpapers/AuroraNoir/balanced/mobile-text.svg",
     pngPath: "wallpapers/AuroraNoir/balanced/mobile-text.png",
     displayName: "Aurora Noir · Starfield",
-    colors: mockColors,
   },
 ];
 

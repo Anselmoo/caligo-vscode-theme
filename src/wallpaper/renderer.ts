@@ -149,3 +149,18 @@ export function wallpaperFilename(spec: WallpaperSpec, ext: "svg" | "png"): stri
   const textSuffix = spec.textVariant === "text" ? "-text" : "";
   return `${spec.seedId}/${mode}/${spec.platform}${textSuffix}.${ext}`;
 }
+
+// ─── Thumbnails ───────────────────────────────────────────────────────────────
+
+/**
+ * Re-exported from ./types.js so build scripts can pull the whole thumbnail API
+ * from one place. The Vue gallery imports them from ./types.js directly — this
+ * module drags in the entire brick/compose library and must stay out of the
+ * client bundle.
+ */
+export { THUMBNAIL_LONG_EDGE, thumbnailSize } from "./types.js";
+
+/** File path for a wallpaper's gallery thumbnail, relative to public/wallpapers. */
+export function thumbnailFilename(spec: WallpaperSpec): string {
+  return wallpaperFilename(spec, "svg").replace(/\.svg$/, ".webp");
+}

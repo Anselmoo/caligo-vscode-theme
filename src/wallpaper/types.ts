@@ -19,6 +19,35 @@ export const PLATFORM_SIZES: Record<Platform, { width: number; height: number }>
 export const PLATFORMS: Platform[] = ["monitor", "tablet", "mobile"];
 export const TEXT_VARIANTS: TextVariant[] = ["text", "no-text"];
 
+// ─── Thumbnails ───────────────────────────────────────────────────────────────
+
+/**
+ * Long-edge budget for gallery thumbnails, in pixels.
+ *
+ * Cards render ~300 CSS px wide, so 640 covers a 2x display. The wallpaper SVGs
+ * themselves are authored at up to 3840x2160 with tens of thousands of nodes —
+ * far past what a thumbnail can resolve — so the gallery must never point at them.
+ */
+export const THUMBNAIL_LONG_EDGE = 640;
+
+/**
+ * Thumbnail dimensions for a platform, preserving its aspect ratio.
+ *
+ * Scales the *long* edge to `longEdge`. Capping width instead would make the
+ * portrait mobile format (1290x2796) the largest thumbnail of the three.
+ */
+export function thumbnailSize(
+  platform: Platform,
+  longEdge: number = THUMBNAIL_LONG_EDGE
+): { width: number; height: number } {
+  const { width, height } = PLATFORM_SIZES[platform];
+  const scale = longEdge / Math.max(width, height);
+  return {
+    width: Math.max(1, Math.round(width * scale)),
+    height: Math.max(1, Math.round(height * scale)),
+  };
+}
+
 export interface PlatformSceneTuning {
   /** Multiplier for aurora band count and density */
   auroraBandScale: number;
@@ -191,7 +220,15 @@ export interface WallpaperManifestEntry extends WallpaperSpec {
   svgPath: string;
   /** Relative path for the PNG, e.g. "wallpapers/AuroraNoir/analogous/monitor.png" */
   pngPath: string;
-  colors: WallpaperColors;
+  /**
+   * Relative path for the gallery thumbnail, e.g.
+   * "wallpapers/AuroraNoir/analogous/monitor.webp".
+   *
+   * Optional: thumbnails are rasterised in CI and never committed, so a local
+   * `wallpapers:generate` without the thumbnail pass yields entries without one.
+   * Consumers must fall back to svgPath rather than render a broken image.
+   */
+  thumbPath?: string;
 }
 
 export interface WallpapersManifest {

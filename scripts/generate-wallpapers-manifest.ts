@@ -11,9 +11,8 @@
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { derivePalette } from "../src/lib/palette.js";
 import { expandSeedVariants, loadAllSeeds } from "../src/lib/seeds.js";
-import { extractWallpaperColors } from "../src/wallpaper/renderer.js";
+import { resolveThumbPath } from "../src/wallpaper/manifest.js";
 import type { WallpaperManifestEntry, WallpapersManifest } from "../src/wallpaper/types.js";
 import { MODE_TOPICS } from "../src/wallpaper/types.js";
 
@@ -21,16 +20,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = resolve(__dirname, "..");
 const WALLPAPERS_DIR = join(PROJECT_ROOT, "public", "wallpapers");
 const OUTPUT_FILE = join(PROJECT_ROOT, "public", "wallpapers-manifest.json");
-
-type ThemeMode = "Balanced" | "Analogous" | "Monochromatic" | "Triadic" | "SplitComplementary";
-
-const HARMONY_TO_THEME_MODE: Record<string, ThemeMode> = {
-  none: "Balanced",
-  analogous: "Analogous",
-  monochromatic: "Monochromatic",
-  triadic: "Triadic",
-  "split-complementary": "SplitComplementary",
-};
 
 const HARMONY_LABELS: Record<string, string> = {
   none: "Balanced",
@@ -49,17 +38,14 @@ async function main() {
     process.exit(0);
   }
 
-  // Build palette cache
-  const paletteCacheMap = new Map<string, ReturnType<typeof extractWallpaperColors>>();
+  // Every seed/mode pair that a real seed variant produces. Used to skip
+  // orphaned directories left behind by a renamed or deleted seed, which would
+  // otherwise enter the manifest and 404 in the gallery.
   const baseSeeds = await loadAllSeeds();
+  const knownVariants = new Set<string>();
   for (const baseSeed of baseSeeds) {
-    const variants = expandSeedVariants(baseSeed);
-    for (const variant of variants) {
-      const harmonyMode = variant.harmony ?? "none";
-      const themeMode = HARMONY_TO_THEME_MODE[harmonyMode] ?? "Balanced";
-      const palette = derivePalette(variant, themeMode);
-      const key = `${baseSeed.id}/${harmonyMode}`;
-      paletteCacheMap.set(key, extractWallpaperColors(palette));
+    for (const variant of expandSeedVariants(baseSeed)) {
+      knownVariants.add(`${baseSeed.id}/${variant.harmony ?? "none"}`);
     }
   }
 
@@ -82,9 +68,8 @@ async function main() {
       const baseSeed = baseSeeds.find(s => s.id === seedId);
       const seedDisplayName = baseSeed?.displayName ?? seedId;
 
-      const colors = paletteCacheMap.get(`${seedId}/${harmonyMode}`);
-      if (!colors) {
-        console.warn(`  ⚠  No palette for ${seedId}/${harmonyMode}`);
+      if (!knownVariants.has(`${seedId}/${harmonyMode}`)) {
+        console.warn(`  ⚠  No seed variant for ${seedId}/${harmonyMode} — skipping`);
         continue;
       }
 
@@ -100,6 +85,11 @@ async function main() {
         const svgPath = `wallpapers/${seedId}/${modeFolder}/${file}`;
         const pngPath = `wallpapers/${seedId}/${modeFolder}/${base}.png`;
         const topic = MODE_TOPICS[harmonyMode] ?? "Core";
+        // Thumbnails are rasterised in CI and not committed; omit the field
+        // entirely when absent so the gallery falls back to the SVG.
+        const thumbPath = resolveThumbPath(svgPath, rel =>
+          existsSync(join(PROJECT_ROOT, "public", rel))
+        );
 
         entries.push({
           seedId,
@@ -112,7 +102,7 @@ async function main() {
           displayName: `${seedDisplayName} · ${topic}`,
           svgPath,
           pngPath,
-          colors,
+          ...(thumbPath ? { thumbPath } : {}),
         });
       }
     }
