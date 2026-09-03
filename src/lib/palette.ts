@@ -177,6 +177,19 @@ export type DerivedPalette = {
   harmony: DerivedHarmonyPalette;
 
   /**
+   * Six nesting colours for bracket-pair highlighting.
+   *
+   * Their own surface, not the decorative wheel. Brackets render INSIDE the
+   * same line as code, so they compete with syntax roles directly -- and while
+   * they were wheel colours, every one of the 50 themes painted at least one
+   * bracket in the byte-identical colour of a syntax role (259 exact matches
+   * across the matrix). Allocating them separately, with the syntax inks
+   * reserved, keeps the decorative wheel untouched for the markup and git
+   * scopes it actually serves.
+   */
+  brackets: string[];
+
+  /**
    * Per-role weight and slope, populated only for a single-hue theme.
    *
    * Empty for every other mode: hue carries role identity there, and adding
@@ -434,6 +447,25 @@ export function derivePalette(seed: Seed, mode: ThemeMode): DerivedPalette {
     bg0Hex
   );
 
+  // Brackets: a third surface, allocated against the syntax inks.
+  //
+  // Six evenly spaced hues around the wheel from the accent, so nesting depth
+  // reads as a rotation rather than an arbitrary sequence, then placed with the
+  // code surface reserved so a bracket can never take a syntax colour.
+  //
+  // Deliberately NOT done by constraining the decorative wheel itself: that was
+  // measured to cost decor colours on two themes while still leaving exact
+  // matches, because it forces one allocation to satisfy two surfaces at once.
+  // A separate six-member surface costs the wheel nothing.
+  const bracketBudget = allocateSharedBudget(
+    Array.from({ length: 6 }, (_, i) => ({
+      id: `bracket${i + 1}`,
+      hue: (((accent.h + 60 * i) % 360) + 360) % 360,
+    })),
+    [...reservedColors, ...SYNTAX_ROLE_IDS.map(r => codeBudget.colors[r])],
+    bg0Hex
+  );
+
   const budget = {
     colors: { ...codeBudget.colors, ...decorBudget.colors },
     distinctCount: codeBudget.distinctCount,
@@ -584,6 +616,7 @@ export function derivePalette(seed: Seed, mode: ThemeMode): DerivedPalette {
     huePurple: toHex(wheelFinal.huePurple),
     semantic,
     harmony: budgetedHarmony,
+    brackets: Array.from({ length: 6 }, (_, i) => toHex(bracketBudget.colors[`bracket${i + 1}`])),
     syntaxEmphasis,
     intent,
     border,

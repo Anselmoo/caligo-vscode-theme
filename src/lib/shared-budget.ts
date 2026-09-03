@@ -319,7 +319,10 @@ export function allocateSharedBudget(
       for (const r of reserved) {
         const d = separation(placed[i], r);
         const deficit = d / requiredSeparation(placed[i], r, workingFloor);
-        if (d > 0 && deficit < worst.deficit) worst = { i, deficit };
+        // No `d > 0` guard here. An exact identity with a reserved colour has
+        // deficit 0 -- the worst possible case -- and guarding it out meant the
+        // one case most needing repair was the one case never selected for it.
+        if (deficit < worst.deficit) worst = { i, deficit };
       }
     }
     if (worst.i === -1) break;

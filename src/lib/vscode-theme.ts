@@ -257,12 +257,16 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     "terminal.findMatchHighlightBorder": withAlpha(p.accent, 0.65),
 
     // Bracket pair colorization - use decorative hue wheel for visual distinction
-    "editorBracketHighlight.foreground1": p.hueCyan,
-    "editorBracketHighlight.foreground2": p.hueGreen,
-    "editorBracketHighlight.foreground3": p.hueYellow,
-    "editorBracketHighlight.foreground4": p.hueRed,
-    "editorBracketHighlight.foreground5": p.huePurple,
-    "editorBracketHighlight.foreground6": p.hueBlue,
+    // From the dedicated bracket surface, not the decorative wheel. Brackets
+    // share a line with code, so they are allocated with the syntax inks
+    // reserved; drawing them from the wheel put 259 brackets across the 50
+    // themes in the exact colour of a syntax role.
+    "editorBracketHighlight.foreground1": p.brackets[0],
+    "editorBracketHighlight.foreground2": p.brackets[1],
+    "editorBracketHighlight.foreground3": p.brackets[2],
+    "editorBracketHighlight.foreground4": p.brackets[3],
+    "editorBracketHighlight.foreground5": p.brackets[4],
+    "editorBracketHighlight.foreground6": p.brackets[5],
     "editorBracketHighlight.unexpectedBracket.foreground": p.fgMuted,
     "editorBracketPairGuide.activeBackground1": withAlpha(p.hueCyan, 0.55),
     "editorBracketPairGuide.activeBackground2": withAlpha(p.hueGreen, 0.55),
