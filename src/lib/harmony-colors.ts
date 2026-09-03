@@ -110,12 +110,16 @@ export type DerivedHarmonyPalette = {
   roleHues: Record<keyof typeof SYNTAX_LC_DEFAULTS, number>;
 
   /**
-   * How many distinct weights this palette actually carries.
+   * How many distinct colours this palette actually carries.
    *
-   * Equal to the role count for modes with a hue span. For a single-hue mode it
-   * is what that hue can hold -- measured across the shipped backgrounds, seven
-   * at green and four at most other hues -- so the theme can state its own
-   * resolution rather than implying eleven roles it cannot deliver.
+   * `deriveHarmonyPalette` sets this from hue geometry alone, but it is NOT the
+   * final word: `derivePalette` overwrites it with the shared budget's own
+   * `distinctCount`, which is measured against the real background and the
+   * reserved colours and is usually lower. Read it as "what shipped", and
+   * expect the value on a fully-derived palette rather than this one.
+   *
+   * It reaches a reader directly -- single-hue themes put it in their picker
+   * label -- so it must never claim more than was delivered.
    */
   weightCount: number;
 

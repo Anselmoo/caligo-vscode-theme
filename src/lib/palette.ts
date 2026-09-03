@@ -32,6 +32,7 @@ import {
   placeOnLadder,
   SINGLE_INK_PRESENTATION,
 } from "./separation-ladder.js";
+import { allocateSharedBudget } from "./shared-budget.js";
 
 /** The nine syntax roles the shared budget allocates, in priority order. */
 const SYNTAX_ROLE_IDS = [
@@ -45,8 +46,6 @@ const SYNTAX_ROLE_IDS = [
   "tags",
   "attributes",
 ] as const satisfies readonly LadderRole[];
-
-import { allocateSharedBudget } from "./shared-budget.js";
 
 /**
  * Chroma multipliers for different syntax styles.

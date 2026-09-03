@@ -33,10 +33,10 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import { type OkLch, oklch, toHex } from "../src/lib/color";
-import { apcaLc } from "../src/lib/contrast-solve";
-import { derivePalette } from "../src/lib/palette";
-import { expandSeedVariants, loadAllSeeds } from "../src/lib/seeds";
+import { type OkLch, oklch, toHex } from "../src/lib/color.js";
+import { apcaLc } from "../src/lib/contrast-solve.js";
+import { derivePalette } from "../src/lib/palette.js";
+import { expandSeedVariants, loadAllSeeds } from "../src/lib/seeds.js";
 import {
   ABSOLUTE_FLOOR_LC,
   achievableSeparation,
@@ -44,7 +44,7 @@ import {
   requiredSeparation,
   SEPARATION_FLOOR,
   separation,
-} from "../src/lib/separation-ladder";
+} from "../src/lib/separation-ladder.js";
 
 /**
  * A palette must reach at least this fraction of the uniform-spread reference.

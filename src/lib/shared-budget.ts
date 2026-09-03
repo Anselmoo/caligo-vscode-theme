@@ -405,8 +405,6 @@ export function allocateSharedBudget(
     // A member is never folded onto another to fix reserved proximity -- that
     // deletes a colour without fixing anything, and on single-hue themes it
     // collapsed nine roles to one.
-    // Retire the member either way. A member is never folded onto another to
-    // fix reserved proximity -- that deletes a colour without fixing anything.
     for (const ix of group) resolvedAgainstReserved.add(ix);
   }
 
