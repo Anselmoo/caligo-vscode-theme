@@ -137,7 +137,7 @@
     "jsdom": "^28.1.0",
     "lefthook": "^2.1.8",
     "playwright": "^1.58.2",
-    "serve": "^14.2.5",
+    "serve": "^14.2.6",
     "simplex-noise": "^4.0.3",
     "standard-version": "^9.5.0",
     "ts-node": "^10.9.2",
