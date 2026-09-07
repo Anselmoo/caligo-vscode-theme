@@ -130,7 +130,7 @@
     "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2",
     "@vscode/vsce": "^3.7.1",
-    "@vue/test-utils": "^2.4.9",
+    "@vue/test-utils": "^2.5.0",
     "axe-core": "^4.11.4",
     "d3-shape": "^3.2.0",
     "happy-dom": "^20.9.0",
