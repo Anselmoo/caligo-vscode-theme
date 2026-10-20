@@ -7,7 +7,7 @@ Base: `21c6f7e` (main) + `npm run generate --silent` → 50 themes. Part 2 reads
 - We emit **940** colour keys (identical in all 50 themes). Upstream has **990** ids in `vscode-known-variables.json` (989 after case/punctuation normalisation). The prior measurement (65 missing, 15 extra) **reproduces exactly**.
 - The known-variables file **lags the source**: scanning `registerColor(` in `main` plus extension manifests gives a 1006-id universe. Against it we miss **68** and have **1** unexplained extra. Use the union, not the file alone.
 - All 65 file-listed gaps already exist in **stable 1.142.0**; none is Insiders-only. Nearly all gaps are `agents*`, `chat.*` and "modern UI" ids.
-- Growth is ~2.9 ids per weekly release (896 → 990 since the ^1.108 pin), with bursts of 20+. A one-off catch-up will not hold.
+- Growth: +94 ids since the ^1.108 pin (896 → 990, Jan → Oct 2026) and +76 in the last 26 releases (1.116 → 1.142, one release per week, ≈2.9 per release), with bursts of 20+. A one-off catch-up will not hold.
 - Part 2: the engine scores **foreground-over-surface only**. Of 681 pairs, **1** has a border/outline as the foreground. Focus rings, boundaries and hover-vs-rest distance are unscored, and the probe below shows real failures there.
 
 ## Part 1 — Token coverage
@@ -26,15 +26,15 @@ Base: `21c6f7e` (main) + `npm run generate --silent` → 50 themes. Part 2 reads
 
 990 vs 989: `quickInput.list.focusBackground` and `quickInputList.focusBackground` collide after normalising. `main` equals 1.142.0 for colours; the file's `others`/`sizes` sections are what grew. Growth per release is in `research/scripts/token-diff.out.txt`; the largest steps are 1.117 (+20/−8, `sessions*`→`agents*` rename), 1.134 (+23) and 1.138 (+8).
 
-**Missing (68)**, scan via `research/scripts/registry-scan.sh` (`grep -rF` on the extracted tarball for the defining file):
+**Missing (68)**, scan via `research/scripts/registry-scan.sh`; defining file = file whose `registerColor(` call names the id:
 
-| Group | n | Ids (prefix omitted where shared) | Defined in |
+| Group | n | Ids (prefix omitted where shared) | Defined in (`registerColor('<id>'` match) |
 |---|---|---|---|
-| Agents window | 34 | `agents.background`; `agentsPanel`.{background,border,foreground}; `agentsChatInput`.{background,border,focusBorder,foreground,placeholderForeground}; `agentsNewSessionButton`.{background,border,foreground,hoverBackground}; `agentsBadge`/`agentsUnreadBadge`.{background,foreground}; `agentsCard.border`; `agentsDetail.background`; `agentsBottomPanel.border`; `agentsGradient.tintColor`; `agentsUpdateButton`.{downloaded,downloading}Background; `activeSessionView`/`inactiveSessionView`.{background,foreground}; `agentFeedbackEditorWidget`.{background,border}; `agentFeedbackInputWidget.border`; `agentsMobileDiff`.{added,deleted,modified}Foreground; `editorOverviewRuler.agentFeedbackForeground` | `workbench/common/agentsColors.ts` + `splash/partsSplash.ts` (30), `src/vs/sessions/**` (4) |
-| chat (workbench) | 12 | `chat.`{findMatchBackground, findMatchHighlightBackground, statusBackground, inputWorkingBorderColor1..3, sessionStateIndicator.{inProgress,needsInput,unvisited}Border, workingProgress{Insiders,Stable}IconForeground, mcpCompatibilityWarningForeground} | `contrib/chat/common/widget/chatColors.ts`, `aiCustomizationColors.ts` |
-| chat voice | 4 | `chat.`{dictationActiveMicGlow, voiceGlowBaseColor, voiceListeningGlow, voiceSpeakingGlow} | same |
+| Agents window | 34 | `agents.background`; `agentsPanel`.{background,border,foreground}; `agentsChatInput`.{background,border,focusBorder,foreground,placeholderForeground}; `agentsNewSessionButton`.{background,border,foreground,hoverBackground}; `agentsBadge`/`agentsUnreadBadge`.{background,foreground}; `agentsCard.border`; `agentsDetail.background`; `agentsBottomPanel.border`; `agentsGradient.tintColor`; `agentsUpdateButton`.{downloaded,downloading}Background; `activeSessionView`/`inactiveSessionView`.{background,foreground}; `agentFeedbackEditorWidget`.{background,border}; `agentFeedbackInputWidget.border`; `agentsMobileDiff`.{added,deleted,modified}Foreground; `editorOverviewRuler.agentFeedbackForeground` | `workbench/common/agentsColors.ts` (30), `src/vs/sessions/**` (4) |
+| chat (workbench) | 12 | `chat.`{findMatchBackground, findMatchHighlightBackground, statusBackground, inputWorkingBorderColor1..3, sessionStateIndicator.{inProgress,needsInput,unvisited}Border, workingProgress{Insiders,Stable}IconForeground, mcpCompatibilityWarningForeground} | `contrib/chat/common/widget/chatColors.ts` (11), `aiCustomizationColors.ts` (`mcpCompatibilityWarningForeground`) |
+| chat voice | 4 | `chat.`{dictationActiveMicGlow, voiceGlowBaseColor, voiceListeningGlow, voiceSpeakingGlow} | `chatColors.ts` (4) |
 | modern UI shell | 11 | `modernUI`.{shellBackground,inactiveShellBackground}; `modernActivityBar`.{background,inactiveBackground,border}; `modernActivityBarItem`.{active,hover}{Background,Foreground}; `modernPanel.border`; `modernSash.gripForeground` | `workbench/common/theme.ts` |
-| classic | 7 | `statusBar.inactiveBackground`, `tab.divider`, `editorGroupHeader.connectedTabsBackground`, `editorWordWrapIndicator.foreground`, `inlineChat.regionHighlight` (no static `registerColor` found), `contrastBorder`, `contrastActiveBorder` | `theme.ts`, `editorColorRegistry.ts`, `baseColors.ts` |
+| classic | 7 | `statusBar.inactiveBackground`, `tab.divider`, `editorGroupHeader.connectedTabsBackground`, `editorWordWrapIndicator.foreground`, `inlineChat.regionHighlight` (no static `registerColor` found), `contrastBorder`, `contrastActiveBorder` | `theme.ts` (3), `editorColorRegistry.ts` (1), `baseColors.ts` (2), none (`inlineChat.regionHighlight`) |
 
 `contrastBorder`/`contrastActiveBorder` are a deliberate omission (high-contrast only, `src/lib/vscode-theme-extended.ts:12`). `modernActivityBar.background` and `.inactiveBackground` are registered at tag 1.142.0 (`curl …/1.142.0/src/vs/workbench/common/theme.ts`) but absent from the known file.
 
@@ -55,18 +55,20 @@ Only `extensions/git` contributes colours (11 ids). `merge-conflict`, `terminal-
 
 ### 1c. Semantic tokens and TextMate
 
-Authority: `src/vs/platform/theme/common/tokenClassificationRegistry.ts` (lines 545–597), consistent with the docs page.
+Two authorities, compared in full: the [semantic highlight guide](https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide) (three tables, parsed from the page HTML) and `src/vs/platform/theme/common/tokenClassificationRegistry.ts` on `main` (lines 545–597).
 
-| | VS Code registers | `semantic-token-registry.ts` | Diff |
+| | Docs | VS Code source | `semantic-token-registry.ts` |
 |---|---|---|---|
-| Types | 24 (incl. deprecated `member`) | 23 | **missing `label`**; has non-standard `modifier` |
-| Modifiers | 8: declaration, documentation, static, abstract, deprecated, modification, async, readonly (`defaultLibrary` has default styles only) | 10 | extra `definition`, `defaultLibrary` (LSP-standard, harmless) |
+| Types | 23 | 24 = docs + deprecated `member` | 23 = docs − **`label`** + **`modifier`** |
+| Modifiers | 10 (declaration, definition, readonly, static, deprecated, abstract, async, modification, documentation, defaultLibrary) | 8 registered: docs − `definition`, `defaultLibrary` (the latter still has default-style mappings) | 10 = docs |
+
+Findings: `label` is in docs and source but not in our registry (Caligo gap; the generated theme does emit a `label` selector). `modifier` is in neither docs nor source (an LSP-only type), yet the file header calls itself the "canonical VS Code" registry. Docs-vs-source drift, not ours: `definition` and `defaultLibrary` are documented but not registered as modifiers, and the docs' fallback table maps `struct` → `storage.type.struct` while the source probes `entity.name.type.struct`.
 
 The generated themes carry 321 `semanticTokenColors` selectors (many per-language, with custom types such as `lifetime`, `symbol`, `module`; these only apply if the language server emits them) and 67 `tokenColors` rules over 159 scopes. Of the 33 fallback scopes VS Code probes for semantic defaults, 2 match no rule prefix: `entity.name.decorator`, `entity.name.namespace`.
 
 ### 1d. Upcoming
 
-- Colours list: `main` = 1.142.0 (0 diff). The pipeline is not "Insiders adds ids"; ids land in stable within a release or two.
+- **Measured main-vs-stable delta: 0 colour ids.** The known-variables file is identical at `main` and 1.142.0 (990/990), but that file lags, so I also diffed the source: for each of the 68 files containing `registerColor(` in the `main` tarball I fetched the same path at tag 1.142.0 and compared ids. Result: 970 ids on both sides, no file new in `main`, no id added or removed. So the 68 gaps above are all *already shipped in stable*; nothing is Insiders-only today (as of the `main` snapshot of 2026-10-20). Point-in-time result; the commits below show definitions still changing through 2026-10-06.
 - Recent definition changes (commits touching `theme.ts` and `chatColors.ts` since 2026-06-20, `api.github.com/repos/microsoft/vscode/commits?path=…`): [#335056](https://github.com/microsoft/vscode/pull/335056) themeable shell colours, panel borders, resize grips (2026-09-08); [#337126](https://github.com/microsoft/vscode/pull/337126) and [#338796](https://github.com/microsoft/vscode/pull/338796) connected tabs (`tab.divider`, `editorGroupHeader.connectedTabsBackground`); [#336087](https://github.com/microsoft/vscode/pull/336087) chat working progress; [#334150](https://github.com/microsoft/vscode/pull/334150) session-state indicators; [#330340](https://github.com/microsoft/vscode/pull/330340) chat find; [#328455](https://github.com/microsoft/vscode/pull/328455), [#327713](https://github.com/microsoft/vscode/pull/327713) voice/dictation glow. Rename in `24ae5cf9` (2026-08-27).
 - Release-notes signals with contrast impact: 1.141 frosted-glass overlays (blurred, translucent menus and pop-ups in the Agents window and, with the modernized UI, in editor windows; solid with high-contrast themes); 1.138 per-theme-kind chat backgrounds (request/response surfaces stay opaque); 1.141 compact layout density.
 - Not found: any new colour id for terminal suggest/sticky scroll (the `terminalSymbolIcon.*` set is already complete in our output) or for editor "modes". Treat any claim of such ids as unverified.
@@ -85,31 +87,38 @@ The generated themes carry 321 `semanticTokenColors` selectors (many per-languag
 
 681 pairs, 322 distinct foreground keys, 377 `text` (4.5:1) and 304 `ui` (3:1); 34 exempt foregrounds (disabled/dimmed, overview rulers, ANSI black); tokenColors/semantic rules scored per theme over `editor.background`. Each pair is *a foreground over a layer stack*. APCA Lc is computed per pair but **not gated** (only syntax tiers, Lc 30–42, `semantic-token-quality.ts:10`). The syntax separation gate (`separation-gate.ts`) covers syntax roles only, no UI states.
 
-### Coverage matrix (pairs by family × state)
+### Coverage matrix (surface × state × kind)
 
-`python3 research/scripts/pair-state-matrix.py pairs.json`. Heuristic key-name regex; tags overlap; "hover" excludes hover *widgets* (44 here vs 47 with a plain `/hover/` match).
+`python3 research/scripts/pair-state-matrix.py pairs.json`. The surface is the first family matched walking the background stack top → bottom, so a diff or selection layer over `editor.background` counts as diff/selection. States are key-name regexes over the foreground and every stack key; one pair can carry several tags. "hover" excludes hover *widgets* (43+1 here vs 47 with a plain `/hover/` match). Cells are **text/icon** pair counts; `b` = border pairs.
 
-| Family | Pairs | rest | hover | active | focus | selected | inactive | disabled |
-|---|---|---|---|---|---|---|---|---|
-| scm/debug/testing/notebook/icons | 241 | 208 | 10 | 0 | 0 | 20 | 10 | 3 |
-| terminal (mostly ANSI palette) | 93 | 74 | 1 | 0 | 0 | 18 | 1 | 0 |
-| editor text/tokens | 74 | 60 | 3 | 3 | 2 | 6 | 1 | 0 |
-| lists/trees | 49 | 13 | 10 | 0 | 6 | 22 | 6 | 0 |
-| buttons/inputs/badges | 47 | 33 | 7 | 5 | 1 | 0 | 2 | 0 |
-| quick input/widgets | 27 | 19 | 0 | 0 | 5 | 4 | 0 | 0 |
-| status bar | 16 | 8 | 7 | 1 | 0 | 0 | 0 | 0 |
-| tabs | 14 | 1 | 5 | 4 | 3 | 2 | 4 | 0 |
-| notifications | 14 | 14 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **chat/agents** | **14** | 14 | 0 | 0 | 0 | 0 | 0 | 0 |
-| activity bar | 11 | 6 | 1 | 2 | 0 | 0 | 2 | 0 |
-| minimap/gutter/ruler | 10 | 8 | 0 | 2 | 0 | 0 | 0 | 0 |
-| sidebar/panel | 10 | 6 | 0 | 1 | 1 | 1 | 1 | 0 |
-| menus/title bar | 8 | 2 | 0 | 2 | 0 | 2 | 2 | 0 |
-| diff/merge | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 |
-| other (`foreground`, `icon.foreground`, …) | 52 | 50 | 0 | 1 | 0 | 1 | 0 | 0 |
-| total | 681 | 517 | 44 | 21 | 18 | 76 | 29 | 3 |
+| surface | pairs | rest | hover | active | focus | selected | selected+focus | inactive | disabled |
+|---|---|---|---|---|---|---|---|---|---|
+| sidebar/panel | 196 | 43/146 | 0/0 | 2/0 | 1/0 | 1/0 | 0/0 | 1/0 | 0/2 |
+| editor | 129 | 71/42 | 3/0 | 6/0 | 1/0 | 5/0 | 0/0 | 1/0 | 0/1 |
+| quick input/dialogs/widgets | 120 | 27/84 | 0/0 | 1/0 | 4/1 | 3/1 | 1/0 | 0/0 | 0/0 |
+| lists/trees | 69 | 2/0 | 20/0 | 0/0 | 6/0 | 39/4 | 2/0 | 14/2 | 0/0 |
+| terminal | 40 | 20/1 | 1/0 | 0/0 | 0/0 | 18/0 | 0/0 | 1/0 | 0/0 |
+| buttons/inputs/badges | 40 | 26/3+1b | 6/0 | 2/0 | 1/0 | 0/0 | 0/0 | 2/0 | 0/0 |
+| status bar | 17 | 9/0 | 7/0 | 1/0 | 0/0 | 0/0 | 0/0 | 0/0 | 0/0 |
+| tabs | 14 | 1/0 | 5/0 | 4/0 | 3/0 | 2/0 | 0/0 | 4/0 | 0/0 |
+| activity bar | 12 | 5/2 | 0/1 | 0/2 | 0/0 | 0/0 | 0/0 | 0/2 | 0/0 |
+| menus/title bar | 10 | 3/0 | 0/0 | 3/0 | 0/0 | 2/0 | 0/0 | 2/0 | 0/0 |
+| notebook | 8 | 2/3 | 1/0 | 0/0 | 1/0 | 1/0 | 0/0 | 0/0 | 0/0 |
+| minimap/gutter | 7 | 1/6 | 0/0 | 0/0 | 0/0 | 0/0 | 0/0 | 0/0 | 0/0 |
+| diff/merge | 6 | 6/0 | 0/0 | 0/0 | 0/0 | 0/0 | 0/0 | 0/0 | 0/0 |
+| chat/agents | 6 | 5/1 | 0/0 | 0/0 | 0/0 | 0/0 | 0/0 | 0/0 | 0/0 |
+| notifications | 5 | 4/1 | 0/0 | 0/0 | 0/0 | 0/0 | 0/0 | 0/0 | 0/0 |
+| other | 2 | 2/0 | 0/0 | 0/0 | 0/0 | 0/0 | 0/0 | 0/0 | 0/0 |
+| **total** | 681 | 227/289+1b | 43/1 | 19/2 | 17/1 | 71/5 | 3/0 | 25/4 | 0/3 |
 
-Qualitative gaps behind the counts: **text** is covered for rest, hover and selected on lists, tabs, status bar and buttons. **Icons** (kind `ui`) are covered at rest; no hover, selected or disabled icon pair exists beyond the 3 disabled. **Borders and outlines: 1 pair in total** (`listFilterWidget.noMatchesOutline`). Pressed/active-on-press is untestable by key name (VS Code has few pressed keys). Diff/merge has 1 pair under this heuristic because most diff pairs are classed as editor text.
+Reading it (681 pairs = 377 text, 303 icon/glyph, 1 border):
+
+- **Borders and outlines: 1 pair in total** (`listFilterWidget.noMatchesOutline`); no focus ring, no input/checkbox/dropdown boundary, no active-tab indicator is a foreground in any pair.
+- **Icons** are almost entirely rest (289 of 303); state icons exist only as `list.activeSelectionIconForeground`, `list.inactiveSelectionIconForeground`, `quickInputList.focusIconForeground`, `editorSuggestWidget.selectedIconForeground` (selected/focus), 1 hover, 2 active, 4 inactive and 3 disabled pairs. No toolbar/action-bar hover icon, no tab close-button icon.
+- **Selected+focused** has 3 text pairs (lists 2, quick input 1); its outline (`list.focusAndSelectionOutline`) is unscored and is where the probe finds failures.
+- **Chat/agents**: 6 pairs sit on a chat surface (5 text, 1 icon), all rest. 14 pairs have a `chat.*`/`agents*` foreground, also all rest.
+- **Hover** is covered for text on lists (20), status bar (7), tabs (5), buttons (6); the surface-vs-surface distance is not covered anywhere. The `sidebar/panel` row (196) is mostly icon foregrounds over sideBar/panel/editor at rest.
+- Pressed/active-on-press is not expressible by key name; VS Code has few pressed keys.
 
 ### Evidence probe: what the missing rule types would find today
 
