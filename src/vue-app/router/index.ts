@@ -36,15 +36,6 @@ const routes: RouteRecordRaw[] = [
     },
   },
   {
-    path: "/export",
-    name: "export",
-    component: () => import(/* webpackChunkName: "export" */ "../views/ExportView.vue"),
-    meta: {
-      title: "Export — Caligo",
-      description: "Export current Caligo colors in standards-based formats",
-    },
-  },
-  {
     path: "/wallpapers",
     name: "wallpapers",
     component: () => import(/* webpackChunkName: "wallpapers" */ "../views/WallpapersView.vue"),
@@ -56,6 +47,8 @@ const routes: RouteRecordRaw[] = [
   // Pre-2026 URLs keep working.
   { path: "/gallery", redirect: "/themes" },
   { path: "/analysis", redirect: "/science" },
+  // Export lives in the Themes detail now.
+  { path: "/export", redirect: { path: "/themes", hash: "#export" } },
   {
     path: "/:pathMatch(.*)*",
     name: "not-found",
@@ -70,9 +63,13 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
   routes,
-  scrollBehavior(_to, _from, savedPosition) {
+  scrollBehavior(to, _from, savedPosition) {
     if (savedPosition) {
       return savedPosition;
+    }
+    // In-page targets (e.g. /export → /themes#export) clear the sticky nav.
+    if (to.hash) {
+      return { el: to.hash, top: 72 };
     }
     return { top: 0 };
   },

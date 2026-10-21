@@ -1,50 +1,33 @@
 <script setup lang="ts">
 /**
- * The selected variant: its screenshot, a line on what it is, and the core palette
- * with exact values. The screenshots are generated files, so a variant without one
- * gets a plain note instead of a broken image.
+ * The selected variant: a live editor mock-up drawn from its colours (instant, and it
+ * relights with every pick), a line on what it is, and the core palette with exact
+ * values. A real VS Code screenshot is offered as a link only when CI generated one.
  */
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import { RouterLink } from "vue-router";
 import type { ThemeIndexEntry } from "../../types/theme.js";
 import { renderedContrast } from "../analysis/colour-report.js";
+import VSCodeMock from "../theme/VSCodeMock.vue";
 
 const props = defineProps<{
   theme: ThemeIndexEntry;
-  /** Resolved URL of this variant's screenshot, or null until it is known. */
+  /** Resolved URL of this variant's VS Code screenshot, or null when none exists. */
   screenshot: string | null;
 }>();
 
-const failedSrc = ref("");
-const hasImage = computed(() => !!props.screenshot && failedSrc.value !== props.screenshot);
 
 const textContrast = computed(() => {
   const { fg0, bg0 } = props.theme.colors;
   return renderedContrast(fg0, bg0).toFixed(1);
 });
 
-function onImageError() {
-  failedSrc.value = props.screenshot ?? "";
-}
 
 </script>
 
 <template>
   <section class="detail" data-selected-variant aria-labelledby="variant-title">
-    <figure class="shot">
-      <img
-        v-if="hasImage && screenshot"
-        :key="screenshot"
-        class="shot__img"
-        :src="screenshot"
-        :alt="`${theme.displayName} in VS Code`"
-        decoding="async"
-        @error="onImageError"
-      />
-      <p v-else-if="screenshot" class="shot__empty">
-        No screenshot has been generated for this variant yet.
-      </p>
-    </figure>
+    <VSCodeMock class="detail__mock" />
 
     <h2 id="variant-title" class="detail__title">{{ theme.displayName }}</h2>
     <p class="detail__lede">
@@ -61,8 +44,8 @@ function onImageError() {
     </ul>
 
     <p class="detail__links">
-      <a v-if="hasImage && screenshot" :href="screenshot" target="_blank" rel="noopener">
-        Open screenshot full size
+      <a v-if="screenshot" :href="screenshot" target="_blank" rel="noopener">
+        Open a real VS Code screenshot
       </a>
       <RouterLink to="/science">See how the colours are measured</RouterLink>
     </p>
@@ -74,32 +57,8 @@ function onImageError() {
   min-width: 0;
 }
 
-.shot {
-  display: grid;
-  place-items: center;
-  box-sizing: border-box;
-  aspect-ratio: 16 / 10;
-  margin: 0 0 20px;
-  overflow: hidden;
-  border: 1px solid color-mix(in oklab, var(--fg0) 14%, transparent);
-  border-radius: 10px;
-  background: var(--bg1);
-}
-
-.shot__img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.shot__empty {
-  max-width: 24ch;
-  margin: 0;
-  padding: 16px;
-  color: var(--fg-muted);
-  font-size: var(--step--1);
-  text-align: center;
+.detail__mock {
+  margin: 0 0 22px;
 }
 
 .detail__title {

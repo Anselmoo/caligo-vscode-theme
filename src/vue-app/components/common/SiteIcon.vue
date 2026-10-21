@@ -7,7 +7,16 @@
  */
 import { computed } from "vue";
 
-type IconName = "github" | "marketplace" | "heart" | "moon" | "contribute" | "license" | "copy" | "check";
+type IconName =
+  | "github"
+  | "marketplace"
+  | "heart"
+  | "moon"
+  | "contribute"
+  | "license"
+  | "copy"
+  | "check"
+  | "file";
 
 const props = withDefaults(defineProps<{ name: IconName; label?: string; size?: number }>(), {
   label: "",
@@ -45,6 +54,10 @@ const SHAPES: Record<IconName, { box: string; fill?: boolean; d: string }> = {
   copy: {
     box: "0 0 24 24",
     d: "M9 9h11v11H9ZM5 15H4V4h11v1",
+  },
+  file: {
+    box: "0 0 24 24",
+    d: "M7 3h7l5 5v13H7ZM14 3v5h5",
   },
   check: {
     box: "0 0 24 24",

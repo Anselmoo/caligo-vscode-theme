@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import WallpaperCard from "../components/wallpapers/WallpaperCard.vue";
-import WallpaperFilters from "../components/wallpapers/WallpaperFilters.vue";
+import WallpaperFilters, {
+  type WallpaperScope,
+} from "../components/wallpapers/WallpaperFilters.vue";
+import { useTheme } from "../composables/useTheme.js";
 import { useWallpapers } from "../composables/useWallpapers";
 
 const {
@@ -10,11 +13,25 @@ const {
   missing,
   filter,
   filteredEntries,
-  allSeeds,
-  allModes,
   loadManifest,
   setFilter,
 } = useWallpapers();
+const { currentTheme } = useTheme();
+
+/** The active palette's five scenes first; the whole family is one switch away. */
+const scope = ref<WallpaperScope>("palette");
+const paletteLabel = computed(() => currentTheme.value?.seedLabel ?? "This palette");
+const familySize = computed(
+  () => new Set(entries.value.map(e => `${e.seedId}|${e.harmonyMode}`)).size || 50
+);
+
+watch(
+  [scope, () => currentTheme.value?.seedId],
+  ([s, seedId]) => {
+    setFilter({ seedId: s === "palette" ? (seedId ?? null) : null, harmonyMode: null });
+  },
+  { immediate: true }
+);
 
 onMounted(loadManifest);
 
@@ -23,7 +40,6 @@ const platformLabel = computed(() => {
   const p = platform.value;
   return p.charAt(0).toUpperCase() + p.slice(1);
 });
-const hasFilters = computed(() => Boolean(filter.value.seedId || filter.value.harmonyMode));
 const summary = computed(() => {
   const n = filteredEntries.value.length;
   return `${n} ${n === 1 ? "scene" : "scenes"} for ${platformLabel.value}`;
@@ -38,9 +54,6 @@ function cardKey(e: {
   return `${e.seedId}|${e.harmonyMode}|${e.platform}|${e.textVariant}`;
 }
 
-function clearFilters() {
-  setFilter({ seedId: null, harmonyMode: null });
-}
 
 </script>
 
@@ -49,8 +62,8 @@ function clearFilters() {
     <header class="intro">
       <h1 class="intro__title">Wallpapers</h1>
       <p class="intro__lede">
-        Every theme and harmony mode has its own night scene, drawn in the theme's colours. Pick a
-        device, then download the SVG or a full-resolution PNG.
+        Every theme has its own night scene, drawn in its colours. Here are the ones for the
+        palette you are wearing; pick a device, then download the SVG or a full-resolution PNG.
       </p>
     </header>
 
@@ -77,18 +90,18 @@ function clearFilters() {
     <template v-else>
       <WallpaperFilters
         :filter="filter"
-        :seeds="allSeeds"
-        :modes="allModes"
+        :show="scope"
+        :palette-label="paletteLabel"
+        :total="familySize"
         @update="setFilter"
+        @scope="scope = $event"
       />
 
       <p class="summary" aria-live="polite">{{ summary }}</p>
 
       <section v-if="filteredEntries.length === 0" class="note note--inline">
-        <p>No scenes match these filters.</p>
-        <button v-if="hasFilters" type="button" class="note__action" @click="clearFilters">
-          Clear filters
-        </button>
+        <p>No scenes for this palette yet.</p>
+        <button type="button" class="note__action" @click="scope = 'all'">Show all scenes</button>
       </section>
 
       <section v-else aria-labelledby="scenes-heading">

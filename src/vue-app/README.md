@@ -18,14 +18,13 @@ npm run vue:preview  # serve the production build
 
 | Route        | View                       | What it is                                                         |
 | ------------ | -------------------------- | ------------------------------------------------------------------ |
-| `/`          | `views/HomeView.vue`       | Landing page with a live editor preview and the theme picker       |
-| `/themes`    | `views/GalleryView.vue`    | All 50 themes, filterable by theme and mode                        |
+| `/`          | `views/HomeView.vue`       | Scene hero, the Theme Spectrum, how to wear the pick in VS Code    |
+| `/themes`    | `views/GalleryView.vue`    | The Spectrum, the active theme in a live editor, its palette, export |
 | `/wallpapers`| `views/WallpapersView.vue` | Generated wallpapers per theme, platform and mode                  |
 | `/science`   | `views/AnalysisView.vue`   | Lightness, hue and chroma of the current theme, and its contrast   |
-| `/export`    | `views/ExportView.vue`     | Download or copy the current theme as CSS, SCSS, JSON or TypeScript |
 | anything else| `views/NotFoundView.vue`   | 404 with a way home                                                 |
 
-`/gallery` and `/analysis` redirect to `/themes` and `/science`.
+`/gallery` and `/analysis` redirect to `/themes` and `/science`; `/export` goes to `/themes#export`.
 
 ## Layout of the source
 

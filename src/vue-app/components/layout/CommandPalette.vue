@@ -36,7 +36,7 @@ const pages = [
   { path: "/themes", title: "Themes", detail: "All 50 variants side by side" },
   { path: "/wallpapers", title: "Wallpapers", detail: "Scenes for desktop, tablet and phone" },
   { path: "/science", title: "Science", detail: "Lightness, hue and contrast, measured" },
-  { path: "/export", title: "Export", detail: "Download the selected theme" },
+  { path: "/export", title: "Export", detail: "Download the selected theme as tokens" },
 ];
 
 const commands = computed<Command[]>(() => {

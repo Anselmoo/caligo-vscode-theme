@@ -155,6 +155,7 @@ const modeName = computed(() => currentTheme.value?.harmonyLabel ?? "");
 
 .theme-chip {
   margin-left: 6px;
+  white-space: nowrap;
   display: inline-flex;
   align-items: center;
   gap: 8px;
