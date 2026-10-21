@@ -8,7 +8,6 @@ const themeDisplayName = computed(() => currentTheme.value?.displayName || "Deep
 
 // Some tooling/lint setups don’t account for Vue template usage when checking <script setup>.
 // This keeps the ref “used” without affecting runtime behavior.
-void themeDisplayName;
 </script>
 
 <template>

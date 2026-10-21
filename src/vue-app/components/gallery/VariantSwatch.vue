@@ -22,7 +22,6 @@ const paint = computed(() => {
   };
 });
 
-void paint;
 </script>
 
 <template>

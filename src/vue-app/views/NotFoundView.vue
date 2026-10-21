@@ -3,8 +3,6 @@ import { RouterLink, useRoute } from "vue-router";
 
 const route = useRoute();
 
-void RouterLink;
-void route;
 </script>
 
 <template>

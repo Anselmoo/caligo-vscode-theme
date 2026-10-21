@@ -86,11 +86,6 @@ const description = computed(
     "."
 );
 
-void circles;
-void ring;
-void dots;
-void description;
-void omitted;
 </script>
 
 <template>

@@ -44,15 +44,6 @@ const bgOklch = computed(() => {
   return { l: bg.l.toFixed(2), c: bg.c.toFixed(3), h: Math.round(bg.h) };
 });
 
-void MARKETPLACE_URL;
-void textContrast;
-void modes;
-void bgOklch;
-void setTheme;
-void RouterLink;
-void EditorPreview;
-void SceneBackdrop;
-void ThemeHorizon;
 </script>
 
 <template>

@@ -52,18 +52,6 @@ function download() {
 
 onBeforeUnmount(() => clearTimeout(clearTimer));
 
-void CopyDownload;
-void ExportPreview;
-void FormatSelector;
-void selectedFormat;
-void availableFormats;
-void formatLabels;
-void themeName;
-void content;
-void fileNote;
-void status;
-void copy;
-void download;
 </script>
 
 <template>

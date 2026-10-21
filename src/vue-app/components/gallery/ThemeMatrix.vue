@@ -92,11 +92,6 @@ function onKeydown(event: KeyboardEvent) {
   }
 }
 
-void VariantSwatch;
-void emit;
-void tabKey;
-void cellName;
-void onKeydown;
 </script>
 
 <template>

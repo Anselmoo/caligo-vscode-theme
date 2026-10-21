@@ -42,20 +42,6 @@ function clearFilters() {
   setFilter({ seedId: null, harmonyMode: null });
 }
 
-void WallpaperCard;
-void WallpaperFilters;
-void entries;
-void error;
-void missing;
-void allSeeds;
-void allModes;
-void setFilter;
-void platformLabel;
-void hasFilters;
-void summary;
-void cardKey;
-void clearFilters;
-void loadManifest;
 </script>
 
 <template>

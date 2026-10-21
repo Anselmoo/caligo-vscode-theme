@@ -6,10 +6,6 @@ const MARKETPLACE =
   "https://marketplace.visualstudio.com/items?itemName=AnselmHahn.caligo-vscode-theme";
 const year = new Date().getFullYear();
 
-void RouterLink;
-void REPO;
-void MARKETPLACE;
-void year;
 </script>
 
 <template>

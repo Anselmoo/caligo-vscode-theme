@@ -19,13 +19,6 @@ const shortcutLabel = isMac ? "⌘K" : "Ctrl K";
 const themeName = computed(() => currentTheme.value?.seedLabel ?? "Theme");
 const modeName = computed(() => currentTheme.value?.harmonyLabel ?? "");
 
-void RouterLink;
-void open;
-void navItems;
-void shortcutLabel;
-void isMac;
-void themeName;
-void modeName;
 </script>
 
 <template>

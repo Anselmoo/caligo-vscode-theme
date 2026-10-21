@@ -27,10 +27,6 @@ function onImageError() {
   failedSrc.value = props.screenshot ?? "";
 }
 
-void RouterLink;
-void hasImage;
-void textContrast;
-void onImageError;
 </script>
 
 <template>

@@ -67,21 +67,6 @@ const screenshot = computed(() => {
   return resolveScreenshotPath(entry?.filename ?? `${key}.png`);
 });
 
-void ThemeFilters;
-void ThemeMatrix;
-void VariantDetail;
-void seedOptions;
-void harmonyIds;
-void modeOptions;
-void visible;
-void hasFilters;
-void hasThemes;
-void clearFilters;
-void choose;
-void screenshot;
-void isLoading;
-void error;
-void currentThemeKey;
 </script>
 
 <template>

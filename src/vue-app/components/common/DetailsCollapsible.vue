@@ -18,7 +18,6 @@ function toggle() {
 }
 
 // Reference to satisfy static analysis (used in template)
-void toggle;
 </script>
 
 <template>

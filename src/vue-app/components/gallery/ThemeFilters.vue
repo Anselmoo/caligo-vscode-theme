@@ -22,13 +22,6 @@ const seedId = `${uid}-seed`;
 const modeId = `${uid}-mode`;
 const searchId = `${uid}-search`;
 
-void seed;
-void mode;
-void search;
-void seedId;
-void modeId;
-void searchId;
-void emit;
 </script>
 
 <template>

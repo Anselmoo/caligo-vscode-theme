@@ -45,11 +45,6 @@ function pickHarmony(id: string) {
   if (theme) setTheme(theme.key);
 }
 
-void harmonies;
-void seedDots;
-void shortMode;
-void pickSeed;
-void pickHarmony;
 </script>
 
 <template>

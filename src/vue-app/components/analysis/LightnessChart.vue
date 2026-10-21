@@ -71,12 +71,6 @@ const description = computed(
       : `Neutral text needs a lightness of at least ${props.threshold.toFixed(2)} to reach ${AA_TEXT}:1 over the background.`)
 );
 
-void x;
-void y;
-void yTicks;
-void xTicks;
-void labels;
-void description;
 </script>
 
 <template>

@@ -29,10 +29,6 @@ function onSelect(key: "seedId" | "harmonyMode", event: Event) {
   emit("update", { [key]: (event.target as HTMLSelectElement).value || null });
 }
 
-void emit;
-void platforms;
-void resolution;
-void onSelect;
 </script>
 
 <template>

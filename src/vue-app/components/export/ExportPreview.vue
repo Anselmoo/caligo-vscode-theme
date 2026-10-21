@@ -23,12 +23,14 @@ const shouldTokenizeJson = computed(() => {
     return false;
   }
 });
+// biome-ignore lint/correctness/noUnusedVariables: used in the template (v-for); biome's Vue support misses it
 const tokenizedLines = computed(() =>
   lines.value.map(line =>
     shouldTokenizeJson.value ? tokenizeJsonLine(line) : tokenizeStructuredLine(line)
   )
 );
 
+// biome-ignore lint/correctness/noUnusedVariables: used in the template (:class); biome's Vue support misses it
 function isHighlighted(line: string): boolean {
   if (!props.highlightToken) return false;
   const lower = props.highlightToken.toLowerCase();
@@ -135,12 +137,6 @@ function tokenizeStructuredLine(line: string): Array<{ type: string; value: stri
   return tokens;
 }
 
-void lines;
-void shouldTokenizeJson;
-void tokenizedLines;
-void isHighlighted;
-void tokenizeJsonLine;
-void tokenizeStructuredLine;
 </script>
 
 <template>
