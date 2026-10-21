@@ -18,22 +18,13 @@ import {
   writeFileSync,
 } from "node:fs";
 import { join, resolve } from "node:path";
+import { slugifyForFilename } from "./lib/screenshot-filename.js";
 
 const PROJECT_ROOT = resolve(process.cwd());
 const OUTPUT_DIR = join(PROJECT_ROOT, "docs", "images", "themes");
 
 const BASE64_PNG_1X1 =
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=";
-
-function slugifyForFilename(input: string): string {
-  return input
-    .toLowerCase()
-    .replace(/\s+/g, " ")
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
 
 function parseArgValue(flag: string): string | undefined {
   const args = process.argv.slice(2);

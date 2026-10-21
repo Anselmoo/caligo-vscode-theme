@@ -5,6 +5,7 @@
  */
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { readThemeLabels, screenshotFilename } from "./lib/screenshot-filename.js";
 
 interface ScreenshotEntry {
   themeKey: string;
@@ -47,21 +48,15 @@ if (existsSync(screenshotsDir)) {
   }
 }
 
+const themeLabels = readThemeLabels(process.cwd());
+
 // Generate screenshot entries for all themes
 const screenshots: ScreenshotEntry[] = Object.values(themeIndex.themes).map(theme => {
-  // Construct full theme name as it appears in theme JSON file:
-  // "Caligo (Aurora Noir — Balanced)"
-  // Then slugify to match VS Code screenshot generator output:
-  // "caligo-aurora-noir-balanced-typescript.png"
-  const fullThemeName = `Caligo (${theme.seedLabel} — ${theme.harmonyLabel})`;
-
-  const filename = `${fullThemeName
-    .toLowerCase()
-    .replace(/\s+/g, " ")
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/(^-|-$)/g, "")}-typescript.png`;
+  // The capture names each file after the label VS Code shows (package.json),
+  // which is not always "Caligo (Seed — Harmony)": monochromatic labels carry a
+  // weight count. Fall back to the reconstructed label only for unknown keys.
+  const label = themeLabels.get(theme.key) ?? `Caligo (${theme.seedLabel} — ${theme.harmonyLabel})`;
+  const filename = screenshotFilename(label);
 
   return {
     themeKey: theme.key,
