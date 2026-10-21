@@ -35,6 +35,7 @@ const { currentTheme } = useTheme();
 
 <style scoped>
 .wear {
+  container-type: inline-size;
   display: grid;
   gap: 16px;
   padding: clamp(18px, 3vw, 28px);
@@ -64,15 +65,18 @@ const { currentTheme } = useTheme();
   counter-reset: step;
 }
 
+/* Stacked by default (label above, code and copy below); a label column only when
+   the strip itself is wide, so a narrow column never squeezes the code. */
 .wear__step {
   display: grid;
-  grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 8px 16px;
   align-items: center;
   counter-increment: step;
 }
 
 .wear__what {
+  grid-column: 1 / -1;
   color: var(--fg1);
   font-size: var(--step--1);
 }
@@ -111,13 +115,13 @@ const { currentTheme } = useTheme();
   text-decoration-color: var(--accent);
 }
 
-@media (max-width: 720px) {
+@container (min-width: 760px) {
   .wear__step {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) auto;
   }
 
   .wear__what {
-    grid-column: 1 / -1;
+    grid-column: auto;
   }
 }
 </style>
