@@ -478,7 +478,8 @@ function slicesVE(o: {
         const bottom = Math.min(prof[j].pts[k].y, env[j][k]);
         if (top < env[cur][k] + 1) {
           const b = (bottom - top) / scale[k];
-          if (b > maxBand && b > band && colourDist(colOf(cur, k), colOf(j, k)) > BAND_JND)
+          const kc = k - (k % 3); // colour test on every 3rd column (smooth field)
+          if (b > maxBand && b > band && colourDist(colOf(cur, kc), colOf(j, kc)) > BAND_JND)
             band = b;
         }
         // A skipped candidate standing above both neighbours and in view.
@@ -779,21 +780,28 @@ export function voidEmberMotif(p: BrickParams): ComposedWallpaper {
   // ember some palettes give (lightness kept).
   const emberWarm = keepLightness(mix(ember, yellowish, 0.3), 0.6, 0.7);
   const deepLava = keepLightness(shade(ember, 0.72), 0.42, 0.5);
-  const rock = shade(c.bg, 0.4); // the darkest solid
+  // Value plan, round 2 (user: "void ember schaut generell nicht realistisch
+  // aus"): one red wash over rock, haze and sky read as a red filter. Basalt
+  // is near-black and nearly neutral; the haze is grey-black smoke. Red and
+  // orange belong only to what the lava lights: the lava itself, the rock
+  // and smoke near it, and a low glow over the sources.
+  const rock = tone(shade(c.bg, 0.35), 0.3); // the darkest solid
   const crust = keepLightness(mix(rock, ember, 0.1), 0.1, 0.16);
   const crustWarm = keepLightness(mix(crust, deepLava, 0.15), 0.14, 0.2);
-  const litRock = keepLightness(mix(rock, ember, 0.45), 0.34, 0.42);
-  const glowRock = keepLightness(mix(litRock, ember, 0.35), 0.46, 0.52);
+  // Rock lit by lava takes the lava's orange, not the pink ember of some palettes.
+  const litRock = keepLightness(mix(rock, emberWarm, 0.5), 0.34, 0.44);
+  const glowRock = keepLightness(mix(litRock, hot, 0.3), 0.5, 0.56);
   const bankTone = mix(crustWarm, litRock, 0.55);
-  const rimRock = keepLightness(mix(rock, ember, 0.32), 0.17, 0.21); // backlit rim
+  const rimRock = keepLightness(mix(rock, ember, 0.12), 0.13, 0.16); // backlit rim
   // Smoke haze: a deep red-black. Backlit, far forms stay dark silhouettes
   // against the glow (the user's preference), only redder than near rock.
-  const air = keepLightness(mix(shade(c.bg, 0.7), ember, 0.14), 0.12, 0.13);
-  const voidTop = shade(c.bg, 0.42);
-  const voidMid = shade(c.bg, 0.7);
-  const skyGlow = keepLightness(mix(c.bg, ember, 0.32), 0.29, 0.33);
-  const smokeDark = keepLightness(mix(shade(c.bg, 0.5), ember, 0.03), 0.07, 0.095);
-  const smokeLit = keepLightness(mix(shade(c.bg, 0.5), ember, 0.3), 0.28, 0.36);
+  const air = keepLightness(mix(tone(shade(c.bg, 0.7), 0.35), ember, 0.04), 0.11, 0.12);
+  const voidTop = tone(shade(c.bg, 0.42), 0.25);
+  const voidMid = tone(shade(c.bg, 0.7), 0.3);
+  const skyGlow = keepLightness(mix(tone(c.bg, 0.4), emberWarm, 0.3), 0.24, 0.28);
+  const smokeDark = keepLightness(mix(tone(shade(c.bg, 0.5), 0.3), ember, 0.02), 0.07, 0.095);
+  // Smoke lit from below by the lava: orange undersides on grey-black ash.
+  const smokeLit = keepLightness(mix(tone(shade(c.bg, 0.5), 0.3), emberWarm, 0.32), 0.28, 0.36);
   const starTint = keepLightness(
     tone(palest([c.keywords, c.functions, c.strings, c.types, c.constants]), 0.2),
     0.8,
@@ -1826,7 +1834,7 @@ export function voidEmberMotif(p: BrickParams): ComposedWallpaper {
         ]);
         const e = emission(x, h, z, nB);
         if (e > 0.002) {
-          col = mix(col, litRock, Math.min(1, e * 1.3) ** 0.8);
+          col = mix(col, litRock, Math.min(1, e * 1.8) ** 0.8);
           if (e > 0.75) col = mix(col, glowRock, Math.min(1, (e - 0.75) * 1.2));
           // Rock lit by lava is a secondary emitter seen through the smoke:
           // pre-lift it a little, as the lava itself, so the lit flanks

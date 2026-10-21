@@ -262,7 +262,7 @@ function duneSlices(
           if (
             top < env[cur][k] + 1 &&
             bottom - top > lim[k] &&
-            colourDist(colOf(cur, k), colOf(j, k)) > BAND_JND
+            colourDist(colOf(cur, k - (k % 3)), colOf(j, k - (k % 3))) > BAND_JND
           )
             over = true;
         }
