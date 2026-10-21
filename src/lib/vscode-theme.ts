@@ -1,5 +1,6 @@
 import { scaleAlpha, withAlpha } from "./color.js";
 import { pickReadableForeground } from "./contrast.js";
+import { codeInks } from "./contrast-pairs.js";
 import { deriveIntentSemanticTokenColors } from "./intent-layers.js";
 import { fitOverlaysToReaders } from "./overlay-fit.js";
 import type { DerivedPalette } from "./palette.js";
@@ -997,7 +998,12 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
   for (const [key, value] of Object.entries(buildInheritedColors(p, settled))) {
     if (!(key in settled)) settled[key] = value;
   }
-  const fitted = fitOverlaysToReaders(settled);
+  const semanticTokenColors = p.intent
+    ? deriveIntentSemanticTokenColors(p.intent, p.fgMuted)
+    : deriveSemanticTokenColors(p);
+  // Code is painted in token colors, so they read the diff, merge and inline-chat overlays too.
+  const inks = codeInks({ tokenColors, semanticTokenColors }).map(ink => ink.fg);
+  const fitted = fitOverlaysToReaders(settled, inks);
   // An inactive selection is its active twin at lower alpha. Re-derive it from the
   // fitted active tint, or a darkened active selection reads weaker than the inactive.
   for (const [active, inactive] of [
@@ -1017,9 +1023,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     colors: fitted,
     tokenColors,
     semanticHighlighting: true,
-    semanticTokenColors: p.intent
-      ? deriveIntentSemanticTokenColors(p.intent, p.fgMuted)
-      : deriveSemanticTokenColors(p),
+    semanticTokenColors,
     _oklchDebug,
   };
 }

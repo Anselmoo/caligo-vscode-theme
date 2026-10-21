@@ -36,6 +36,15 @@ export function buildExtendedColors(p: DerivedPalette): Record<string, string> {
   const addedLine = withAlpha(s.success, 0.1);
   const removedBg = withAlpha(s.error, 0.16);
   const removedLine = withAlpha(s.error, 0.1);
+  /**
+   * Diff editor lines: the dark status tint (errorBg / successBg: background lightness + 0.08, low
+   * chroma), so code painted on a changed line keeps its contrast. The changed word is the same
+   * tint at a higher alpha, marked by hue and depth instead of a border box.
+   */
+  const diffRemovedLine = s.errorBg;
+  const diffRemovedWord = scaleAlpha(s.errorBg, 1.8);
+  const diffAddedLine = s.successBg;
+  const diffAddedWord = scaleAlpha(s.successBg, 1.8);
 
   return {
     // ── Activity Bar ────────────────────────────────────────────────────────
@@ -299,11 +308,11 @@ export function buildExtendedColors(p: DerivedPalette): Record<string, string> {
     // ── Diff / merge ──────────────────────────────────────────────────────
     "diffEditor.border": p.border,
     "diffEditor.diagonalFill": withAlpha(p.border, 0.5),
-    "diffEditor.insertedTextBackground": addedBg,
-    "diffEditor.insertedLineBackground": addedLine,
+    "diffEditor.insertedTextBackground": diffAddedWord,
+    "diffEditor.insertedLineBackground": diffAddedLine,
     "diffEditor.insertedTextBorder": transparent,
-    "diffEditor.removedTextBackground": removedBg,
-    "diffEditor.removedLineBackground": removedLine,
+    "diffEditor.removedTextBackground": diffRemovedWord,
+    "diffEditor.removedLineBackground": diffRemovedLine,
     "diffEditor.removedTextBorder": transparent,
     "diffEditor.unchangedRegionBackground": p.bg1,
     "diffEditor.unchangedRegionForeground": p.fgMuted,

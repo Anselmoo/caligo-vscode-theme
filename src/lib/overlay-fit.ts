@@ -24,7 +24,7 @@ import { converter, formatHex } from "culori";
 import { oklch } from "./color.js";
 import { deltaEOklch } from "./color-utils.js";
 import { flattenLayers, type Rgba, relativeLuminance, wcagContrastRatio } from "./contrast.js";
-import { CONTRAST_PAIRS } from "./contrast-pairs.js";
+import { CODE_STACKS, CONTRAST_PAIRS, WCAG_MIN } from "./contrast-pairs.js";
 import { gamutMap } from "./contrast-solve.js";
 
 const toOklch = converter("oklch") as (c: string) => { l: number; c?: number; h?: number };
@@ -92,14 +92,21 @@ function fitOverlay(overlay: string, readers: Reader[], bases: string[][]): stri
   return best;
 }
 
+/** Code stacks as `{ overlay, base }`: the top layer and the keys under it, bottom -> top. */
+const CODE_OVERLAYS = CODE_STACKS.map(stack => {
+  const keys = stack.split(">");
+  return { overlay: keys[keys.length - 1], base: keys.slice(0, -1) };
+});
+
 /** Overlay keys in the order they must be fitted: lower layers of a stack before upper ones. */
 const OVERLAY_ORDER: readonly string[] = (() => {
   const depth = new Map<string, number>();
+  const note = (key: string, d: number) => depth.set(key, Math.max(depth.get(key) ?? 0, d));
   for (const p of CONTRAST_PAIRS) {
     if (p.base === undefined) continue;
-    const d = ([] as string[]).concat(p.base).length;
-    depth.set(p.bg, Math.max(depth.get(p.bg) ?? 0, d));
+    note(p.bg, ([] as string[]).concat(p.base).length);
   }
+  for (const { overlay, base } of CODE_OVERLAYS) note(overlay, base.length);
   return [...depth.entries()].sort((a, b) => a[1] - b[1]).map(([key]) => key);
 })();
 
@@ -107,10 +114,17 @@ const OVERLAY_ORDER: readonly string[] = (() => {
  * Fit every translucent or stacked background in `colors` to the text the registry says is drawn
  * on it. Returns a new map; keys the registry does not stack over a base are untouched.
  *
+ * `inks` are the theme's code colors (tokenColors / semanticTokenColors foregrounds). They read
+ * every overlay of a CODE_STACKS stack at the text floor; an ink that already fails under the
+ * overlay's base is skipped like any other reader.
+ *
  * Apply once, to the designed colors: the visibility budget is measured from the overlay passed
  * in, so a second pass would spend another half on any overlay that already stopped at it.
  */
-export function fitOverlaysToReaders(colors: Record<string, string>): Record<string, string> {
+export function fitOverlaysToReaders(
+  colors: Record<string, string>,
+  inks: readonly string[] = []
+): Record<string, string> {
   const out = { ...colors };
   for (const key of OVERLAY_ORDER) {
     const overlay = out[key];
@@ -125,6 +139,13 @@ export function fitOverlaysToReaders(colors: Record<string, string>): Record<str
       if (typeof fg !== "string" || base.some(b => typeof b !== "string")) continue;
       readers.push({ fg, base, min: p.min });
       bases.set(baseKeys.join(">"), base);
+    }
+    for (const stack of CODE_OVERLAYS) {
+      if (stack.overlay !== key) continue;
+      const base = stack.base.map(k => out[k]);
+      if (base.some(b => typeof b !== "string")) continue;
+      for (const fg of inks) readers.push({ fg, base, min: WCAG_MIN.text });
+      bases.set(stack.base.join(">"), base);
     }
     if (readers.length === 0) continue;
     out[key] = fitOverlay(overlay, readers, [...bases.values()]);

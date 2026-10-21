@@ -8,6 +8,7 @@ import {
   wcagContrastRatio,
 } from "../contrast.js";
 import {
+  CODE_STACKS,
   CONTRAST_EXEMPT_FOREGROUNDS,
   CONTRAST_PAIRS,
   evaluateThemeContrast,
@@ -61,9 +62,19 @@ describe("contrast-pairs registry", () => {
       const bottom = [p.base ?? [], p.bg].flat()[0];
       if (!(bottom in colors) || colors[bottom].length === 9) colors[bottom] = "#000000";
     }
+    // Code stacks: opaque bottom, translucent white overlays on top.
+    for (const stack of CODE_STACKS) {
+      const [bottom, ...overlays] = stack.split(">");
+      colors[bottom] = "#000000";
+      for (const k of overlays) colors[k] = "#ffffff1a";
+    }
     const results = evaluateThemeContrast({
       colors: { ...colors, "editor.background": "#000000" },
-      tokenColors: [{ name: "Comment", settings: { foreground: "#ffffff80" } }, { scope: "x" }],
+      tokenColors: [
+        { name: "Comment", settings: { foreground: "#ffffff80" } },
+        { name: "Faint", settings: { foreground: "#ffffff40" } },
+        { scope: "x" },
+      ],
       semanticTokenColors: { "variable.readonly": { foreground: "#ffffff" }, "x.y": "#ffffff" },
     });
     const byId = new Map(results.map(r => [r.id, r]));
@@ -73,6 +84,22 @@ describe("contrast-pairs registry", () => {
     expect(byId.get("semantic:variable.readonly|editor.background")?.wcag).toBeCloseTo(21, 9);
     expect(byId.get("semantic:x.y|editor.background")?.pass).toBe(true);
     expect(byId.has("token:x|editor.background")).toBe(false);
+
+    // Every code ink that passes on the bare editor is scored over every code stack, composited;
+    // inks are deduplicated by hex (x.y shares #ffffff with variable.readonly).
+    const removedWord =
+      "editor.background>diffEditor.removedLineBackground>diffEditor.removedTextBackground";
+    expect(byId.get(`code:semantic:variable.readonly|${removedWord}`)?.wcag).toBeCloseTo(
+      wcagContrastRatio("#ffffff", "#ffffff1a", ["#000000", "#ffffff1a"]),
+      9
+    );
+    expect(byId.has(`code:semantic:x.y|${removedWord}`)).toBe(false);
+    // An ink that already fails on the bare editor is not scored again on the code stacks.
+    expect(wcagContrastRatio("#ffffff40", "#000000")).toBeLessThan(4.5);
+    expect([...byId.keys()].some(id => id.startsWith("code:token:Faint|"))).toBe(false);
+    expect(results.filter(r => r.id.startsWith("code:")).length).toBe(
+      CODE_STACKS.length * 2 // Comment (#ffffff80 passes bare) and variable.readonly
+    );
   });
 
   it("throws on a missing registry key", () => {
