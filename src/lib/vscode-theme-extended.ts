@@ -14,8 +14,21 @@
  *  - `myWidget.*` — a documentation example, not a real VS Code color.
  */
 
-import { scaleAlpha, withAlpha } from "./color.js";
+import { converter } from "culori";
+import { oklch, scaleAlpha, toHex, withAlpha } from "./color.js";
 import type { DerivedPalette } from "./palette.js";
+
+const toOklch = converter("oklch") as (c: string) => { l: number; c?: number; h?: number };
+
+/**
+ * The same color with its chroma multiplied, lightness and hue kept (toHex maps the chroma back into
+ * sRGB), at the given alpha. A changed diff word is marked by saturation, not by lightness: a
+ * lighter tint would lift the surface toward the code painted on it.
+ */
+function deepen(hex: string, chromaFactor: number, alpha: number, lift = 0): string {
+  const o = toOklch(hex.slice(0, 7));
+  return withAlpha(toHex(oklch(o.l + lift, (o.c ?? 0) * chromaFactor, o.h ?? 0)), alpha);
+}
 
 export function buildExtendedColors(p: DerivedPalette): Record<string, string> {
   const s = p.semantic;
@@ -39,12 +52,14 @@ export function buildExtendedColors(p: DerivedPalette): Record<string, string> {
   /**
    * Diff editor lines: the dark status tint (errorBg / successBg: background lightness + 0.08, low
    * chroma), so code painted on a changed line keeps its contrast. The changed word is the same
-   * tint at a higher alpha, marked by hue and depth instead of a border box.
+   * tint saturated (chroma x4.5) and only slightly lighter (L + 0.06) at 0.6 alpha: marked by
+   * saturation instead of a border box. The small lift keeps it visible where the status hue is
+   * close to the background hue (green words on teal themes, red words on red themes).
    */
   const diffRemovedLine = s.errorBg;
-  const diffRemovedWord = scaleAlpha(s.errorBg, 1.8);
+  const diffRemovedWord = deepen(s.errorBg, 4.5, 0.6, 0.06);
   const diffAddedLine = s.successBg;
-  const diffAddedWord = scaleAlpha(s.successBg, 1.8);
+  const diffAddedWord = deepen(s.successBg, 4.5, 0.6, 0.06);
 
   return {
     // ── Activity Bar ────────────────────────────────────────────────────────
