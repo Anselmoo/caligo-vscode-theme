@@ -1,4 +1,5 @@
-import type { DerivedPalette } from "../core/palette.js";
+import { converter, type Oklch } from "culori";
+import type { ThemeIndexEntry } from "../types/theme.js";
 import type { ExportOptions } from "./types.js";
 
 type OklchLike = { l: number; c: number; h: number };
@@ -38,33 +39,64 @@ export function toSrgbComponents(hex: string): [number, number, number] {
   return [r / 255, g / 255, b / 255];
 }
 
-export function buildTokenGroups(palette: DerivedPalette): ExportTokenGroups {
+/**
+ * What the export layer formats: a title and the token groups, nothing else.
+ * Formatters never see a palette, so they cannot re-derive colours the theme does not ship.
+ */
+export type ExportSource = {
+  title: string;
+  groups: ExportTokenGroups;
+};
+
+const toOklch = converter("oklch") as (color: unknown) => Oklch | undefined;
+
+function oklchFromHex(hex: string): OklchLike {
+  const color = toOklch(hex);
+  return { l: color?.l ?? 0, c: color?.c ?? 0, h: color?.h ?? 0 };
+}
+
+/**
+ * Build the export source from the colours the theme actually ships (the generated themes
+ * manifest, read from the theme JSON). OKLCH comes from `entry.core` where the role is listed
+ * there, otherwise it is computed from the hex.
+ */
+export function sourceFromTheme(entry: ThemeIndexEntry): ExportSource {
+  const { colors } = entry;
+  const coreOklch = new Map(entry.core.map(item => [item.key, item.oklch]));
+  const token = (hex: string, coreKey?: string): ExportToken => ({
+    hex,
+    oklch: (coreKey ? coreOklch.get(coreKey) : undefined) ?? oklchFromHex(hex),
+  });
+
   return {
-    backgrounds: {
-      "bg-base": { hex: palette.bg0, oklch: palette.debug.oklch.bg0 },
-      "bg-surface": { hex: palette.bg1, oklch: palette.debug.oklch.bg1 },
-      "bg-elevated": { hex: palette.bg2, oklch: palette.debug.oklch.bg2 },
-    },
-    foregrounds: {
-      "fg-primary": { hex: palette.fg0, oklch: palette.debug.oklch.fg0 },
-      "fg-secondary": { hex: palette.fg1, oklch: palette.debug.oklch.fg1 },
-      "fg-muted": { hex: palette.fgMuted, oklch: palette.debug.oklch.fgMuted },
-    },
-    syntax: {
-      "syntax-keywords": { hex: palette.hueOrange, oklch: palette.debug.oklch.hueOrange },
-      "syntax-types": { hex: palette.hueBlue, oklch: palette.debug.oklch.hueBlue },
-      "syntax-functions": { hex: palette.hueGreen, oklch: palette.debug.oklch.hueGreen },
-      "syntax-strings": { hex: palette.hueCyan, oklch: palette.debug.oklch.hueCyan },
-      "syntax-decorator": { hex: palette.huePurple, oklch: palette.debug.oklch.huePurple },
-    },
-    semantic: {
-      error: { hex: palette.semantic.error, oklch: palette.semantic.debug.error },
-      warning: { hex: palette.semantic.warning, oklch: palette.semantic.debug.warning },
-      success: { hex: palette.semantic.success, oklch: palette.semantic.debug.success },
-      info: { hex: palette.semantic.info, oklch: palette.semantic.debug.info },
-    },
-    accent: {
-      accent: { hex: palette.accent, oklch: palette.debug.oklch.accent },
+    title: `${entry.seedLabel} (${entry.harmonyLabel})`,
+    groups: {
+      backgrounds: {
+        "bg-base": token(colors.bg0, "bg0"),
+        "bg-surface": token(colors.bg1, "bg1"),
+        "bg-elevated": token(colors.bg2, "bg2"),
+      },
+      foregrounds: {
+        "fg-primary": token(colors.fg0, "fg0"),
+        "fg-secondary": token(colors.fg1, "fg1"),
+        "fg-muted": token(colors.fgMuted, "fgMuted"),
+      },
+      syntax: {
+        "syntax-keywords": token(colors.keywords, "keywords"),
+        "syntax-types": token(colors.types, "types"),
+        "syntax-functions": token(colors.functions, "functions"),
+        "syntax-strings": token(colors.strings, "strings"),
+        "syntax-decorator": token(colors.decorator, "decorator"),
+      },
+      semantic: {
+        error: token(colors.error, "error"),
+        warning: token(colors.warning, "warning"),
+        success: token(colors.success, "success"),
+        info: token(colors.info, "info"),
+      },
+      accent: {
+        accent: token(colors.accent, "accent"),
+      },
     },
   };
 }

@@ -138,13 +138,10 @@ export function useTheme() {
     root.style.setProperty("--error", colors.error);
     root.style.setProperty("--color-error", colors.error);
 
-    // Semantic state colors derived from theme palette
-    // Warning: Use types/keywords color (typically yellow/orange in themes)
-    root.style.setProperty("--color-warning", colors.keywords);
-    // Success: Use strings/functions color (typically green/cyan in themes)
-    root.style.setProperty("--color-success", colors.strings);
-    // Info: Use accent color
-    root.style.setProperty("--color-info", colors.accent);
+    // Semantic state colors: the shipped theme's own editorWarning / added / editorInfo colours
+    root.style.setProperty("--color-warning", colors.warning);
+    root.style.setProperty("--color-success", colors.success);
+    root.style.setProperty("--color-info", colors.info);
 
     // RGB variants for rgba() usage
     root.style.setProperty("--bg0-rgb", hexToRgb(colors.bg0));
@@ -154,8 +151,8 @@ export function useTheme() {
     root.style.setProperty("--fg1-rgb", hexToRgb(colors.fg1));
     root.style.setProperty("--fg-muted-rgb", hexToRgb(colors.fgMuted));
     root.style.setProperty("--color-error-rgb", hexToRgb(colors.error));
-    root.style.setProperty("--color-warning-rgb", hexToRgb(colors.keywords));
-    root.style.setProperty("--color-success-rgb", hexToRgb(colors.strings));
+    root.style.setProperty("--color-warning-rgb", hexToRgb(colors.warning));
+    root.style.setProperty("--color-success-rgb", hexToRgb(colors.success));
 
     // Syntax highlighting colors
     root.style.setProperty("--syntax-keywords", colors.keywords);

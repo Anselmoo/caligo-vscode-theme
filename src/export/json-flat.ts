@@ -1,5 +1,4 @@
-import type { DerivedPalette } from "../core/palette.js";
-import { buildTokenGroups, flattenTokenGroups, getPrefix } from "./shared.js";
+import { flattenTokenGroups, getPrefix } from "./shared.js";
 import type { ExportFormatter } from "./types.js";
 
 export const jsonFlatFormatter: ExportFormatter = {
@@ -7,9 +6,9 @@ export const jsonFlatFormatter: ExportFormatter = {
   label: "JSON (Flat)",
   extension: "json",
   mimeType: "application/json",
-  generate(palette: DerivedPalette, options) {
+  generate(source, options) {
     const prefix = getPrefix(options);
-    const flat = flattenTokenGroups(buildTokenGroups(palette));
+    const flat = flattenTokenGroups(source.groups);
     const content = `${JSON.stringify(
       Object.fromEntries(Object.entries(flat).map(([key, token]) => [key, token.hex])),
       null,

@@ -35,6 +35,12 @@ export interface ThemeColors {
   fgMuted: string;
   accent: string;
   error: string;
+  /** editorWarning.foreground of the shipped theme */
+  warning: string;
+  /** gitDecoration.addedResourceForeground of the shipped theme (testing.iconPassed, terminal.ansiGreen as fallbacks) */
+  success: string;
+  /** editorInfo.foreground of the shipped theme */
+  info: string;
   strings: string;
   types: string;
   functions: string;

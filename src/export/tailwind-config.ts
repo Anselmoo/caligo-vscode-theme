@@ -1,5 +1,4 @@
-import type { DerivedPalette } from "../core/palette.js";
-import { buildTokenGroups, getPrefix } from "./shared.js";
+import { getPrefix } from "./shared.js";
 import type { ExportFormatter } from "./types.js";
 
 export const tailwindConfigFormatter: ExportFormatter = {
@@ -7,9 +6,9 @@ export const tailwindConfigFormatter: ExportFormatter = {
   label: "Tailwind Config",
   extension: "ts",
   mimeType: "text/typescript",
-  generate(palette: DerivedPalette, options) {
+  generate(source, options) {
     const prefix = getPrefix(options);
-    const groups = buildTokenGroups(palette);
+    const groups = source.groups;
     const colors = Object.fromEntries(
       Object.entries(groups).map(([groupName, group]) => [
         groupName,

@@ -1,18 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import * as corePalette from "../../../core/palette.js";
-
-type MockTheme = {
-  seedId: string;
-  seedLabel: string;
-  harmonyId: string;
-  oklch: {
-    bg: { l: number; c: number; h: number };
-    accent: { l: number; c: number; h: number };
-  };
-};
+import type { ThemeIndexEntry } from "../../../types/theme.js";
 
 const currentTheme = vi.hoisted(() => ({
-  value: null as MockTheme | null,
+  value: null as ThemeIndexEntry | null,
 }));
 
 vi.mock("../useTheme", () => ({
@@ -23,19 +13,46 @@ vi.mock("../useTheme", () => ({
 
 import { useExport } from "../useExport";
 
-describe("useExport", () => {
-  const THEME_MODE = "Balanced";
+function makeTheme(overrides: Partial<ThemeIndexEntry> = {}): ThemeIndexEntry {
+  return {
+    key: "Caligo-DeepSable",
+    seedId: "DeepSable",
+    seedSlug: "deepsable",
+    seedLabel: "Deep Sable",
+    harmonyId: "balanced",
+    harmonyLabel: "Balanced",
+    displayName: "Deep Sable",
+    colors: {
+      bg0: "#0f0e17",
+      bg1: "#14131d",
+      bg2: "#1a1925",
+      fg0: "#e6e4f0",
+      fg1: "#c9c7d6",
+      fgMuted: "#8a889a",
+      accent: "#3b9cf6",
+      error: "#ff9687",
+      warning: "#e2aa00",
+      success: "#00ce39",
+      info: "#73dfff",
+      strings: "#ffc8cf",
+      types: "#ce8545",
+      functions: "#d1d473",
+      keywords: "#71fff7",
+      decorator: "#b79cff",
+    },
+    core: [],
+    oklch: {
+      accent: { l: 0.65, c: 0.15, h: 250 },
+      bg: { l: 0.1, c: 0.02, h: 290 },
+      fg: { l: 0.9, c: 0.02, h: 290 },
+    },
+    ...overrides,
+  };
+}
 
+describe("useExport", () => {
   beforeEach(() => {
-    currentTheme.value = {
-      seedId: "Signal",
-      seedLabel: "Deep Sable",
-      harmonyId: "balanced",
-      oklch: {
-        bg: { l: 0.1, c: 0.02, h: 250 },
-        accent: { l: 0.65, c: 0.15, h: 250 },
-      },
-    };
+    currentTheme.value = makeTheme();
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
   });
@@ -55,31 +72,17 @@ describe("useExport", () => {
     expect(currentResult.value).toBeNull();
   });
 
-  it.each([
-    ["balanced", "none"],
-    ["analogous", "analogous"],
-    ["monochromatic", "monochromatic"],
-    ["triadic", "triadic"],
-    ["split-complementary", "split-complementary"],
-    ["unknown", "none"],
-  ])("maps harmony '%s' to '%s'", (harmonyId, expectedHarmony) => {
-    const deriveSpy = vi.spyOn(corePalette, "derivePalette");
-    currentTheme.value = {
-      seedId: "Signal",
-      seedLabel: "Deep Sable",
-      harmonyId,
-      oklch: {
-        bg: { l: 0.1, c: 0.02, h: 250 },
-        accent: { l: 0.65, c: 0.15, h: 250 },
-      },
-    };
+  it("exports the shipped colours of the current theme, whatever its harmony", () => {
+    currentTheme.value = makeTheme({
+      harmonyId: "triadic",
+      harmonyLabel: "Triadic",
+      colors: { ...makeTheme().colors, keywords: "#abcdef" },
+    });
 
     const { currentResult } = useExport();
-    expect(currentResult.value?.content).toContain("--caligo-bg-base:");
-    expect(deriveSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ harmony: expectedHarmony }),
-      THEME_MODE
-    );
+    expect(currentResult.value?.content).toContain("--caligo-bg-base: #0f0e17;");
+    expect(currentResult.value?.content).toContain("--caligo-syntax-keywords: #abcdef;");
+    expect(currentResult.value?.content).toContain("Caligo — Deep Sable (Triadic)");
   });
 
   it("copies current content successfully", async () => {

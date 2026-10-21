@@ -2,7 +2,9 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
-import { extractManifestColors } from "../../scripts/generate-themes-manifest";
+import { buildCoreColors, extractManifestColors } from "../../scripts/generate-themes-manifest";
+import { sourceFromTheme } from "../../src/export/shared";
+import type { ThemeIndexEntry } from "../../src/types/theme";
 
 describe("generate-themes-manifest: extractManifestColors", () => {
   it("does not misclassify keyword storage.type as the Types color", () => {
@@ -102,5 +104,37 @@ describe("generate-themes-manifest: roles match the shipped themes", () => {
     expect(extracted.keywords).toBe(exact(theme, "keyword"));
     expect(extracted.types).toBe(exact(theme, "entity.name.type"));
     expect(extracted.functions).toBe(exact(theme, "entity.name.function"));
+  });
+
+  const color = (theme: { colors?: Record<string, string> }, key: string) =>
+    theme.colors?.[key]?.slice(0, 7);
+
+  it.each(files)("%s: warning/info/success are extracted from the theme", file => {
+    const theme = JSON.parse(readFileSync(join(themesDir, file), "utf-8"));
+    const extracted = extractManifestColors(theme);
+    expect(extracted.warning).toBe(color(theme, "editorWarning.foreground"));
+    expect(extracted.info).toBe(color(theme, "editorInfo.foreground"));
+    expect(extracted.success).toBe(color(theme, "gitDecoration.addedResourceForeground"));
+    for (const hex of [extracted.warning, extracted.info, extracted.success]) {
+      expect(hex).toMatch(/^#[0-9a-f]{6}$/i);
+    }
+  });
+
+  it.each(files)("%s: export emits exactly what the manifest holds", file => {
+    const theme = JSON.parse(readFileSync(join(themesDir, file), "utf-8"));
+    const colors = extractManifestColors(theme);
+    const entry = {
+      key: file.replace(".json", ""),
+      seedLabel: "Seed",
+      harmonyLabel: "Harmony",
+      colors,
+      core: buildCoreColors(colors),
+    } as unknown as ThemeIndexEntry;
+    const { groups } = sourceFromTheme(entry);
+    expect(groups.syntax["syntax-keywords"].hex).toBe(exact(theme, "keyword"));
+    expect(groups.syntax["syntax-types"].hex).toBe(exact(theme, "entity.name.type"));
+    expect(groups.syntax["syntax-functions"].hex).toBe(exact(theme, "entity.name.function"));
+    expect(groups.syntax["syntax-strings"].hex).toBe(exact(theme, "string"));
+    expect(groups.semantic.warning.hex).toBe(color(theme, "editorWarning.foreground"));
   });
 });

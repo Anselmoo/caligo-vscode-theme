@@ -26,6 +26,7 @@ interface OklchColor {
 }
 
 type TokenColor = {
+  name?: string;
   scope?: string | string[];
   settings?: { foreground?: string };
 };
@@ -94,6 +95,9 @@ export function extractManifestColors(themeContent: ThemeJson): {
   fgMuted: string;
   accent: string;
   error: string;
+  warning: string;
+  success: string;
+  info: string;
   strings: string;
   types: string;
   functions: string;
@@ -145,6 +149,24 @@ export function extractManifestColors(themeContent: ThemeJson): {
     "#7dd3fc"
   );
   const error = pickColor(colors, ["editorError.foreground"], "#f87171");
+  // Semantic states, read from the same workbench keys VS Code paints them with.
+  // success has no editor key: "added" (git) is the closest "positive" state every theme ships,
+  // then the test-passed icon, then the terminal green.
+  const warning = pickColor(
+    colors,
+    ["editorWarning.foreground", "list.warningForeground", "terminal.ansiYellow"],
+    "#fbbf24"
+  );
+  const success = pickColor(
+    colors,
+    ["gitDecoration.addedResourceForeground", "testing.iconPassed", "terminal.ansiGreen"],
+    "#4ade80"
+  );
+  const info = pickColor(
+    colors,
+    ["editorInfo.foreground", "notificationsInfoIcon.foreground", "terminal.ansiBlue"],
+    "#60a5fa"
+  );
 
   // Token extraction: exact scope first, then a prefix match that cannot collide
   // (Keywords includes storage.type; Comments includes string.comment).
@@ -189,6 +211,9 @@ export function extractManifestColors(themeContent: ThemeJson): {
     fgMuted,
     accent,
     error,
+    warning,
+    success,
+    info,
     strings,
     types,
     functions,
@@ -321,6 +346,9 @@ function generateThemesManifest() {
         fgMuted,
         accent,
         error,
+        warning,
+        success,
+        info,
         strings,
         types,
         functions,
@@ -361,6 +389,9 @@ function generateThemesManifest() {
           fgMuted,
           accent,
           error,
+          warning,
+          success,
+          info,
           strings,
           types,
           functions,

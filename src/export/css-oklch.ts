@@ -1,5 +1,4 @@
-import type { DerivedPalette } from "../core/palette.js";
-import { buildTokenGroups, formatOklch, getPrefix } from "./shared.js";
+import { formatOklch, getPrefix } from "./shared.js";
 import type { ExportFormatter } from "./types.js";
 
 export const cssOklchFormatter: ExportFormatter = {
@@ -7,9 +6,9 @@ export const cssOklchFormatter: ExportFormatter = {
   label: "CSS Custom Properties (OKLCH)",
   extension: "css",
   mimeType: "text/css",
-  generate(palette: DerivedPalette, options) {
+  generate(source, options) {
     const prefix = getPrefix(options);
-    const groups = buildTokenGroups(palette);
+    const groups = source.groups;
     const lines = [":root {"];
 
     for (const [groupName, group] of Object.entries(groups)) {
