@@ -861,6 +861,38 @@
         "Caligo-CinderTriadic"
       ],
       "reason": "syntax token \"Type Parameters\" over editor.background. Measured WCAG 3.50-3.88 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+    },
+    {
+      "pair": "agentsChatInput.placeholderForeground|agentsChatInput.background",
+      "themes": "*",
+      "reason": "Same value as input.placeholderForeground (VS Code defaults this key to it, vscode-theme-inherited.ts), so it fails with it. low-emphasis (secondary/muted) text role. Measured WCAG 4.02-4.32 vs floor 4.5 (text) in 50/50 themes (10 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+    },
+    {
+      "pair": "agentsBadge.foreground|agentsBadge.background",
+      "themes": [
+        "Caligo-Cinder",
+        "Caligo-CinderAnalogous",
+        "Caligo-CinderMonochromatic",
+        "Caligo-CinderSplitComplementary",
+        "Caligo-CinderTriadic"
+      ],
+      "reason": "Same value as activityBarBadge.foreground (VS Code defaults this key to it, vscode-theme-inherited.ts), so it fails with it. label text on a filled (accent or badge) background. Measured WCAG 3.09-3.62 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+    },
+    {
+      "pair": "agentsUnreadBadge.foreground|agentsUnreadBadge.background",
+      "themes": [
+        "Caligo-Cinder",
+        "Caligo-CinderAnalogous",
+        "Caligo-CinderMonochromatic",
+        "Caligo-CinderSplitComplementary",
+        "Caligo-CinderTriadic"
+      ],
+      "reason": "Same value as activityBarBadge.foreground (VS Code defaults this key to it, vscode-theme-inherited.ts), so it fails with it. label text on a filled (accent or badge) background. Measured WCAG 3.09-3.62 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+    },
+    {
+      "pair": "modernActivityBarItem.activeForeground|activityBar.background>modernActivityBarItem.activeBackground",
+      "themes": ["Caligo-Cinder", "Caligo-CinderAnalogous", "Caligo-CinderMonochromatic"],
+      "reason": "Same value as modernActivityBar.activeForeground (VS Code defaults this key to it, vscode-theme-inherited.ts), so it fails with it. icon/glyph colour, drawn through translucent overlay stack activityBar.background > modernActivityBar.activeBackground (alpha composited over its base). Measured WCAG 2.91-2.92 vs floor 3 (ui) in 3/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     }
   ]
 }

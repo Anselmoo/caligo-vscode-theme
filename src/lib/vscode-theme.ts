@@ -6,6 +6,7 @@ import type { DerivedPalette } from "./palette.js";
 import { SEMANTIC_COLOR_KEYS } from "./semantic-colors.js";
 import { deriveSemanticTokenColors, type SemanticTokenColors } from "./semantic-tokens.js";
 import { buildExtendedColors } from "./vscode-theme-extended.js";
+import { buildInheritedColors } from "./vscode-theme-inherited.js";
 
 export type VscodeThemeJson = {
   $schema: string;
@@ -990,7 +991,13 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
   // Extended coverage fills the surfaces the base map leaves unset; the
   // hand-tuned base colors above always win on conflict. Selection and highlight
   // overlays are then fitted to the text the contrast registry draws on them.
-  const fitted = fitOverlaysToReaders({ ...buildExtendedColors(p), ...colors });
+  const settled = { ...buildExtendedColors(p), ...colors };
+  // Colors VS Code defines as "same as another key" are restated on top of what is settled, so the
+  // Agents window, modern UI and chat follow the palette instead of VS Code's fallback chain.
+  for (const [key, value] of Object.entries(buildInheritedColors(p, settled))) {
+    if (!(key in settled)) settled[key] = value;
+  }
+  const fitted = fitOverlaysToReaders(settled);
   // An inactive selection is its active twin at lower alpha. Re-derive it from the
   // fitted active tint, or a darkened active selection reads weaker than the inactive.
   for (const [active, inactive] of [

@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Added
+- **colors**: emit the 63 VS Code workbench colors the themes were missing (Agents window, chat incl. voice glow, modern UI shell, `tab.divider`, `statusBar.inactiveBackground`, ...) and gate coverage against a fixture pinned to VS Code 1.142.0
+
 ## [0.7.0] - 2026-09-03
 
 ### Fixed

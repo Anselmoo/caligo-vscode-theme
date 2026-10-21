@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "skipped": [
+    {
+      "id": "contrastBorder",
+      "reason": "High-contrast themes only: setting it in a normal theme outlines every widget (see src/lib/vscode-theme-extended.ts header)."
+    },
+    {
+      "id": "contrastActiveBorder",
+      "reason": "High-contrast themes only: setting it in a normal theme outlines every active widget (see src/lib/vscode-theme-extended.ts header)."
+    },
+    {
+      "id": "inlineChat.regionHighlight",
+      "reason": "Listed in vscode-known-variables.json and referenced by CSS, but no registerColor defines it in the 1.142.0 source, so there is no registered default to override."
+    }
+  ],
+  "nonUpstream": [
+    {
+      "id": "aiCustomizationManagement.sashBorder",
+      "reason": "Not in vscode-known-variables.json and not registered in the 1.142.0 source (removed or renamed upstream). Emitted by an earlier generator; remove it in a follow-up once confirmed unused."
+    }
+  ]
+}

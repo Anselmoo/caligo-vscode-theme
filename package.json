@@ -95,6 +95,7 @@
     "typecheck": "npm run typecheck:web && npm run typecheck:tests && npm run typecheck:screenshots",
     "typecheck:screenshots": "tsc -p tsconfig.tests.json --noEmit",
     "sync:themes": "tsx scripts/sync-theme-contributions.ts",
+    "vscode:colors:refresh": "tsx scripts/refresh-vscode-colors.ts",
     "check:themes": "tsx scripts/sync-theme-contributions.ts --check",
     "test:separation": "tsx scripts/separation-gate.ts",
     "inspect:palette": "tsx scripts/palette-inspector.ts"
