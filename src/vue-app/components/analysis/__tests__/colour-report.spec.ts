@@ -65,6 +65,11 @@ describe("colour report", () => {
     expect(renderedContrast(toContrastColor(grey((l ?? 0) - 0.02)), BG0)).toBeLessThan(AA_TEXT);
   });
 
+  it("returns null when even white cannot reach the ratio", () => {
+    // White on white is 1:1, so no grey can reach 4.5:1 over it.
+    expect(minLightnessFor("#ffffff")).toBeNull();
+  });
+
   it("returns no rows before a theme is loaded", () => {
     expect(colourRows(null)).toEqual([]);
   });
