@@ -336,6 +336,13 @@ function slicesVE(o: {
   zFar: number;
   candidates: number;
   maxBand: (z: number) => number;
+  /**
+   * Per world point, how much taller than maxBand a band may be there (≥ 1).
+   * A band only shows where its colour differs from what lies below it; on
+   * dark rock far from any light a tall band is invisible and only costs a
+   * slice. Defaults to 1 everywhere.
+   */
+  bandScale?: (x: number, z: number) => number;
   samples: number;
   tolerance: number;
   /** Level of a flat liquid surface: its edge is located exactly (fix 4). */
@@ -422,13 +429,37 @@ function slicesVE(o: {
   for (let i = C - 1; i >= 0; i--)
     env[i] = env[i + 1].map((e, k) => Math.min(e, prof[i + 1].pts[k].y));
 
-  // Greedy selection with the peak guard (fix 1).
+  // Greedy selection with the peak guard (fix 1), colour-aware (fix 9).
+  // A band's colour is constant downward, so a tall band only shows where
+  // the surface colour really changes across it. Where the geometric band is
+  // too tall, the colours of the two slices meeting there are compared
+  // (computed lazily, cached per candidate and sample); if they agree within
+  // the tolerance the band is accepted. Large dark faces and the plain then
+  // stop forcing a slice every few px, while lit rims and lava-lit flanks
+  // keep their thin bands.
+  // Just-noticeable step between two adjacent bands on a smooth face
+  // (OKLab); 0.06 showed as contour lines on the dark plain.
+  const BAND_JND = 0.025;
+  const colCache = new Map<number, string>();
+  const colOf = (ci: number, k: number) => {
+    const key = ci * (S + 1) + k;
+    let c = colCache.get(key);
+    if (c === undefined) {
+      c = shadeAt(prof[ci].xs[k], zs[ci], prof[ci].hs[k]);
+      colCache.set(key, c);
+    }
+    return c;
+  };
   const kept: number[] = [0];
   let cur = 0;
   const mid = new Array(S + 1);
+  const ones = new Array(S + 1).fill(1);
   while (cur < C) {
     let next = cur + 1;
     const maxBand = o.maxBand(zs[cur]);
+    const scale = o.bandScale
+      ? prof[cur].xs.map(x => (o.bandScale as (x: number, z: number) => number)(x, zs[cur]))
+      : ones;
     mid.fill(Number.POSITIVE_INFINITY);
     for (let j = cur + 1; j <= C; j++) {
       let band = 0;
@@ -436,9 +467,16 @@ function slicesVE(o: {
       for (let k = 0; k <= S; k++) {
         const top = prof[cur].pts[k].y;
         const bottom = Math.min(prof[j].pts[k].y, env[j][k]);
-        if (top < env[cur][k] + 1) band = Math.max(band, bottom - top);
+        if (top < env[cur][k] + 1) {
+          const b = (bottom - top) / scale[k];
+          if (b > maxBand && b > band && colourDist(colOf(cur, k), colOf(j, k)) > BAND_JND)
+            band = b;
+        }
         // A skipped candidate standing above both neighbours and in view.
-        if (mid[k] < Math.min(top, bottom) - PEAK && mid[k] < env[j][k]) peak = true;
+        // On dark rock (scale > 1) a skipped bump of a few px is as invisible
+        // as a tall band: the rough near plain no longer forces a slice per
+        // candidate.
+        if (mid[k] < Math.min(top, bottom) - PEAK * scale[k] && mid[k] < env[j][k]) peak = true;
       }
       if (band > maxBand || peak) break;
       next = j;
@@ -1000,6 +1038,26 @@ export function voidEmberMotif(p: BrickParams): ComposedWallpaper {
   };
 
   // ── The full height field ─────────────────────────────────────────────────
+  // Spatial index: the height field is sampled ~2 million times, and each
+  // sample used to test every spire. A grid of CELL-sized buckets lists, in
+  // the original order (smax is order-sensitive), the spires whose reach
+  // touches the cell; a sample only visits its own bucket. Same result.
+  const CELL = 4;
+  const buckets = new Map<number, Spire[]>();
+  const cellKey = (i: number, j: number) => i * 100003 + j;
+  for (const s of spires) {
+    const reach = s.r * 2.9 + Math.abs(s.lx * s.h) + Math.abs(s.lz * s.h);
+    for (let i = Math.floor((s.x - reach) / CELL); i <= Math.floor((s.x + reach) / CELL); i++)
+      for (let j = Math.floor((s.z - reach) / CELL); j <= Math.floor((s.z + reach) / CELL); j++) {
+        const k = cellKey(i, j);
+        const list = buckets.get(k);
+        if (list) list.push(s);
+        else buckets.set(k, [s]);
+      }
+  }
+  const NONE: Spire[] = [];
+  const spiresNear = (x: number, z: number) =>
+    buckets.get(cellKey(Math.floor(x / CELL), Math.floor(z / CELL))) ?? NONE;
   const rawHeight = (x: number, z: number) => {
     let g =
       0.4 + 0.2 * nPlain(x * 0.09, z * 0.09) + 0.08 * flatW(2.5, z) * nPlain2(x * 0.4, z * 0.4);
@@ -1008,7 +1066,7 @@ export function voidEmberMotif(p: BrickParams): ComposedWallpaper {
     g += 0.1 * flatW(1.2, z) * nPlain2(x * 0.85 + 31, z * 0.85);
     g = Math.max(0.15, g); // the plain never dips to lava level by itself
     g = smax(g, ledgeH(x, z), 0.5);
-    for (const s of spires) {
+    for (const s of spiresNear(x, z)) {
       const sh = spireH(s, x, z);
       if (sh > 0) g = smax(g, sh, 0.8);
     }
@@ -1662,6 +1720,24 @@ export function voidEmberMotif(p: BrickParams): ComposedWallpaper {
     const inner = [0.8, 0.2].map(f => project(cam, [tl + (tr - tl) * f, LAVA, zo]));
     return `<path d="${relPath([...l, ...r.reverse(), ...inner])}Z" fill="url(#${(ref as { id: string }).id})"/>`;
   };
+  // The terrain may keep tall bands on dark rock (bandScale), but the lava
+  // carries crust edges across the flow: a river piece is split into
+  // sub-pieces no taller than RIVER_BAND px, so those edges never step.
+  const RIVER_BAND = (2.5 * H) / 2160;
+  const riverPieces = (z0: number, z1: number) => {
+    if (z0 > PIECE_Z) return "";
+    const y0 = project(cam, [riverX(z0), LAVA, z0]).y;
+    const y1 = project(cam, [riverX(z1), LAVA, z1]).y;
+    const m = Math.max(1, Math.min(12, Math.ceil(Math.abs(y1 - y0) / RIVER_BAND)));
+    let out = "";
+    for (let i = 0; i < m; i++) {
+      // Evenly in 1/z, i.e. evenly on screen.
+      const za = 1 / (1 / z0 + ((1 / z1 - 1 / z0) * i) / m);
+      const zb = 1 / (1 / z0 + ((1 / z1 - 1 / z0) * (i + 1)) / m);
+      out += riverPiece(za, zb);
+    }
+    return out;
+  };
 
   // ── Terrain: adaptive depth slices, far → near ───────────────────────────
   const terrain = slicesVE({
@@ -1675,8 +1751,22 @@ export function voidEmberMotif(p: BrickParams): ComposedWallpaper {
     candidates: 3000,
     // Thin bands over the river (z 3–35): crust edges across the flow are
     // drawn by them, and 5 px bands showed as steps along those edges.
-    maxBand: z => (z < 35 ? 2.5 : z < 90 ? 5.5 : 7),
-    samples: 440,
+    maxBand: z => (z < 35 ? 3 : z < 90 ? 8 : 14),
+    // Far from every lava light the rock is near-black: bands there may be
+    // up to 2× taller without showing (the lava light falls off over R_EM).
+    bandScale: (x, z) => {
+      const ch = channel(x, z);
+      // Inside the main river the sub-divided river pieces paint over the
+      // slices, so the slice bands there are never seen.
+      if (ch.main && ch.d < 0 && z < PIECE_Z) return 6;
+      const dLava = Math.min(
+        ch.d,
+        Math.hypot(x - FALL.x, z - FALL.z) - 1,
+        Math.hypot(x - FAR_FALL.x, z - farSpire.z) - 1
+      );
+      return 1.25 + 0.75 * smooth(0.5 * R_EM, 2 * R_EM, dLava);
+    },
+    samples: 340,
     tolerance: 0.015,
     floor: LAVA,
     surface: (_lam, x, z, h, nrm) => {
@@ -1741,7 +1831,7 @@ export function voidEmberMotif(p: BrickParams): ComposedWallpaper {
       return col;
     },
     after: s => {
-      let out = riverPiece(s.z, s.zNext);
+      let out = riverPieces(s.z, s.zNext);
       for (const f of features) {
         if (done.has(f)) continue;
         if (f.z <= s.z && f.z > s.zNext) {

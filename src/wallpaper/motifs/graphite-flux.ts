@@ -101,6 +101,7 @@ import {
   valueNoise2D,
 } from "./scene3d.js";
 import {
+  colourDistance,
   grainBrick,
   keepLightness,
   lightness,
@@ -238,6 +239,31 @@ function depthSlices(o: GfSliceOptions): { defs: string; elements: string } {
   // from the last kept slice up to j − 1; the band a skipped stretch would
   // leave is the distance from there down to what covers it (slice j or
   // anything nearer). Hidden columns give a band ≤ 0 by construction.
+  // Colour-aware (as void-ember's fix 9): a stretch of skipped candidates
+  // only matters at a column where the colours of the two kept slices that
+  // meet there differ by more than BAND_JND (OKLab); a tall band of one
+  // smooth fogged tone is invisible. Colours are computed lazily and cached,
+  // and the painter below reuses them.
+  const BAND_JND = 0.012;
+  const COL_STRIDE = 3;
+  const colCache = new Map<number, string>();
+  const colOf = (ci: number, k: number) => {
+    const key = ci * (S + 1) + k;
+    let c = colCache.get(key);
+    if (c === undefined) {
+      const z = zs[ci];
+      const x = prof[ci].xs[k];
+      const eps = epsAt(z);
+      const dx = (o.height(x + eps * z, z) - o.height(x - eps * z, z)) / (2 * eps * z);
+      const dz = (o.height(x, z + eps * z) - o.height(x, z - eps * z)) / (2 * eps * z);
+      const nrm = norm3([-dx, 1, -dz]);
+      const lam = Math.max(0, nrm[0] * L[0] + nrm[1] * L[1] + nrm[2] * L[2]);
+      const hz = Math.min(o.atm.max ?? 0.85, 1 - Math.exp(-z / o.atm.visibility));
+      c = mix(o.surface(lam, x, z, prof[ci].hs[k], nrm), o.atm.haze, hz);
+      colCache.set(key, c);
+    }
+    return c;
+  };
   const kept: number[] = [0];
   let cur = 0;
   const colTop = new Array(S + 1);
@@ -249,7 +275,13 @@ function depthSlices(o: GfSliceOptions): { defs: string; elements: string } {
       let band = 0;
       for (let k = 0; k <= S; k++) {
         const cover = Math.min(prof[j].pts[k].y, env[j][k]);
-        band = Math.max(band, cover - colTop[k]);
+        const b = cover - colTop[k];
+        // The colour test reads every COL_STRIDE-th column (the fogged colour
+        // field is smooth across x): it ran for every skipped candidate, and
+        // at full resolution it dominated the compose time.
+        const kc = k - (k % COL_STRIDE);
+        if (b > maxBand && b > band && colourDistance(colOf(cur, kc), colOf(j, kc)) > BAND_JND)
+          band = b;
       }
       if (band > maxBand) break;
       next = j;
@@ -264,22 +296,13 @@ function depthSlices(o: GfSliceOptions): { defs: string; elements: string } {
   // The last fill emitted, kept with its stops so the next slice can reuse it.
   let last: { fill: string; stops: Array<{ sx: number; rgb: V3 }> } | null = null;
   kept.forEach((ci, idx) => {
-    const z = zs[ci];
-    const { xs, hs, pts } = prof[ci];
+    const { pts } = prof[ci];
     const nearer = idx + 1 < kept.length ? kept[idx + 1] : -1;
     const front = nearer < 0 ? new Array(S + 1).fill(cam.H) : env[ci];
     const visible = pts.map((q, k) => q.y < front[k] + 1);
     if (!visible.some(Boolean)) return;
-    const hz = Math.min(o.atm.max ?? 0.85, 1 - Math.exp(-z / o.atm.visibility));
-    const eps = epsAt(z);
-    const colour = (k: number) => {
-      const x = xs[k];
-      const dx = (o.height(x + eps * z, z) - o.height(x - eps * z, z)) / (2 * eps * z);
-      const dz = (o.height(x, z + eps * z) - o.height(x, z - eps * z)) / (2 * eps * z);
-      const nrm = norm3([-dx, 1, -dz]);
-      const lam = Math.max(0, nrm[0] * L[0] + nrm[1] * L[1] + nrm[2] * L[2]);
-      return mix(o.surface(lam, x, z, hs[k], nrm), o.atm.haze, hz);
-    };
+    // Same colour the selection computed (and cached) for this slice.
+    const colour = (k: number) => colOf(ci, k);
     // Outline: visible samples and their neighbours; inside hidden runs every
     // 4th sample, pushed below what covers it so no chord rises into view.
     const keep = pts.map(

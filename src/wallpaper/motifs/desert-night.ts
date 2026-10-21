@@ -225,6 +225,27 @@ function duneSlices(
   for (let i = C - 1; i >= 0; i--)
     env[i] = env[i + 1].map((e, k) => Math.min(e, prof[i + 1].pts[k].y));
 
+  // Colour-aware selection (as void-ember's fix 9): a band's colour is
+  // constant downward, so a band taller than maxBand only matters where the
+  // colours of the two slices meeting there differ by more than BAND_JND.
+  // Colours are computed lazily, only where the geometric test fails.
+  const BAND_JND = 0.015;
+  const colCache = new Map<number, string>();
+  const colOf = (ci: number, k: number) => {
+    const key = ci * (S + 1) + k;
+    let c = colCache.get(key);
+    if (c === undefined) {
+      const z = zs[ci];
+      const x = prof[ci].xs[k];
+      const dx = (o.height(x + eps * z, z) - o.height(x - eps * z, z)) / (2 * eps * z);
+      const dz = (o.height(x, z + eps * z) - o.height(x, z - eps * z)) / (2 * eps * z);
+      const nrm = norm3([-dx, 1, -dz]);
+      const lam = Math.max(0, nrm[0] * L[0] + nrm[1] * L[1] + nrm[2] * L[2]);
+      c = mix(o.surface(lam, x, z, prof[ci].hs[k], nrm), o.atm.haze, hazeAt(o.atm, z));
+      colCache.set(key, c);
+    }
+    return c;
+  };
   const kept: number[] = [0];
   let cur = 0;
   while (cur < C) {
@@ -238,7 +259,12 @@ function duneSlices(
         for (let k = 0; k <= S && !over; k++) {
           const top = prof[cur].pts[k].y;
           const bottom = Math.min(prof[j].pts[k].y, env[j][k]);
-          if (top < env[cur][k] + 1 && bottom - top > lim[k]) over = true;
+          if (
+            top < env[cur][k] + 1 &&
+            bottom - top > lim[k] &&
+            colourDist(colOf(cur, k), colOf(j, k)) > BAND_JND
+          )
+            over = true;
         }
         if (over) break;
         next = j;
@@ -257,15 +283,8 @@ function duneSlices(
     const front = nearer < 0 ? new Array(S + 1).fill(cam.H) : env[ci];
     const visible = pts.map((q, k) => q.y < front[k] + 1);
     if (!visible.some(Boolean)) return;
-    const hz = hazeAt(o.atm, z);
-    const colour = (k: number) => {
-      const x = xs[k];
-      const dx = (o.height(x + eps * z, z) - o.height(x - eps * z, z)) / (2 * eps * z);
-      const dz = (o.height(x, z + eps * z) - o.height(x, z - eps * z)) / (2 * eps * z);
-      const nrm = norm3([-dx, 1, -dz]);
-      const lam = Math.max(0, nrm[0] * L[0] + nrm[1] * L[1] + nrm[2] * L[2]);
-      return mix(o.surface(lam, x, z, hs[k], nrm), o.atm.haze, hz);
-    };
+    // Same colour as the selection computed (and cached) for this slice.
+    const colour = (k: number) => colOf(ci, k);
     // Hidden runs: every 4th sample, pushed below what covers it (as upstream).
     const keep = pts.map(
       (_, k) => visible[k] || visible[k - 1] || visible[k + 1] || k % 4 === 0 || k === S
@@ -293,7 +312,17 @@ function duneSlices(
     const sxs = vis.map(k => pts[k].x);
     const keepIdx = [0];
     let a = 0;
+    // Segments are capped at FIT_MAX samples: the fit re-checks every sample
+    // of the open segment for each new end point (quadratic in its length),
+    // and on long smooth dune flanks that dominated the compose time. A cap
+    // only ever adds a stop, so the gradient stays at least as accurate.
+    const FIT_MAX = 48;
     for (let b = 2; b < vis.length; b++) {
+      if (b - a > FIT_MAX) {
+        keepIdx.push(b - 1);
+        a = b - 1;
+        continue;
+      }
       const span = sxs[b] - sxs[a];
       let ok = true;
       for (let j = a + 1; j < b && ok; j++) {
@@ -666,16 +695,16 @@ export function desertNightMotif(p: BrickParams): ComposedWallpaper {
     zFar: 220,
     // Dense candidates: near the horizon 1/z spacing is sparse, and an oblique
     // far crest then shows as scalloped teeth on the skyline.
-    candidates: 5000,
+    candidates: 3200,
     // 3D2-04: the slip-face hatch had two causes, measured with
     // spike/wallpapers/desert-night-slip-diag.ts (|ΔL| at slice boundaries):
     // gradient-stop error (fixed by the piecewise-linear fit in duneSlices)
     // and the band itself, since the dark slip face changes colour fast with
     // depth. So the band halves (6 → 3 px) on the hero's slip side and just
     // under its brink, and stays 6 px on the calm windward flank and field.
-    maxBand: z => (z < 30 ? 6 : 3) * (W / 3840),
+    maxBand: z => (z < 30 ? 6 : 4) * (W / 3840),
     bandScale: (x, z) => 1 - 0.5 * heroSlip(x, z),
-    samples: Math.round(520 * Math.min(1, W / 3840) + 120),
+    samples: Math.round(400 * Math.min(1, W / 3840) + 100),
     // Fit tolerance in OKLab: 0.005 is about one 8-bit level in this dark
     // sand (≈ 0.0046 L); the grain covers the rest. Halving it on the slip
     // face cost ~8k elements (split-complementary 32k > 30k budget), so no.

@@ -65,17 +65,61 @@ export function fbm1D(rng: () => number, octaves: number): (x: number) => number
 
 // ─── Colour ──────────────────────────────────────────────────────────────────
 
-/** Mix two palette colours in OKLab; t = 0 → a, t = 1 → b. */
 type Lab = { l: number; a: number; b: number };
 const toOklab = converter("oklab") as (c: string) => Lab | undefined;
 
+// The 3D scenes call mix() millions of times per wallpaper (every visible
+// sample of every depth slice). Parsing the hex strings and walking culori's
+// converter graph each time dominated the compose time, so the OKLab value of
+// each colour string is cached and the way back to hex is inlined below with
+// culori's exact constants and rounding: the output is byte-identical.
+const labCache = new Map<string, Lab | undefined>();
+function labOf(c: string): Lab | undefined {
+  let v = labCache.get(c);
+  if (v === undefined && !labCache.has(c)) {
+    v = toOklab(c);
+    labCache.set(c, v);
+  }
+  return v;
+}
+
+/** sRGB gamma, as culori's convertLrgbToRgb. */
+const gamma = (c: number) => {
+  const abs = Math.abs(c);
+  return abs > 0.0031308 ? (Math.sign(c) || 1) * (1.055 * abs ** (1 / 2.4) - 0.055) : c * 12.92;
+};
+/** 0–1 channel to two hex digits, as culori's formatHex (clamp, round). */
+const hex2 = (v: number) =>
+  Math.round(Math.max(0, Math.min(1, v || 0)) * 255)
+    .toString(16)
+    .padStart(2, "0");
+
+/** OKLab → "#rrggbb", identical to culori's formatHex({ mode: "oklab", … }). */
+function oklabHex(l: number, a: number, b: number): string {
+  const L = (l + 0.3963377773761749 * a + 0.2158037573099136 * b) ** 3;
+  const M = (l - 0.1055613458156586 * a - 0.0638541728258133 * b) ** 3;
+  const S = (l - 0.0894841775298119 * a - 1.2914855480194092 * b) ** 3;
+  const r = 4.0767416360759574 * L - 3.3077115392580616 * M + 0.2309699031821044 * S;
+  const g = -1.2684379732850317 * L + 2.6097573492876887 * M - 0.3413193760026573 * S;
+  const bl = -0.0041960761386756 * L - 0.7034186179359362 * M + 1.7076146940746117 * S;
+  return `#${hex2(gamma(r))}${hex2(gamma(g))}${hex2(gamma(bl))}`;
+}
+
+/** Perceptual distance of two colours (Euclidean in OKLab, cached parse). */
+export function colourDistance(a: string, b: string): number {
+  const p = labOf(a);
+  const q = labOf(b);
+  if (!p || !q) return 0;
+  return Math.hypot(p.l - q.l, p.a - q.a, p.b - q.b);
+}
+
+/** Mix two palette colours in OKLab; t = 0 → a, t = 1 → b. */
 export function mix(a: string, b: string, t: number): string {
-  const p = toOklab(a);
-  const q = toOklab(b);
+  const p = labOf(a);
+  const q = labOf(b);
   if (!p || !q) return a;
   const k = Math.min(1, Math.max(0, t));
-  const lerp = (u: number, v: number) => u + (v - u) * k;
-  return formatHex({ mode: "oklab", l: lerp(p.l, q.l), a: lerp(p.a, q.a), b: lerp(p.b, q.b) });
+  return oklabHex(p.l + (q.l - p.l) * k, p.a + (q.a - p.a) * k, p.b + (q.b - p.b) * k);
 }
 
 /** Scale a palette colour's OKLCH lightness (k < 1 darkens) — a palette-derived deep tone. */
