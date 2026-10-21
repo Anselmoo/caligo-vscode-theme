@@ -30,10 +30,13 @@ export type ThemeColors = Record<
 export type ThemeEntry = {
   key: string;
   seedId: string;
+  seedSlug: string;
   seedLabel: string;
   harmonyId: string;
   harmonyLabel: string;
   displayName: string;
+  /** The exact name VS Code lists under "Preferences: Color Theme". */
+  vscodeLabel: string;
   colors: ThemeColors;
   core: Array<{ key: string; hex: string }>;
 };
@@ -100,11 +103,19 @@ export async function applyThemeViaPalette(page: Page, query: string): Promise<v
   await expect(dialog).toBeHidden();
 }
 
-/** `data-theme-id`s of the theme cards that are currently visible. */
-export async function visibleThemeIds(page: Page): Promise<string[]> {
-  return page
-    .locator("#main [data-theme-card]:visible")
-    .evaluateAll(cards => cards.map(card => card.getAttribute("data-theme-id") ?? ""));
+/** The Theme Spectrum section (Home and Themes render the same component). */
+export function spectrum(page: Page) {
+  return page.locator('#main section[aria-labelledby="spectrum-title"]');
+}
+
+/** One Spectrum chip, addressed by the manifest theme key. */
+export function chipFor(page: Page, key: string) {
+  return spectrum(page).locator(`button[data-chip][data-key="${key}"]`);
+}
+
+/** `?theme=` value for a variant: "<seed slug>-<harmony id>", e.g. "eclipse-triadic". */
+export function themeSlug(theme: ThemeEntry): string {
+  return `${theme.seedSlug}-${theme.harmonyId}`;
 }
 
 /** Smallest angular distance between two hues, in degrees. */

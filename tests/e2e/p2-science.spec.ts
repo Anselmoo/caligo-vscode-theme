@@ -8,6 +8,9 @@
  * Why culori here: themes-manifest.json carries wrong OKLCH metadata for some
  * colours (in Deep Sable, `types` is #ce8545, L 0.68 by measurement, but the
  * manifest says L 0.92). The page must show what the hex actually is.
+ *
+ * No shipped core colour is translucent any more, so the compositing path is
+ * exercised against a manifest served with a translucent `strings` (page.route).
  */
 
 import { expect, type Page, test } from "@playwright/test";
@@ -19,6 +22,7 @@ import {
   hueDistance,
   loadThemeManifest,
   type ThemeEntry,
+  type ThemeManifest,
   themeByKey,
 } from "./support/app";
 
@@ -59,12 +63,30 @@ async function expectOklchMatchesHex(page: Page, theme: ThemeEntry, key: string)
   await expect(cells, "the visible text shows L to two decimals").toContainText(truth.l.toFixed(2));
 }
 
-test.beforeEach(async ({ page }) => {
+async function openScience(page: Page) {
   await gotoApp(page, "/#/science");
   await expect(page.locator("#main h1")).toBeVisible();
-});
+}
+
+/**
+ * Serve the real manifest, except that the default theme's `strings` (in `colors` and in
+ * its matching `core` entry) is `hex`, a translucent #rrggbbaa value.
+ */
+async function serveTranslucentStrings(page: Page, hex: string) {
+  await page.route("**/themes-manifest.json", async route => {
+    const data = (await (await route.fetch()).json()) as ThemeManifest;
+    const theme = data.themes[data.defaultThemeKey];
+    theme.colors.strings = hex;
+    for (const entry of theme.core) if (entry.key === "strings") entry.hex = hex;
+    await route.fulfill({ json: data });
+  });
+}
 
 test.describe("Science page: one report for the current theme", { tag: "@science" }, () => {
+  test.beforeEach(async ({ page }) => {
+    await openScience(page);
+  });
+
   test("shows the lightness and OKLCH views together", async ({ page }) => {
     await expect(page.locator('#main [data-science-view="lightness"]')).toBeVisible();
     await expect(page.locator('#main [data-science-view="oklch"]')).toBeVisible();
@@ -91,6 +113,10 @@ test.describe("Science page: one report for the current theme", { tag: "@science
 test.describe("Science page: OKLCH comes from the hex, not the manifest", {
   tag: "@science",
 }, () => {
+  test.beforeEach(async ({ page }) => {
+    await openScience(page);
+  });
+
   for (const key of ["types", "keywords", "functions", "strings", "accent", "bg0"]) {
     test(`${key} matches culori's conversion of its hex within 0.01`, async ({ page }) => {
       await expectOklchMatchesHex(page, defaultTheme, key);
@@ -99,11 +125,25 @@ test.describe("Science page: OKLCH comes from the hex, not the manifest", {
 });
 
 test.describe("Science page: honest contrast", { tag: "@science" }, () => {
+  test("no shipped core colour is translucent", async () => {
+    for (const theme of Object.values(manifest.themes)) {
+      for (const [key, hex] of Object.entries(theme.colors)) {
+        expect(hex, `${theme.key} ${key}`).toMatch(/^#[0-9a-f]{6}$/i);
+      }
+      for (const { key, hex } of theme.core)
+        expect(hex, `${theme.key} core ${key}`).toMatch(/^#[0-9a-f]{6}$/i);
+    }
+  });
+
   test("a translucent colour is reported after compositing over its background", async ({
     page,
   }) => {
-    const { bg0, strings } = defaultTheme.colors;
-    expect(strings, "strings is translucent (#rrggbbaa) in every theme").toMatch(/^#[0-9a-f]{8}$/i);
+    // 50% opaque: far enough from the opaque reading to tell the two apart.
+    const strings = `${defaultTheme.colors.strings.slice(0, 7)}80`;
+    const { bg0 } = defaultTheme.colors;
+    await serveTranslucentStrings(page, strings);
+    await openScience(page);
+
     const composited = renderedContrast(strings, bg0);
     const opaque = wcagContrast(strings, bg0);
     expect(
@@ -121,6 +161,7 @@ test.describe("Science page: honest contrast", { tag: "@science" }, () => {
     await expect(cell).toContainText(composited.toFixed(1));
 
     const alphaPercent = Math.round((toOklch(strings).alpha ?? 1) * 100);
+    expect(alphaPercent).toBe(50);
     await expect(
       page.locator('#main [data-oklch-row][data-color-key="strings"]'),
       "the row says the colour is translucent"
@@ -128,6 +169,7 @@ test.describe("Science page: honest contrast", { tag: "@science" }, () => {
   });
 
   test("an opaque colour reports its plain contrast over the background", async ({ page }) => {
+    await openScience(page);
     const { bg0, keywords } = defaultTheme.colors;
     const expected = renderedContrast(keywords, bg0);
     const cell = page.locator('#main [data-contrast-key="keywords"]');
