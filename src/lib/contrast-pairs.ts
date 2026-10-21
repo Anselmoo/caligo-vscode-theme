@@ -1472,6 +1472,17 @@ export const CODE_STACKS: readonly string[] = [
   "editor.background>mergeEditor.change.background",
   "editor.background>inlineChatDiff.removed",
   "editor.background>inlineChatDiff.inserted",
+  // Selection and occurrence highlights: code under them keeps its token colors. (Find matches are
+  // not listed: the themes set editor.findMatchForeground / findMatchHighlightForeground, which
+  // replace the token colors of matched text; the registry pairs above gate those.
+  // editor.selectionForeground applies to high-contrast themes only, so selected code is still
+  // painted in token colors.)
+  "editor.background>editor.lineHighlightBackground>editor.selectionBackground",
+  "editor.background>diffEditor.removedLineBackground>editor.selectionBackground",
+  "editor.background>diffEditor.insertedLineBackground>editor.selectionBackground",
+  "editor.background>editor.selectionHighlightBackground",
+  "editor.background>editor.wordHighlightBackground",
+  "editor.background>editor.wordHighlightStrongBackground",
 ];
 
 /**
