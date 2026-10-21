@@ -1,158 +1,86 @@
 <script setup lang="ts">
-const currentYear = new Date().getFullYear();
-void currentYear;
+import { RouterLink } from "vue-router";
+
+const REPO = "https://github.com/Anselmoo/caligo-vscode-theme";
+const MARKETPLACE =
+  "https://marketplace.visualstudio.com/items?itemName=AnselmHahn.caligo-vscode-theme";
+const year = new Date().getFullYear();
+
+void RouterLink;
+void REPO;
+void MARKETPLACE;
+void year;
 </script>
 
 <template>
-  <footer class="app-footer">
-    <div class="footer-container container">
-      <div class="footer-content">
-        <div class="footer-left">
-          <p class="footer-text">
-            &copy; {{ currentYear }} Anselm Hahn. MIT Licensed.
-          </p>
-          <p class="footer-tagline">
-            Built with <i class="pi pi-heart-fill"></i> for developers who code after dark <i class="pi pi-moon"></i>
-          </p>
-        </div>
-        <div class="footer-links">
-          <a 
-            href="https://marketplace.visualstudio.com/items?itemName=AnselmHahn.caligo-vscode-theme"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="footer-link"
-          >
-            <i class="pi pi-microsoft"></i>
-            <span>Marketplace</span>
-          </a>
-          <a 
-            href="https://github.com/Anselmoo/caligo-vscode-theme"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="footer-link"
-          >
-            <i class="pi pi-github"></i>
-            <span>GitHub</span>
-          </a>
-          <a 
-            href="https://github.com/Anselmoo/caligo-vscode-theme/blob/main/docs/ENHANCED_DOCUMENTATION.md"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="footer-link"
-          >
-            <i class="pi pi-book"></i>
-            <span>Gallery</span>
-          </a>
-          <a 
-            href="https://github.com/Anselmoo/caligo-vscode-theme/blob/main/CONTRIBUTING.md"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="footer-link"
-          >
-            <i class="pi pi-users"></i>
-            <span>Contributing</span>
-          </a>
-          <a 
-            href="https://github.com/Anselmoo/caligo-vscode-theme/blob/main/LICENSE"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="footer-link"
-          >
-            <i class="pi pi-file"></i>
-            <span>License</span>
-          </a>
-        </div>
-      </div>
+  <footer class="footer">
+    <div class="footer__inner">
+      <p class="footer__note">Caligo is open source under the MIT license. Copyright {{ year }} Anselm Hahn.</p>
+      <nav class="footer__nav" aria-label="Footer">
+        <RouterLink class="footer__link" to="/themes">Themes</RouterLink>
+        <a class="footer__link" :href="MARKETPLACE" target="_blank" rel="noopener noreferrer"
+          >Marketplace</a
+        >
+        <a class="footer__link" :href="REPO" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a
+          class="footer__link"
+          :href="`${REPO}/blob/main/LICENSE`"
+          target="_blank"
+          rel="noopener noreferrer"
+          >License</a
+        >
+      </nav>
     </div>
   </footer>
 </template>
 
 <style scoped>
-.app-footer {
-  background: var(--bg0);
-  border-top: 1px solid var(--border-color);
-  padding: var(--space-xl) 0;
+.footer {
   margin-top: auto;
+  border-top: 1px solid color-mix(in oklab, var(--fg0) 10%, transparent);
+  background: var(--bg0);
+  font-family: var(--font-sans);
 }
 
-.footer-content {
+.footer__inner {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  gap: var(--space-lg);
+  gap: 12px 40px;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 28px var(--gutter);
 }
 
-.footer-left {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-}
-
-.footer-text {
+.footer__note {
+  max-width: var(--measure);
+  margin: 0;
   color: var(--fg-muted);
-  font-size: var(--text-sm);
+  font-size: var(--step--1);
+  line-height: 1.5;
 }
 
-.footer-tagline {
+.footer__nav {
   display: flex;
-  align-items: center;
-  gap: var(--space-xs);
+  flex-wrap: wrap;
+  gap: 4px 20px;
+}
+
+.footer__link {
+  padding: 4px 0;
   color: var(--fg-muted);
-  font-size: var(--text-xs);
-  font-style: italic;
+  font-size: var(--step--1);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, var(--fg-muted) 45%, transparent);
+  text-underline-offset: 4px;
+  /* Colour changes with the theme go through a View Transition; a global colour
+     transition on links would tween from the pre-theme default on first paint. */
+  transition: none;
 }
 
-.footer-tagline i.pi-heart-fill {
-  color: var(--accent-alt, var(--accent));
-  font-size: 12px;
-}
-
-.footer-tagline i.pi-moon {
-  color: var(--accent);
-  font-size: 12px;
-}
-
-.footer-links {
-  display: flex;
-  gap: var(--space-lg);
-}
-
-.footer-link {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-xs);
+.footer__link:hover {
   color: var(--fg-muted);
-  font-size: var(--text-sm);
-  transition: all var(--transition-fast);
-  text-decoration: none;
-}
-
-.footer-link i {
-  font-size: 16px;
-  transition: transform var(--transition-fast);
-}
-
-.footer-link:hover {
-  color: var(--accent);
-}
-
-.footer-link:hover i {
-  transform: translateY(-2px);
-}
-
-@media (max-width: 640px) {
-  .footer-content {
-    flex-direction: column;
-    text-align: center;
-  }
-  
-  .footer-left {
-    align-items: center;
-  }
-  
-  .footer-links {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
+  text-decoration-color: currentColor;
 }
 </style>

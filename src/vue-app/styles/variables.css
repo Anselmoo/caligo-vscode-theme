@@ -57,13 +57,30 @@
   --radius-xl: 16px;
   --radius-full: 9999px;
 
-  /* Typography */
+  /* Typography
+   * Martian Mono (display + code): Caligo is about code, so headlines are set in
+   * a coding face; its width axis lets display type run wide without growing.
+   * Hanken Grotesk (body): a quiet grotesk that stays readable at small sizes. */
   --font-sans:
-    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
-  --font-mono:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
-    monospace;
+    "Hanken Grotesk Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Martian Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-mono: "Martian Mono Variable", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Fluid type scale (perfect-fourth steps, clamped between phone and desktop) */
+  --step--1: clamp(0.8rem, 0.78rem + 0.1vw, 0.86rem);
+  --step-0: clamp(0.95rem, 0.92rem + 0.15vw, 1.05rem);
+  --step-1: clamp(1.15rem, 1.08rem + 0.35vw, 1.4rem);
+  --step-2: clamp(1.4rem, 1.25rem + 0.75vw, 1.9rem);
+  --step-3: clamp(1.8rem, 1.45rem + 1.6vw, 2.9rem);
+  --step-4: clamp(2.2rem, 1.6rem + 2.9vw, 4.1rem);
+
+  /* Measure and gutters */
+  --measure: 62ch;
+  --gutter: clamp(16px, 4vw, 56px);
+  --page-max: 1320px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 
   /* Font sizes */
   --text-xs: 11px;

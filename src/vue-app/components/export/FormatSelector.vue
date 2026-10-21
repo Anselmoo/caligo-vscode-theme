@@ -18,9 +18,9 @@ void onChange;
 </script>
 
 <template>
-  <label class="format-selector">
-    <span>Format</span>
-    <select :value="modelValue" @change="onChange">
+  <label class="format">
+    <span class="format__label">Format</span>
+    <select class="format__select" :value="modelValue" @change="onChange">
       <option v-for="option in options" :key="option" :value="option">
         {{ labels?.[option] ?? option }}
       </option>
@@ -29,16 +29,31 @@ void onChange;
 </template>
 
 <style scoped>
-.format-selector {
+.format {
   display: grid;
-  gap: var(--space-xs);
+  gap: 6px;
+  min-width: 0;
 }
 
-select {
+.format__label {
+  color: var(--fg1);
+  font-size: var(--step--1);
+  font-weight: 500;
+}
+
+.format__select {
+  height: 44px;
+  min-width: min(100%, 16rem);
+  padding: 0 12px;
+  border: 1px solid color-mix(in oklab, var(--fg0) 22%, transparent);
+  border-radius: 10px;
   background: var(--bg1);
   color: var(--fg0);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  padding: var(--space-xs) var(--space-sm);
+  font: inherit;
+  font-size: var(--step-0);
+}
+
+.format__select:hover {
+  border-color: color-mix(in oklab, var(--fg0) 40%, transparent);
 }
 </style>

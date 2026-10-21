@@ -8,19 +8,34 @@
 
 body {
   background: var(--bg0);
-  color: var(--text-primary);
+  color: var(--fg0);
   color-scheme: dark;
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 #app {
   min-height: 100vh;
 }
 
-/* Smooth transitions for theme changes */
-* {
-  transition-property: background-color, border-color, color, fill, stroke;
-  transition-duration: var(--transition-fast);
-  transition-timing-function: ease-in-out;
+/* Theme and route changes animate through the View Transitions API
+ * (see useTheme.setTheme and router/index.ts), not a transition on every
+ * element: one composited cross-fade instead of thousands of colour tweens. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 260ms;
+  animation-timing-function: var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none;
+  }
 }
 
 /* Focus styles for accessibility */
@@ -62,9 +77,9 @@ body {
 
 /* Utility classes */
 .container {
-  max-width: 1400px;
+  max-width: var(--page-max);
   margin: 0 auto;
-  padding: 0 var(--space-lg);
+  padding: 0 var(--gutter);
 }
 
 .section {

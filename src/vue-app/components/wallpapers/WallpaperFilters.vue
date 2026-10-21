@@ -1,16 +1,18 @@
 <script setup lang="ts">
+/**
+ * Controls for the wallpaper grid. Platform leads because it changes every
+ * thumbnail's shape and the file you download; theme and mode only narrow the list.
+ */
+import { PLATFORM_SIZES } from "../../../wallpaper/types.js";
 import type { WallpaperFilter } from "../../composables/useWallpapers";
 
-const _props = defineProps<{
+const props = defineProps<{
   filter: WallpaperFilter;
   seeds: Array<{ id: string; label: string }>;
-  modes: Array<{ id: string; label: string; topic: string }>;
+  modes: Array<{ id: string; label: string }>;
 }>();
 
-const emit = defineEmits<{
-  update: [patch: Partial<WallpaperFilter>];
-  reset: [];
-}>();
+const emit = defineEmits<{ update: [patch: Partial<WallpaperFilter>] }>();
 
 const platforms = [
   { id: "monitor", label: "Monitor" },
@@ -18,154 +20,188 @@ const platforms = [
   { id: "mobile", label: "Mobile" },
 ] as const;
 
-const textVariants = [
-  { id: "no-text", label: "No text" },
-  { id: "text", label: "With text" },
-] as const;
+function resolution(): string {
+  const { width, height } = PLATFORM_SIZES[props.filter.platform ?? "monitor"];
+  return `${width} × ${height} px`;
+}
 
-// Silence biome: all vars below are used in the Vue template
+function onSelect(key: "seedId" | "harmonyMode", event: Event) {
+  emit("update", { [key]: (event.target as HTMLSelectElement).value || null });
+}
+
 void emit;
 void platforms;
-void textVariants;
+void resolution;
+void onSelect;
 </script>
 
 <template>
-  <div class="wallpaper-filters">
-    <!-- Platform (always visible) -->
-    <div class="filter-group">
-      <label class="filter-label">Platform</label>
-      <div class="chip-row">
+  <div class="controls">
+    <div class="controls__platform">
+      <div class="segmented" role="group" aria-label="Platform" data-platform-toggle>
         <button
           v-for="p in platforms"
           :key="p.id"
-          class="chip"
-          :class="{ active: filter.platform === p.id }"
+          type="button"
+          class="segmented__btn"
+          :aria-pressed="filter.platform === p.id"
           @click="emit('update', { platform: p.id })"
-        >{{ p.label }}</button>
+        >
+          {{ p.label }}
+        </button>
       </div>
+      <p class="controls__size">{{ resolution() }}</p>
     </div>
 
-    <!-- Text variant -->
-    <div class="filter-group">
-      <label class="filter-label">Text</label>
-      <div class="chip-row">
-        <button
-          v-for="v in textVariants"
-          :key="v.id"
-          class="chip"
-          :class="{ active: filter.textVariant === v.id }"
-          @click="emit('update', { textVariant: v.id })"
-        >{{ v.label }}</button>
+    <div class="controls__filters">
+      <div class="field">
+        <label class="field__label" for="wallpaper-theme">Theme</label>
+        <select
+          id="wallpaper-theme" class="field__select" :value="filter.seedId ?? ''" @change="onSelect('seedId', $event)">
+          <option value="">All themes</option>
+          <option v-for="s in seeds" :key="s.id" :value="s.id">{{ s.label }}</option>
+        </select>
       </div>
-    </div>
 
-    <!-- Seed filter -->
-    <div class="filter-group">
-      <label class="filter-label">Theme</label>
-      <select
-        class="filter-select"
-        :value="filter.seedId ?? ''"
-        @change="emit('update', { seedId: ($event.target as HTMLSelectElement).value || null })"
-      >
-        <option value="">All themes</option>
-        <option v-for="s in seeds" :key="s.id" :value="s.id">{{ s.label }}</option>
-      </select>
-    </div>
+      <div class="field">
+        <label class="field__label" for="wallpaper-mode">Mode</label>
+        <select
+          id="wallpaper-mode" class="field__select" :value="filter.harmonyMode ?? ''" @change="onSelect('harmonyMode', $event)">
+          <option value="">All modes</option>
+          <option v-for="m in modes" :key="m.id" :value="m.id">{{ m.label }}</option>
+        </select>
+      </div>
 
-    <!-- Mode filter -->
-    <div class="filter-group">
-      <label class="filter-label">Mode / Topic</label>
-      <select
-        class="filter-select"
-        :value="filter.harmonyMode ?? ''"
-        @change="emit('update', { harmonyMode: ($event.target as HTMLSelectElement).value || null })"
-      >
-        <option value="">All modes</option>
-        <option v-for="m in modes" :key="m.id" :value="m.id">{{ m.label }} · {{ m.topic }}</option>
-      </select>
+      <label class="check">
+        <input
+          type="checkbox"
+          :checked="filter.textVariant === 'text'"
+          @change="emit('update', { textVariant: ($event.target as HTMLInputElement).checked ? 'text' : 'no-text' })"
+        />
+        <span>With caption text</span>
+      </label>
     </div>
-
-    <!-- Reset -->
-    <button class="reset-btn" @click="emit('reset')">Reset filters</button>
   </div>
 </template>
 
 <style scoped>
-.wallpaper-filters {
+.controls {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-md);
   align-items: flex-end;
-  padding: var(--space-md) 0;
-  border-bottom: 1px solid var(--border-color);
+  justify-content: space-between;
+  gap: 20px 40px;
 }
 
-.filter-group {
+.controls__platform {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
 }
 
-.filter-label {
-  font-size: var(--text-xs);
-  color: var(--fg2);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+.segmented {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 10px;
+  background: color-mix(in oklab, var(--fg0) 8%, var(--bg0));
 }
 
-.chip-row {
-  display: flex;
-  gap: var(--space-xs);
-}
-
-.chip {
-  padding: 4px 12px;
-  border-radius: var(--radius-full);
-  border: 1px solid var(--border-color);
+.segmented__btn {
+  min-width: 88px;
+  height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 8px;
   background: transparent;
-  color: var(--fg2);
-  font-size: var(--text-sm);
+  color: var(--fg1);
+  font: inherit;
+  font-size: var(--step-0);
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.1s, color 0.1s, border-color 0.1s;
+  transition: background var(--transition-fast), color var(--transition-fast);
 }
 
-.chip.active,
-.chip:hover {
-  background: var(--accent);
-  border-color: var(--accent);
+.segmented__btn:hover {
+  color: var(--fg0);
+}
+
+.segmented__btn[aria-pressed="true"] {
+  background: var(--fg0);
   color: var(--bg0);
 }
 
-.filter-select {
-  padding: 4px 8px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-color);
-  background: var(--bg1);
+.controls__size {
+  margin: 0;
   color: var(--fg1);
-  font-size: var(--text-sm);
-  cursor: pointer;
-  min-width: 160px;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
 }
 
-.filter-select:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+.controls__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px 20px;
 }
 
-.reset-btn {
-  padding: 4px 14px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-color);
-  background: transparent;
-  color: var(--fg2);
-  font-size: var(--text-sm);
-  cursor: pointer;
-  transition: color 0.1s, border-color 0.1s;
-  align-self: flex-end;
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.reset-btn:hover {
+.field__label {
+  color: var(--fg1);
+  font-size: var(--step--1);
+}
+
+.field__select {
+  height: 40px;
+  min-width: 11rem;
+  padding: 0 12px;
+  border: 1px solid color-mix(in oklab, var(--fg0) 22%, transparent);
+  border-radius: 8px;
+  background: var(--bg1);
   color: var(--fg0);
-  border-color: var(--fg2);
+  font: inherit;
+  font-size: var(--step-0);
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  color: var(--fg0);
+  font-size: var(--step-0);
+  cursor: pointer;
+}
+
+.check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--fg0);
+}
+
+@media (max-width: 640px) {
+  .segmented {
+    display: flex;
+    width: 100%;
+  }
+
+  .segmented__btn {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .field {
+    flex: 1 1 8rem;
+  }
+
+  .field__select {
+    width: 100%;
+    min-width: 0;
+  }
 }
 </style>

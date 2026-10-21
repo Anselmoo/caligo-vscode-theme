@@ -1,122 +1,70 @@
-# Vue 3 Migration — Initial Setup Complete ✅
+# Caligo website (Vue 3)
 
-This directory contains the Vue 3-based preview application for Caligo themes.
+The preview site for the Caligo themes: a Vue 3 single-page app with hash routing, built by Vite.
+Every page reads its colours from the current theme, so the whole site changes when you pick
+another one.
 
-## What's Been Created
-
-### ✅ Phase 1: Project Foundation (COMPLETE)
-
-1. **Entry Point & Configuration**
-   - [index.html](../../index.html) - SPA entry point
-   - [vite.config.ts](../../vite.config.ts) - Build configuration with path aliases
-   - [env.d.ts](./env.d.ts) - TypeScript declarations for Vue SFC
-
-2. **Application Core**
-   - [main.ts](./main.ts) - App initialization
-   - [App.vue](./App.vue) - Root component
-   - [router/index.ts](./router/index.ts) - Vue Router with hash mode
-
-3. **Type Definitions**
-   - [types/theme.ts](./types/theme.ts) - Theme system types
-   - [types/gallery.ts](./types/gallery.ts) - Gallery types
-
-4. **Global Styles**
-   - [styles/reset.css](./styles/reset.css) - Modern CSS reset
-   - [styles/variables.css](./styles/variables.css) - CSS custom properties
-   - [styles/globals.css](./styles/globals.css) - Global styles & utilities
-
-5. **Views (Placeholder)**
-   - [views/HomeView.vue](./views/HomeView.vue) - Landing page
-   - [views/GalleryView.vue](./views/GalleryView.vue) - Gallery page
-   - [views/AnalysisView.vue](./views/AnalysisView.vue) - Analysis page
-
-6. **Core Components**
-   - [components/layout/AppNav.vue](./components/layout/AppNav.vue) - Navigation
-   - [components/layout/AppFooter.vue](./components/layout/AppFooter.vue) - Footer
-   - [components/layout/SVGBackground.vue](./components/layout/SVGBackground.vue) - Background
-   - [components/theme/ThemeSelector.vue](./components/theme/ThemeSelector.vue) - Theme picker
-
-7. **Composables**
-   - [composables/useTheme.ts](./composables/useTheme.ts) - Theme management logic
-
-## Next Steps
-
-### 📋 To Do
-
-- [ ] Install dependencies: `npm install`
-- [ ] Generate theme index JSON: `npm run generate`
-- [ ] Start dev server: `npm run vue:dev`
-- [ ] Implement gallery filtering logic
-- [ ] Port SVG visualizations to Vue components
-- [ ] Add comprehensive tests
-- [ ] Performance optimization
-
-### 🚀 Running the App
+## Run it
 
 ```bash
-# Install dependencies (if not already done)
 npm install
-
-# Generate theme data
-npm run generate
-
-# Start development server
-npm run vue:dev
-
-# Build for production
-npm run vue:build
-
-# Preview production build
-npm run vue:preview
+npm run generate     # writes public/themes-manifest.json
+npm run vue:dev      # dev server
+npm run vue:build    # production build
+npm run vue:preview  # serve the production build
 ```
 
-## Architecture Overview
+## Pages
+
+| Route        | View                       | What it is                                                         |
+| ------------ | -------------------------- | ------------------------------------------------------------------ |
+| `/`          | `views/HomeView.vue`       | Landing page with a live editor preview and the theme picker       |
+| `/themes`    | `views/GalleryView.vue`    | All 50 themes, filterable by theme and mode                        |
+| `/wallpapers`| `views/WallpapersView.vue` | Generated wallpapers per theme, platform and mode                  |
+| `/science`   | `views/AnalysisView.vue`   | Lightness, hue and chroma of the current theme, and its contrast   |
+| `/export`    | `views/ExportView.vue`     | Download or copy the current theme as CSS, SCSS, JSON or TypeScript |
+| anything else| `views/NotFoundView.vue`   | 404 with a way home                                                 |
+
+`/gallery` and `/analysis` redirect to `/themes` and `/science`.
+
+## Layout of the source
 
 ```
 src/vue-app/
-├── main.ts                    # App entry point
-├── App.vue                    # Root component
-├── env.d.ts                   # TypeScript declarations
-├── router/
-│   └── index.ts               # Vue Router config
-├── views/
-│   ├── HomeView.vue           # Landing page
-│   ├── GalleryView.vue        # Screenshot gallery
-│   └── AnalysisView.vue       # Color analysis
+├── main.ts, App.vue         entry point and shell (nav, #main, footer, command palette)
+├── router/                  hash-mode routes, lazy-loaded views
+├── views/                   one file per route
 ├── components/
-│   ├── layout/
-│   │   ├── AppNav.vue         # Navigation bar
-│   │   ├── AppFooter.vue      # Footer
-│   │   └── SVGBackground.vue  # Background pattern
-│   └── theme/
-│       └── ThemeSelector.vue  # Theme dropdown
-├── composables/
-│   └── useTheme.ts            # Theme state management
-├── types/
-│   ├── theme.ts               # Theme interfaces
-│   └── gallery.ts             # Gallery interfaces
-└── styles/
-    ├── reset.css              # CSS reset
-    ├── variables.css          # CSS custom properties
-    └── globals.css            # Global styles
+│   ├── layout/              AppNav, AppFooter, CommandPalette
+│   ├── home/                Home page pieces
+│   ├── gallery/             Themes page
+│   ├── wallpapers/          Wallpapers page
+│   ├── analysis/            Science page: colour-report.ts, LightnessChart, HueWheel, ColourTable
+│   └── export/              Export page: FormatSelector, CopyDownload, ExportPreview
+├── composables/             useTheme (state and CSS variables), useExport, useThemeAnalysis, ...
+├── types/                   theme and gallery types
+└── styles/                  reset, variables (tokens), globals, typography
 ```
 
-## Key Decisions
+## Design rules
 
-- **Router Mode**: Hash history (for GitHub Pages compatibility)
-- **State Management**: Composables (no Pinia needed for this scope)
-- **Styling**: Scoped CSS with CSS custom properties
-- **Type Safety**: Full TypeScript coverage
-- **Bundle Strategy**: Manual chunks for vue/router and color utilities
+- Colours come from theme tokens (`--bg0`, `--fg0`, `--fg-muted`, `--accent`, `--syntax-*`). No
+  hardcoded colours.
+- Martian Mono (`--font-display`, `--font-mono`) is for headlines, display figures and code.
+  Hanken Grotesk (`--font-sans`) is for everything else.
+- Pages are left-aligned inside `var(--page-max)` with `var(--gutter)` on each side, and use the
+  fluid `--step-*` type scale.
+- Small text must clear 4.5:1 over `--bg0` in every theme. `--syntax-strings` is translucent and
+  `--accent` dips below 4.5:1 in a few themes, so neither is used for small text. Use them for
+  swatches and large marks.
+- Anything that shows a colour's lightness, chroma or hue computes it from the hex with culori.
+  The manifest's `oklch` metadata is not trusted. Contrast for translucent colours is measured
+  after blending them over the background (see `components/analysis/colour-report.ts`).
+- Theme and route changes animate through View Transitions, not per-element transitions.
 
-## Documentation
+## Tests
 
-Comprehensive migration documentation is available in:
-- [VUE_MIGRATION_SUMMARY.md](../../docs/VUE_MIGRATION_SUMMARY.md) - Executive overview
-- [VUE_MIGRATION_ANALYSIS.md](../../docs/VUE_MIGRATION_ANALYSIS.md) - Detailed analysis
-- [VUE_IMPLEMENTATION_GUIDE.md](../../docs/VUE_IMPLEMENTATION_GUIDE.md) - Step-by-step guide
-- [VUE_ARCHITECTURE_DIAGRAMS.md](../../docs/VUE_ARCHITECTURE_DIAGRAMS.md) - Visual diagrams
-
-## Questions?
-
-Refer to the implementation guide or open an issue on GitHub.
+```bash
+npx vitest run src/vue-app --coverage=false   # unit tests
+bash .werkplan/e2e-gate.sh                    # Playwright against a throwaway dev server
+```

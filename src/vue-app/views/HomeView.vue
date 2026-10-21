@@ -1,575 +1,332 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import CorePalette from "../components/theme/CorePalette.vue";
-import LiveTokenSample from "../components/theme/LiveTokenSample.vue";
-import ThemeSpectrum from "../components/theme/ThemeSpectrum.vue";
-import VSCodeMock from "../components/theme/VSCodeMock.vue";
+import { RouterLink } from "vue-router";
+import { renderedContrast } from "../components/analysis/colour-report.js";
+import EditorPreview from "../components/home/EditorPreview.vue";
+import SceneBackdrop from "../components/home/SceneBackdrop.vue";
+import ThemeHorizon from "../components/home/ThemeHorizon.vue";
 import { useTheme } from "../composables/useTheme.js";
 
-const { themes, seeds, harmonies } = useTheme();
+const { themes, harmonies, currentTheme, setTheme } = useTheme();
 
-const stats = computed(() => ({
-  seedPalettes: seeds.value.length,
-  harmonyModes: harmonies.value.length,
-  totalThemes: themes.value.length,
-}));
+const MARKETPLACE_URL =
+  "https://marketplace.visualstudio.com/items?itemName=AnselmHahn.caligo-vscode-theme";
 
-// Some TS configurations (and editor diagnostics) don't account for template usage
-// when reporting noUnusedLocals in <script setup>.
-void CorePalette;
-void LiveTokenSample;
-void ThemeSpectrum;
-void VSCodeMock;
-void stats;
+const textContrast = computed(() => {
+  const c = currentTheme.value?.colors;
+  return c ? renderedContrast(c.fg0, c.bg0).toFixed(1) : "–";
+});
+
+/** The current seed in all five harmony modes, as clickable mini palettes. */
+const modes = computed(() => {
+  const seed = currentTheme.value?.seedId;
+  return harmonies.value
+    .map(h => themes.value.find(t => t.seedId === seed && t.harmonyId === h.id))
+    .filter(t => t !== undefined)
+    .map(t => ({
+      key: t.key,
+      label: t.harmonyLabel,
+      current: t.key === currentTheme.value?.key,
+      inks: [
+        t.colors.keywords,
+        t.colors.types,
+        t.colors.functions,
+        t.colors.strings,
+        t.colors.decorator,
+      ],
+      bg: t.colors.bg0,
+    }));
+});
+
+const bgOklch = computed(() => {
+  const bg = currentTheme.value?.oklch.bg;
+  if (!bg) return null;
+  return { l: bg.l.toFixed(2), c: bg.c.toFixed(3), h: Math.round(bg.h) };
+});
+
+void MARKETPLACE_URL;
+void textContrast;
+void modes;
+void bgOklch;
+void setTheme;
+void RouterLink;
+void EditorPreview;
+void SceneBackdrop;
+void ThemeHorizon;
 </script>
 
 <template>
-  <div class="home-view">
-    <!-- Hero Section -->
-    <section class="hero">
-      <div class="container">
-        <div class="hero-layout">
-          <div class="hero-left">
-            <span class="kicker text-keywords">Visual Studio Code • Color Themes</span>
-            <h1>Caligo</h1>
-            <p class="hero-subtitle text-types">
-              OKLCH-powered VS Code themes with scientific harmony variants
-            </p>
-            <p class="hero-description text-functions">
-              {{ stats.totalThemes }} variants generated from {{ stats.seedPalettes }} seed palettes × {{ stats.harmonyModes }} harmony modes.
-              Built for long sessions: perceptual uniformity, consistent contrast, and intent-aware syntax.
-            </p>
-            
-            <!-- Stats -->
-            <div class="hero-stats">
-              <div class="hero-stat hero-stat--types">
-                <div class="hero-stat-value">{{ stats.seedPalettes || '—' }}</div>
-                <div class="hero-stat-label">Seed Palettes</div>
-              </div>
-              <div class="hero-stat hero-stat--keywords">
-                <div class="hero-stat-value">{{ stats.harmonyModes || '—' }}</div>
-                <div class="hero-stat-label">Harmony Modes</div>
-              </div>
-              <div class="hero-stat hero-stat--functions">
-                <div class="hero-stat-value">{{ stats.totalThemes || '—' }}</div>
-                <div class="hero-stat-label">Total Themes</div>
-              </div>
-            </div>
-            
-            <!-- CTA Buttons -->
-            <div class="btn-row">
-              <a
-                href="https://marketplace.visualstudio.com/items?itemName=AnselmHahn.caligo-vscode-theme"
-                class="btn btn--primary"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <i class="pi pi-microsoft"></i>
-                <span>Install from Marketplace</span>
-              </a>
-              <a
-                href="https://github.com/Anselmoo/caligo-vscode-theme"
-                class="btn"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <i class="pi pi-github"></i>
-                <span>View on GitHub</span>
-              </a>
-            </div>
-          </div>
-          
-          <div class="hero-right">
-            <VSCodeMock />
+  <div class="home">
+    <section class="hero" aria-labelledby="hero-title">
+      <SceneBackdrop />
+      <div class="hero__inner">
+        <div class="hero__copy">
+          <h1 id="hero-title" class="hero__title">Dark themes for long nights of code.</h1>
+          <p class="hero__lede">
+            Fifty VS Code themes built in a perceptual colour space, so text stays readable and
+            every hue stays distinct after hours at the screen.
+          </p>
+          <div class="hero__actions">
+            <a class="btn-primary" :href="MARKETPLACE_URL" rel="noopener" target="_blank">
+              Install from Marketplace
+            </a>
+            <RouterLink class="btn-quiet" to="/themes">Browse all themes</RouterLink>
           </div>
         </div>
+        <EditorPreview class="hero__editor" />
+        <ThemeHorizon class="hero__horizon" />
       </div>
     </section>
-    
-    <!-- Theme Spectrum Section -->
-    <section class="section">
-      <div class="container">
-        <ThemeSpectrum />
-      </div>
-    </section>
-    
-    <!-- Preview Section (Core Palette + Live Token Sample) -->
-    <section class="section preview-section">
-      <div class="container">
-        <h2 class="section-title">Preview</h2>
-        <p class="section-subtitle text-subtle">
-          The page is fully skinned by your selection (seed + harmony). 
-          Use the navbar selectors or click the spectrum matrix.
-        </p>
-        
-        <div class="preview-grid">
-          <CorePalette />
-          <LiveTokenSample />
-        </div>
-      </div>
-    </section>
-    
-    <!-- Design Philosophy Section -->
-    <section class="section philosophy-section">
-      <div class="container">
-        <h2 class="section-title">Design Philosophy</h2>
-        <p class="section-subtitle text-subtle">
-          Built on OKLCH color science for perceptual uniformity and accessibility
-        </p>
-        
-        <div class="philosophy-grid">
-          <div class="philosophy-card philosophy-card--types">
-            <i class="pi pi-palette philosophy-icon"></i>
-            <h3>OKLCH Color Space</h3>
-            <p>
-              All colors use OKLCH for perceptually uniform brightness and hue distribution.
-              This ensures consistent visual weight across all accent colors and maintains
-              readability regardless of the harmony mode selected.
-            </p>
+
+    <section class="facts" aria-label="What makes Caligo different">
+      <div class="facts__inner">
+        <article class="fact">
+          <p class="fact__figure">{{ textContrast }}<span class="fact__unit">:1</span></p>
+          <h2 class="fact__title">Readable for hours</h2>
+          <p class="fact__body">
+            Body text contrast in {{ currentTheme?.displayName ?? "this theme" }}. WCAG asks for
+            4.5:1 for small text; Caligo measures every theme against it.
+          </p>
+        </article>
+
+        <article class="fact">
+          <div class="fact__modes" role="group" aria-label="Harmony modes of this theme">
+            <button
+              v-for="mode in modes"
+              :key="mode.key"
+              type="button"
+              class="mode-swatch"
+              :class="{ 'is-current': mode.current }"
+              :aria-pressed="mode.current"
+              :aria-label="`${mode.label} mode`"
+              :style="{ background: mode.bg }"
+              @click="setTheme(mode.key)"
+            >
+              <span v-for="(ink, i) in mode.inks" :key="i" :style="{ background: ink }" />
+            </button>
           </div>
-          
-          <div class="philosophy-card philosophy-card--keywords">
-            <i class="pi pi-objects-column philosophy-icon"></i>
-            <h3>Harmony Modes</h3>
-            <p>
-              Each seed palette generates 5 harmony variations: balanced (original), 
-              analogous, monochromatic, split-complementary, and triadic. These modes
-              provide visual variety while maintaining semantic clarity in code.
-            </p>
-          </div>
-          
-          <div class="philosophy-card philosophy-card--functions">
-            <i class="pi pi-verified philosophy-icon"></i>
-            <h3>WCAG AAA Compliant</h3>
-            <p>
-              All foreground/background pairs meet WCAG AAA contrast standards (7:1 minimum).
-              Token colors are validated to maintain at least AA compliance (4.5:1) against
-              the background for optimal readability.
-            </p>
-          </div>
-          
-          <div class="philosophy-card philosophy-card--strings">
-            <i class="pi pi-code philosophy-icon"></i>
-            <h3>Intent-Aware Syntax</h3>
-            <p>
-              Syntax highlighting follows semantic intent rather than arbitrary color mapping.
-              Keywords, types, functions, strings, and decorators each have distinct,
-              purposeful colors that enhance code comprehension.
-            </p>
-          </div>
-          
-          <div class="philosophy-card philosophy-card--decorator">
-            <i class="pi pi-ban philosophy-icon"></i>
-            <h3>No Forbidden Black</h3>
-            <p>
-              Forbidden near-black tones are excluded from generation. All dark tones maintain
-              subtle color temperature and depth, reducing eye strain during extended
-              coding sessions.
-            </p>
-          </div>
-          
-          <div class="philosophy-card philosophy-card--accent">
-            <i class="pi pi-cog philosophy-icon"></i>
-            <h3>Systematic Generation</h3>
-            <p>
-              Themes are generated programmatically from seed palettes using TypeScript,
-              ensuring consistency, maintainability, and adherence to design constraints
-              across all 50 variations.
-            </p>
-          </div>
-          
-          <div class="philosophy-card philosophy-card--decorator">
-            <i class="pi pi-sitemap philosophy-icon"></i>
-            <h3>AI-Guided Architecture</h3>
-            <p>
-              Architecture decisions leverage AI-powered design prompt builders to explore
-              optimal patterns, validate design choices against best practices, and ensure
-              scalable, maintainable system architecture for theme generation infrastructure.
-            </p>
-          </div>
-          
-          <div class="philosophy-card philosophy-card--accent">
-            <i class="pi pi-book philosophy-icon"></i>
-            <h3>Research-Driven Design</h3>
-            <p>
-              Development integrates real-time library documentation access and web research
-              capabilities to validate color theory implementations, accessibility standards,
-              and modern design patterns against current best practices.
-            </p>
-          </div>
-          
-        </div>
-      </div>
-    </section>
-    
-    <!-- Features Section -->
-    <section class="section features">
-      <div class="container">
-        <h2 class="section-title">Features</h2>
-        <div class="features-grid">
-          <div class="feature-card feature-card--types">
-            <h3>50 Theme Variations</h3>
-            <p>10 seed palettes × 5 harmony modes for diverse visual experiences</p>
-          </div>
-          <div class="feature-card feature-card--functions">
-            <h3>Multi-Language Support</h3>
-            <p>Optimized syntax highlighting for TypeScript, Python, Rust, Go, and more</p>
-          </div>
-          <div class="feature-card feature-card--strings">
-            <h3>Perceptual Uniformity</h3>
-            <p>OKLCH ensures colors have consistent perceived brightness</p>
-          </div>
-          <div class="feature-card feature-card--keywords">
-            <h3>Long-Session Friendly</h3>
-            <p>Designed for extended coding with reduced eye strain</p>
-          </div>
-        </div>
+          <h2 class="fact__title">One palette, five moods</h2>
+          <p class="fact__body">
+            Each theme comes in balanced, analogous, monochromatic, split-complementary and
+            triadic harmony. Pick the one that suits the hour.
+          </p>
+        </article>
+
+        <article class="fact">
+          <p v-if="bgOklch" class="fact__figure fact__figure--small">
+            L {{ bgOklch.l }}<br />C {{ bgOklch.c }}<br />h {{ bgOklch.h }}°
+          </p>
+          <h2 class="fact__title">Placed in OKLCH</h2>
+          <p class="fact__body">
+            Colours are chosen in a space where equal steps look equal, then checked by
+            measurement rather than by eye.
+            <RouterLink to="/science">See the measurements</RouterLink>
+          </p>
+        </article>
       </div>
     </section>
   </div>
 </template>
 
 <style scoped>
-.home-view {
-  min-height: 100vh;
-}
-
 .hero {
-  padding: var(--space-3xl) 0;
-  background: linear-gradient(180deg, var(--bg0) 0%, var(--bg1) 100%);
+  position: relative;
+  min-height: min(calc(100svh - 56px), 900px);
+  display: flex;
+  isolation: isolate;
 }
 
-.hero-layout {
+.hero__inner {
+  position: relative;
+  z-index: 1;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-3xl);
-  align-items: center;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  grid-template-rows: 1fr auto;
+  gap: clamp(28px, 4vw, 64px);
+  width: 100%;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: clamp(48px, 9vh, 112px) var(--gutter) clamp(28px, 6vh, 56px);
 }
 
-.hero-left {
-  text-align: left;
+.hero__copy {
+  align-self: center;
+  max-width: 38rem;
 }
 
-.kicker {
-  display: inline-block;
-  font-size: var(--text-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: var(--space-md);
-  padding: var(--space-xs) var(--space-md);
-  background: var(--glow-keywords);
-  border-radius: var(--radius-full);
-  border: 1px solid var(--glow-keywords);
+.hero__title {
+  margin: 0 0 22px;
+  color: var(--fg0);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 1.25rem + 2.3vw, 3.3rem);
+  font-weight: 340;
+  font-stretch: 106%;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
 }
 
-
-.hero-subtitle {
-  font-size: var(--text-2xl);
-  margin-bottom: var(--space-md);
-  font-weight: 600;
-  line-height: 1.3;
+.hero__lede {
+  max-width: var(--measure);
+  margin: 0 0 32px;
+  color: var(--fg1);
+  font-size: var(--step-1);
+  line-height: 1.55;
+  text-wrap: pretty;
 }
 
-.hero-description {
-  font-size: var(--text-base);
-  margin-bottom: var(--space-xl);
-  line-height: 1.6;
-}
-
-.hero-stats {
+.hero__actions {
   display: flex;
-  gap: var(--space-2xl);
-  margin-bottom: var(--space-2xl);
-}
-
-.hero-stat {
-  text-align: left;
-  padding: var(--space-md);
-  border-radius: var(--radius-md);
-  border: 2px solid transparent;
-  transition: all 0.3s ease;
-}
-
-.hero-stat:hover {
-  border-color: var(--stat-color);
-  background: var(--stat-bg-color);
-  transform: translateY(-2px);
-}
-
-.hero-stat--types {
-  --stat-color: var(--syntax-types);
-  --stat-color-rgb: var(--syntax-types-rgb);
-  --stat-bg-color: var(--stat-bg-types);
-  --stat-text-color: var(--stat-text-types);
-}
-
-.hero-stat--keywords {
-  --stat-color: var(--syntax-keywords);
-  --stat-color-rgb: var(--syntax-keywords-rgb);
-  --stat-bg-color: var(--stat-bg-keywords);
-  --stat-text-color: var(--stat-text-keywords);
-}
-
-.hero-stat--functions {
-  --stat-color: var(--syntax-functions);
-  --stat-color-rgb: var(--syntax-functions-rgb);
-  --stat-bg-color: var(--stat-bg-functions);
-  --stat-text-color: var(--stat-text-functions);
-}
-
-.hero-stat-value {
-  font-size: var(--text-4xl);
-  font-weight: 700;
-  color: var(--stat-color, var(--accent));
-  line-height: 1;
-  margin-bottom: var(--space-xs);
-  text-shadow: 0 2px 8px rgba(var(--stat-color-rgb), 0.3);
-}
-
-.hero-stat-label {
-  font-size: var(--text-sm);
-  color: var(--stat-text-color);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.hero-right {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.btn-row {
-  display: flex;
-  gap: var(--space-md);
   flex-wrap: wrap;
+  gap: 12px;
 }
 
-.btn {
+.btn-primary,
+.btn-quiet {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-md) var(--space-xl);
-  border-radius: var(--radius-md);
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 10px;
   font-weight: 600;
+  font-size: var(--step-0);
   text-decoration: none;
-  transition: all 0.2s ease;
-  border: 2px solid transparent;
 }
 
-.btn i {
-  font-size: 18px;
-}
-
-.btn--primary {
+.btn-primary {
   background: var(--accent);
-  color: var(--bg0);
+  color: oklch(from var(--accent) 0.18 calc(c * 0.4) h);
 }
 
-.btn--primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px var(--glow-accent-strong);
+.btn-primary:hover {
+  background: oklch(from var(--accent) calc(l + 0.06) c h);
 }
 
-.btn:not(.btn--primary) {
-  background: var(--interactive-hover);
-  border-color: var(--border-base);
-  color: var(--syntax-types);
+.btn-quiet {
+  color: var(--fg0);
+  border: 1px solid color-mix(in oklab, var(--fg0) 20%, transparent);
+  background: color-mix(in oklab, var(--bg0) 40%, transparent);
+  backdrop-filter: blur(8px);
 }
 
-.btn:not(.btn--primary):hover {
-  background: var(--interactive-hover-strong);
-  border-color: var(--accent);
+.btn-quiet:hover {
+  border-color: color-mix(in oklab, var(--fg0) 40%, transparent);
 }
 
-.section {
-  padding: var(--space-3xl) 0;
+.hero__editor {
+  align-self: center;
 }
 
-.section-title {
-  font-size: var(--text-3xl);
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: var(--space-lg);
+.hero__horizon {
+  grid-column: 1 / -1;
 }
 
-.section-subtitle {
-  font-size: var(--text-base);
-  text-align: center;
-  max-width: 700px;
-  margin: 0 auto var(--space-2xl);
-  line-height: 1.6;
-}
-
-.preview-grid {
+/* Facts: three measured statements, set as a quiet row rather than cards. */
+.facts__inner {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-xl);
-  margin-top: var(--space-2xl);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(28px, 5vw, 72px);
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: clamp(56px, 10vh, 120px) var(--gutter);
 }
 
-@media (min-width: 1024px) {
-  .preview-grid {
-    grid-template-columns: 1fr 1fr;
-  }
+.fact {
+  display: flex;
+  flex-direction: column;
 }
 
-.philosophy-section {
-  background: linear-gradient(180deg, var(--bg0) 0%, var(--bg1) 100%);
-}
-
-.philosophy-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--space-lg);
-  margin-top: var(--space-2xl);
-}
-
-.philosophy-card {
-  padding: var(--space-xl);
-  background: var(--surface-overlay);
-  border: 2px solid transparent;
-  border-radius: var(--radius-lg);
-  backdrop-filter: blur(12px);
-  transition: all 0.3s ease;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  --card-accent-color: var(--text-strong);
-  --card-accent-rgb: var(--syntax-keywords-rgb);
-}
-
-.philosophy-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: var(--card-accent-color);
-  opacity: 0.8;
-}
-
-.philosophy-card:hover {
-  border-color: var(--card-accent-color);
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(var(--card-accent-rgb), 0.25);
-  background: rgba(var(--card-accent-rgb), 0.08);
-}
-
-
-.philosophy-icon {
-  font-size: 48px;
-  margin-bottom: var(--space-md);
+.fact__figure {
+  min-height: 3.6rem;
+  margin: 0 0 18px;
+  color: var(--fg0);
+  font-family: var(--font-display);
+  font-size: var(--step-3);
+  font-weight: 300;
+  font-stretch: 112.5%;
   line-height: 1;
-  color: var(--text-strong);
-  transition: all 0.3s ease;
-  filter: drop-shadow(0 2px 8px rgba(var(--card-accent-rgb), 0.3));
+  letter-spacing: -0.03em;
 }
 
-.philosophy-card:hover .philosophy-icon {
-  transform: scale(1.15) rotate(5deg);
-  filter: drop-shadow(0 4px 16px rgba(var(--card-accent-rgb), 0.5));
+.fact__figure--small {
+  font-size: var(--step-0);
+  font-stretch: 100%;
+  line-height: 1.35;
+  letter-spacing: 0;
+  color: var(--fg1);
 }
 
-.philosophy-card h3 {
-  font-size: var(--text-xl);
-  font-weight: 700;
-  margin-bottom: var(--space-md);
-  color: var(--text-strong);
+.fact__unit {
+  color: var(--fg-muted);
 }
 
-.philosophy-card p {
-  color: var(--text-subtle);
+.fact__title {
+  margin: 0 0 8px;
+  color: var(--fg0);
+  font-family: var(--font-sans);
+  font-size: var(--step-1);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.fact__body {
+  max-width: 36ch;
+  margin: 0;
+  color: var(--fg-muted);
   line-height: 1.6;
-  font-size: var(--text-sm);
 }
 
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--space-lg);
+.fact__body a {
+  color: var(--fg0);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, var(--fg0) 45%, transparent);
+  text-underline-offset: 3px;
 }
 
-.feature-card {
-  padding: var(--space-xl);
-  background: var(--surface-overlay);
-  border: 2px solid transparent;
-  border-radius: var(--radius-lg);
-  backdrop-filter: blur(12px);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  --card-accent-color: var(--text-strong);
-  --card-accent-rgb: var(--syntax-keywords-rgb);
+.fact__body a:hover {
+  text-decoration-color: var(--fg0);
 }
 
-.feature-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--card-accent-color);
-  opacity: 0.6;
+.fact__modes {
+  display: flex;
+  gap: 8px;
+  min-height: 3.6rem;
+  margin-bottom: 18px;
+  align-items: flex-start;
 }
 
-.feature-card:hover {
-  border-color: var(--card-accent-color);
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(var(--card-accent-rgb), 0.2);
-  background: rgba(var(--card-accent-rgb), 0.05);
+.mode-swatch {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 30px;
+  padding: 6px;
+  border: 1px solid color-mix(in oklab, var(--fg0) 14%, transparent);
+  border-radius: 8px;
+  cursor: pointer;
 }
 
-
-.feature-card h3 {
-  font-size: var(--text-xl);
-  font-weight: 700;
-  margin-bottom: var(--space-md);
-  color: var(--text-strong);
+.mode-swatch span {
+  height: 5px;
+  border-radius: 2px;
 }
 
-.feature-card p {
-  color: var(--text-subtle);
-  line-height: 1.6;
-  font-size: var(--text-sm);
+.mode-swatch.is-current {
+  border-color: var(--fg0);
 }
 
-@media (max-width: 1024px) {
-  .hero-layout {
-    grid-template-columns: 1fr;
-    gap: var(--space-2xl);
+@media (max-width: 960px) {
+  .hero__inner {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
   }
-  
-  .hero-left {
-    text-align: center;
-  }
-  
-  .hero-stats {
-    justify-content: center;
-  }
-  
-  .hero-stat {
-    text-align: center;
-  }
-  
-  .btn-row {
-    justify-content: center;
-  }
-}
 
-@media (max-width: 640px) {
-  
-  .hero-subtitle {
-    font-size: var(--text-xl);
+  .hero__copy {
+    max-width: none;
   }
-  
-  .hero-stats {
-    flex-direction: column;
-    gap: var(--space-lg);
-    align-items: center;
+
+  .facts__inner {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 </style>

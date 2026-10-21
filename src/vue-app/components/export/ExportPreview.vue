@@ -144,7 +144,12 @@ void tokenizeStructuredLine;
 </script>
 
 <template>
-  <pre class="export-preview"><code><span
+  <pre
+    class="export-preview"
+    role="region"
+    aria-label="Export preview"
+    tabindex="0"
+  ><code><span
     v-for="(lineTokens, index) in tokenizedLines"
     :key="`${index}-${lines[index]}`"
     class="export-preview__line"
@@ -157,54 +162,71 @@ void tokenizeStructuredLine;
 </span></code></pre>
 </template>
 
+<!--
+  Token inks are limited to the colours that clear 4.5:1 over the background in every
+  theme (fg, keywords, types, functions, decorator). `strings` is translucent and
+  `accent` dips under 4.5:1 in a few themes, so neither is used for small text here.
+-->
 <style scoped>
 .export-preview {
-  max-height: 260px;
-  overflow: auto;
+  max-height: min(60vh, 520px);
   margin: 0;
-  padding: var(--space-md);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-color);
-  background: var(--bg0);
+  padding: 18px 20px;
+  overflow: auto;
+  border: 1px solid color-mix(in oklab, var(--fg0) 12%, transparent);
+  border-radius: var(--radius-md);
+  background: var(--bg1);
   color: var(--fg0);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  line-height: 1.7;
+  tab-size: 2;
+}
+
+/* The global `code` style tints text and adds a chip background; reset it here. */
+.export-preview code {
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
 }
 
 .export-preview__line {
   display: block;
+  padding: 0 6px;
+  margin: 0 -6px;
+  border-radius: 3px;
+  white-space: pre;
 }
 
 .export-preview__line--highlight {
-  background: color-mix(in oklab, var(--accent) 22%, transparent);
+  background: color-mix(in oklab, var(--fg0) 10%, transparent);
 }
 
-.export-preview__token--key {
-  color: var(--syntax-keywords, var(--caligo-syntax-keywords, var(--accent)));
-  font-weight: 600;
-}
-
-.export-preview__token--string {
-  color: var(--syntax-strings, var(--caligo-syntax-strings, var(--accent)));
-}
-
-.export-preview__token--comment {
-  color: var(--syntax-comments, var(--caligo-syntax-comments, var(--fg-muted)));
-  font-style: italic;
-}
-
+.export-preview__token--key,
 .export-preview__token--variable {
-  color: var(--syntax-keywords, var(--caligo-syntax-keywords, var(--accent)));
+  color: var(--syntax-keywords);
 }
 
 .export-preview__token--function {
-  color: var(--syntax-functions, var(--caligo-syntax-functions, var(--accent)));
+  color: var(--syntax-functions);
+}
+
+.export-preview__token--string {
+  color: var(--syntax-functions);
 }
 
 .export-preview__token--hex {
-  color: var(--accent, var(--caligo-accent, var(--fg0)));
+  color: var(--syntax-types);
 }
 
 .export-preview__token--number,
 .export-preview__token--keyword {
-  color: var(--syntax-types, var(--caligo-syntax-types, var(--accent)));
+  color: var(--syntax-decorator);
+}
+
+.export-preview__token--comment {
+  color: var(--fg-muted);
 }
 </style>

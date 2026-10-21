@@ -117,6 +117,8 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
     "@biomejs/biome": "^2.4.15",
+    "@fontsource-variable/hanken-grotesk": "^5.3.0",
+    "@fontsource-variable/martian-mono": "^5.3.0",
     "@playwright/test": "^1.58.2",
     "@types/d3-contour": "^3.0.6",
     "@types/d3-delaunay": "^6.0.4",

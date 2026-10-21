@@ -1,104 +1,90 @@
 <script setup lang="ts">
-import { RouterLink } from "vue-router";
+import { RouterLink, useRoute } from "vue-router";
 
-// Some TS configurations (and editor diagnostics) don't account for template usage
-// when reporting noUnusedLocals in <script setup>.
+const route = useRoute();
+
 void RouterLink;
+void route;
 </script>
 
 <template>
-  <div class="not-found-view">
-    <div class="container">
-      <div class="error-content">
-        <h1 class="error-code">404</h1>
-        <h2 class="error-title">Page Not Found</h2>
-        <p class="error-message">
-          The page you're looking for doesn't exist or has been moved.
-        </p>
-        <div class="error-actions">
-          <RouterLink to="/" class="btn btn-primary">
-            Go Home
-          </RouterLink>
-          <RouterLink to="/gallery" class="btn btn-secondary">
-            Browse Gallery
-          </RouterLink>
-        </div>
-      </div>
-    </div>
+  <div class="not-found">
+    <h1 class="not-found__title">Page not found</h1>
+    <p class="not-found__text">
+      Nothing lives at <code class="not-found__path">{{ route.fullPath }}</code
+      >. The link may be mistyped, or the page may have moved.
+    </p>
+    <p class="not-found__actions">
+      <RouterLink class="not-found__home" to="/">Back to home</RouterLink>
+      <RouterLink class="not-found__link" to="/themes">Browse themes</RouterLink>
+    </p>
   </div>
 </template>
 
 <style scoped>
-.not-found-view {
-  min-height: 80vh;
+.not-found {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: clamp(56px, 14vh, 160px) var(--gutter);
+}
+
+.not-found__title {
+  margin: 0 0 18px;
+  color: var(--fg0);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 1.25rem + 2.3vw, 3.3rem);
+  font-weight: 340;
+  font-stretch: 106%;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+}
+
+.not-found__text {
+  max-width: var(--measure);
+  margin: 0 0 28px;
+  color: var(--fg1);
+  font-size: var(--step-1);
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.not-found__path {
+  padding: 0;
+  background: none;
+  color: var(--fg0);
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+}
+
+.not-found__actions {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-2xl) 0;
-}
-
-.error-content {
-  text-align: center;
-  max-width: 600px;
-}
-
-.error-code {
-  font-size: 120px;
-  font-weight: 900;
-  line-height: 1;
-  background: linear-gradient(135deg, var(--error), var(--syntax-decorator));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: var(--space-md);
-}
-
-.error-title {
-  font-size: var(--text-3xl);
-  font-weight: 700;
-  margin-bottom: var(--space-md);
-}
-
-.error-message {
-  font-size: var(--text-lg);
-  color: var(--text-subtle);
-  margin-bottom: var(--space-2xl);
-  line-height: 1.6;
-}
-
-.error-actions {
-  display: flex;
-  gap: var(--space-md);
-  justify-content: center;
   flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+  margin: 0;
 }
 
-.btn {
-  display: inline-block;
-  padding: var(--space-md) var(--space-xl);
-  border-radius: var(--radius-md);
-  font-weight: 600;
-  transition: all var(--transition-base);
-}
-
-.btn-primary {
+.not-found__home {
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 10px;
   background: var(--accent);
-  color: var(--bg0);
+  color: oklch(from var(--accent) 0.18 calc(c * 0.4) h);
+  font-size: var(--step-0);
+  font-weight: 600;
+  text-decoration: none;
 }
 
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(var(--bg0-rgb), 0.55);
+.not-found__home:hover {
+  background: oklch(from var(--accent) calc(l + 0.06) c h);
 }
 
-.btn-secondary {
-  background: var(--bg2);
-  color: var(--syntax-types);
-  border: 1px solid var(--border-base);
-}
-
-.btn-secondary:hover {
-  background: var(--surface-elevated);
-  border-color: var(--accent);
+.not-found__link {
+  color: var(--fg0);
+  font-size: var(--step-0);
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 </style>

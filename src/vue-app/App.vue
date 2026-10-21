@@ -2,8 +2,8 @@
 import { onBeforeMount } from "vue";
 import AppFooter from "./components/layout/AppFooter.vue";
 import AppNav from "./components/layout/AppNav.vue";
-import AuroraBackground from "./components/layout/AuroraBackground.vue";
-import NightSky from "./components/layout/NightSky.vue";
+import CommandPalette from "./components/layout/CommandPalette.vue";
+import { useCommandPaletteShortcut } from "./composables/useCommandPalette.js";
 import { useTheme } from "./composables/useTheme.js";
 
 const { loadThemeIndex } = useTheme();
@@ -13,27 +13,28 @@ onBeforeMount(async () => {
   await loadThemeIndex();
 });
 
+useCommandPaletteShortcut();
+
 // Some TS configurations (and editor diagnostics) don't account for template usage
 // when reporting noUnusedLocals in <script setup>.
 void AppFooter;
 void AppNav;
-void AuroraBackground;
-void NightSky;
+void CommandPalette;
 </script>
 
 <template>
   <div id="caligo-app">
-    <NightSky />
-    <AuroraBackground />
+    <a class="skip-link" href="#main">Skip to content</a>
     <AppNav />
-    <main class="app-main">
+    <!-- Page changes animate through View Transitions (router/index.ts), so the
+         router view swaps instantly here instead of running an out-in fade. -->
+    <main id="main" class="app-main" tabindex="-1">
       <RouterView v-slot="{ Component, route }">
-        <Transition :name="typeof route.meta.transition === 'string' ? route.meta.transition : 'fade'" mode="out-in">
-          <component :is="Component" :key="route.path" />
-        </Transition>
+        <component :is="Component" :key="route.path" />
       </RouterView>
     </main>
     <AppFooter />
+    <CommandPalette />
   </div>
 </template>
 
@@ -51,29 +52,23 @@ void NightSky;
   z-index: 1;
 }
 
-/* Route transitions */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
+.app-main:focus {
+  outline: none;
 }
 
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 16px;
+  z-index: var(--z-modal);
+  padding: 8px 14px;
+  border-radius: 6px;
+  background: var(--accent);
+  color: var(--bg0);
+  font-weight: 600;
 }
 
-.slide-left-enter-active,
-.slide-left-leave-active {
-  transition: all 0.3s ease;
-}
-
-.slide-left-enter-from {
-  opacity: 0;
-  transform: translateX(30px);
-}
-
-.slide-left-leave-to {
-  opacity: 0;
-  transform: translateX(-30px);
+.skip-link:focus {
+  top: 12px;
 }
 </style>

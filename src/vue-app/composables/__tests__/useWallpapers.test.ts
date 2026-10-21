@@ -324,3 +324,81 @@ describe("useWallpapers — balanced/none path regression", () => {
     expect(findVariant("AuroraNoir", "none", "tablet", "text")).toBeNull();
   });
 });
+
+describe("useWallpapers — missing manifest detection", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("flags a 404 as missing", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 404 }));
+    const { missing, loadManifest } = useWallpapers();
+    await loadManifest();
+    expect(missing.value).toBe(true);
+  });
+
+  it("does not flag a server error as missing", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 500 }));
+    const { missing, error, loadManifest } = useWallpapers();
+    await loadManifest();
+    expect(missing.value).toBe(false);
+    expect(error.value).toBe("HTTP 500");
+  });
+
+  it("flags a text/html answer as missing without calling json()", async () => {
+    const json = vi.fn();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        headers: new Headers({ "content-type": "text/html; charset=utf-8" }),
+        json,
+      })
+    );
+    const { missing, entries, loadManifest } = useWallpapers();
+    await loadManifest();
+    expect(missing.value).toBe(true);
+    expect(entries.value).toEqual([]);
+    expect(json).not.toHaveBeenCalled();
+  });
+
+  it("flags unparseable JSON as missing", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        headers: new Headers({ "content-type": "application/json" }),
+        json: () => Promise.reject(new SyntaxError("Unexpected token")),
+      })
+    );
+    const { missing, loadManifest } = useWallpapers();
+    await loadManifest();
+    expect(missing.value).toBe(true);
+  });
+
+  it("flags a manifest without entries as missing", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        headers: new Headers({ "content-type": "application/json" }),
+        json: async () => ({ total: 0, entries: [] }),
+      })
+    );
+    const { missing, error, entries, loadManifest } = useWallpapers();
+    await loadManifest();
+    expect(missing.value).toBe(true);
+    expect(error.value).toBe("Wallpaper manifest has no entries");
+    expect(entries.value).toEqual([]);
+  });
+
+  it("does not flag a network failure as missing", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
+    const { missing, loadManifest } = useWallpapers();
+    await loadManifest();
+    expect(missing.value).toBe(false);
+  });
+});

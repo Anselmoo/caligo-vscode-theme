@@ -1,117 +1,45 @@
-# Visual Regression Tests
+# End-to-end tests
 
-This directory contains visual regression tests for the Caligo Vue app using Playwright.
+Playwright specs for the Caligo website (`src/vue-app`), run in Chromium.
 
-## Overview
+## Running
 
-Visual regression tests capture screenshots of UI components and compare them against baseline images to detect unintended visual changes.
-
-## Running Tests
-
-### Prerequisites
-
-1. Start the development server:
-   ```bash
-   npm run pages:preview
-   ```
-
-2. In a separate terminal, run the tests:
-   ```bash
-   npm run test:e2e
-   ```
-
-### Updating Baselines
-
-When you intentionally change the UI, update the baseline screenshots:
+The hermetic gate starts its own Vite dev server on `127.0.0.1:4183`, runs Playwright
+against it and stops the server on exit:
 
 ```bash
-npx playwright test tests/e2e --update-snapshots
+bash .werkplan/e2e-gate.sh                        # whole suite
+bash .werkplan/e2e-gate.sh tests/e2e/p2-themes.spec.ts
 ```
 
-### Interactive Mode
+It needs `public/themes-manifest.json` (`npx tsx scripts/generate-themes-manifest.ts`).
+Without the gate, `npm run test:e2e` uses the preview server from `playwright.config.ts`.
 
-Run tests in interactive UI mode:
+## Specs
 
-```bash
-npm run test:e2e:ui
-```
+| File | What it pins down |
+| --- | --- |
+| `navigation.spec.ts` | Nav links open Home, Themes, Wallpapers and Science and mark the current page. |
+| `p2-themes.spec.ts` | `/#/themes`: all 50 variants as `[data-theme-card]` buttons, theme/mode/search filters, choosing a card applies the theme site-wide, keyboard operation. |
+| `p2-wallpapers.spec.ts` | `/#/wallpapers`: plain empty state naming `npm run wallpapers:all` when the manifest is missing or not JSON; with a mocked manifest, thumbnails only (never a full SVG), platform toggle, filters. |
+| `p2-science.spec.ts` | `/#/science`: lightness and OKLCH views for the current theme, OKLCH derived from hex (checked against culori), contrast of translucent colours after compositing. |
+| `p2-shell.spec.ts` | Nav contents, `/gallery` and `/analysis` redirects, the ⌘K palette, Export download and copy, footer, 404, axe-core on every page, no horizontal scroll at 375px. |
 
-## Test Structure
+Every test carries an owner tag: `@themes`, `@wallpapers`, `@science` (Science, Export,
+footer, 404) or `@shell` (nav, palette, Home). `@phase1` marks the whole-document axe
+checks, which also cover the nav and Home. Run one area with
+`bash .werkplan/e2e-gate.sh --grep @science`.
 
-### Test Suites
+Shared helpers live in `support/app.ts` (not a spec; Playwright only collects `*.spec.ts`).
 
-- **Home Page**: Tests hero section, philosophy cards, navigation, footer
-- **Theme Selector**: Tests theme switching UI components
-- **Analysis Components**: Tests canvas-based visualizations
-- **Gallery**: Tests screenshot grid and cards
-- **Theme Switching**: Verifies themes change visual appearance
-- **Responsive Design**: Tests mobile and tablet viewports
-- **Color Consistency**: Validates no hardcoded colors are rendered
+## Rules
 
-### Screenshot Naming
-
-Screenshots are stored in `tests/e2e/visual-regression.spec.ts-snapshots/` with the following naming pattern:
-
-```
-{test-name}-{browser}.png
-```
-
-Example: `hero-section-chromium.png`
-
-## Configuration
-
-Visual regression tests use Playwright's built-in screenshot comparison with:
-
-- **maxDiffPixels**: Tolerance for pixel differences (50-200 depending on component)
-- **threshold**: Perceptual difference threshold (default: 0.2)
-
-## Best Practices
-
-1. **Keep baselines updated**: Regenerate after intentional UI changes
-2. **Use appropriate tolerances**: Canvas elements need higher `maxDiffPixels`
-3. **Test across viewports**: Include mobile, tablet, and desktop
-4. **Test theme switching**: Verify themes properly update visuals
-5. **Avoid flaky tests**: Use `waitForLoadState` and appropriate timeouts
-
-## Troubleshooting
-
-### Tests failing after theme updates
-
-Regenerate baselines:
-```bash
-npx playwright test tests/e2e --update-snapshots
-```
-
-### Server not running
-
-Ensure the preview server is running on port 4173:
-```bash
-npm run pages:preview
-```
-
-### Canvas rendering differences
-
-Canvas elements may have minor pixel differences due to font rendering. Increase `maxDiffPixels` if needed.
-
-## CI/CD Integration
-
-Visual regression tests currently run in CI and **will fail the build** on screenshot differences by default, as Playwright's screenshot comparison is enabled. 
-
-However, due to potential rendering differences across environments, you may want to make visual tests informational-only in CI. To do this, you can:
-
-1. **Option 1**: Update the test configuration to skip visual tests in CI:
-   ```typescript
-   // In test files
-   test.skip(process.env.CI, 'skipping visual regression in CI');
-   ```
-
-2. **Option 2**: Adjust the diff threshold to be more lenient:
-   ```typescript
-   // playwright.config.ts
-   expect: {
-     toHaveScreenshot: {
-       maxDiffPixels: 200,  // Increase tolerance
-       threshold: 0.3,       // Increase perceptual threshold
-     },
-   },
-   ```
+- No test skips itself. A missing selector is a failure, not a reason to skip.
+- Prefer roles and accessible names; use `data-*` hooks where a role cannot identify
+  an element (`data-theme-card`, `data-theme-id`, `data-wallpaper-card`,
+  `data-platform-toggle`, `data-wallpapers-empty`, `data-science-view`,
+  `data-science-theme`, `data-oklch-row`, `data-color-key`, `data-contrast-key`,
+  `data-export-theme`, `data-export-action`, `data-selected-variant`).
+- Theme changes run inside a View Transition, so wait with `expect.poll` (see
+  `expectThemeApplied`), never with fixed timeouts.
+- Network assets that do not exist locally (wallpapers) are mocked with `page.route`.
