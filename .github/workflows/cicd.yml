@@ -54,8 +54,9 @@ jobs:
           node-version: 24.13.1
           cache: npm
       - run: npm ci
-      - name: Ensure themes for tests
-        run: node ./scripts/ensure-themes.js
+      # The contrast-truth registry tests read the real themes/Caligo-*.json.
+      - name: Generate themes for tests
+        run: npm run generate
       - run: npm run test:unit:coverage
       - name: Coverage summary
         if: always()
