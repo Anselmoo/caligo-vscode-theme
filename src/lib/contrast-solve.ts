@@ -31,8 +31,8 @@
  */
 
 import { clampChroma, converter, formatHex } from "culori";
-import { APCAcontrast, sRGBtoY } from "./apca-wrapper.js";
 import { type OkLch, oklch } from "./color.js";
+import { apcaLc } from "./contrast.js";
 
 const toRgb = converter("rgb");
 
@@ -53,15 +53,6 @@ export type ContrastSolution = {
   met: boolean;
 };
 
-function hexToRgbTuple(hex: string): [number, number, number] {
-  const c = hex.replace("#", "").slice(0, 6);
-  return [
-    Number.parseInt(c.slice(0, 2), 16),
-    Number.parseInt(c.slice(2, 4), 16),
-    Number.parseInt(c.slice(4, 6), 16),
-  ];
-}
-
 /**
  * Gamut-map an OKLCH color into sRGB by reducing chroma only.
  *
@@ -79,12 +70,8 @@ export function maxChromaAt(l: number, h: number): number {
   return clampChroma({ mode: "oklch", l, c: UNREACHABLE_CHROMA, h }, "oklch").c;
 }
 
-/** APCA Lc of a foreground hex against a background hex, sign discarded. */
-export function apcaLc(foregroundHex: string, backgroundHex: string): number {
-  return Math.abs(
-    APCAcontrast(sRGBtoY(hexToRgbTuple(foregroundHex)), sRGBtoY(hexToRgbTuple(backgroundHex)))
-  );
-}
+/** Absolute APCA Lc of a foreground hex against a background hex; the single implementation in contrast.ts. */
+export { apcaLc };
 
 export type SolveOptions = {
   /** OKLCH hue, 0-360. Preserved exactly; never traded for contrast. */

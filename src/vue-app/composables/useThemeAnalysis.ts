@@ -1,12 +1,12 @@
-import { APCAcontrast, sRGBtoY } from "apca-w3";
 // Import utility functions from main culori - these don't require mode registration
 import { differenceEuclidean, displayable } from "culori";
 // Import converters directly from culori/all to ensure these color modes are bundled
 // The default culori import uses converter() with dynamic strings which get tree-shaken
 // See: https://github.com/evercoder/culori/blob/main/docs/guides/tree-shaking.md
 // @ts-expect-error - culori/all has no type declarations but exports converters at runtime
-import { oklch, p3, rgb } from "culori/all";
+import { oklch, p3 } from "culori/all";
 import { computed } from "vue";
+import { apcaContrast } from "../../lib/contrast.js";
 import { useTheme } from "./useTheme.js";
 
 export interface OKLCHColor {
@@ -41,11 +41,9 @@ export function useThemeAnalysis() {
 
   // Color converters - directly imported functions (not converter("mode") which gets tree-shaken)
   const toOKLCH = oklch;
-  const toRGB = rgb;
   const toP3 = p3;
 
   type CuloriOklchLike = { l?: number; c?: number; h?: number };
-  type CuloriRgbLike = { r?: number; g?: number; b?: number };
 
   function isInUnitRgbChannels(color: unknown): boolean {
     if (!color || typeof color !== "object") return false;
@@ -175,20 +173,11 @@ export function useThemeAnalysis() {
 
   /**
    * Calculate APCA contrast (WCAG 3.0)
-   * Returns Lc value (can be negative based on polarity)
+   * Returns signed Lc (text, background order); delegates to src/lib/contrast.ts
+   * so alpha is composited and the number matches the generator.
    */
   function getAPCAContrast(fgHex: string, bgHex: string): number {
-    const fg = toRGB(fgHex);
-    const bg = toRGB(bgHex);
-
-    const fgRgb = (fg ?? {}) as CuloriRgbLike;
-    const bgRgb = (bg ?? {}) as CuloriRgbLike;
-
-    // Convert to sRGB arrays [0-255]
-    const bgY = sRGBtoY([(bgRgb.r ?? 0) * 255, (bgRgb.g ?? 0) * 255, (bgRgb.b ?? 0) * 255]);
-    const fgY = sRGBtoY([(fgRgb.r ?? 0) * 255, (fgRgb.g ?? 0) * 255, (fgRgb.b ?? 0) * 255]);
-
-    return APCAcontrast(fgY, bgY);
+    return apcaContrast(fgHex, bgHex);
   }
 
   /**

@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { evaluateThemeContrast, type PairResult, type ThemeJson } from "../src/lib/contrast-pairs";
 import {
   evaluateModeDistinctness,
   type ModeDistinctnessSample,
@@ -10,12 +11,12 @@ import type { SemanticTokenColors } from "../src/lib/semantic-tokens";
 const projectRoot = process.cwd();
 const reportsDir = path.join(projectRoot, "build", "reports");
 
-const THRESHOLDS: Record<string, number> = {
-  editorFgOnBg: 4.5,
-  workbenchFgOnBg1: 4.5,
-  mutedOnBg1: 3.0,
-  lineNumbersOnBg: 3.0,
-};
+const themesDir = path.join(projectRoot, "themes");
+const knownViolationsPath = path.join(projectRoot, "scripts", "contrast-known-violations.json");
+const pairsReportPath = path.join(reportsDir, "contrast-pairs.json");
+
+type KnownViolation = { pair: string; themes: string[] | "*"; reason: string };
+type KnownViolationsFile = { version: number; violations: KnownViolation[] };
 
 function isNumber(x: unknown): x is number {
   return typeof x === "number" && Number.isFinite(x);
@@ -23,6 +24,130 @@ function isNumber(x: unknown): x is number {
 
 function sanitizeIdForFilename(id: string): string {
   return id.replace(/[^A-Za-z0-9_-]/g, "");
+}
+
+/**
+ * Registry gate: every text-on-background pair the emitted themes declare is scored with
+ * alpha compositing (src/lib/contrast.ts) and compared with the ratchet list. A failing
+ * (pair, theme) that is not listed is a regression; a listed (pair, theme) that passes is
+ * stale and must be removed, so the list can only shrink.
+ */
+function evaluateRegistryGate(): string[] {
+  const problems: string[] = [];
+
+  const themeFiles = fs.existsSync(themesDir)
+    ? fs
+        .readdirSync(themesDir)
+        .filter(f => /^Caligo-.+\.json$/.test(f))
+        .sort((a, b) => a.localeCompare(b))
+    : [];
+  if (themeFiles.length === 0) {
+    return [`no themes/Caligo-*.json found in ${themesDir}; run \`npm run generate\` first`];
+  }
+
+  if (!fs.existsSync(knownViolationsPath)) {
+    return [`missing ${path.relative(projectRoot, knownViolationsPath)}`];
+  }
+  const known = JSON.parse(fs.readFileSync(knownViolationsPath, "utf8")) as KnownViolationsFile;
+  if (known.version !== 1 || !Array.isArray(known.violations)) {
+    return [
+      `${path.relative(projectRoot, knownViolationsPath)}: expected { version: 1, violations: [] }`,
+    ];
+  }
+
+  const themeNames = themeFiles.map(f => f.replace(/\.json$/, ""));
+  const perTheme: Record<string, Array<Array<string | number | boolean | string[]>>> = {};
+  const failing = new Set<string>();
+  const knownPairIds = new Set<string>();
+  const results = new Map<string, PairResult[]>();
+
+  for (const [index, file] of themeFiles.entries()) {
+    const name = themeNames[index];
+    const theme = JSON.parse(fs.readFileSync(path.join(themesDir, file), "utf8")) as ThemeJson;
+    const evaluated = evaluateThemeContrast(theme);
+    results.set(name, evaluated);
+    for (const r of evaluated) {
+      knownPairIds.add(r.id);
+      if (!r.pass) failing.add(`${r.id}@${name}`);
+    }
+  }
+
+  const listed = new Set<string>();
+  const seenPairs = new Set<string>();
+  for (const v of known.violations) {
+    if (seenPairs.has(v.pair)) problems.push(`duplicate known-violation entry: ${v.pair}`);
+    seenPairs.add(v.pair);
+    if (!knownPairIds.has(v.pair))
+      problems.push(`known violation names an unknown pair: ${v.pair}`);
+    if (typeof v.reason !== "string" || v.reason.trim().length < 10) {
+      problems.push(`known violation without a reason (>= 10 chars): ${v.pair}`);
+    }
+    const names = v.themes === "*" ? themeNames : v.themes;
+    if (!Array.isArray(names) || names.length === 0) {
+      problems.push(`known violation without themes: ${v.pair}`);
+      continue;
+    }
+    for (const n of names) {
+      if (!themeNames.includes(n)) problems.push(`known violation ${v.pair}: unknown theme ${n}`);
+      listed.add(`${v.pair}@${n}`);
+    }
+  }
+
+  const unlisted = [...failing].filter(k => !listed.has(k)).sort();
+  const stale = [...listed].filter(k => !failing.has(k)).sort();
+
+  for (const name of themeNames) {
+    perTheme[name] = (results.get(name) ?? []).map(r => [
+      r.id,
+      r.kind,
+      r.min,
+      r.fg,
+      r.layers,
+      r.wcag,
+      r.apcaLc,
+      r.pass,
+      r.pass ? "ok" : listed.has(`${r.id}@${name}`) ? "known" : "violation",
+    ]);
+  }
+  fs.mkdirSync(reportsDir, { recursive: true });
+  fs.writeFileSync(
+    pairsReportPath,
+    JSON.stringify({
+      version: 1,
+      // rows are columnar to keep the file small: results[theme][i] follows `columns`
+      columns: ["id", "kind", "min", "fg", "layers", "wcag", "apcaLc", "pass", "status"],
+      themes: themeNames.length,
+      pairs: Object.values(perTheme)[0]?.length ?? 0,
+      failing: failing.size,
+      known: failing.size - unlisted.length,
+      results: perTheme,
+    })
+  );
+
+  if (unlisted.length) {
+    problems.push(
+      `${unlisted.length} failing (pair, theme) not in ${path.relative(projectRoot, knownViolationsPath)}:`
+    );
+    for (const k of unlisted.slice(0, 30)) {
+      const [id, theme] = k.split("@");
+      const r = results.get(theme)?.find(x => x.id === id);
+      problems.push(
+        `  ${theme}: ${id} wcag=${r?.wcag.toFixed(2)} (min ${r?.min}) fg=${r?.fg} layers=${r?.layers.join(">")}`
+      );
+    }
+    if (unlisted.length > 30) problems.push(`  ...and ${unlisted.length - 30} more`);
+  }
+  if (stale.length) {
+    problems.push(`${stale.length} stale known-violation entries (now passing, remove them):`);
+    for (const k of stale.slice(0, 30)) problems.push(`  ${k}`);
+    if (stale.length > 30) problems.push(`  ...and ${stale.length - 30} more`);
+  }
+
+  console.log(
+    `Contrast pairs: ${themeNames.length} theme(s), ${failing.size} failing (pair, theme), ` +
+      `${failing.size - unlisted.length} known, ${unlisted.length} new -> ${path.relative(projectRoot, pairsReportPath)}`
+  );
+  return problems;
 }
 
 function main(): void {
@@ -43,7 +168,6 @@ function main(): void {
     process.exit(1);
   }
 
-  const failures: Array<{ file: string; key: string; value: number }> = [];
   const semanticFailures: Array<{ file: string; issue: string }> = [];
   const modeFailures: string[] = [];
   const modeDistinctnessSamples: ModeDistinctnessSample[] = [];
@@ -53,7 +177,6 @@ function main(): void {
     const json = JSON.parse(fs.readFileSync(fullPath, "utf8")) as {
       seed?: { id?: string };
       colors?: { bg0?: string };
-      contrast?: Record<string, unknown>;
       semanticQuality?: {
         coverage?: {
           typeCoverage?: number;
@@ -71,16 +194,8 @@ function main(): void {
       };
       modeDistinctnessSource?: ModeDistinctnessSample;
     };
-    const contrast = json?.contrast ?? {};
     if (json.modeDistinctnessSource) {
       modeDistinctnessSamples.push(json.modeDistinctnessSource);
-    }
-
-    for (const [key, min] of Object.entries(THRESHOLDS)) {
-      const v = contrast[key];
-      if (!isNumber(v) || v < min) {
-        failures.push({ file, key, value: isNumber(v) ? v : NaN });
-      }
     }
 
     const themeId = json.seed?.id ? sanitizeIdForFilename(json.seed.id) : undefined;
@@ -182,15 +297,10 @@ function main(): void {
     console.warn("⚠️ Skipping mode distinctness checks: no mode distinctness data available");
   }
 
-  if (failures.length) {
-    console.error(`❌ Contrast checks failed (${failures.length} issue(s))`);
-    for (const f of failures.slice(0, 30)) {
-      const value = Number.isFinite(f.value) ? f.value.toFixed(2) : "(missing)";
-      console.error(`  ${f.file}: ${f.key} = ${value} (min ${THRESHOLDS[f.key]})`);
-    }
-    if (failures.length > 30) {
-      console.error(`  …and ${failures.length - 30} more`);
-    }
+  const registryProblems = evaluateRegistryGate();
+  if (registryProblems.length) {
+    console.error("❌ Contrast pair gate failed");
+    for (const line of registryProblems) console.error(`  ${line}`);
     process.exit(1);
   }
 
@@ -216,7 +326,7 @@ function main(): void {
     process.exit(1);
   }
 
-  console.log(`✅ Contrast checks passed (${files.length} report(s))`);
+  console.log(`✅ Contrast checks passed (${files.length} report(s), pair registry gate)`);
 }
 
 main();

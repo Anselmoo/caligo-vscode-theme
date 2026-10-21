@@ -14,6 +14,7 @@ export default defineConfig({
     include: [
       "src/**/*.{test,spec}.ts",
       "tests/integration/**/*.test.ts",
+      "tests/contrast-truth/**/*.test.ts",
       "tests/verification/**/*.test.ts",
       "tests/verification/**/*.ts",
     ],
