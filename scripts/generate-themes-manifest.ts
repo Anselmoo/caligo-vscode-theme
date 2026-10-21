@@ -205,26 +205,53 @@ function formatDisplayName(name: string): string {
         .join(" ")}`;
 }
 
-function oklchToObject(arr: number[]): OklchColor {
-  return { l: arr[0] || 0, c: arr[1] || 0, h: arr[2] || 0 };
+/**
+ * Convert a hex colour (#rrggbb or #rrggbbaa) to OKLCH, computed from the hex itself.
+ *
+ * Translucent colours: the hex keeps its alpha bytes, `oklch` describes the OPAQUE colour
+ * (culori ignores alpha for l/c/h) and `alpha` carries the opacity separately.
+ * We deliberately do not read `_oklchDebug` from the theme JSON: it records the generator's
+ * intended values before gamut mapping and alpha handling, so it does not match the hex that ships.
+ */
+export function hexToOklchAlpha(hex: string): OklchColor & { alpha: number } {
+  const color = toOKLCH(hex);
+  if (!color) return { l: 0, c: 0, h: 0, alpha: 1 };
+  const round = (n: number, digits: number) => Number(n.toFixed(digits));
+  return {
+    l: round(color.l ?? 0, 4),
+    c: round(color.c ?? 0, 4),
+    // Achromatic colours have no hue in culori (undefined) → 0
+    h: round(color.h ?? 0, 2),
+    alpha: round(color.alpha ?? 1, 3),
+  };
 }
 
-/**
- * Convert hex color to OKLCH values
- */
-function hexToOklch(hex: string): OklchColor {
-  const oklch = toOKLCH(hex);
+/** OKLCH of the opaque colour only (see hexToOklchAlpha for translucent hex). */
+export function hexToOklch(hex: string): OklchColor {
+  const { alpha: _alpha, ...oklch } = hexToOklchAlpha(hex);
+  return oklch;
+}
 
-  if (!oklch || typeof oklch !== "object") {
-    return { l: 0, c: 0, h: 0 };
-  }
+const CORE_COLOR_LABELS = [
+  ["bg0", "Background Primary"],
+  ["bg1", "Background Secondary"],
+  ["bg2", "Background Tertiary"],
+  ["fg0", "Foreground Primary"],
+  ["accent", "Accent"],
+  ["strings", "Strings"],
+  ["types", "Types"],
+  ["functions", "Functions"],
+  ["keywords", "Keywords"],
+  ["decorator", "Decorator"],
+] as const;
 
-  const color = oklch as Partial<OklchColor>;
-  return {
-    l: color.l ?? 0,
-    c: color.c ?? 0,
-    h: color.h ?? 0,
-  };
+/** Build the `core` array (spectrum dots) with oklch derived from each entry's own hex. */
+export function buildCoreColors(colors: Record<string, string>) {
+  return CORE_COLOR_LABELS.map(([key, label]) => {
+    const hex = colors[key] as string;
+    const { alpha, ...oklch } = hexToOklchAlpha(hex);
+    return { key, label, hex, oklch, alpha };
+  });
 }
 
 function generateThemesManifest() {
@@ -243,12 +270,13 @@ function generateThemesManifest() {
         key: string;
         label: string;
         hex: string;
-        oklch: { l: number; c: number; h: number };
+        oklch: OklchColor;
+        alpha: number;
       }>;
       oklch: {
-        accent: { l: number; c: number; h: number };
-        bg: { l: number; c: number; h: number };
-        fg: { l: number; c: number; h: number };
+        accent: OklchColor;
+        bg: OklchColor;
+        fg: OklchColor;
       };
     }> = [];
 
@@ -256,11 +284,6 @@ function generateThemesManifest() {
       const themePath = join(THEMES_DIR, file);
       const themeContent = JSON.parse(readFileSync(themePath, "utf-8")) as ThemeJson;
       const themeName = file.replace(".json", "");
-
-      // Extract OKLCH debug info if available
-      const oklchDebug: Record<string, number[] | undefined> =
-        (themeContent._oklchDebug as Record<string, number[]>) || {};
-      // Note: themeContent.colors is accessed through extractManifestColors(themeContent)
 
       const family = extractFamily(themeName);
       const variant = extractVariant(themeName);
@@ -282,69 +305,18 @@ function generateThemesManifest() {
         decorator,
       } = extractManifestColors(themeContent);
 
-      // Build core colors array (used for spectrum dots)
-      const coreColors = [
-        {
-          key: "bg0",
-          label: "Background Primary",
-          hex: bg0,
-          oklch: oklchDebug.bg0 ? oklchToObject(oklchDebug.bg0) : hexToOklch(bg0),
-        },
-        {
-          key: "bg1",
-          label: "Background Secondary",
-          hex: bg1,
-          oklch: oklchDebug.bg1 ? oklchToObject(oklchDebug.bg1) : hexToOklch(bg1),
-        },
-        {
-          key: "bg2",
-          label: "Background Tertiary",
-          hex: bg2,
-          oklch: oklchDebug.bg2 ? oklchToObject(oklchDebug.bg2) : hexToOklch(bg2),
-        },
-        {
-          key: "fg0",
-          label: "Foreground Primary",
-          hex: fg0,
-          oklch: oklchDebug.fg0 ? oklchToObject(oklchDebug.fg0) : hexToOklch(fg0),
-        },
-        {
-          key: "accent",
-          label: "Accent",
-          hex: accent,
-          oklch: oklchDebug.accent ? oklchToObject(oklchDebug.accent) : hexToOklch(accent),
-        },
-        {
-          key: "strings",
-          label: "Strings",
-          hex: strings,
-          oklch: oklchDebug.strings ? oklchToObject(oklchDebug.strings) : hexToOklch(strings),
-        },
-        {
-          key: "types",
-          label: "Types",
-          hex: types,
-          oklch: oklchDebug.types ? oklchToObject(oklchDebug.types) : hexToOklch(types),
-        },
-        {
-          key: "functions",
-          label: "Functions",
-          hex: functions,
-          oklch: oklchDebug.functions ? oklchToObject(oklchDebug.functions) : hexToOklch(functions),
-        },
-        {
-          key: "keywords",
-          label: "Keywords",
-          hex: keywords,
-          oklch: oklchDebug.keywords ? oklchToObject(oklchDebug.keywords) : hexToOklch(keywords),
-        },
-        {
-          key: "decorator",
-          label: "Decorator",
-          hex: decorator,
-          oklch: oklchDebug.decorator ? oklchToObject(oklchDebug.decorator) : hexToOklch(decorator),
-        },
-      ];
+      const coreColors = buildCoreColors({
+        bg0,
+        bg1,
+        bg2,
+        fg0,
+        accent,
+        strings,
+        types,
+        functions,
+        keywords,
+        decorator,
+      });
 
       themeEntries.push({
         key: themeName,
@@ -374,9 +346,9 @@ function generateThemesManifest() {
         },
         core: coreColors,
         oklch: {
-          accent: oklchDebug.accent ? oklchToObject(oklchDebug.accent) : hexToOklch(accent),
-          bg: oklchDebug.bg0 ? oklchToObject(oklchDebug.bg0) : hexToOklch(bg0),
-          fg: oklchDebug.fg0 ? oklchToObject(oklchDebug.fg0) : hexToOklch(fg0),
+          accent: hexToOklch(accent),
+          bg: hexToOklch(bg0),
+          fg: hexToOklch(fg0),
         },
       });
     }
@@ -447,7 +419,7 @@ function generateSemanticTokensCSS() {
   const css = `/**
  * Semantic Design Tokens
  * Auto-generated from theme manifest - DO NOT EDIT MANUALLY
- * 
+ *
  * These tokens create a consistent design language for the preview site.
  * All formulas use CSS custom properties set by useTheme composable.
  */
@@ -456,93 +428,93 @@ function generateSemanticTokensCSS() {
   /* ========================================
    * SURFACE LAYERS
    * ======================================== */
-  
+
   /* Base surfaces inherit from theme */
   --surface-base: var(--bg1);
   --surface-elevated: var(--bg2);
-  
+
   /* Overlays for cards, modals, panels */
   --surface-overlay: color-mix(in oklab, var(--bg2) 80%, var(--bg0) 20%);
   --surface-overlay-strong: color-mix(in oklab, var(--bg2) 60%, var(--bg0) 40%);
-  
+
   /* ========================================
    * INTERACTIVE STATES
    * ======================================== */
-  
+
   /* Hover states for buttons, links, cards */
   --interactive-hover: color-mix(in oklab, var(--accent) 15%, var(--bg0) 85%);
   --interactive-hover-strong: color-mix(in oklab, var(--accent) 18%, var(--bg0) 82%);
-  
+
   /* Active/pressed states */
   --interactive-active: color-mix(in oklab, var(--accent) 25%, var(--bg0) 75%);
-  
+
   /* Disabled states */
   --interactive-disabled: color-mix(in oklab, var(--fg0) 40%, var(--bg0) 60%);
-  
+
   /* ========================================
    * TEXT HIERARCHY
    * ======================================== */
-  
+
   /* Primary text uses chromatic syntax colors (not neutral fg0) */
   --text-primary: var(--syntax-types);
   --text-strong: var(--syntax-keywords);
-  
+
   /* Muted text (de-emphasized but readable) */
   --text-muted: color-mix(in oklab, var(--syntax-types) 65%, var(--bg1) 35%);
   --text-subtle: color-mix(in oklab, var(--syntax-functions) 60%, var(--bg1) 40%);
-  
+
   /* Disabled text */
   --text-disabled: color-mix(in oklab, var(--fg0) 40%, var(--bg0) 60%);
-  
+
   /* ========================================
    * BORDERS
    * ======================================== */
-  
+
   /* Base border uses accent tint */
   --border-base: color-mix(in oklab, var(--accent) 30%, var(--bg0) 70%);
   --border-strong: color-mix(in oklab, var(--accent) 45%, var(--bg0) 55%);
-  
+
   /* Muted borders (subtle dividers) */
   --border-muted: color-mix(in oklab, var(--fg0) 10%, transparent 90%);
   --border-subtle: color-mix(in oklab, var(--fg0) 8%, transparent 92%);
-  
+
   /* ========================================
    * SHADOWS & GLOWS
    * ======================================== */
-  
+
   /* Shadow tokens using RGB variables */
   --shadow-sm: rgba(var(--bg0-rgb), 0.5);
   --shadow-md: rgba(var(--bg0-rgb), 0.55);
   --shadow-lg: rgba(var(--bg0-rgb), 0.6);
-  
+
   /* Accent glows for highlights */
   --glow-accent: rgba(var(--accent-rgb), 0.3);
   --glow-accent-strong: rgba(var(--accent-rgb), 0.4);
-  
+
   /* Syntax color glows for themed effects */
   --glow-keywords: rgba(var(--syntax-keywords-rgb), 0.15);
   --glow-types: rgba(var(--syntax-types-rgb), 0.15);
   --glow-functions: rgba(var(--syntax-functions-rgb), 0.15);
   --glow-strings: rgba(var(--syntax-strings-rgb), 0.15);
-  
+
   /* ========================================
    * STAT CARD VARIANTS
    * ======================================== */
-  
+
   /* Background tints for stat cards */
   --stat-bg-keywords: rgba(var(--syntax-keywords-rgb), 0.08);
   --stat-bg-types: rgba(var(--syntax-types-rgb), 0.08);
   --stat-bg-functions: rgba(var(--syntax-functions-rgb), 0.08);
-  
+
   /* Text colors for stat labels */
   --stat-text-keywords: color-mix(in oklab, var(--syntax-keywords) 60%, var(--bg1) 40%);
   --stat-text-types: color-mix(in oklab, var(--syntax-types) 60%, var(--bg1) 40%);
   --stat-text-functions: color-mix(in oklab, var(--syntax-functions) 60%, var(--bg1) 40%);
-  
+
   /* ========================================
    * PHILOSOPHY CARD VARIANTS
    * ======================================== */
-  
+
   /* Card backgrounds using syntax color tints */
   --card-bg-types: rgba(var(--syntax-types-rgb), 0.08);
   --card-bg-keywords: rgba(var(--syntax-keywords-rgb), 0.08);
@@ -555,7 +527,8 @@ function generateSemanticTokensCSS() {
 
   try {
     mkdirSync(dirname(SEMANTIC_TOKENS_CSS), { recursive: true });
-    writeFileSync(SEMANTIC_TOKENS_CSS, css);
+    // Keep output identical to the biome-formatted, committed file (no trailing whitespace)
+    writeFileSync(SEMANTIC_TOKENS_CSS, css.replace(/[ \t]+$/gm, ""));
     console.log("✅ Generated semantic-tokens.css");
     console.log(`   Output: ${SEMANTIC_TOKENS_CSS}`);
   } catch (error) {
