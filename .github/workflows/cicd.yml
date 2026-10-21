@@ -693,15 +693,22 @@ jobs:
         with:
           node-version: 24.13.1
       - name: Publish to Visual Studio Marketplace
+        id: publish
         run: |
           VSIX_FILE=$(find artifacts/vsix -maxdepth 1 -type f -name '*.vsix' -print -quit)
           if [ -z "$VSIX_FILE" ]; then echo "No VSIX file found" && exit 1; fi
           npx vsce publish --no-dependencies --packagePath "$VSIX_FILE" --pat "${{ secrets.VSCE_PAT }}"
       - name: Marketplace release summary
         if: always()
+        env:
+          PUBLISH_OUTCOME: ${{ steps.publish.outcome }}
         run: |
           echo "### VS Code Marketplace" >> $GITHUB_STEP_SUMMARY
-          echo "✅ Version ${{ github.ref_name }} published to Marketplace" >> $GITHUB_STEP_SUMMARY
+          if [ "$PUBLISH_OUTCOME" = "success" ]; then
+            echo "✅ Version ${{ github.ref_name }} published to Marketplace" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Failed to publish version ${{ github.ref_name }} to Marketplace" >> $GITHUB_STEP_SUMMARY
+          fi
           echo "🔗 https://marketplace.visualstudio.com/items?itemName=AnselmHahn.caligo-vscode-theme" >> $GITHUB_STEP_SUMMARY
 
   release-ghcr:
@@ -865,9 +872,15 @@ jobs:
         uses: actions/deploy-pages@v4
       - name: Release pages summary
         if: always()
+        env:
+          DEPLOY_OUTCOME: ${{ steps.deployment.outcome }}
         run: |
           echo "### Release Pages" >> $GITHUB_STEP_SUMMARY
-          echo "✅ Pages release deployment completed for ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          if [ "$DEPLOY_OUTCOME" = "success" ]; then
+            echo "✅ Pages release deployment completed for ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Pages release deployment failed for ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          fi
           echo "ℹ️ Pages deployment is intentionally independent from GHCR/npm publish jobs" >> $GITHUB_STEP_SUMMARY
           echo "🔗 https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/" >> $GITHUB_STEP_SUMMARY
 
