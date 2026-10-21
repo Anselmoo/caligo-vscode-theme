@@ -326,10 +326,12 @@ export function buildExtendedColors(p: DerivedPalette): Record<string, string> {
     "diffEditor.diagonalFill": withAlpha(p.border, 0.5),
     "diffEditor.insertedTextBackground": diffAddedWord,
     "diffEditor.insertedLineBackground": diffAddedLine,
-    "diffEditor.insertedTextBorder": transparent,
+    // A faint outline marks the changed word without sitting under its text (no contrast cost);
+    // at 0.3 alpha it reads as a hairline, not the solid box the semantic border used to draw.
+    "diffEditor.insertedTextBorder": withAlpha(s.success, 0.3),
     "diffEditor.removedTextBackground": diffRemovedWord,
     "diffEditor.removedLineBackground": diffRemovedLine,
-    "diffEditor.removedTextBorder": transparent,
+    "diffEditor.removedTextBorder": withAlpha(s.error, 0.3),
     "diffEditor.unchangedRegionBackground": p.bg1,
     "diffEditor.unchangedRegionForeground": p.fgMuted,
     "diffEditor.unchangedCodeBackground": withAlpha(p.fg0, 0.02),
