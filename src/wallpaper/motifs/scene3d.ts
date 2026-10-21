@@ -444,6 +444,43 @@ export interface SliceProfile {
   visible: boolean[];
 }
 
+/**
+ * Douglas–Peucker: drop points that lie within `eps` (user units) of the
+ * straight line through their kept neighbours. A slice outline samples the
+ * terrain at a fixed spacing, and on smooth stretches most samples are
+ * collinear to well under a pixel; removing them is invisible and roughly
+ * halves the outline bytes.
+ */
+export function simplify(pts: Pt[], eps: number): Pt[] {
+  if (pts.length < 3 || eps <= 0) return pts;
+  const keep = new Uint8Array(pts.length);
+  keep[0] = 1;
+  keep[pts.length - 1] = 1;
+  const stack: Array<[number, number]> = [[0, pts.length - 1]];
+  while (stack.length) {
+    const [a, b] = stack.pop() as [number, number];
+    const ax = pts[a].x;
+    const ay = pts[a].y;
+    const dx = pts[b].x - ax;
+    const dy = pts[b].y - ay;
+    const len = Math.hypot(dx, dy) || 1e-9;
+    let worst = -1;
+    let at = -1;
+    for (let i = a + 1; i < b; i++) {
+      const d = Math.abs(dy * (pts[i].x - ax) - dx * (pts[i].y - ay)) / len;
+      if (d > worst) {
+        worst = d;
+        at = i;
+      }
+    }
+    if (worst > eps) {
+      keep[at] = 1;
+      stack.push([a, at], [at, b]);
+    }
+  }
+  return pts.filter((_, i) => keep[i] === 1);
+}
+
 /** Path data with absolute start and relative integer steps (compact). */
 export function relPath(pts: Pt[]): string {
   let px = Math.round(pts[0].x);
@@ -602,7 +639,9 @@ export function terrainSlices(o: SliceOptions): { defs: string; elements: string
       );
       fill = `url(#${id})`;
     }
-    els.push(`<path d="${relPath(outline)}V${cam.H}H${Math.round(x0)}Z" fill="${fill}"/>`);
+    els.push(
+      `<path d="${relPath(simplify(outline, 0.6))}V${cam.H}H${Math.round(x0)}Z" fill="${fill}"/>`
+    );
     if (o.after) {
       const zNext = nearer < 0 ? o.zNear : zs[nearer];
       els.push(o.after({ index: idx, z, zNext, xs, hs, pts, visible }));

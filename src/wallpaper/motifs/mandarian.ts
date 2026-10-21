@@ -68,10 +68,12 @@ import {
   project,
   relPath,
   type SliceOptions,
+  simplify,
   type V3,
   valueNoise2D,
 } from "./scene3d.js";
 import {
+  colourDistance,
   grainBrick,
   keepLightness,
   mix,
@@ -197,6 +199,28 @@ function terrainSlicesLocal(o: SliceOptions): { defs: string; elements: string }
   for (let i = C - 1; i >= 0; i--)
     env[i] = env[i + 1].map((e, k) => Math.min(e, prof[i + 1].pts[k].y));
 
+  // Colour-aware selection (as void-ember's fix 9): a band taller than
+  // maxBand only forces a nearer slice where the colours meeting across it
+  // differ by more than BAND_JND (OKLab), tested on every COL_STRIDE-th
+  // column; colours are cached and reused by the painter.
+  const BAND_JND = 0.012;
+  const COL_STRIDE = 3;
+  const colCache = new Map<number, string>();
+  const colOf = (ci: number, k: number) => {
+    const key = ci * (S + 1) + k;
+    let c = colCache.get(key);
+    if (c === undefined) {
+      const z = zs[ci];
+      const x = prof[ci].xs[k];
+      const dx = (o.height(x + eps * z, z) - o.height(x - eps * z, z)) / (2 * eps * z);
+      const dz = (o.height(x, z + eps * z) - o.height(x, z - eps * z)) / (2 * eps * z);
+      const nrm = norm3([-dx, 1, -dz]);
+      const lam = Math.max(0, nrm[0] * L[0] + nrm[1] * L[1] + nrm[2] * L[2]);
+      c = mix(o.surface(lam, x, z, prof[ci].hs[k], nrm), o.atm.haze, hazeAt(o.atm, z));
+      colCache.set(key, c);
+    }
+    return c;
+  };
   const kept: number[] = [0];
   let cur = 0;
   while (cur < C) {
@@ -207,7 +231,11 @@ function terrainSlicesLocal(o: SliceOptions): { defs: string; elements: string }
       for (let k = 0; k <= S; k++) {
         const top = prof[cur].pts[k].y;
         const bottom = Math.min(prof[j].pts[k].y, env[j][k]);
-        if (top < env[cur][k] + 1) band = Math.max(band, bottom - top);
+        if (top >= env[cur][k] + 1) continue;
+        const b = bottom - top;
+        if (b <= maxBand || b <= band) continue;
+        const kc = k - (k % COL_STRIDE);
+        if (colourDistance(colOf(cur, kc), colOf(j, kc)) > BAND_JND) band = b;
       }
       if (band > maxBand) break;
       next = j;
@@ -225,15 +253,8 @@ function terrainSlicesLocal(o: SliceOptions): { defs: string; elements: string }
     const front = nearer < 0 ? new Array(S + 1).fill(cam.H) : env[ci];
     const visible = pts.map((q, k) => q.y < front[k] + 1);
     if (!visible.some(Boolean)) return;
-    const hz = hazeAt(o.atm, z);
-    const colour = (k: number) => {
-      const x = xs[k];
-      const dx = (o.height(x + eps * z, z) - o.height(x - eps * z, z)) / (2 * eps * z);
-      const dz = (o.height(x, z + eps * z) - o.height(x, z - eps * z)) / (2 * eps * z);
-      const nrm = norm3([-dx, 1, -dz]);
-      const lam = Math.max(0, nrm[0] * L[0] + nrm[1] * L[1] + nrm[2] * L[2]);
-      return mix(o.surface(lam, x, z, hs[k], nrm), o.atm.haze, hz);
-    };
+    // Same colour the selection computed (and cached) for this slice.
+    const colour = (k: number) => colOf(ci, k);
     const near = (k: number) => visible[k] || visible[k - 1] || visible[k + 1];
     const keep = pts.map((_, k) => near(k) || k % 4 === 0 || k === S);
     const ks = pts.map((_, k) => k).filter(k => keep[k]);
@@ -300,7 +321,9 @@ function terrainSlicesLocal(o: SliceOptions): { defs: string; elements: string }
       );
       fill = `url(#${id})`;
     }
-    els.push(`<path d="${relPath(outline)}V${cam.H}H${Math.round(x0)}Z" fill="${fill}"/>`);
+    els.push(
+      `<path d="${relPath(simplify(outline, 0.6))}V${cam.H}H${Math.round(x0)}Z" fill="${fill}"/>`
+    );
     if (o.after) {
       const zNext = nearer < 0 ? o.zNear : zs[nearer];
       els.push(o.after({ index: idx, z, zNext, xs, hs, pts, visible }));

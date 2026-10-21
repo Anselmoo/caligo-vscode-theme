@@ -112,7 +112,16 @@ import { clampChroma, converter, formatHex, oklch } from "culori";
 import { mergeBricks } from "../composer.js";
 import { MODE_COMPOSERS } from "../modes/index.js";
 import type { BrickOutput, BrickParams, ComposedWallpaper } from "../types.js";
-import { type Camera, hazeAt, norm3, project, relPath, type V3, valueNoise2D } from "./scene3d.js";
+import {
+  type Camera,
+  hazeAt,
+  norm3,
+  project,
+  relPath,
+  simplify,
+  type V3,
+  valueNoise2D,
+} from "./scene3d.js";
 import {
   fbm1D,
   grainBrick,
@@ -651,7 +660,9 @@ function slicesVE(o: {
       );
       fill = `url(#${id})`;
     }
-    els.push(`<path d="${relPath(path)}V${cam.H}H${Math.round(x0)}Z" fill="${fill}"/>`);
+    els.push(
+      `<path d="${relPath(simplify(path, 0.6))}V${cam.H}H${Math.round(x0)}Z" fill="${fill}"/>`
+    );
     if (o.after) {
       const zNext = nearer < 0 ? o.zNear : zs[nearer];
       els.push(o.after({ index: idx, z, zNext, xs, hs, pts, visible }));

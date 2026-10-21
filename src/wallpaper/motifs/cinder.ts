@@ -78,6 +78,7 @@ import {
   valueNoise2D,
 } from "./scene3d.js";
 import {
+  colourDistance,
   fbm1D,
   grainBrick,
   keepLightness,
@@ -692,31 +693,44 @@ export function cinderMotif(p: BrickParams): ComposedWallpaper {
         const gx = belly[0] - q[0];
         const gz = belly[2] - q[2];
         const gl = Math.hypot(gx, gz) || 1;
-        const stops = us
-          .map(u => {
-            const sq = Math.sqrt(Math.max(0, 1 - u * u));
-            const nrm: V3 = [u * v[2] - sq * v[0], 0, -u * v[0] - sq * v[2]];
-            let col = lightUp(
-              bodyCol,
-              lightAt(q, nrm).map(k => k * charK),
-              barkLit,
-              1.2
-            );
-            const nb = (nrm[0] * bv[0] + nrm[1] * bv[1] + nrm[2] * bv[2]) / bd;
-            col = mix(col, smokeLit[0], Math.min(0.45, kBelly * wrap(nb, 0.5) * charK));
-            const nv = nrm[0] * v[0] + nrm[2] * v[2];
-            col = mix(col, rimCol, Math.min(0.6, 0.7 * wrap(nv, 0.45) * (0.6 + 0.4 * charK)));
-            if (s.rim) {
-              // Backdrop rim: grows toward the silhouette (nv → 0) as the
-              // cylinder turns away from the eye; weighted to the glow side.
-              const gs = Math.max(0, (nrm[0] * gx + nrm[2] * gz) / gl);
-              const edge = Math.max(0, 1 + nv) ** 0.75;
-              const target = mix(air(backAlt), smokeLit[0], 0.18 * gs);
-              const k = s.rim * edge * (0.4 + 0.55 * gs) * (0.7 + 0.3 * charK);
-              col = mix(col, target, Math.min(0.92, k));
-            }
-            return `<stop offset="${n((u + 1) / 2, 3)}" stop-color="${fog(col, q[1], zc)}"/>`;
-          })
+        const cols = us.map(u => {
+          const sq = Math.sqrt(Math.max(0, 1 - u * u));
+          const nrm: V3 = [u * v[2] - sq * v[0], 0, -u * v[0] - sq * v[2]];
+          let col = lightUp(
+            bodyCol,
+            lightAt(q, nrm).map(k => k * charK),
+            barkLit,
+            1.2
+          );
+          const nb = (nrm[0] * bv[0] + nrm[1] * bv[1] + nrm[2] * bv[2]) / bd;
+          col = mix(col, smokeLit[0], Math.min(0.45, kBelly * wrap(nb, 0.5) * charK));
+          const nv = nrm[0] * v[0] + nrm[2] * v[2];
+          col = mix(col, rimCol, Math.min(0.6, 0.7 * wrap(nv, 0.45) * (0.6 + 0.4 * charK)));
+          if (s.rim) {
+            // Backdrop rim: grows toward the silhouette (nv → 0) as the
+            // cylinder turns away from the eye; weighted to the glow side.
+            const gs = Math.max(0, (nrm[0] * gx + nrm[2] * gz) / gl);
+            const edge = Math.max(0, 1 + nv) ** 0.75;
+            const target = mix(air(backAlt), smokeLit[0], 0.18 * gs);
+            const k = s.rim * edge * (0.4 + 0.55 * gs) * (0.7 + 0.3 * charK);
+            col = mix(col, target, Math.min(0.92, k));
+          }
+          return fog(col, q[1], zc);
+        });
+        // Keep a normal's stop only where the straight ramp between its kept
+        // neighbours would miss its colour by more than STRIP_TOL (OKLab): a
+        // dark, evenly lit strip costs two or three stops instead of 9–11,
+        // a strip with a rim or an ember-lit flank keeps them.
+        const STRIP_TOL = 0.006;
+        const keepU = [0];
+        for (let i = 1; i < us.length - 1; i++) {
+          const a0 = keepU[keepU.length - 1];
+          const f = (us[i] - us[a0]) / (us[i + 1] - us[a0]);
+          if (colourDistance(cols[i], mix(cols[a0], cols[i + 1], f)) > STRIP_TOL) keepU.push(i);
+        }
+        keepU.push(us.length - 1);
+        const stops = keepU
+          .map(i => `<stop offset="${n((us[i] + 1) / 2, 3)}" stop-color="${cols[i]}"/>`)
           .join("");
         const g0 = { x: am.sp.x - px * am.w, y: am.sp.y - py * am.w };
         const g1 = { x: am.sp.x + px * am.w, y: am.sp.y + py * am.w };
