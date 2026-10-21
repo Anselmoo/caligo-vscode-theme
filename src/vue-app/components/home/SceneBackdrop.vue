@@ -197,11 +197,14 @@ const stars = Array.from({ length: 70 }, (_, i) => {
 .scene__scrim {
   position: absolute;
   inset: 0;
+  /* Measured: the lede must clear 4.5:1 over the brightest scene pixel behind it in
+     every theme (aurora and moonlight are the bright spots). */
   background: linear-gradient(
     100deg,
-    color-mix(in oklab, var(--bg0) 92%, transparent) 0%,
-    color-mix(in oklab, var(--bg0) 78%, transparent) 38%,
-    transparent 70%
+    color-mix(in oklab, var(--bg0) 95%, transparent) 0%,
+    color-mix(in oklab, var(--bg0) 90%, transparent) 42%,
+    color-mix(in oklab, var(--bg0) 55%, transparent) 58%,
+    transparent 76%
   );
 }
 
