@@ -3,7 +3,7 @@
  *
  * For each scene (and each `<id>.v-<x>.ts` variant next to it) in all five
  * harmony modes on its own theme seed, checks:
- *   · SVG ≤ 10 MB and ≤ 80,000 elements (quality first; watch the Chromium render time)
+ *   · SVG ≤ 2 MB and ≤ 20,000 elements (per-scene exceptions in MAX_ELEMENTS_FOR), all three platforms
  *   · deterministic (two renders byte-identical)
  *   · every filter containing feTurbulence is region-restricted
  *     (filterUnits="userSpaceOnUse", width and height ≤ 1024) — no full-canvas noise
@@ -24,8 +24,20 @@ import { PLATFORM_SIZES, PLATFORMS } from "../src/wallpaper/types.js";
 import { ALL_MODES, HARMONY_TO_THEME, SCENES } from "./wallpaper-scenes.js";
 
 const MOTIF_DIR = resolve("src/wallpaper/motifs");
-const MAX_BYTES = 10 * 1024 * 1024; // user, 2026-10-21: "hier zählt Qualität … erhöhe auf 10 MB wenn es sein muss"
-const MAX_ELEMENTS = 80000;
+// Round 2 (weight): every scene × mode × platform fits 2 MB and 20k elements
+// at unchanged quality (checked against before-crops at 2×), except two
+// scenes whose remaining elements carry visible detail:
+//   · void-ember — the lava crust needs ~48 gradient samples across the near
+//     river in thin depth bands; fewer showed as stepped plate edges;
+//   · midnight-atelier — its output is byte-identical to before round 2; the
+//     lake's glitter rows and glints need their thin bands (coarser bands
+//     brightened the moon path).
+const MAX_BYTES = 2 * 1024 * 1024;
+const MAX_ELEMENTS = 20000;
+const MAX_ELEMENTS_FOR: Record<string, number> = {
+  "void-ember": 30000,
+  "midnight-atelier": 22000,
+};
 const MAX_NOISE_REGION = 1024;
 
 const only = process.argv
@@ -98,7 +110,9 @@ async function main() {
         const noise = unrestrictedTurbulence(a);
         const problems = [
           bytes > MAX_BYTES ? `size ${(bytes / 1024).toFixed(1)} KB` : "",
-          elements > MAX_ELEMENTS ? `${elements} elements` : "",
+          elements > (MAX_ELEMENTS_FOR[t.name.split(".")[0]] ?? MAX_ELEMENTS)
+            ? `${elements} elements`
+            : "",
           a !== b ? "non-deterministic" : "",
           noise > 0 ? `${noise} full-canvas feTurbulence` : "",
           hex > 0 && mode === "none" && platform === "monitor" ? `${hex} hex literals` : "",
