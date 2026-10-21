@@ -6,9 +6,11 @@
  * Pipeline:
  *   1. derivePalette(seed, themeMode) — get OKLCH-derived hex palette
  *   2. extractWallpaperColors(palette) — pick the fields we need
- *   3. MOTIFS[seedId](brickParams) → motif ComposedWallpaper
- *   4. MODE_COMPOSERS[harmonyMode](motif, params) → composed with mode overlay
- *   5. Optionally inject textBrick
+ *   3. composeSeedWallpaper(brickParams) → the seed's bare 3D scene
+ *      (registry in compose.ts; scenes in motifs/, method in spike/scene-brief.md)
+ *   4. MODE_COMPOSERS[harmonyMode](scene, params) → scene with the mode overlay
+ *      (applied here once; the registry deliberately holds the mode-free motifs)
+ *   5. Optionally inject textBrick (bottom-left pill, lines from labelLines)
  *   6. toSvgDocument(composed, viewBox) → final SVG string
  */
 
@@ -62,6 +64,29 @@ export function extractWallpaperColors(palette: DerivedPalette): WallpaperColors
   };
 }
 
+// ─── Text label ───────────────────────────────────────────────────────────────
+
+/**
+ * The two label lines of a `-text` wallpaper (bottom-left pill, `textBrick`).
+ *
+ * `textBrick` never wraps and caps its pill at 90 % of the canvas width. On a
+ * landscape canvas "<Seed> · <Topic>" fits on the large second line (the
+ * longest, "Midnight Atelier · Split Complementary", ends near x 2220 of 3840
+ * on monitor and x 1590 of 2732 on tablet). On the portrait mobile canvas the
+ * same line would run to x ≈ 1620 of 1290, so there the seed name moves up to
+ * the small first line and the second line carries only the harmony topic.
+ */
+export function labelLines(
+  spec: Pick<WallpaperSpec, "seedDisplayName" | "harmonyMode">,
+  viewBox: { width: number; height: number }
+): { line1: string; line2: string } {
+  const topic = MODE_TOPICS[spec.harmonyMode] ?? "Balanced";
+  if (viewBox.height > viewBox.width) {
+    return { line1: `Caligo · ${spec.seedDisplayName}`, line2: topic };
+  }
+  return { line1: "Caligo", line2: `${spec.seedDisplayName} · ${topic}` };
+}
+
 // ─── Core render function ─────────────────────────────────────────────────────
 
 export interface RenderWallpaperOptions {
@@ -88,7 +113,7 @@ export function renderWallpaperSvg(options: RenderWallpaperOptions): string {
     platform,
   };
 
-  // Compose: seed-mapped composition → mode overlay
+  // Compose: seed-mapped scene → mode overlay (the only place the mode is applied)
   const motifResult = composeSeedWallpaper(params);
 
   const modeComposer = MODE_COMPOSERS[harmonyMode] ?? MODE_COMPOSERS.none;
@@ -97,12 +122,7 @@ export function renderWallpaperSvg(options: RenderWallpaperOptions): string {
   // Optionally inject text
   let finalComposed = withMode;
   if (textVariant === "text") {
-    const topic = MODE_TOPICS[harmonyMode] ?? "Balanced";
-    const label = textBrick(params, {
-      line1: "Caligo",
-      line2: `${spec.seedDisplayName} · ${topic}`,
-      position: "bottom-left",
-    });
+    const label = textBrick(params, { ...labelLines(spec, viewBox), position: "bottom-left" });
     const merged = mergeBricks([label]);
     finalComposed = {
       defs: [withMode.defs, merged.defs].filter(Boolean).join("\n"),

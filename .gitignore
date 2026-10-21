@@ -617,3 +617,7 @@ examples/effects/397-static-blossom-over-obsidian-surf.svg
 examples/effects/398-refraction-riot-cathedral.svg
 examples/effects/399-liquid-antenna-eclipse.svg
 examples/effects/400-vhs-halo-over-broken-marble.svg
+
+# Wallpaper design renders (scripts/wallpaper-spike.ts, wallpaper-crop.mjs); keep only the docs
+spike/*
+!spike/*.md

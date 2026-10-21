@@ -4,8 +4,9 @@
  * A single-hue journey downward into texture and material.
  * Vertical gradient layers simulate falling through progressively deeper colour.
  */
-import { linearGradientBrick, noiseBrick, vignetteBrick } from "../bricks/index.js";
+import { linearGradientBrick, vignetteBrick } from "../bricks/index.js";
 import { mergeBricks } from "../composer.js";
+import { grainBrick } from "../motifs/shared.js";
 import type { BrickParams, ComposedWallpaper } from "../types.js";
 
 export function monochromaticMode(
@@ -26,8 +27,10 @@ export function monochromaticMode(
     opacity: 1,
   });
 
-  // Enhanced grain for material texture
-  const grain = noiseBrick(params, { id: "mode-depth-noise", opacity: 0.055, numOctaves: 6 });
+  // Material grain on a 256 px stitched tile — crisp at full resolution and
+  // cheap (the former full-canvas feTurbulence pair was slow and softened detail).
+  const { width, height } = params.viewBox;
+  const grain = grainBrick("mode-depth-noise", width, height, colors.accentSoft, 0.06);
 
   const vignette = vignetteBrick(params, { opacity: 0.65, innerRadius: 0.4 });
 
