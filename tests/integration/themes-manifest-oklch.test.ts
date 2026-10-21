@@ -1,11 +1,11 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { converter } from "culori";
+import { converter, type Oklch } from "culori";
 import { describe, expect, it } from "vitest";
 
 import { buildCoreColors, extractManifestColors } from "../../scripts/generate-themes-manifest";
 
-const toOklch = converter("oklch");
+const toOklch = converter("oklch") as (color: unknown) => Oklch | undefined;
 const TOLERANCE = 1e-3;
 const THEMES_DIR = join(process.cwd(), "build/themes");
 

@@ -6,7 +6,7 @@
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { converter } from "culori";
+import { converter, type Oklch } from "culori";
 
 const THEMES_DIR = join(process.cwd(), "build/themes");
 const SEEDS_DIR = join(process.cwd(), "src/seeds");
@@ -17,7 +17,7 @@ const SEEDS_MANIFEST = join(OUTPUT_DIR, "seeds-manifest.json");
 const SEMANTIC_TOKENS_CSS = join(process.cwd(), "src/vue-app/styles/semantic-tokens.css");
 
 // Color converter at module level to avoid recreating on each call
-const toOKLCH = converter("oklch");
+const toOKLCH = converter("oklch") as (color: unknown) => Oklch | undefined;
 
 interface OklchColor {
   l: number;
