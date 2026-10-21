@@ -69,4 +69,12 @@ describe("theme-link", () => {
     writeThemeToAddress({ seedId: "", harmonyId: "balanced" } as never);
     expect(window.location.search).toBe("");
   });
+
+  it("does not rewrite the address when it already names the theme", () => {
+    const replace = vi.spyOn(history, "replaceState");
+    writeThemeToAddress(index.themes["Caligo-DeepSable"]);
+    writeThemeToAddress(index.themes["Caligo-DeepSable"]);
+    expect(replace).toHaveBeenCalledOnce();
+    replace.mockRestore();
+  });
 });

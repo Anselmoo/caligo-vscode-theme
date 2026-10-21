@@ -73,6 +73,16 @@ describe("useExport", () => {
     expect(currentResult.value).toBeNull();
   });
 
+  it("neither copies nor downloads when there is nothing to export", async () => {
+    currentTheme.value = null;
+    const createObjectURL = vi.spyOn(URL, "createObjectURL");
+    const { copyCurrent, downloadCurrent } = useExport();
+
+    await expect(copyCurrent()).resolves.toBe(false);
+    downloadCurrent();
+    expect(createObjectURL).not.toHaveBeenCalled();
+  });
+
   it("exports the shipped colours of the current theme, whatever its harmony", () => {
     currentTheme.value = makeTheme({
       harmonyId: "triadic",

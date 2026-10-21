@@ -16,9 +16,10 @@ describe("useTheme", () => {
   });
 
   it("should initialize with default state", () => {
-    const { themeIndex, currentThemeKey, isLoading, error } = useTheme();
+    const { themeIndex, currentThemeKey, currentTheme, isLoading, error } = useTheme();
 
     expect(themeIndex.value).toBeNull();
+    expect(currentTheme.value).toBeNull();
     expect(currentThemeKey.value).toBe("");
     expect(isLoading.value).toBe(true);
     expect(error.value).toBeNull();
@@ -53,6 +54,18 @@ describe("useTheme", () => {
 
     expect(themeIndex.value).toEqual(mockThemeData);
     expect(isLoading.value).toBe(false);
+  });
+
+  it("reports a manifest that answers with an error status", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce({
+      ok: false,
+      statusText: "Not Found",
+    } as Response);
+
+    const { loadThemeIndex, error } = useTheme();
+    await loadThemeIndex();
+
+    expect(error.value?.message).toBe("Failed to load theme index: Not Found");
   });
 
   it("should handle load errors gracefully", async () => {
