@@ -24,6 +24,7 @@ const themeComment = computed(() => {
   return `// ${theme.seedLabel}, ${theme.harmonyLabel.toLowerCase()} mode`;
 });
 
+// biome-ignore lint/correctness/noUnusedVariables: used in the template (v-for); biome's Vue support misses it
 const lines = computed<Token[][]>(() => [
   [["com", themeComment.value]],
   [["dec", "@sealed"]],
@@ -97,8 +98,6 @@ const lines = computed<Token[][]>(() => [
   [["pun", "}"]],
 ]);
 
-void lines;
-void themeLabel;
 </script>
 
 <template>

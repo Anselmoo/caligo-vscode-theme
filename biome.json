@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.5/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.6.2/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -49,7 +49,7 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "style": {
         "noUnusedTemplateLiteral": "warn",
         "useTemplate": "warn"
@@ -58,5 +58,51 @@
         "noConsole": "off"
       }
     }
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.md", "**/*.yml", "**/*.yaml", "**/*.svg"],
+      "formatter": {
+        "enabled": false
+      },
+      "linter": {
+        "enabled": false
+      },
+      "assist": {
+        "enabled": false
+      }
+    },
+    {
+      "includes": ["tests/e2e/**"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "usePlaywrightValidDescribeCallback": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/*.vue"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noInvalidGridAreas": "off"
+          },
+          "a11y": {
+            "noNoninteractiveElementToInteractiveRole": "warn",
+            "noNoninteractiveTabindex": "warn",
+            "noStaticElementInteractions": "warn",
+            "noSvgWithoutTitle": "warn",
+            "useFocusableInteractive": "warn",
+            "useKeyWithClickEvents": "warn",
+            "useSemanticElements": "warn"
+          }
+        }
+      }
+    }
+  ],
+  "html": {
+    "experimentalFullSupportEnabled": true
   }
 }

@@ -39,11 +39,6 @@ async function downloadPng() {
   }
 }
 
-void previewUrl;
-void svgUrl;
-void previewSize;
-void baseName;
-void downloadPng;
 </script>
 
 <template>

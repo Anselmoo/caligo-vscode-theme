@@ -7,7 +7,6 @@ const emit = defineEmits<{
   copy: [];
   download: [];
 }>();
-void emit;
 </script>
 
 <template>

@@ -145,11 +145,6 @@ function isFirstOfGroup(index: number): boolean {
   return index === 0 || results.value[index - 1]?.group !== results.value[index]?.group;
 }
 
-void inputEl;
-void onKeydown;
-void onDialogClick;
-void runCommand;
-void isFirstOfGroup;
 </script>
 
 <template>

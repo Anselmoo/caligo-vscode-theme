@@ -53,8 +53,6 @@ const stars = Array.from({ length: 70 }, (_, i) => {
   return { x: x.toFixed(1), y: y.toFixed(1), r, o: o.toFixed(2) };
 });
 
-void sceneLoaded;
-void stars;
 </script>
 
 <template>

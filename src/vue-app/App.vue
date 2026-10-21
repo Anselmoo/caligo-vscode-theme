@@ -17,9 +17,6 @@ useCommandPaletteShortcut();
 
 // Some TS configurations (and editor diagnostics) don't account for template usage
 // when reporting noUnusedLocals in <script setup>.
-void AppFooter;
-void AppNav;
-void CommandPalette;
 </script>
 
 <template>

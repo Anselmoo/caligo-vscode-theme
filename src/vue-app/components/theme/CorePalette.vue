@@ -8,12 +8,10 @@ const coreColors = computed(() => {
   if (!currentTheme.value?.core) return [];
   return currentTheme.value.core;
 });
-void coreColors;
 
 const themeName = computed(() => {
   return currentTheme.value?.displayName || "Theme";
 });
-void themeName;
 </script>
 
 <template>

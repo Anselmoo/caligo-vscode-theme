@@ -66,15 +66,6 @@ const references = [
 
 // Some TS configurations (and editor diagnostics) don't account for template usage
 // when reporting noUnusedLocals in <script setup>.
-void ColourTable;
-void HueWheel;
-void LightnessChart;
-void themeName;
-void rows;
-void threshold;
-void weakInks;
-void translucentInks;
-void references;
 </script>
 
 <template>

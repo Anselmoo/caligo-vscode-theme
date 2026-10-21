@@ -14,7 +14,6 @@ const emit = defineEmits<{
 function onChange(event: Event) {
   emit("update:modelValue", (event.target as HTMLSelectElement).value as ExportFormat);
 }
-void onChange;
 </script>
 
 <template>

@@ -7,7 +7,6 @@ import { type ColourRow, opacityPercent } from "./colour-report.js";
 
 defineProps<{ rows: ColourRow[]; themeName: string }>();
 
-void opacityPercent;
 </script>
 
 <template>
