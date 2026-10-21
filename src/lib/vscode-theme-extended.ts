@@ -50,15 +50,16 @@ export function buildExtendedColors(p: DerivedPalette): Record<string, string> {
   const removedBg = withAlpha(s.error, 0.16);
   const removedLine = withAlpha(s.error, 0.1);
   /**
-   * Diff editor lines: the dark status tint (errorBg / successBg: background lightness + 0.08, low
-   * chroma), so code painted on a changed line keeps its contrast. The changed word is the same
-   * tint saturated (chroma x4.5) and only slightly lighter (L + 0.06) at 0.6 alpha: marked by
-   * saturation instead of a border box. The small lift keeps it visible where the status hue is
-   * close to the background hue (green words on teal themes, red words on red themes).
+   * Diff editor lines start from the dark status tint (errorBg / successBg: background lightness
+   * + 0.08, low chroma) and are marked by saturation rather than lightness, so code painted on them
+   * keeps its contrast: the changed line at chroma x3, L + 0.02, 0.45 alpha; the changed word at
+   * chroma x4.5, L + 0.06, 0.6 alpha (no border box). The small lifts keep both visible where the
+   * status hue is close to the background hue (green on teal themes, red on red themes). The diff
+   * gutter uses the word tint: a clear change marker that still leaves line numbers at ~3:1.
    */
-  const diffRemovedLine = s.errorBg;
+  const diffRemovedLine = deepen(s.errorBg, 3, 0.45, 0.02);
   const diffRemovedWord = deepen(s.errorBg, 4.5, 0.6, 0.06);
-  const diffAddedLine = s.successBg;
+  const diffAddedLine = deepen(s.successBg, 3, 0.45, 0.02);
   const diffAddedWord = deepen(s.successBg, 4.5, 0.6, 0.06);
 
   return {
@@ -335,8 +336,8 @@ export function buildExtendedColors(p: DerivedPalette): Record<string, string> {
     "diffEditor.unchangedRegionShadow": shadow,
     "diffEditor.move.border": withAlpha(p.huePurple, 0.6),
     "diffEditor.moveActive.border": p.huePurple,
-    "diffEditorGutter.insertedLineBackground": diffAddedLine,
-    "diffEditorGutter.removedLineBackground": diffRemovedLine,
+    "diffEditorGutter.insertedLineBackground": diffAddedWord,
+    "diffEditorGutter.removedLineBackground": diffRemovedWord,
     "diffEditorOverview.insertedForeground": withAlpha(s.success, 0.6),
     "diffEditorOverview.removedForeground": withAlpha(s.error, 0.6),
     "merge.border": p.border,
