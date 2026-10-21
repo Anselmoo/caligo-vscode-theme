@@ -6,6 +6,6 @@ describe("router", () => {
     const resolved = router.resolve("/export");
 
     expect(resolved.name).toBe("export");
-    expect(resolved.meta.title).toBe("Export — Caligo Themes");
+    expect(resolved.meta.title).toBe("Export — Caligo");
   });
 });

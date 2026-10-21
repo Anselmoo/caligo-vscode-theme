@@ -19,16 +19,20 @@ type GuardTo = {
 const { createWebHashHistoryMock, createRouterMock, mockRouter, state } = vi.hoisted(() => {
   const hoistedState: {
     capturedConfig: RouterConfig | null;
-    registeredGuard: ((to: GuardTo, from: unknown, next: () => void) => void) | null;
+    registeredGuard: ((to: GuardTo) => unknown) | null;
   } = {
     capturedConfig: null,
     registeredGuard: null,
   };
 
   const hoistedMockRouter = {
-    beforeEach: vi.fn((guard: (to: GuardTo, from: unknown, next: () => void) => void) => {
+    beforeEach: vi.fn((guard: (to: GuardTo) => unknown) => {
       hoistedState.registeredGuard = guard;
     }),
+    // View Transition hooks (router/index.ts); not exercised here.
+    beforeResolve: vi.fn(),
+    afterEach: vi.fn(),
+    onError: vi.fn(),
   };
 
   const hoistedCreateRouterMock = vi.fn((config: RouterConfig) => {
@@ -68,10 +72,12 @@ describe("router/index", () => {
     const routeNames = (state.capturedConfig?.routes ?? []).map(route => route.name);
     expect(routeNames).toEqual([
       "home",
-      "gallery",
-      "analysis",
+      "themes",
+      "science",
       "export",
       "wallpapers",
+      undefined, // /gallery → /themes redirect
+      undefined, // /analysis → /science redirect
       "not-found",
     ]);
   });
@@ -98,41 +104,33 @@ describe("router/index", () => {
     expect(mockRouter.beforeEach).toHaveBeenCalledTimes(1);
     expect(state.registeredGuard).not.toBeNull();
 
-    const next = vi.fn();
-
-    state.registeredGuard?.(
-      {
-        meta: {
-          title: "Export — Caligo Themes",
-          description: "Export current Caligo colors in standards-based formats",
-        },
+    const result = state.registeredGuard?.({
+      meta: {
+        title: "Export — Caligo",
+        description: "Export current Caligo colors in standards-based formats",
       },
-      {},
-      next
-    );
+    });
 
-    expect(document.title).toBe("Export — Caligo Themes");
+    expect(document.title).toBe("Export — Caligo");
     expect(document.querySelector('meta[name="description"]')?.getAttribute("content")).toBe(
       "Export current Caligo colors in standards-based formats"
     );
-    expect(next).toHaveBeenCalledOnce();
+    // undefined = proceed with the navigation
+    expect(result).toBeUndefined();
   });
 
-  it("still calls next when description is missing", () => {
+  it("still proceeds when description is missing", () => {
     document.head.innerHTML = "";
-    const next = vi.fn();
 
-    state.registeredGuard?.(
-      {
-        meta: {
-          title: "Gallery — Caligo Themes",
-        },
-      },
-      {},
-      next
-    );
+    const result = state.registeredGuard?.({ meta: { title: "Themes — Caligo" } });
 
-    expect(document.title).toBe("Gallery — Caligo Themes");
-    expect(next).toHaveBeenCalledOnce();
+    expect(document.title).toBe("Themes — Caligo");
+    expect(result).toBeUndefined();
+  });
+
+  it("falls back to 'Caligo' when a route has no title", () => {
+    state.registeredGuard?.({ meta: {} });
+
+    expect(document.title).toBe("Caligo");
   });
 });
