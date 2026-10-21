@@ -31,6 +31,13 @@ export const TEXT_VARIANTS: TextVariant[] = ["text", "no-text"];
 export const THUMBNAIL_LONG_EDGE = 640;
 
 /**
+ * Long edge of the site hero rendition. Only the monitor scene without caption
+ * gets one ("monitor.hero.webp"): the Home hero shows it full-bleed, where the
+ * 640 px thumbnail is too soft and the SVG (several MB) far too heavy.
+ */
+export const HERO_LONG_EDGE = 1920;
+
+/**
  * Thumbnail dimensions for a platform, preserving its aspect ratio.
  *
  * Scales the *long* edge to `longEdge`. Capping width instead would make the
@@ -229,6 +236,12 @@ export interface WallpaperManifestEntry extends WallpaperSpec {
    * Consumers must fall back to svgPath rather than render a broken image.
    */
   thumbPath?: string;
+  /**
+   * Full-bleed WebP of the same scene for the site hero; only on monitor
+   * no-text entries, and only once CI has rasterised it. Consumers fall back to
+   * thumbPath, never to the SVG.
+   */
+  heroPath?: string;
 }
 
 export interface WallpapersManifest {

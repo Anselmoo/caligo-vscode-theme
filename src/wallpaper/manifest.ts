@@ -21,3 +21,13 @@ export function resolveThumbPath(
   const thumbPath = svgPath.replace(/\.svg$/, ".webp");
   return thumbExists(thumbPath) ? thumbPath : undefined;
 }
+
+/** The hero rendition path ("…/monitor.hero.webp") for a wallpaper, when one exists. */
+export function resolveHeroPath(
+  svgPath: string,
+  heroExists: (heroPath: string) => boolean
+): string | undefined {
+  if (!/\/monitor\.svg$/.test(svgPath)) return undefined;
+  const heroPath = svgPath.replace(/\.svg$/, ".hero.webp");
+  return heroExists(heroPath) ? heroPath : undefined;
+}

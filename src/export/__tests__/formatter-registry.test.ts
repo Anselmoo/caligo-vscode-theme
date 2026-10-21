@@ -13,6 +13,7 @@ function makeEntry(overrides: Partial<ThemeIndexEntry> = {}): ThemeIndexEntry {
     harmonyId: "balanced",
     harmonyLabel: "Balanced",
     displayName: "Deep Sable",
+    vscodeLabel: "Caligo (Deep Sable — Balanced)",
     colors: {
       bg0: "#0f0e17",
       bg1: "#14131d",

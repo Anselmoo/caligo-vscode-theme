@@ -12,7 +12,7 @@ import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { expandSeedVariants, loadAllSeeds } from "../src/lib/seeds.js";
-import { resolveThumbPath } from "../src/wallpaper/manifest.js";
+import { resolveHeroPath, resolveThumbPath } from "../src/wallpaper/manifest.js";
 import type { WallpaperManifestEntry, WallpapersManifest } from "../src/wallpaper/types.js";
 import { MODE_TOPICS } from "../src/wallpaper/types.js";
 
@@ -90,6 +90,9 @@ async function main() {
         const thumbPath = resolveThumbPath(svgPath, rel =>
           existsSync(join(PROJECT_ROOT, "public", rel))
         );
+        const heroPath = resolveHeroPath(svgPath, rel =>
+          existsSync(join(PROJECT_ROOT, "public", rel))
+        );
 
         entries.push({
           seedId,
@@ -103,6 +106,7 @@ async function main() {
           svgPath,
           pngPath,
           ...(thumbPath ? { thumbPath } : {}),
+          ...(heroPath ? { heroPath } : {}),
         });
       }
     }

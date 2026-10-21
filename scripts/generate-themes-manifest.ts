@@ -32,6 +32,7 @@ type TokenColor = {
 };
 
 type ThemeJson = {
+  name?: string;
   colors?: Record<string, string>;
   tokenColors?: TokenColor[];
   _oklchDebug?: Record<string, unknown>;
@@ -313,6 +314,7 @@ function generateThemesManifest() {
       harmonyId: string;
       harmonyLabel: string;
       displayName: string;
+      vscodeLabel: string;
       colors: Record<string, string>;
       core: Array<{
         key: string;
@@ -380,6 +382,8 @@ function generateThemesManifest() {
           .map(w => w.charAt(0).toUpperCase() + w.slice(1))
           .join(" "),
         displayName: formatDisplayName(themeName),
+        // The name VS Code lists under Preferences: Color Theme.
+        vscodeLabel: themeContent.name ?? formatDisplayName(themeName),
         colors: {
           bg0,
           bg1,

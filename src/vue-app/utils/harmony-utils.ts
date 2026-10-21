@@ -16,12 +16,28 @@ export const HARMONY_LABELS: Record<ThemeHarmonyId, string> = {
   triadic: "Triadic",
 };
 
-export const HARMONY_ICONS: Record<ThemeHarmonyId, string> = {
-  balanced: "pi pi-circle-fill",
-  analogous: "pi pi-sun",
-  monochromatic: "pi pi-align-justify",
-  "split-complementary": "pi pi-stop-circle",
-  triadic: "pi pi-play",
+/**
+ * Hue angles (degrees from the base hue) each harmony mode places, as drawn by
+ * HarmonyGlyph. Mirrors HARMONY_OFFSETS in src/lib/harmony-colors.ts, which the
+ * site cannot import without pulling the palette engine into the bundle; a test
+ * keeps the two equal. Balanced ("none" in the engine) spreads hues around the
+ * wheel, drawn as five evenly spaced points.
+ */
+export const HARMONY_GLYPH_ANGLES: Record<string, readonly number[]> = {
+  balanced: [0, 72, 144, 216, 288],
+  analogous: [0, -30, 30],
+  monochromatic: [0],
+  "split-complementary": [0, 150, 210],
+  triadic: [0, 120, 240],
+};
+
+/** One plain sentence per mode, for the Spectrum legend. */
+export const HARMONY_MEANINGS: Record<ThemeHarmonyId, string> = {
+  balanced: "Hues spread around the wheel; the most even mix.",
+  analogous: "Neighbouring hues, 30° either side; calm and close.",
+  monochromatic: "One hue in several lightness steps; the quietest.",
+  "split-complementary": "A hue and the two beside its opposite; lively without clashing.",
+  triadic: "Three hues a third of the wheel apart; the most varied.",
 };
 
 export function harmonySortIndex(id: string): number {

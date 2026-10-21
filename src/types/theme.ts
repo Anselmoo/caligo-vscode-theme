@@ -86,6 +86,8 @@ export interface ThemeIndexEntry {
   harmonyId: ThemeHarmonyId;
   harmonyLabel: string;
   displayName: string;
+  /** The theme's name as VS Code lists it, e.g. "Caligo (Aurora Noir — Monochromatic · 2 weights)". */
+  vscodeLabel: string;
   colors: ThemeColors;
   core: ThemeCoreColor[];
   oklch: {

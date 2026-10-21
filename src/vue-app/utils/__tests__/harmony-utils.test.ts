@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import type { ThemeHarmony } from "@/types/theme";
+import { HARMONY_OFFSETS } from "../../../lib/harmony-colors.js";
 import {
   getHarmonyLabel,
-  HARMONY_ICONS,
+  HARMONY_GLYPH_ANGLES,
   HARMONY_LABELS,
+  HARMONY_MEANINGS,
   HARMONY_ORDER,
   harmonySortIndex,
   normalizeHarmonyLabel,
@@ -28,10 +30,18 @@ describe("HARMONY_LABELS", () => {
   });
 });
 
-describe("HARMONY_ICONS", () => {
-  it("provides an icon for each harmony mode", () => {
+describe("HARMONY_GLYPH_ANGLES", () => {
+  it("draws the hue offsets the palette engine actually uses", () => {
+    const sorted = (a: readonly number[]) => [...a].sort((x, y) => x - y);
+    for (const mode of ["analogous", "monochromatic", "split-complementary", "triadic"] as const) {
+      expect(sorted(HARMONY_GLYPH_ANGLES[mode])).toEqual(sorted(HARMONY_OFFSETS[mode]));
+    }
+  });
+
+  it("has a glyph and a one-line meaning for each harmony mode", () => {
     for (const id of HARMONY_ORDER) {
-      expect(HARMONY_ICONS[id]).toBeDefined();
+      expect(HARMONY_GLYPH_ANGLES[id]?.length).toBeGreaterThan(0);
+      expect(HARMONY_MEANINGS[id]).toMatch(/\.$/);
     }
   });
 });
