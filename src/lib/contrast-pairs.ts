@@ -87,7 +87,16 @@ const PAIR_GROUPS: ReadonlyArray<
     ["editor.background>editor.findMatchHighlightBackground"],
   ],
   ["editor.foldPlaceholderForeground", "text", ["editor.background>editor.foldBackground"]],
-  ["editorLineNumber.foreground", "text", ["editor.background", "editorGutter.background"]],
+  [
+    "editorLineNumber.foreground",
+    "text",
+    [
+      "editor.background",
+      "editorGutter.background",
+      "editor.background>diffEditorGutter.removedLineBackground",
+      "editor.background>diffEditorGutter.insertedLineBackground",
+    ],
+  ],
   [
     "editorLineNumber.activeForeground",
     "text",
