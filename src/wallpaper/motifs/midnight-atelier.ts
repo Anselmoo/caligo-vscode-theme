@@ -717,6 +717,28 @@ export function midnightAtelierMotif(p: BrickParams): ComposedWallpaper {
   // (tilted by 2α for a facet tilt α); the shore is found by marching it
   // through the height field, the sky otherwise. Five stratified slope
   // samples give the breeze blur of the mirror image.
+  // The march below samples the land along one azimuth a = x/z from the
+  // shore outward. Water points in one screen column share a (the slices
+  // sample fixed screen columns), and for a point before the shore the march
+  // starts at the shore itself, so the heights it reads do not depend on z:
+  // they are cached per azimuth (lazily, in march order). Same values, so
+  // the output is identical — but the lake no longer costs hundreds of
+  // height evaluations per sample.
+  const rays = new Map<number, number[]>();
+  const rayFrom = (a: number, start: number) => {
+    let hs = rays.get(a);
+    if (!hs) {
+      hs = [];
+      rays.set(a, hs);
+    }
+    const cached = hs;
+    return (i: number, zz: number) => {
+      if (i < cached.length) return cached[i];
+      const h = rawHeight(a * zz, zz);
+      cached.push(h);
+      return h;
+    };
+  };
   const reflectAt = (x: number, z: number, sz: number) => {
     // The shore's horizon seen from P along its azimuth: the steepest
     // land elevation slope h/(zz − z) and the land colour there.
@@ -726,9 +748,11 @@ export function midnightAtelierMotif(p: BrickParams): ComposedWallpaper {
     let top = 0;
     let topCol = "";
     if (zs < 255) {
-      for (let zz = Math.max(z + 0.01, zs); zz < 260; zz += Math.max(0.35, 0.01 * zz)) {
+      const ray = z + 0.01 <= zs ? rayFrom(a, zs) : null;
+      let i = 0;
+      for (let zz = Math.max(z + 0.01, zs); zz < 260; zz += Math.max(0.35, 0.01 * zz), i++) {
         if (9 / (zz - z) < top) break; // nothing farther can rise above it
-        const hh = rawHeight(a * zz, zz);
+        const hh = ray ? ray(i, zz) : rawHeight(a * zz, zz);
         const sl = hh / (zz - z);
         if (sl > top) {
           top = sl;
