@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-10-21
 ### Added
 - **colors**: emit the 63 VS Code workbench colors the themes were missing (Agents window, chat incl. voice glow, modern UI shell, `tab.divider`, `statusBar.inactiveBackground`, ...) and gate coverage against a fixture pinned to VS Code 1.142.0 (#174)
 - **wallpapers**: ten rebuilt 3D scenes, one per base theme, with a determinism and size gate (#168)
