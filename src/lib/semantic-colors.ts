@@ -381,10 +381,10 @@ export const SEMANTIC_COLOR_KEYS = {
     // Git (deleted = error-like)
     "gitDecoration.deletedResourceForeground",
 
-    // Diff removed
-    "diffEditor.removedTextBackground",
-    "diffEditor.removedTextBorder",
-    "diffEditor.removedLineBackground",
+    // Diff removed. The line/word backgrounds and the word border are NOT listed: the generic
+    // mapping gives every background the same errorBg (so a changed word was told apart from its
+    // line only by a solid errorMuted border, which boxes every word). vscode-theme-extended.ts
+    // owns them: a stronger word tint than line tint, and no border.
     "diffEditorGutter.removedLineBackground",
     "diffEditorOverview.removedForeground",
 
@@ -464,10 +464,8 @@ export const SEMANTIC_COLOR_KEYS = {
     "gitDecoration.addedResourceForeground",
     "gitDecoration.stageModifiedResourceForeground",
 
-    // Diff added
-    "diffEditor.insertedTextBackground",
-    "diffEditor.insertedTextBorder",
-    "diffEditor.insertedLineBackground",
+    // Diff added (line/word backgrounds and word border are owned by vscode-theme-extended.ts;
+    // see "Diff removed" above).
     "diffEditorGutter.insertedLineBackground",
     "diffEditorOverview.insertedForeground",
     "editorOverviewRuler.addedForeground",
