@@ -237,6 +237,49 @@ const PAIR_GROUPS: ReadonlyArray<
     ["activityBar.background>modernActivityBar.hoverBackground"],
   ],
   [
+    "modernActivityBarItem.activeForeground",
+    "ui",
+    ["activityBar.background>modernActivityBarItem.activeBackground"],
+  ],
+  [
+    "modernActivityBarItem.hoverForeground",
+    "ui",
+    ["activityBar.background>modernActivityBarItem.hoverBackground"],
+  ],
+  ["activeSessionView.foreground", "text", ["activeSessionView.background"]],
+  ["inactiveSessionView.foreground", "text", ["inactiveSessionView.background"]],
+  ["agentsPanel.foreground", "text", ["agentsPanel.background"]],
+  ["agentsBadge.foreground", "text", ["agentsBadge.background"]],
+  ["agentsUnreadBadge.foreground", "text", ["agentsUnreadBadge.background"]],
+  ["agentsChatInput.foreground", "text", ["agentsChatInput.background"]],
+  ["agentsChatInput.placeholderForeground", "text", ["agentsChatInput.background"]],
+  [
+    "agentsNewSessionButton.foreground",
+    "text",
+    [
+      "sideBar.background>agentsNewSessionButton.background",
+      "sideBar.background>agentsNewSessionButton.hoverBackground",
+    ],
+  ],
+  ["agentsMobileDiff.addedForeground", "text", ["agentsPanel.background", "editor.background"]],
+  ["agentsMobileDiff.deletedForeground", "text", ["agentsPanel.background", "editor.background"]],
+  ["agentsMobileDiff.modifiedForeground", "text", ["agentsPanel.background", "editor.background"]],
+  [
+    "chat.mcpCompatibilityWarningForeground",
+    "text",
+    ["sideBar.background", "panel.background", "editor.background"],
+  ],
+  [
+    "chat.workingProgressStableIconForeground",
+    "ui",
+    ["sideBar.background", "panel.background", "editor.background"],
+  ],
+  [
+    "chat.workingProgressInsidersIconForeground",
+    "ui",
+    ["sideBar.background", "panel.background", "editor.background"],
+  ],
+  [
     "foreground",
     "text",
     [
@@ -249,6 +292,9 @@ const PAIR_GROUPS: ReadonlyArray<
       "activityBar.background",
       "statusBar.background",
       "titleBar.activeBackground",
+      "sideBar.background>chat.statusBackground",
+      "sideBar.background>chat.findMatchHighlightBackground",
+      "sideBar.background>chat.findMatchBackground",
     ],
   ],
   [
@@ -1311,6 +1357,12 @@ const PAIR_GROUPS: ReadonlyArray<
 ];
 
 export const CONTRAST_EXEMPT_FOREGROUNDS: Readonly<Record<string, string>> = {
+  "editorOverviewRuler.agentFeedbackForeground":
+    "Decorative guide, ruler or overview-ruler mark: carries no text and no information that is not available elsewhere (WCAG 1.4.11 does not apply); not gated.",
+  "editorWordWrapIndicator.foreground":
+    "Decorative guide, ruler or overview-ruler mark: carries no text and no information that is not available elsewhere (WCAG 1.4.11 does not apply); not gated.",
+  "modernSash.gripForeground":
+    "Decorative guide, ruler or overview-ruler mark: carries no text and no information that is not available elsewhere (WCAG 1.4.11 does not apply); not gated.",
   "checkbox.disabled.foreground":
     "Disabled or dimmed state: inactive components are exempt from WCAG 1.4.3 / 1.4.11; reported, not gated.",
   "diffEditorOverview.insertedForeground":

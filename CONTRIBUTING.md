@@ -50,6 +50,18 @@ All theme colors are derived from JSON seeds in `src/seeds/*.json`. Each seed de
 2. Regenerate with `npm run build && npm run generate`
 3. Validate contrast and colors in `build/palettes/*` and preview
 
+### VS Code color coverage
+
+`src/lib/__fixtures__/vscode-colors.json` pins every workbench color id VS Code defines at one release. `tests/verification/vscode-color-coverage.test.ts` fails when a generated theme omits a non-deprecated id or emits a key VS Code does not define. Exceptions live in `scripts/vscode-colors-skips.json`, each with a reason, and a stale entry fails too.
+
+To follow a new VS Code release (network needed, run only here, never in tests):
+
+```bash
+npm run vscode:colors:refresh -- --tag 1.143.0
+```
+
+New ids then fail the test until the generator emits them (`src/lib/vscode-theme-extended.ts` for palette-derived colors, `src/lib/vscode-theme-inherited.ts` for keys VS Code defaults to another key) and, for text or icon foregrounds, `src/lib/contrast-pairs.ts` covers them.
+
 ### Code Changes
 
 - **Generator logic:** `src/lib/palette.ts`, `src/lib/vscode-theme.ts`

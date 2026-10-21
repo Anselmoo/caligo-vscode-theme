@@ -1,0 +1,7023 @@
+{
+  "vscodeVersion": "1.142.0",
+  "sourceCommit": "d956e8a6ac5d904486557eea07e1d6bd62a4d36f",
+  "fetchedAt": "2026-10-21T18:38:24.604Z",
+  "colors": [
+    {
+      "id": "actionBar.toggledBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "activeSessionView.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "activeSessionView.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "activityBar.activeBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "activityBar.activeBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "activityBar.activeFocusBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "activityBar.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "activityBar.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "activityBar.dropBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "activityBar.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "activityBar.inactiveForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "activityBarBadge.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "activityBarBadge.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "activityBarTop.activeBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "activityBarTop.activeBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "activityBarTop.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "activityBarTop.dropBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "activityBarTop.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "activityBarTop.inactiveForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "activityErrorBadge.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "activityErrorBadge.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "activityWarningBadge.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "activityWarningBadge.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentFeedbackEditorWidget.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentFeedbackEditorWidget.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentFeedbackInputWidget.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agents.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsBadge.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsBadge.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsBottomPanel.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsCard.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsChatInput.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsChatInput.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsChatInput.focusBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsChatInput.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsChatInput.placeholderForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsDetail.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentSessionReadIndicator.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentSessionSelectedBadge.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentSessionSelectedUnfocusedBadge.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsGradient.tintColor",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsMobileDiff.addedForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsMobileDiff.deletedForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsMobileDiff.modifiedForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsNewSessionButton.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsNewSessionButton.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsNewSessionButton.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsNewSessionButton.hoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsPanel.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsPanel.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsPanel.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentStatusIndicator.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsUnreadBadge.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsUnreadBadge.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsUpdateButton.downloadedBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsUpdateButton.downloadingBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsVoice.speakingBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "agentsVoice.speakingForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "badge.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "badge.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "banner.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "banner.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "banner.iconForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "breadcrumb.activeSelectionForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "breadcrumb.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "breadcrumb.focusForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "breadcrumb.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "breadcrumbPicker.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "browser.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "button.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "button.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "button.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "button.hoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "button.secondaryBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "button.secondaryBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "button.secondaryForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "button.secondaryHoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "button.separator",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chart.axis",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chart.guide",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chart.line",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "charts.blue",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "charts.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "charts.green",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "charts.lines",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "charts.orange",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "charts.purple",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "charts.red",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "charts.yellow",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.avatarBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.avatarForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.checkpointSeparator",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.dictationActiveMicGlow",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.editedFileForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.findMatchBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.findMatchHighlightBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.inputWorkingBorderColor1",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.inputWorkingBorderColor2",
+      "sources": [
+        "known",
+        "registered"
+      ],
+      "deprecated": true
+    },
+    {
+      "id": "chat.inputWorkingBorderColor3",
+      "sources": [
+        "known",
+        "registered"
+      ],
+      "deprecated": true
+    },
+    {
+      "id": "chat.linesAddedForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.linesRemovedForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.mcpCompatibilityWarningForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.requestBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.requestBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.requestBubbleBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.requestBubbleHoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.requestCodeBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.sessionStateIndicator.inProgressBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.sessionStateIndicator.needsInputBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.sessionStateIndicator.unvisitedBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.slashCommandBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.slashCommandForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.statusBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.thinkingShimmer",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.voiceGlowBaseColor",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.voiceListeningGlow",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.voiceSpeakingGlow",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.workingProgressInsidersIconForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chat.workingProgressStableIconForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "chatManagement.sashBorder",
+      "sources": [
+        "known"
+      ]
+    },
+    {
+      "id": "checkbox.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "checkbox.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "checkbox.disabled.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "checkbox.disabled.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "checkbox.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "checkbox.selectBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "checkbox.selectBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "commandCenter.activeBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "commandCenter.activeBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "commandCenter.activeForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "commandCenter.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "commandCenter.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "commandCenter.debuggingBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "commandCenter.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "commandCenter.inactiveBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "commandCenter.inactiveForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "commentsView.resolvedIcon",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "commentsView.unresolvedIcon",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "contrastActiveBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "contrastBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugConsole.errorForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugConsole.infoForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugConsole.sourceForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugConsole.warningForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugConsoleInputIcon.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugExceptionWidget.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugExceptionWidget.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugIcon.breakpointCurrentStackframeForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugIcon.breakpointDisabledForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugIcon.breakpointForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugIcon.breakpointStackframeForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugIcon.breakpointUnverifiedForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugIcon.continueForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugIcon.disconnectForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugIcon.pauseForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugIcon.restartForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugIcon.startForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugIcon.stepBackForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugIcon.stepIntoForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugIcon.stepOutForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugIcon.stepOverForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugIcon.stopForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugTokenExpression.boolean",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugTokenExpression.error",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugTokenExpression.name",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugTokenExpression.number",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugTokenExpression.string",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugTokenExpression.type",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugTokenExpression.value",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugToolBar.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugToolBar.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugView.exceptionLabelBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugView.exceptionLabelForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugView.stateLabelBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugView.stateLabelForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "debugView.valueChangedHighlight",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "descriptionForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "diffEditor.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "diffEditor.diagonalFill",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "diffEditor.insertedLineBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "diffEditor.insertedTextBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "diffEditor.insertedTextBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "diffEditor.move.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "diffEditor.moveActive.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "diffEditor.removedLineBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "diffEditor.removedTextBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "diffEditor.removedTextBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "diffEditor.unchangedCodeBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "diffEditor.unchangedRegionBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "diffEditor.unchangedRegionForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "diffEditor.unchangedRegionShadow",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "diffEditorGutter.insertedLineBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "diffEditorGutter.removedLineBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "diffEditorOverview.insertedForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "diffEditorOverview.removedForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "disabledForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "dropdown.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "dropdown.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "dropdown.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "dropdown.listBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.compositionBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.findMatchBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.findMatchBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.findMatchForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.findMatchHighlightBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.findMatchHighlightBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.findMatchHighlightForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.findRangeHighlightBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.findRangeHighlightBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.focusedStackFrameHighlightBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.foldBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.foldPlaceholderForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.hoverHighlightBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.inactiveLineHighlightBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.inactiveSelectionBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.inlineValuesBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.inlineValuesForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.lineHighlightBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.lineHighlightBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.linkedEditingBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.placeholder.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.rangeHighlightBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.rangeHighlightBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.selectionBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.selectionForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.selectionHighlightBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.selectionHighlightBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.snippetFinalTabstopHighlightBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.snippetFinalTabstopHighlightBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.snippetTabstopHighlightBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.snippetTabstopHighlightBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.stackFrameHighlightBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.symbolHighlightBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.symbolHighlightBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.wordHighlightBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.wordHighlightBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.wordHighlightStrongBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.wordHighlightStrongBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.wordHighlightTextBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editor.wordHighlightTextBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorActionList.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorActionList.focusBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorActionList.focusForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorActionList.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorActiveLineNumber.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ],
+      "deprecated": true
+    },
+    {
+      "id": "editorBracketHighlight.foreground1",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorBracketHighlight.foreground2",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorBracketHighlight.foreground3",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorBracketHighlight.foreground4",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorBracketHighlight.foreground5",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorBracketHighlight.foreground6",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorBracketHighlight.unexpectedBracket.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorBracketMatch.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorBracketMatch.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorBracketMatch.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorBracketPairGuide.activeBackground1",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorBracketPairGuide.activeBackground2",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorBracketPairGuide.activeBackground3",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorBracketPairGuide.activeBackground4",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorBracketPairGuide.activeBackground5",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorBracketPairGuide.activeBackground6",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorBracketPairGuide.background1",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorBracketPairGuide.background2",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorBracketPairGuide.background3",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorBracketPairGuide.background4",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorBracketPairGuide.background5",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorBracketPairGuide.background6",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorCodeLens.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorCommentsWidget.rangeActiveBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorCommentsWidget.rangeBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorCommentsWidget.replyInputBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorCommentsWidget.resolvedBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorCommentsWidget.unresolvedBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorCursor.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorCursor.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorError.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorError.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorError.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGhostText.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGhostText.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGhostText.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGroup.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGroup.dropBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGroup.dropIntoPromptBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGroup.dropIntoPromptBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGroup.dropIntoPromptForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGroup.emptyBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGroup.focusedEmptyBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGroupHeader.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGroupHeader.connectedTabsBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGroupHeader.noTabsBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGroupHeader.tabsBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGroupHeader.tabsBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGutter.addedBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGutter.addedSecondaryBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGutter.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGutter.commentDraftGlyphForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGutter.commentGlyphForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGutter.commentRangeForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGutter.commentUnresolvedGlyphForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGutter.deletedBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGutter.deletedSecondaryBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGutter.foldingControlForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGutter.itemBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGutter.itemGlyphForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGutter.modifiedBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorGutter.modifiedSecondaryBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorHint.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorHint.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorHoverWidget.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorHoverWidget.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorHoverWidget.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorHoverWidget.highlightForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorHoverWidget.statusBarBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorIndentGuide.activeBackground",
+      "sources": [
+        "known",
+        "registered"
+      ],
+      "deprecated": true
+    },
+    {
+      "id": "editorIndentGuide.activeBackground1",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorIndentGuide.activeBackground2",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorIndentGuide.activeBackground3",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorIndentGuide.activeBackground4",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorIndentGuide.activeBackground5",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorIndentGuide.activeBackground6",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorIndentGuide.background",
+      "sources": [
+        "known",
+        "registered"
+      ],
+      "deprecated": true
+    },
+    {
+      "id": "editorIndentGuide.background1",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorIndentGuide.background2",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorIndentGuide.background3",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorIndentGuide.background4",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorIndentGuide.background5",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorIndentGuide.background6",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorInfo.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorInfo.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorInfo.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorInlayHint.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorInlayHint.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorInlayHint.parameterBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorInlayHint.parameterForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorInlayHint.typeBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorInlayHint.typeForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorLightBulb.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorLightBulbAi.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorLightBulbAutoFix.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorLineNumber.activeForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorLineNumber.dimmedForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorLineNumber.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorLink.activeForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorMarkerNavigation.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorMarkerNavigationError.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorMarkerNavigationError.headerBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorMarkerNavigationInfo.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorMarkerNavigationInfo.headerBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorMarkerNavigationWarning.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorMarkerNavigationWarning.headerBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorMinimap.inlineChatInserted",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorMultiCursor.primary.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorMultiCursor.primary.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorMultiCursor.secondary.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorMultiCursor.secondary.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorOverviewRuler.addedForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorOverviewRuler.agentFeedbackForeground",
+      "sources": [
+        "registered"
+      ]
+    },
+    {
+      "id": "editorOverviewRuler.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorOverviewRuler.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorOverviewRuler.bracketMatchForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorOverviewRuler.commentDraftForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorOverviewRuler.commentForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorOverviewRuler.commentUnresolvedForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorOverviewRuler.commonContentForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorOverviewRuler.currentContentForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorOverviewRuler.deletedForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorOverviewRuler.errorForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorOverviewRuler.findMatchForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorOverviewRuler.incomingContentForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorOverviewRuler.infoForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorOverviewRuler.inlineChatInserted",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorOverviewRuler.inlineChatRemoved",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorOverviewRuler.modifiedForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorOverviewRuler.rangeHighlightForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorOverviewRuler.selectionHighlightForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorOverviewRuler.warningForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorOverviewRuler.wordHighlightForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorOverviewRuler.wordHighlightStrongForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorOverviewRuler.wordHighlightTextForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorPane.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorRuler.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorStickyScroll.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorStickyScroll.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorStickyScroll.shadow",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorStickyScrollGutter.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorStickyScrollHover.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorSuggestWidget.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorSuggestWidget.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorSuggestWidget.focusHighlightForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorSuggestWidget.focusOutline",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorSuggestWidget.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorSuggestWidget.highlightForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorSuggestWidget.selectedBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorSuggestWidget.selectedForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorSuggestWidget.selectedIconForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorSuggestWidgetStatus.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorUnicodeHighlight.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorUnicodeHighlight.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorUnnecessaryCode.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorUnnecessaryCode.opacity",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorWarning.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorWarning.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorWarning.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorWhitespace.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorWidget.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorWidget.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorWidget.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorWidget.resizeBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "editorWordWrapIndicator.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "errorForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "extensionBadge.remoteBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "extensionBadge.remoteForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "extensionButton.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "extensionButton.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "extensionButton.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "extensionButton.hoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "extensionButton.prominentBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "extensionButton.prominentForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "extensionButton.prominentHoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "extensionButton.separator",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "extensionIcon.preReleaseForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "extensionIcon.privateForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "extensionIcon.sponsorForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "extensionIcon.starForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "extensionIcon.verifiedForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "focusBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "gauge.background",
+      "sources": [
+        "known"
+      ]
+    },
+    {
+      "id": "gauge.border",
+      "sources": [
+        "known"
+      ]
+    },
+    {
+      "id": "gauge.errorBackground",
+      "sources": [
+        "known"
+      ]
+    },
+    {
+      "id": "gauge.errorForeground",
+      "sources": [
+        "known"
+      ]
+    },
+    {
+      "id": "gauge.foreground",
+      "sources": [
+        "known"
+      ]
+    },
+    {
+      "id": "gauge.warningBackground",
+      "sources": [
+        "known"
+      ]
+    },
+    {
+      "id": "gauge.warningForeground",
+      "sources": [
+        "known"
+      ]
+    },
+    {
+      "id": "git.blame.editorDecorationForeground",
+      "sources": [
+        "extension:git"
+      ]
+    },
+    {
+      "id": "gitDecoration.addedResourceForeground",
+      "sources": [
+        "known",
+        "extension:git"
+      ]
+    },
+    {
+      "id": "gitDecoration.conflictingResourceForeground",
+      "sources": [
+        "extension:git"
+      ]
+    },
+    {
+      "id": "gitDecoration.deletedResourceForeground",
+      "sources": [
+        "known",
+        "extension:git"
+      ]
+    },
+    {
+      "id": "gitDecoration.ignoredResourceForeground",
+      "sources": [
+        "extension:git"
+      ]
+    },
+    {
+      "id": "gitDecoration.modifiedResourceForeground",
+      "sources": [
+        "known",
+        "extension:git"
+      ]
+    },
+    {
+      "id": "gitDecoration.renamedResourceForeground",
+      "sources": [
+        "extension:git"
+      ]
+    },
+    {
+      "id": "gitDecoration.stageDeletedResourceForeground",
+      "sources": [
+        "extension:git"
+      ]
+    },
+    {
+      "id": "gitDecoration.stageModifiedResourceForeground",
+      "sources": [
+        "extension:git"
+      ]
+    },
+    {
+      "id": "gitDecoration.submoduleResourceForeground",
+      "sources": [
+        "extension:git"
+      ]
+    },
+    {
+      "id": "gitDecoration.untrackedResourceForeground",
+      "sources": [
+        "extension:git"
+      ]
+    },
+    {
+      "id": "icon.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inactiveSessionView.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inactiveSessionView.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineChat.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineChat.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineChat.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineChat.regionHighlight",
+      "sources": [
+        "known"
+      ]
+    },
+    {
+      "id": "inlineChat.shadow",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineChatDiff.inserted",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineChatDiff.removed",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineChatInput.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineChatInput.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineChatInput.focusBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineChatInput.placeholderForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineEdit.gutterIndicator.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineEdit.gutterIndicator.primaryBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineEdit.gutterIndicator.primaryBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineEdit.gutterIndicator.primaryForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineEdit.gutterIndicator.secondaryBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineEdit.gutterIndicator.secondaryBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineEdit.gutterIndicator.secondaryForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineEdit.gutterIndicator.successfulBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineEdit.gutterIndicator.successfulBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineEdit.gutterIndicator.successfulForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineEdit.modifiedBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineEdit.modifiedBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineEdit.modifiedChangedLineBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineEdit.modifiedChangedTextBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineEdit.originalBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineEdit.originalBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineEdit.originalChangedLineBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineEdit.originalChangedTextBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineEdit.tabWillAcceptModifiedBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inlineEdit.tabWillAcceptOriginalBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "input.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "input.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "input.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "input.placeholderForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inputOption.activeBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inputOption.activeBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inputOption.activeForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inputOption.hoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inputValidation.errorBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inputValidation.errorBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inputValidation.errorForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inputValidation.infoBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inputValidation.infoBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inputValidation.infoForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inputValidation.warningBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inputValidation.warningBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "inputValidation.warningForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "interactive.activeCodeBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "interactive.inactiveCodeBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "keybindingLabel.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "keybindingLabel.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "keybindingLabel.bottomBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "keybindingLabel.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "keybindingTable.headerBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "keybindingTable.rowsBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "list.activeSelectionBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "list.activeSelectionForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "list.activeSelectionIconForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "list.deemphasizedForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "list.dropBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "list.dropBetweenBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "list.errorForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "list.filterMatchBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "list.filterMatchBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "list.focusAndSelectionOutline",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "list.focusBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "list.focusForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "list.focusHighlightForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "list.focusOutline",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "list.highlightForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "list.hoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "list.hoverForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "list.inactiveFocusBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "list.inactiveFocusOutline",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "list.inactiveSelectionBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "list.inactiveSelectionForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "list.inactiveSelectionIconForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "list.invalidItemForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "list.warningForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "listFilterWidget.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "listFilterWidget.noMatchesOutline",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "listFilterWidget.outline",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "listFilterWidget.shadow",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "markdownAlert.caution.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "markdownAlert.important.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "markdownAlert.note.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "markdownAlert.tip.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "markdownAlert.warning.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "mcpIcon.starForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "menu.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "menu.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "menu.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "menu.selectionBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "menu.selectionBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "menu.selectionForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "menu.separatorBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "menubar.selectionBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "menubar.selectionBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "menubar.selectionForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "merge.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "merge.commonContentBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "merge.commonHeaderBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "merge.currentContentBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "merge.currentHeaderBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "merge.incomingContentBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "merge.incomingHeaderBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "mergeEditor.change.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "mergeEditor.change.word.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "mergeEditor.changeBase.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "mergeEditor.changeBase.word.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "mergeEditor.conflict.handled.minimapOverViewRuler",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "mergeEditor.conflict.handledFocused.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "mergeEditor.conflict.handledUnfocused.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "mergeEditor.conflict.input1.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "mergeEditor.conflict.input2.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "mergeEditor.conflict.unhandled.minimapOverViewRuler",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "mergeEditor.conflict.unhandledFocused.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "mergeEditor.conflict.unhandledUnfocused.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "mergeEditor.conflictingLines.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "minimap.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "minimap.chatEditHighlight",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "minimap.errorHighlight",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "minimap.findMatchHighlight",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "minimap.foregroundOpacity",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "minimap.infoHighlight",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "minimap.selectionHighlight",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "minimap.selectionOccurrenceHighlight",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "minimap.warningHighlight",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "minimapGutter.addedBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "minimapGutter.deletedBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "minimapGutter.modifiedBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "minimapSlider.activeBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "minimapSlider.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "minimapSlider.hoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "modernActivityBar.activeBackground",
+      "sources": [
+        "registered"
+      ],
+      "deprecated": true
+    },
+    {
+      "id": "modernActivityBar.activeForeground",
+      "sources": [
+        "registered"
+      ],
+      "deprecated": true
+    },
+    {
+      "id": "modernActivityBar.background",
+      "sources": [
+        "registered"
+      ]
+    },
+    {
+      "id": "modernActivityBar.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "modernActivityBar.hoverBackground",
+      "sources": [
+        "registered"
+      ],
+      "deprecated": true
+    },
+    {
+      "id": "modernActivityBar.hoverForeground",
+      "sources": [
+        "registered"
+      ],
+      "deprecated": true
+    },
+    {
+      "id": "modernActivityBar.inactiveBackground",
+      "sources": [
+        "registered"
+      ]
+    },
+    {
+      "id": "modernActivityBarItem.activeBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "modernActivityBarItem.activeForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "modernActivityBarItem.hoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "modernActivityBarItem.hoverForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "modernEditorTab.activeActionBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "modernEditorTab.activeBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "modernEditorTab.activeForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "modernEditorTab.activeHoverActionBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "modernEditorTab.activeHoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "modernEditorTab.hoverActionBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "modernEditorTab.hoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "modernEditorTab.hoverForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "modernEditorTab.inactiveBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "modernEditorTab.selectedActionBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "modernPanel.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "modernSash.gripForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "modernTab.activeBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "modernTab.activeForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "modernTab.hoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "modernTab.hoverForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "modernUI.inactiveShellBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "modernUI.shellBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "multiDiffEditor.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "multiDiffEditor.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "multiDiffEditor.headerBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notebook.cellBorderColor",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notebook.cellEditorBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notebook.cellHoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notebook.cellInsertionIndicator",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notebook.cellStatusBarItemHoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notebook.cellToolbarSeparator",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notebook.editorBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notebook.focusedCellBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notebook.focusedCellBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notebook.focusedEditorBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notebook.inactiveFocusedCellBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notebook.inactiveSelectedCellBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notebook.outputContainerBackgroundColor",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notebook.outputContainerBorderColor",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notebook.selectedCellBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notebook.selectedCellBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notebook.symbolHighlightBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notebookEditorOverviewRuler.runningCellForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notebookScrollbarSlider.activeBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notebookScrollbarSlider.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notebookScrollbarSlider.hoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notebookStatusErrorIcon.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notebookStatusRunningIcon.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notebookStatusSuccessIcon.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notificationCenter.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notificationCenterHeader.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notificationCenterHeader.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notificationLink.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notifications.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notifications.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notifications.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notificationsErrorIcon.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notificationsInfoIcon.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notificationsWarningIcon.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "notificationToast.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "outputView.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "outputViewStickyScroll.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "panel.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "panel.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "panel.dropBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "panelInput.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "panelSection.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "panelSection.dropBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "panelSectionHeader.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "panelSectionHeader.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "panelSectionHeader.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "panelStickyScroll.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "panelStickyScroll.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "panelStickyScroll.shadow",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "panelTitle.activeBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "panelTitle.activeForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "panelTitle.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "panelTitle.inactiveForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "panelTitleBadge.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "panelTitleBadge.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "peekView.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "peekViewEditor.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "peekViewEditor.matchHighlightBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "peekViewEditor.matchHighlightBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "peekViewEditorGutter.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "peekViewEditorStickyScroll.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "peekViewEditorStickyScrollGutter.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "peekViewResult.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "peekViewResult.fileForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "peekViewResult.lineForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "peekViewResult.matchHighlightBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "peekViewResult.selectionBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "peekViewResult.selectionForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "peekViewTitle.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "peekViewTitleDescription.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "peekViewTitleLabel.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "pickerGroup.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "pickerGroup.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "ports.iconRunningProcessForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "problemsErrorIcon.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "problemsInfoIcon.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "problemsWarningIcon.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "profileBadge.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "profileBadge.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "profiles.sashBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "progressBar.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "quickInput.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "quickInput.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "quickInput.list.focusBackground",
+      "sources": [
+        "known",
+        "registered"
+      ],
+      "deprecated": true
+    },
+    {
+      "id": "quickInputList.focusBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "quickInputList.focusForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "quickInputList.focusHighlightForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "quickInputList.focusIconForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "quickInputTitle.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "radio.activeBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "radio.activeBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "radio.activeForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "radio.inactiveBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "radio.inactiveBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "radio.inactiveForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "radio.inactiveHoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "sash.hoverBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "scmGraph.foreground1",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "scmGraph.foreground2",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "scmGraph.foreground3",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "scmGraph.foreground4",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "scmGraph.foreground5",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "scmGraph.historyItemBaseRefColor",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "scmGraph.historyItemHoverAdditionsForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "scmGraph.historyItemHoverDefaultLabelBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "scmGraph.historyItemHoverDefaultLabelForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "scmGraph.historyItemHoverDeletionsForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "scmGraph.historyItemHoverLabelForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "scmGraph.historyItemRefColor",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "scmGraph.historyItemRemoteRefColor",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "scrollbar.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "scrollbar.shadow",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "scrollbarSlider.activeBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "scrollbarSlider.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "scrollbarSlider.hoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "search.resultsInfoForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "searchEditor.findMatchBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "searchEditor.findMatchBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "searchEditor.textInputBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "selection.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "settings.checkboxBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "settings.checkboxBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "settings.checkboxForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "settings.dropdownBackground",
+      "sources": [
+        "known"
+      ]
+    },
+    {
+      "id": "settings.dropdownBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "settings.dropdownForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "settings.dropdownListBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "settings.focusedRowBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "settings.focusedRowBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "settings.headerBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "settings.headerForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "settings.modifiedItemIndicator",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "settings.numberInputBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "settings.numberInputBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "settings.numberInputForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "settings.rowHoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "settings.sashBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "settings.settingsHeaderHoverForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "settings.textInputBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "settings.textInputBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "settings.textInputForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "sideBar.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "sideBar.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "sideBar.dropBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "sideBar.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "sideBarActivityBarTop.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "sideBarSectionHeader.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "sideBarSectionHeader.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "sideBarSectionHeader.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "sideBarStickyScroll.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "sideBarStickyScroll.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "sideBarStickyScroll.shadow",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "sideBarTitle.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "sideBarTitle.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "sideBarTitle.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "sideBySideEditor.horizontalBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "sideBySideEditor.verticalBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "simpleFindWidget.sashBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBar.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBar.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBar.debuggingBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBar.debuggingBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBar.debuggingForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBar.focusBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBar.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBar.inactiveBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBar.noFolderBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBar.noFolderBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBar.noFolderForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBarItem.activeBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBarItem.compactHoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBarItem.errorBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBarItem.errorForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBarItem.errorHoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBarItem.errorHoverForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBarItem.focusBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBarItem.hoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBarItem.hoverForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBarItem.offlineBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBarItem.offlineForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBarItem.offlineHoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBarItem.offlineHoverForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBarItem.prominentBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBarItem.prominentForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBarItem.prominentHoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBarItem.prominentHoverForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBarItem.remoteBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBarItem.remoteForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBarItem.remoteHoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBarItem.remoteHoverForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBarItem.warningBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBarItem.warningForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBarItem.warningHoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "statusBarItem.warningHoverForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "strongForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "surface.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "surface.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "surface.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.arrayForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.booleanForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.classForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.colorForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.constantForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.constructorForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.enumeratorForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.enumeratorMemberForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.eventForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.fieldForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.fileForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.folderForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.functionForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.interfaceForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.keyForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.keywordForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.methodForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.moduleForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.namespaceForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.nullForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.numberForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.objectForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.operatorForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.packageForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.propertyForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.referenceForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.snippetForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.stringForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.structForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.textForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.typeParameterForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.unitForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "symbolIcon.variableForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.activeBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.activeBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.activeBorderTop",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.activeForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.activeModifiedBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.divider",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.dragAndDropBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.hoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.hoverBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.hoverForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.inactiveBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.inactiveForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.inactiveModifiedBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.lastPinnedBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.selectedBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.selectedBorderTop",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.selectedForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.unfocusedActiveBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.unfocusedActiveBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.unfocusedActiveBorderTop",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.unfocusedActiveForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.unfocusedActiveModifiedBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.unfocusedHoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.unfocusedHoverBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.unfocusedHoverForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.unfocusedInactiveBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.unfocusedInactiveForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tab.unfocusedInactiveModifiedBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminal.ansiBlack",
+      "sources": [
+        "known"
+      ]
+    },
+    {
+      "id": "terminal.ansiBlue",
+      "sources": [
+        "known"
+      ]
+    },
+    {
+      "id": "terminal.ansiBrightBlack",
+      "sources": [
+        "known"
+      ]
+    },
+    {
+      "id": "terminal.ansiBrightBlue",
+      "sources": [
+        "known"
+      ]
+    },
+    {
+      "id": "terminal.ansiBrightCyan",
+      "sources": [
+        "known"
+      ]
+    },
+    {
+      "id": "terminal.ansiBrightGreen",
+      "sources": [
+        "known"
+      ]
+    },
+    {
+      "id": "terminal.ansiBrightMagenta",
+      "sources": [
+        "known"
+      ]
+    },
+    {
+      "id": "terminal.ansiBrightRed",
+      "sources": [
+        "known"
+      ]
+    },
+    {
+      "id": "terminal.ansiBrightWhite",
+      "sources": [
+        "known"
+      ]
+    },
+    {
+      "id": "terminal.ansiBrightYellow",
+      "sources": [
+        "known"
+      ]
+    },
+    {
+      "id": "terminal.ansiCyan",
+      "sources": [
+        "known"
+      ]
+    },
+    {
+      "id": "terminal.ansiGreen",
+      "sources": [
+        "known"
+      ]
+    },
+    {
+      "id": "terminal.ansiMagenta",
+      "sources": [
+        "known"
+      ]
+    },
+    {
+      "id": "terminal.ansiRed",
+      "sources": [
+        "known"
+      ]
+    },
+    {
+      "id": "terminal.ansiWhite",
+      "sources": [
+        "known"
+      ]
+    },
+    {
+      "id": "terminal.ansiYellow",
+      "sources": [
+        "known"
+      ]
+    },
+    {
+      "id": "terminal.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminal.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminal.dropBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminal.findMatchBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminal.findMatchBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminal.findMatchHighlightBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminal.findMatchHighlightBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminal.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminal.hoverHighlightBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminal.inactiveSelectionBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminal.initialHintForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminal.selectionBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminal.selectionForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminal.tab.activeBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalCommandDecoration.defaultBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalCommandDecoration.errorBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalCommandDecoration.successBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalCommandGuide.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalCursor.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalCursor.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalOverviewRuler.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalOverviewRuler.cursorForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalOverviewRuler.findMatchForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalStickyScroll.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalStickyScroll.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalStickyScrollHover.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalSymbolIcon.aliasForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalSymbolIcon.argumentForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalSymbolIcon.branchForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalSymbolIcon.commitForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalSymbolIcon.fileForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalSymbolIcon.flagForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalSymbolIcon.folderForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalSymbolIcon.inlineSuggestionForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalSymbolIcon.methodForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalSymbolIcon.optionForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalSymbolIcon.optionValueForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalSymbolIcon.pullRequestDoneForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalSymbolIcon.pullRequestForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalSymbolIcon.remoteForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalSymbolIcon.stashForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalSymbolIcon.symbolicLinkFileForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalSymbolIcon.symbolicLinkFolderForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalSymbolIcon.symbolText",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "terminalSymbolIcon.tagForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.coverCountBadgeBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.coverCountBadgeForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.coveredBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.coveredBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.coveredGutterBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.coveredMinimapBackground",
+      "sources": [
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.iconErrored",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.iconErrored.retired",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.iconFailed",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.iconFailed.retired",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.iconPassed",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.iconPassed.retired",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.iconQueued",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.iconQueued.retired",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.iconSkipped",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.iconSkipped.retired",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.iconUnset",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.iconUnset.retired",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.message.error.badgeBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.message.error.badgeBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.message.error.badgeForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.message.error.lineBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.message.info.decorationForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.message.info.lineBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.messagePeekBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.messagePeekHeaderBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.peekBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.peekHeaderBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.runAction",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.uncoveredBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.uncoveredBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.uncoveredBranchBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.uncoveredGutterBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "testing.uncoveredMinimapBackground",
+      "sources": [
+        "registered"
+      ]
+    },
+    {
+      "id": "textBlockQuote.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "textBlockQuote.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "textCodeBlock.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "textLink.activeForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "textLink.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "textPreformat.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "textPreformat.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "textPreformat.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "textSeparator.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "titleBar.activeBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "titleBar.activeForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "titleBar.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "titleBar.inactiveBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "titleBar.inactiveForeground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "toolbar.activeBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "toolbar.hoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "toolbar.hoverOutline",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tree.inactiveIndentGuidesStroke",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tree.indentGuidesStroke",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tree.tableColumnsBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "tree.tableOddRowsBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "walkThrough.embeddedEditorBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "walkthrough.stepTitle.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "welcomePage.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "welcomePage.progress.background",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "welcomePage.progress.foreground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "welcomePage.tileBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "welcomePage.tileBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "welcomePage.tileHoverBackground",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "widget.border",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "widget.shadow",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "window.activeBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    },
+    {
+      "id": "window.inactiveBorder",
+      "sources": [
+        "known",
+        "registered"
+      ]
+    }
+  ]
+}
