@@ -6,6 +6,7 @@
 import { computed, type Ref, ref, watch } from "vue";
 import type { ThemeHarmony, ThemeIndex, ThemeIndexEntry } from "../types/theme.js";
 import { sortHarmonies } from "../utils/harmony-utils.js";
+import { initialThemeKey, storeTheme, writeThemeToAddress } from "../utils/theme-link.js";
 
 // Theme state
 const themeIndex: Ref<ThemeIndex | null> = ref(null);
@@ -60,8 +61,8 @@ export function useTheme() {
 
       themeIndex.value = data;
 
-      // Set default theme
-      currentThemeKey.value = data.defaultThemeKey;
+      // A shared link wins, then the visitor's last pick, then the manifest default.
+      currentThemeKey.value = initialThemeKey(data);
 
       // Apply theme colors to CSS variables
       applyTheme(currentThemeKey.value);
@@ -222,8 +223,7 @@ export function useTheme() {
     root.style.setProperty("--vscode-window-minimize", colors.decorator);
     root.style.setProperty("--vscode-window-maximize", colors.functions);
 
-    // Store in localStorage
-    localStorage.setItem("caligo-site-theme", themeKey);
+    storeTheme(themeKey);
   };
 
   /**
@@ -234,6 +234,9 @@ export function useTheme() {
       console.warn(`Invalid theme key: ${themeKey}`);
       return;
     }
+    // An explicit pick names itself in the address, so the URL is always shareable.
+    writeThemeToAddress(themeIndex.value.themes[themeKey]);
+
     // Re-selecting the current theme re-applies it, without an animation.
     if (themeKey === currentThemeKey.value) {
       applyTheme(themeKey);

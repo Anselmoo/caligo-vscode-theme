@@ -1,6 +1,8 @@
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
-import { extractManifestColors } from "../generate-themes-manifest";
+import { extractManifestColors } from "../../scripts/generate-themes-manifest";
 
 describe("generate-themes-manifest: extractManifestColors", () => {
   it("does not misclassify keyword storage.type as the Types color", () => {
@@ -59,5 +61,46 @@ describe("generate-themes-manifest: extractManifestColors", () => {
     expect(extracted.bg1).toBe("#141425");
     expect(extracted.bg2).toBe("#19182a");
     expect(extracted.bg2).not.toBe(extracted.bg1);
+  });
+
+  it("does not read the comment colour as Strings when a comment rule carries string.comment", () => {
+    const extracted = extractManifestColors({
+      colors: { "editor.background": "#100f20" },
+      tokenColors: [
+        {
+          name: "Comments",
+          scope: ["comment", "punctuation.definition.comment", "string.comment"],
+          settings: { foreground: "#9090a2bf" },
+        },
+        { name: "Strings", scope: ["string"], settings: { foreground: "#ffc8cf" } },
+      ],
+    });
+
+    expect(extracted.strings).toBe("#ffc8cf");
+  });
+});
+
+// Every role the site shows must be the colour VS Code paints for that scope.
+describe("generate-themes-manifest: roles match the shipped themes", () => {
+  const themesDir = join(process.cwd(), "themes");
+  const files = readdirSync(themesDir).filter(f => f.startsWith("Caligo-") && f.endsWith(".json"));
+  const exact = (
+    theme: { tokenColors?: { scope?: string | string[]; settings?: { foreground?: string } }[] },
+    scope: string
+  ) =>
+    theme.tokenColors?.find(t => ([] as string[]).concat(t.scope ?? []).includes(scope))?.settings
+      ?.foreground;
+
+  it("covers all 50 themes", () => {
+    expect(files).toHaveLength(50);
+  });
+
+  it.each(files)("%s", file => {
+    const theme = JSON.parse(readFileSync(join(themesDir, file), "utf-8"));
+    const extracted = extractManifestColors(theme);
+    expect(extracted.strings).toBe(exact(theme, "string"));
+    expect(extracted.keywords).toBe(exact(theme, "keyword"));
+    expect(extracted.types).toBe(exact(theme, "entity.name.type"));
+    expect(extracted.functions).toBe(exact(theme, "entity.name.function"));
   });
 });

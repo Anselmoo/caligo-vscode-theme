@@ -63,6 +63,22 @@ function firstTokenMatching(tokenColors: TokenColor[], matcher: (scope: string) 
 }
 
 /**
+ * The rule that names `scope` exactly, else the first rule a looser matcher accepts.
+ * Prefix matching alone picks whichever rule comes first: the Comments rule lists
+ * `string.comment`, so `^string` used to return the comment colour as Strings.
+ */
+function tokenForRole(
+  tokenColors: TokenColor[],
+  scope: string,
+  fallback: (scope: string) => boolean
+) {
+  return (
+    tokenColors.find(t => normalizeScopes(t).includes(scope)) ??
+    firstTokenMatching(tokenColors, fallback)
+  );
+}
+
+/**
  * Extract a stable set of “core” theme colors from VS Code theme JSON.
  *
  * Note: We intentionally avoid mapping bg2 to sidebar/panel because many themes
@@ -130,23 +146,30 @@ export function extractManifestColors(themeContent: ThemeJson): {
   );
   const error = pickColor(colors, ["editorError.foreground"], "#f87171");
 
-  // Token extraction (avoid accidental collisions, e.g. Keywords includes storage.type)
-  const stringToken = firstTokenMatching(
+  // Token extraction: exact scope first, then a prefix match that cannot collide
+  // (Keywords includes storage.type; Comments includes string.comment).
+  const stringToken = tokenForRole(
     tokenColors,
-    s => /^(string)(\.|$)/.test(s) || s.includes("punctuation.definition.string")
+    "string",
+    s =>
+      (/^string(\.|$)/.test(s) && !s.startsWith("string.comment")) ||
+      s.includes("punctuation.definition.string")
   );
-  const typeToken = firstTokenMatching(
+  const typeToken = tokenForRole(
     tokenColors,
+    "entity.name.type",
     s =>
       /^(entity\.name\.(type|class|struct|enum|interface))(\.|$)/.test(s) ||
       /^(support\.type)(\.|$)/.test(s)
   );
-  const functionToken = firstTokenMatching(
+  const functionToken = tokenForRole(
     tokenColors,
+    "entity.name.function",
     s => /^(entity\.name\.function)(\.|$)/.test(s) || /^(support\.function)(\.|$)/.test(s)
   );
-  const keywordToken = firstTokenMatching(
+  const keywordToken = tokenForRole(
     tokenColors,
+    "keyword",
     s => /^(keyword)(\.|$)/.test(s) || /^(storage\.(type|modifier))(\.|$)/.test(s)
   );
   const decoratorToken = firstTokenMatching(tokenColors, s => s.includes("decorator"));
