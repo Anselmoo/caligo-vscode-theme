@@ -83,15 +83,13 @@ const { currentTheme } = useTheme();
 }
 
 .wear__code {
-  overflow-x: auto;
   padding: 8px 12px;
   border-radius: 8px;
   background: color-mix(in oklab, var(--bg0) 80%, transparent);
   color: var(--syntax-strings);
   font-family: var(--font-mono);
   font-size: 0.8rem;
-  white-space: nowrap;
-  scrollbar-width: none;
+  overflow-wrap: anywhere;
 }
 
 .wear__more {

@@ -95,7 +95,7 @@ const bgOklch = computed(() => {
 <style scoped>
 .hero {
   position: relative;
-  min-height: min(calc(100svh - 56px), 900px);
+  min-height: min(calc(100svh - 56px), 820px);
   display: flex;
   isolation: isolate;
 }
@@ -190,7 +190,7 @@ const bgOklch = computed(() => {
   gap: clamp(28px, 4vw, 44px);
   max-width: var(--page-max);
   margin: 0 auto;
-  padding: clamp(40px, 8vh, 96px) var(--gutter) 0;
+  padding: clamp(8px, 2vh, 24px) var(--gutter) 0;
 }
 
 /* Facts: three measured statements on one ruled line, not cards. */

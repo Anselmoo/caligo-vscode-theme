@@ -185,13 +185,17 @@ const themeDisplayName = computed(() => currentTheme.value?.displayName || "Deep
   overflow-x: auto;
 }
 
+/* Wraps instead of scrolling: the mock is a picture, so nothing in it should be a
+   scroll area a keyboard cannot reach. */
 .sample-code {
-  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-family: var(--font-mono);
   font-size: var(--text-sm);
   line-height: 1.6;
   color: var(--vscode-editor-fg, var(--fg0));
   margin: 0;
-  white-space: pre;
+  overflow: visible;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 /* Syntax highlighting tokens */
