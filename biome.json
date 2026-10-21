@@ -18,7 +18,8 @@
       "!**/coverage",
       "!**/public",
       "!**/.vscode-test",
-      "!**/.claude/worktrees"
+      "!.claude",
+      "!.werkplan"
     ]
   },
   "formatter": {
