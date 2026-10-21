@@ -2,8 +2,21 @@
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-10-21
 ### Added
-- **colors**: emit the 63 VS Code workbench colors the themes were missing (Agents window, chat incl. voice glow, modern UI shell, `tab.divider`, `statusBar.inactiveBackground`, ...) and gate coverage against a fixture pinned to VS Code 1.142.0
+- **colors**: emit the 63 VS Code workbench colors the themes were missing (Agents window, chat incl. voice glow, modern UI shell, `tab.divider`, `statusBar.inactiveBackground`, ...) and gate coverage against a fixture pinned to VS Code 1.142.0 (#174)
+- **wallpapers**: ten rebuilt 3D scenes, one per base theme, with a determinism and size gate (#168)
+- **site**: 2026 redesign with scene hero, ⌘K theme switcher, and colour science computed from the shipped colours (#169)
+- **research**: VS Code token coverage and contrast-state audit (#168)
+
+### Fixed
+- **contrast**: translucent colours are composited over their real background before WCAG and APCA scoring; generator, gate and site share one implementation, and 681 foreground/background pairs are gated with a ratchet of known violations (#168)
+- **contrast**: selection and match-highlight overlays are fitted to the text drawn on them, so the known violations drop from 119 to 93 pairs; inactive selections no longer read stronger than active ones (#173)
+- **manifest**: OKLCH values are derived from the shipped hex, not the pre-gamut-mapping intent (#171)
+- **ci**: unit tests run against generated themes, pull requests no longer cancel each other's runs, and release summaries report failed publishes (#168)
+
+### Changed
+- **deps**: Vue, vue-router, vue-tsc, @vscode/vsce and others updated, `standard-version` replaced by `commit-and-tag-version`, npm audit fixes (#170); Biome 2.6 with Vue template analysis and a lockfile refresh (#175)
 
 ## [0.7.0] - 2026-09-03
 
