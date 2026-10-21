@@ -378,6 +378,23 @@ describe("useWallpapers — missing manifest detection", () => {
     expect(missing.value).toBe(true);
   });
 
+  it("flags a manifest without entries as missing", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        headers: new Headers({ "content-type": "application/json" }),
+        json: async () => ({ total: 0, entries: [] }),
+      })
+    );
+    const { missing, error, entries, loadManifest } = useWallpapers();
+    await loadManifest();
+    expect(missing.value).toBe(true);
+    expect(error.value).toBe("Wallpaper manifest has no entries");
+    expect(entries.value).toEqual([]);
+  });
+
   it("does not flag a network failure as missing", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
     const { missing, loadManifest } = useWallpapers();
