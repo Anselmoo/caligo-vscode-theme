@@ -14,7 +14,7 @@
  *  - `myWidget.*` — a documentation example, not a real VS Code color.
  */
 
-import { withAlpha } from "./color.js";
+import { scaleAlpha, withAlpha } from "./color.js";
 import type { DerivedPalette } from "./palette.js";
 
 export function buildExtendedColors(p: DerivedPalette): Record<string, string> {
@@ -665,7 +665,8 @@ export function buildExtendedColors(p: DerivedPalette): Record<string, string> {
     "terminal.border": p.border,
     "terminal.selectionBackground": p.selection,
     "terminal.selectionForeground": p.fg0,
-    "terminal.inactiveSelectionBackground": withAlpha(p.selection, 0.6),
+    // Weaker than the active selection: scale its alpha, do not replace it.
+    "terminal.inactiveSelectionBackground": scaleAlpha(p.selection, 0.6),
     "terminal.hoverHighlightBackground": withAlpha(p.accent, 0.14),
     "terminal.dropBackground": dropBg,
     "terminal.initialHintForeground": withAlpha(p.fgMuted, 0.6),

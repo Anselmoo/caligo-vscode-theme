@@ -1,6 +1,7 @@
 import { withAlpha } from "./color.js";
 import { pickReadableForeground } from "./contrast.js";
 import { deriveIntentSemanticTokenColors } from "./intent-layers.js";
+import { fitOverlaysToReaders } from "./overlay-fit.js";
 import type { DerivedPalette } from "./palette.js";
 import { SEMANTIC_COLOR_KEYS } from "./semantic-colors.js";
 import { deriveSemanticTokenColors, type SemanticTokenColors } from "./semantic-tokens.js";
@@ -988,8 +989,9 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     name,
     type: "dark",
     // Extended coverage fills the surfaces the base map leaves unset; the
-    // hand-tuned base colors above always win on conflict.
-    colors: { ...buildExtendedColors(p), ...colors },
+    // hand-tuned base colors above always win on conflict. Selection and highlight
+    // overlays are then fitted to the text the contrast registry draws on them.
+    colors: fitOverlaysToReaders({ ...buildExtendedColors(p), ...colors }),
     tokenColors,
     semanticHighlighting: true,
     semanticTokenColors: p.intent
