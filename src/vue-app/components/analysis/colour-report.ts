@@ -11,13 +11,17 @@
  */
 
 import * as culori from "culori";
+import { type Color, type Rgba, wcagContrastRatio } from "../../../lib/contrast.js";
 import type { ThemeIndexEntry } from "../../types/theme.js";
 
-type CuloriFns = {
-  blend: (colors: string[]) => unknown;
-  wcagContrast: (a: unknown, b: unknown) => number;
-};
-const { blend, wcagContrast } = culori as unknown as CuloriFns;
+type CuloriFns = { rgb: (color: unknown) => { r: number; g: number; b: number } };
+const { rgb } = culori as unknown as CuloriFns;
+
+/** Any culori colour as the unrounded 0-255 Rgba that src/lib/contrast scores. */
+export function toContrastColor(color: unknown): Rgba {
+  const c = rgb(color);
+  return { r: c.r * 255, g: c.g * 255, b: c.b * 255, a: 1 };
+}
 
 /** Smallest WCAG ratio for small text (AA). */
 export const AA_TEXT = 4.5;
@@ -42,8 +46,9 @@ export type ColourRow = {
 };
 
 /** WCAG 2 ratio of a (possibly translucent) colour as it renders over `bg`. */
-export function renderedContrast(fg: string, bg: string): number {
-  return wcagContrast(blend([bg, fg]), bg);
+export function renderedContrast(fg: Color, bg: Color): number {
+  // src/lib/contrast composites a translucent fg over bg before scoring.
+  return wcagContrastRatio(fg, bg);
 }
 
 /** OKLCH of a hex string, computed here and never read from the manifest. */
@@ -83,12 +88,12 @@ export function colourRows(theme: ThemeIndexEntry | null): ColourRow[] {
  */
 export function minLightnessFor(bg: string, ratio = AA_TEXT): number | null {
   const grey = (l: number) => ({ mode: "oklch", l, c: 0, h: 0 });
-  if (wcagContrast(grey(1), bg) < ratio) return null;
+  if (wcagContrastRatio(toContrastColor(grey(1)), bg) < ratio) return null;
   let low = 0;
   let high = 1;
   for (let i = 0; i < 24; i++) {
     const mid = (low + high) / 2;
-    if (wcagContrast(grey(mid), bg) >= ratio) high = mid;
+    if (wcagContrastRatio(toContrastColor(grey(mid)), bg) >= ratio) high = mid;
     else low = mid;
   }
   return high;

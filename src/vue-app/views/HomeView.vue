@@ -1,27 +1,16 @@
 <script setup lang="ts">
-import * as culori from "culori";
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
+import { renderedContrast } from "../components/analysis/colour-report.js";
 import EditorPreview from "../components/home/EditorPreview.vue";
 import SceneBackdrop from "../components/home/SceneBackdrop.vue";
 import ThemeHorizon from "../components/home/ThemeHorizon.vue";
 import { useTheme } from "../composables/useTheme.js";
 
-type CuloriFns = {
-  blend: (colors: string[]) => unknown;
-  wcagContrast: (a: unknown, b: unknown) => number;
-};
-const { blend, wcagContrast } = culori as unknown as CuloriFns;
-
 const { themes, harmonies, currentTheme, setTheme } = useTheme();
 
 const MARKETPLACE_URL =
   "https://marketplace.visualstudio.com/items?itemName=AnselmHahn.caligo-vscode-theme";
-
-/** WCAG 2 ratio of a (possibly translucent) colour as it renders over `bg`. */
-function renderedContrast(fg: string, bg: string): number {
-  return wcagContrast(blend([bg, fg]), bg);
-}
 
 const textContrast = computed(() => {
   const c = currentTheme.value?.colors;

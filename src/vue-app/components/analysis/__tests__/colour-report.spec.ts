@@ -7,6 +7,7 @@ import {
   minLightnessFor,
   opacityPercent,
   renderedContrast,
+  toContrastColor,
 } from "../colour-report.js";
 
 const BG0 = "#100f20";
@@ -58,10 +59,10 @@ describe("colour report", () => {
     const l = minLightnessFor(BG0);
     expect(l).not.toBeNull();
     const grey = (value: number) => ({ mode: "oklch", l: value, c: 0, h: 0 });
-    expect(renderedContrast(grey(l ?? 0) as unknown as string, BG0)).toBeGreaterThanOrEqual(
+    expect(renderedContrast(toContrastColor(grey(l ?? 0)), BG0)).toBeGreaterThanOrEqual(
       AA_TEXT - 0.01
     );
-    expect(renderedContrast(grey((l ?? 0) - 0.02) as unknown as string, BG0)).toBeLessThan(AA_TEXT);
+    expect(renderedContrast(toContrastColor(grey((l ?? 0) - 0.02)), BG0)).toBeLessThan(AA_TEXT);
   });
 
   it("returns no rows before a theme is loaded", () => {

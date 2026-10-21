@@ -4,16 +4,10 @@
  * with exact values. The screenshots are generated files, so a variant without one
  * gets a plain note instead of a broken image.
  */
-import * as culori from "culori";
 import { computed, ref } from "vue";
 import { RouterLink } from "vue-router";
 import type { ThemeIndexEntry } from "../../types/theme.js";
-
-type CuloriFns = {
-  blend: (colors: string[]) => unknown;
-  wcagContrast: (a: unknown, b: unknown) => number;
-};
-const { blend, wcagContrast } = culori as unknown as CuloriFns;
+import { renderedContrast } from "../analysis/colour-report.js";
 
 const props = defineProps<{
   theme: ThemeIndexEntry;
@@ -26,7 +20,7 @@ const hasImage = computed(() => !!props.screenshot && failedSrc.value !== props.
 
 const textContrast = computed(() => {
   const { fg0, bg0 } = props.theme.colors;
-  return wcagContrast(blend([bg0, fg0]), bg0).toFixed(1);
+  return renderedContrast(fg0, bg0).toFixed(1);
 });
 
 function onImageError() {
