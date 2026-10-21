@@ -140,12 +140,7 @@ function tokenizeStructuredLine(line: string): Array<{ type: string; value: stri
 </script>
 
 <template>
-  <pre
-    class="export-preview"
-    role="region"
-    aria-label="Export preview"
-    tabindex="0"
-  ><code><span
+  <section class="export-preview" aria-label="Export preview"><pre class="export-preview__code"><code><span
     v-for="(lineTokens, index) in tokenizedLines"
     :key="`${index}-${lines[index]}`"
     class="export-preview__line"
@@ -155,7 +150,7 @@ function tokenizeStructuredLine(line: string): Array<{ type: string; value: stri
     :key="`${index}-${tokenIndex}-${token.value}`"
     :class="`export-preview__token export-preview__token--${token.type}`"
   >{{ token.value }}</span>
-</span></code></pre>
+</span></code></pre></section>
 </template>
 
 <!--
@@ -165,10 +160,7 @@ function tokenizeStructuredLine(line: string): Array<{ type: string; value: stri
 -->
 <style scoped>
 .export-preview {
-  max-height: min(60vh, 520px);
   margin: 0;
-  padding: 18px 20px;
-  overflow: auto;
   border: 1px solid color-mix(in oklab, var(--fg0) 12%, transparent);
   border-radius: var(--radius-md);
   background: var(--bg1);
@@ -177,6 +169,25 @@ function tokenizeStructuredLine(line: string): Array<{ type: string; value: stri
   font-size: 0.8rem;
   line-height: 1.7;
   tab-size: 2;
+  /* Clips the scroller's corners to the rounded border. */
+  overflow: hidden;
+}
+
+/*
+  The scroller is a plain <pre>: browsers make a scroll container with no focusable
+  children keyboard-focusable on their own, so arrow keys and Page Up/Down work without
+  a tabindex on a non-interactive element. The global `pre` style paints its own block,
+  so it is reset to sit flush inside the frame.
+*/
+.export-preview__code {
+  max-height: min(60vh, 520px);
+  margin: 0;
+  padding: 18px 20px;
+  border-radius: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  overflow: auto;
 }
 
 /* The global `code` style tints text and adds a chip background; reset it here. */

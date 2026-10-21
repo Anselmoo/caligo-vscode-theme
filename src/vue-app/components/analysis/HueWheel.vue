@@ -3,7 +3,7 @@
  * Where the theme's inks sit on the OKLCH hue circle. Angle is hue, distance from the
  * centre is chroma. The ring shows what each hue looks like at a fixed lightness.
  */
-import { computed } from "vue";
+import { computed, useId } from "vue";
 import type { ColourRow } from "./colour-report.js";
 
 const props = defineProps<{ rows: ColourRow[]; themeName: string }>();
@@ -79,6 +79,8 @@ const omitted = computed(() =>
   props.rows.filter(r => !(r.kind === "ink" && r.c >= MIN_CHROMA)).map(r => r.key)
 );
 
+const titleId = useId();
+
 const description = computed(
   () =>
     `Hue and chroma of the inks in ${props.themeName}: ` +
@@ -89,7 +91,8 @@ const description = computed(
 </script>
 
 <template>
-  <svg class="wheel" :viewBox="`0 0 ${SIZE} ${SIZE}`" role="img" :aria-label="description">
+  <svg class="wheel" :viewBox="`0 0 ${SIZE} ${SIZE}`" role="img" :aria-labelledby="titleId">
+    <title :id="titleId">{{ description }}</title>
     <path v-for="(seg, i) in ring" :key="i" :d="seg.d" :fill="seg.fill" />
 
     <g class="wheel__grid">

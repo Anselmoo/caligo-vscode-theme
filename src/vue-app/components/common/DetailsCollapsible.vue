@@ -12,17 +12,15 @@ const props = withDefaults(defineProps<Props>(), {
 
 const isOpen = ref(props.open);
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function toggle() {
-  isOpen.value = !isOpen.value;
+/** The native <details> toggles itself (mouse, Enter and Space); mirror its state. */
+function onToggle(event: Event) {
+  isOpen.value = (event.currentTarget as HTMLDetailsElement).open;
 }
-
-// Reference to satisfy static analysis (used in template)
 </script>
 
 <template>
-  <details :open="isOpen" class="details">
-    <summary class="details__summary" @click.prevent="toggle">
+  <details :open="isOpen" class="details" @toggle="onToggle">
+    <summary class="details__summary">
       {{ title }}
     </summary>
     <div v-if="isOpen" class="details__body">

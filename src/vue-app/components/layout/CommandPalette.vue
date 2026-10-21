@@ -154,6 +154,7 @@ function isFirstOfGroup(index: number): boolean {
     aria-label="Switch theme or go to a page"
     @close="close"
     @click="onDialogClick"
+    @keydown.esc="close"
   >
     <div class="palette__panel">
       <input
@@ -171,16 +172,19 @@ function isFirstOfGroup(index: number): boolean {
         autocomplete="off"
         @keydown="onKeydown"
       />
-      <ul id="palette-list" class="palette__list" role="listbox" aria-label="Results">
+      <div v-show="results.length > 0" id="palette-list" class="palette__list" role="listbox" aria-label="Results">
         <template v-for="(command, index) in results" :key="command.id">
-          <li v-if="isFirstOfGroup(index)" class="palette__group" role="presentation">
+          <div v-if="isFirstOfGroup(index)" class="palette__group" role="presentation">
             {{ command.group }}
-          </li>
-          <li
+          </div>
+          <button
             :id="command.id"
+            type="button"
             class="palette__item"
             role="option"
+            tabindex="-1"
             :aria-selected="index === activeIndex"
+            @mousedown.prevent
             @click="runCommand(index)"
             @mousemove="activeIndex = index"
           >
@@ -195,13 +199,13 @@ function isFirstOfGroup(index: number): boolean {
             <span class="palette__title">{{ command.title }}</span>
             <span class="palette__detail">{{ command.detail }}</span>
             <span v-if="command.current" class="palette__current">Current</span>
-          </li>
+          </button>
         </template>
-        <li v-if="results.length === 0" class="palette__empty" role="presentation">
-          No theme or page matches “{{ query }}”. Try a theme name like “eclipse” or a mode like
-          “triadic”.
-        </li>
-      </ul>
+      </div>
+      <p v-if="results.length === 0" class="palette__empty" role="status">
+        No theme or page matches “{{ query }}”. Try a theme name like “eclipse” or a mode like
+        “triadic”.
+      </p>
       <p class="palette__hint" aria-hidden="true">
         <kbd>↑</kbd><kbd>↓</kbd> to move, <kbd>Enter</kbd> to apply, <kbd>Esc</kbd> to close
       </p>
@@ -268,7 +272,6 @@ function isFirstOfGroup(index: number): boolean {
 .palette__list {
   margin: 0;
   padding: 6px;
-  list-style: none;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -284,8 +287,14 @@ function isFirstOfGroup(index: number): boolean {
   grid-template-columns: auto 1fr auto auto;
   align-items: center;
   gap: 12px;
+  width: 100%;
   padding: 9px 12px;
+  border: 0;
   border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
   cursor: pointer;
 }
 
@@ -305,12 +314,12 @@ function isFirstOfGroup(index: number): boolean {
   height: 18px;
 }
 
-.palette__item:not(:has(.palette__swatches)) .palette__title {
-  grid-column: 1 / 3;
-}
-
 .palette__title {
   font-weight: 560;
+}
+
+.palette__item:not(:has(.palette__swatches)) .palette__title {
+  grid-column: 1 / 3;
 }
 
 .palette__detail {
@@ -325,7 +334,8 @@ function isFirstOfGroup(index: number): boolean {
 }
 
 .palette__empty {
-  padding: 20px 12px;
+  margin: 0;
+  padding: 26px 18px;
   color: var(--fg-muted);
 }
 

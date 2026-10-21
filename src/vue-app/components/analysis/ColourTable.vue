@@ -92,9 +92,9 @@ defineProps<{ rows: ColourRow[]; themeName: string }>();
   font-weight: 400;
 }
 
-.colours__num {
+.colours .colours__num {
   width: 3.4rem;
-  text-align: right !important;
+  text-align: right;
   color: var(--fg0);
   font-variant-numeric: tabular-nums;
 }
