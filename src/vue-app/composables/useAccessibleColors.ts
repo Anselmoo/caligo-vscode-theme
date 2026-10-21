@@ -6,8 +6,7 @@
  */
 
 import { computed } from "vue";
-import { APCAcontrast, sRGBtoY } from "../../lib/apca-wrapper.js";
-import { hexToRgbTuple } from "../utils/color-utils.js";
+import { apcaLc } from "../../lib/contrast.js";
 import { useTheme } from "./useTheme.js";
 
 /**
@@ -43,13 +42,8 @@ export interface ContrastResult {
  */
 export function checkContrast(textColor: string, backgroundColor: string): ContrastResult {
   try {
-    const textRGB = hexToRgbTuple(textColor);
-    const bgRGB = hexToRgbTuple(backgroundColor);
-
-    // Calculate APCA contrast
-    const textY = sRGBtoY(textRGB);
-    const bgY = sRGBtoY(bgRGB);
-    const contrast = Math.abs(APCAcontrast(textY, bgY));
+    // Single implementation: alpha-composited |Lc| from src/lib/contrast.ts
+    const contrast = apcaLc(textColor, backgroundColor);
 
     return {
       contrast,

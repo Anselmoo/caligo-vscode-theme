@@ -10,8 +10,8 @@ import {
 
 describe("color-utils", () => {
   describe("normalizeHex and isHexColor", () => {
-    it("normalizes 8-digit hex to 6-digit and keeps valid 6-digit intact", () => {
-      expect(normalizeHex("#ABCDEF88")).toBe("#abcdef");
+    it("lowercases hex and keeps the alpha byte of 8-digit hex", () => {
+      expect(normalizeHex("#ABCDEF88")).toBe("#abcdef88");
       expect(normalizeHex("#123456")).toBe("#123456");
     });
 
@@ -24,8 +24,8 @@ describe("color-utils", () => {
 
   describe("extractForeground", () => {
     it("extracts normalized foreground from string and object values", () => {
-      expect(extractForeground("#ABCDEF88")).toBe("#abcdef");
-      expect(extractForeground({ foreground: "#112233aa" })).toBe("#112233");
+      expect(extractForeground("#ABCDEF88")).toBe("#abcdef88");
+      expect(extractForeground({ foreground: "#112233aa" })).toBe("#112233aa");
     });
 
     it("returns undefined for unsupported or invalid values", () => {

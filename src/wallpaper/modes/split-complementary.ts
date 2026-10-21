@@ -1,8 +1,10 @@
 /**
  * Mode: Split-Complementary → Topic: "Rupture"
  *
- * A dramatic diagonal split divides the canvas into two contrasting visual zones.
- * One half belongs to the motif; the other to its complement.
+ * A soft diagonal split tints the canvas into two contrasting zones: one half
+ * leans to the motif's hue, the other to its complement. There is no drawn
+ * dividing line: over the 3D scenes a constant-width stroke read as a scratch
+ * across the image (user, 2026-10-21).
  */
 import { linearGradientBrick, vignetteBrick } from "../bricks/index.js";
 import { mergeBricks } from "../composer.js";
@@ -28,20 +30,11 @@ export function splitComplementaryMode(
     opacity: 1,
   });
 
-  // Diagonal dividing line
-  const lineX1 = 0;
-  const lineY1 = height * 0.5;
-  const lineX2 = width;
-  const lineY2 = height * 0.4;
-  const divLine: { defs?: string; elements: string } = {
-    elements: `<line x1="${lineX1}" y1="${lineY1.toFixed(0)}" x2="${lineX2}" y2="${lineY2.toFixed(0)}" stroke="${colors.accentMuted}" stroke-width="${(Math.max(width, height) / 2160).toFixed(1)}" opacity="0.25"/>`,
-  };
-
   const vignette = vignetteBrick(params, { opacity: 0.5, innerRadius: 0.25 });
 
   const extra = mergeBricks([splitGrad, vignette]);
   return {
     defs: [motif.defs, extra.defs].filter(Boolean).join("\n"),
-    elements: [motif.elements, divLine.elements, extra.elements].filter(Boolean).join("\n"),
+    elements: [motif.elements, extra.elements].filter(Boolean).join("\n"),
   };
 }

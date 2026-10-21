@@ -4,12 +4,12 @@
  */
 
 import * as culori from "culori";
+import { wcagContrastRatio } from "../../lib/contrast.js";
 
 type CuloriOklchInput = { l: number; c: number; h: number; mode: "oklch" };
 type CuloriShape = {
   oklch: (input: CuloriOklchInput) => unknown;
   formatHex: (color: unknown) => string | null | undefined;
-  wcagContrast: (color1: string, color2: string) => number | null | undefined;
   differenceEuclidean: (mode?: string, weights?: number[]) => (a: unknown, b: unknown) => number;
 };
 
@@ -26,11 +26,15 @@ export function oklchToHex(l: number, c: number, h: number): string {
 }
 
 /**
- * Calculate WCAG contrast ratio between two colors
+ * Calculate the WCAG 2.x contrast ratio between two colors.
+ *
+ * Delegates to the single implementation in src/lib/contrast.ts, so the site shows
+ * exactly the numbers the generator and the CI gate use. Accepts #RRGGBB or #RRGGBBAA
+ * (a translucent foreground is composited over the background first) and throws on
+ * anything else, including a translucent background (it has no defined backdrop here).
  */
 export function calculateContrast(color1: string, color2: string): number {
-  const ratio = culoriFns.wcagContrast(color1, color2);
-  return ratio || 1;
+  return wcagContrastRatio(color1, color2);
 }
 
 /**
