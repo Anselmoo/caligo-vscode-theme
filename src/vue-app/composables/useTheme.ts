@@ -313,24 +313,6 @@ export function useTheme() {
   });
 
   /**
-   * Get themes grouped by seed
-   */
-  const themesBySeed = computed(() => {
-    if (!themeIndex.value) return {};
-
-    const grouped: Record<string, ThemeIndexEntry[]> = {};
-
-    for (const theme of themes.value) {
-      if (!grouped[theme.seedId]) {
-        grouped[theme.seedId] = [];
-      }
-      grouped[theme.seedId].push(theme);
-    }
-
-    return grouped;
-  });
-
-  /**
    * Watch for theme changes
    */
   watch(currentThemeKey, newKey => {
@@ -347,7 +329,6 @@ export function useTheme() {
     themes,
     harmonies,
     seeds,
-    themesBySeed,
     isLoading,
     error,
 

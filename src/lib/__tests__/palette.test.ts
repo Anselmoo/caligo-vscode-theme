@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Seed } from "../constraints.js";
 import { derivePalette } from "../palette.js";
+import { SINGLE_INK_PRESENTATION } from "../separation-ladder.js";
 
 describe("derivePalette", () => {
   it("should derive a complete palette from a valid seed", () => {
@@ -117,5 +118,46 @@ describe("derivePalette", () => {
     assert.equal(palette.debug.oklch.accentSoft.h, 215);
     assert.equal(palette.debug.oklch.accentMuted.h, 215);
     assert.equal(palette.debug.oklch.accentSubtle.h, 215);
+  });
+});
+
+// Monochromatic themes carry one ink in two tones; roles take their tone and font
+// style from the declared presentation table instead of the allocator's bucketing.
+describe("derivePalette: single-ink (monochromatic) presentation", () => {
+  const seed: Seed = {
+    id: "SingleInk",
+    displayName: "Single Ink",
+    background: { mode: "oklch", l: 0.18, c: 0.03, h: 285 },
+    accent: { mode: "oklch", l: 0.7, c: 0.15, h: 250 },
+    harmony: "monochromatic",
+  };
+  const palette = derivePalette(seed, "Monochromatic");
+  const roles = ["keywords", "functions", "types", "variables", "strings", "numbers"] as const;
+
+  it("paints every role in one of at most two tones, split as the table declares", () => {
+    const tones = new Set(roles.map(r => palette.harmony[r]));
+    expect(tones.size).toBeLessThanOrEqual(2);
+    const toneOf = (r: (typeof roles)[number]) => SINGLE_INK_PRESENTATION[r].tone;
+    for (const a of roles) {
+      for (const b of roles) {
+        if (toneOf(a) === toneOf(b)) expect(palette.harmony[a]).toBe(palette.harmony[b]);
+      }
+    }
+  });
+
+  it("carries the table's font styles as syntax emphasis", () => {
+    const emphasised = Object.entries(palette.syntaxEmphasis);
+    expect(emphasised.length).toBeGreaterThan(0);
+    for (const [role, style] of emphasised) {
+      expect(style).toBe(
+        SINGLE_INK_PRESENTATION[role as keyof typeof SINGLE_INK_PRESENTATION].fontStyle
+      );
+    }
+    expect(palette.syntaxEmphasis.keywords).toBe("bold");
+    expect(palette.syntaxEmphasis.strings).toBe("italic");
+  });
+
+  it("adds no emphasis to multi-ink modes", () => {
+    expect(derivePalette({ ...seed, harmony: "triadic" }, "Triadic").syntaxEmphasis).toEqual({});
   });
 });

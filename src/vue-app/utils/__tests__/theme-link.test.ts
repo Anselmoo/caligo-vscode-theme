@@ -57,4 +57,16 @@ describe("theme-link", () => {
     expect(window.location.search).toBe("?theme=auroranoir-split-complementary");
     expect(window.location.hash).toBe("#/themes");
   });
+
+  it("falls back to the default when storage is blocked", () => {
+    vi.mocked(localStorage.getItem).mockImplementation(() => {
+      throw new Error("SecurityError");
+    });
+    expect(initialThemeKey(index, "")).toBe("Caligo-DeepSable");
+  });
+
+  it("leaves the address alone for a theme without a slug", () => {
+    writeThemeToAddress({ seedId: "", harmonyId: "balanced" } as never);
+    expect(window.location.search).toBe("");
+  });
 });
