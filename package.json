@@ -87,7 +87,7 @@
     "package:theme-data:prepare": "node ./scripts/prepare-theme-data-package.mjs",
     "vscode:prepublish": "npm run build && npm run generate && npm run test",
     "ci": "npm run lint && npm run lint:colors && npm run typecheck && npm run check:underscores && npm run test && npm run generate",
-    "release": "standard-version",
+    "release": "commit-and-tag-version",
     "release:ci": "npm run build && npm run generate && npm run marketplace:package",
     "prepare": "lefthook install",
     "typecheck:web": "vue-tsc -p tsconfig.web.json --noEmit",
@@ -101,7 +101,7 @@
   },
   "dependencies": {
     "apca-w3": "^0.1.9",
-    "canvaskit-wasm": "^0.41.0",
+    "canvaskit-wasm": "^0.42.0",
     "chart.js": "^4.5.1",
     "culori": "^4.0.2",
     "d3-contour": "^4.0.2",
@@ -111,8 +111,8 @@
     "pinia": "^3.0.4",
     "primeicons": "^7.0.0",
     "roughjs": "^4.6.6",
-    "vue": "^3.5.28",
-    "vue-router": "^5.0.3"
+    "vue": "^3.5.44",
+    "vue-router": "^5.4.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
@@ -129,23 +129,23 @@
     "@vitest/coverage-v8": "^4.1.12",
     "@vscode/test-cli": "^0.0.15",
     "@vscode/test-electron": "^2.5.2",
-    "@vscode/vsce": "^3.7.1",
+    "@vscode/vsce": "^3.9.2",
     "@vue/test-utils": "^2.5.1",
     "axe-core": "^4.11.4",
+    "commit-and-tag-version": "^9.6.0",
     "d3-shape": "^3.2.0",
     "happy-dom": "^20.9.0",
     "jsdom": "^28.1.0",
     "lefthook": "^2.1.16",
     "playwright": "^1.58.2",
-    "serve": "^14.2.5",
+    "serve": "^14.2.6",
     "simplex-noise": "^4.0.3",
-    "standard-version": "^9.5.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vite": "^7.3.7",
     "vitest": "^4.1.12",
-    "vue-tsc": "^3.3.11"
+    "vue-tsc": "^3.3.13"
   },
   "categories": [
     "Themes"
