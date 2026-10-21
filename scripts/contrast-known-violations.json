@@ -276,12 +276,12 @@
     {
       "pair": "editorLineNumber.foreground|editor.background",
       "themes": "*",
-      "reason": "low-emphasis (secondary/muted) text role. Measured WCAG 2.58-2.66 vs floor 4.5 (text) in 50/50 themes (10 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "low-emphasis (secondary/muted) text role. Measured WCAG 3.06-3.16 vs floor 4.5 (text) in 50/50 themes (10 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "editorLineNumber.foreground|editorGutter.background",
       "themes": "*",
-      "reason": "low-emphasis (secondary/muted) text role. Measured WCAG 2.58-2.66 vs floor 4.5 (text) in 50/50 themes (10 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "low-emphasis (secondary/muted) text role. Measured WCAG 3.06-3.16 vs floor 4.5 (text) in 50/50 themes (10 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "editorLink.activeForeground|editor.background",
@@ -807,16 +807,6 @@
         "Caligo-CinderTriadic"
       ],
       "reason": "accent/status coloured text on a neutral surface. Measured WCAG 3.09-3.62 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
-      "pair": "token:Comments|editor.background",
-      "themes": "*",
-      "reason": "syntax token \"Comments\" over editor.background. Measured WCAG 3.86-4.02 vs floor 4.5 (text) in 50/50 themes (10 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
-      "pair": "token:Docstrings|editor.background",
-      "themes": "*",
-      "reason": "syntax token \"Docstrings\" over editor.background. Measured WCAG 3.86-4.02 vs floor 4.5 (text) in 50/50 themes (10 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "token:Markup Headings|editor.background",

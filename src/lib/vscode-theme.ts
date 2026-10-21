@@ -56,7 +56,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
 
     "editor.background": p.bg0,
     "editor.foreground": p.fg0,
-    "editorLineNumber.foreground": withAlpha(p.fgMuted, 0.55),
+    "editorLineNumber.foreground": withAlpha(p.fgMuted, 0.63),
     "editorLineNumber.activeForeground": withAlpha(p.fg0, 0.8),
     "editorCursor.foreground": p.accentSoft,
 
@@ -459,7 +459,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
       name: "Comments",
       scope: ["comment", "punctuation.definition.comment", "string.comment"],
       settings: {
-        foreground: withAlpha(p.fgMuted, 0.75),
+        foreground: withAlpha(p.fgMuted, 0.9),
         fontStyle: "italic",
       },
     },
@@ -502,7 +502,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
         "punctuation.definition.string.end",
         "punctuation.definition.string",
       ],
-      settings: { foreground: withAlpha(syntax.strings, 0.85) },
+      settings: { foreground: withAlpha(syntax.strings, 0.92) },
     },
     {
       name: "String Interpolation",
@@ -526,7 +526,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     {
       name: "Docstrings",
       scope: ["string.quoted.docstring.multi", "string.quoted.docstring"],
-      settings: { foreground: withAlpha(p.fgMuted, 0.75) },
+      settings: { foreground: withAlpha(p.fgMuted, 0.9) },
     },
     {
       name: "Regex",
