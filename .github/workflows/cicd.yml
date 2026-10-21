@@ -14,9 +14,12 @@ permissions:
   pages: write
   id-token: write
 
+# One group per ref: a new push to a PR cancels that PR's previous run, but
+# runs of different PRs no longer cancel each other. Only the Pages deploy
+# jobs share the global "pages" lock (job-level concurrency below).
 concurrency:
-  group: "pages"
-  cancel-in-progress: false
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   lint:
@@ -552,6 +555,9 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
     needs: build-pages-main
     runs-on: ubuntu-latest
+    concurrency:
+      group: pages
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -827,6 +833,9 @@ jobs:
     if: ${{ needs.release-gate.outputs.ready == 'true' }}
     needs: [release-gate, build-sbom, build-wallpapers]
     runs-on: ubuntu-latest
+    concurrency:
+      group: pages
+      cancel-in-progress: false
     environment:
       name: github-pages-release
       url: ${{ steps.deployment.outputs.page_url }}
