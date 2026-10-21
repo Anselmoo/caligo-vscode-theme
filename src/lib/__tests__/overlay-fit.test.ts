@@ -60,4 +60,19 @@ describe("fitOverlaysToReaders", () => {
       }
     }
   });
+
+  it("keeps every inactive selection a weaker copy of its fitted active twin", async () => {
+    for (const seed of await loadAllSeeds()) {
+      const { colors: c } = buildVscodeThemeJson(derivePalette(seed, "Balanced"));
+      for (const [active, inactive] of [
+        ["list.activeSelectionBackground", "list.inactiveSelectionBackground"],
+        ["editor.selectionBackground", "editor.inactiveSelectionBackground"],
+      ]) {
+        expect(c[inactive].slice(0, 7), `${seed.id} ${inactive}`).toBe(c[active].slice(0, 7));
+        expect(Number.parseInt(c[inactive].slice(7), 16)).toBeLessThan(
+          Number.parseInt(c[active].slice(7), 16)
+        );
+      }
+    }
+  });
 });

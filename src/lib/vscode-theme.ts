@@ -1,4 +1,4 @@
-import { withAlpha } from "./color.js";
+import { scaleAlpha, withAlpha } from "./color.js";
 import { pickReadableForeground } from "./contrast.js";
 import { deriveIntentSemanticTokenColors } from "./intent-layers.js";
 import { fitOverlaysToReaders } from "./overlay-fit.js";
@@ -21,6 +21,9 @@ export type VscodeThemeJson = {
   semanticTokenColors?: SemanticTokenColors;
   _oklchDebug?: Record<string, number[]>;
 };
+
+/** Alpha of the accent tint for focused and unfocused selections (editor and lists). */
+const SELECTION_ALPHA = { active: 0.35, inactive: 0.22 } as const;
 
 export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
   const modeSuffix = p.mode && p.mode !== "Balanced" ? ` — ${p.mode}` : "";
@@ -58,8 +61,8 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
 
     // Selections: prefer the dark-twin accent ramp so the editor doesn't feel
     // "lit up" by the primary accent.
-    "editor.selectionBackground": withAlpha(p.accentMuted, 0.35),
-    "editor.inactiveSelectionBackground": withAlpha(p.accentMuted, 0.22),
+    "editor.selectionBackground": withAlpha(p.accentMuted, SELECTION_ALPHA.active),
+    "editor.inactiveSelectionBackground": withAlpha(p.accentMuted, SELECTION_ALPHA.inactive),
     "editor.selectionHighlightBackground": withAlpha(p.accentSubtle, 0.55),
 
     // Use the precomputed selection color (accent-based) for line highlight to ensure contrast
@@ -197,8 +200,8 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     "welcomePage.progress.background": p.bg2,
 
     "list.hoverBackground": withAlpha(p.bg2, 0.65),
-    "list.activeSelectionBackground": withAlpha(p.accentMuted, 0.35),
-    "list.inactiveSelectionBackground": withAlpha(p.accentMuted, 0.22),
+    "list.activeSelectionBackground": withAlpha(p.accentMuted, SELECTION_ALPHA.active),
+    "list.inactiveSelectionBackground": withAlpha(p.accentMuted, SELECTION_ALPHA.inactive),
     "list.activeSelectionForeground": p.fg0,
     "list.inactiveSelectionForeground": p.fg1,
 
@@ -984,14 +987,27 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
   ];
   _oklchDebug.info = [p.semantic.debug.info.l, p.semantic.debug.info.c, p.semantic.debug.info.h];
 
+  // Extended coverage fills the surfaces the base map leaves unset; the
+  // hand-tuned base colors above always win on conflict. Selection and highlight
+  // overlays are then fitted to the text the contrast registry draws on them.
+  const fitted = fitOverlaysToReaders({ ...buildExtendedColors(p), ...colors });
+  // An inactive selection is its active twin at lower alpha. Re-derive it from the
+  // fitted active tint, or a darkened active selection reads weaker than the inactive.
+  for (const [active, inactive] of [
+    ["list.activeSelectionBackground", "list.inactiveSelectionBackground"],
+    ["editor.selectionBackground", "editor.inactiveSelectionBackground"],
+  ] as const) {
+    fitted[inactive] = scaleAlpha(
+      fitted[active],
+      SELECTION_ALPHA.inactive / SELECTION_ALPHA.active
+    );
+  }
+
   return {
     $schema: "vscode://schemas/color-theme",
     name,
     type: "dark",
-    // Extended coverage fills the surfaces the base map leaves unset; the
-    // hand-tuned base colors above always win on conflict. Selection and highlight
-    // overlays are then fitted to the text the contrast registry draws on them.
-    colors: fitOverlaysToReaders({ ...buildExtendedColors(p), ...colors }),
+    colors: fitted,
     tokenColors,
     semanticHighlighting: true,
     semanticTokenColors: p.intent

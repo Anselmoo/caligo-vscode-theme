@@ -413,7 +413,7 @@
     {
       "pair": "gitDecoration.ignoredResourceForeground|sideBar.background>list.inactiveSelectionBackground",
       "themes": "*",
-      "reason": "low-emphasis (secondary/muted) text role, drawn through translucent overlay stack sideBar.background > list.inactiveSelectionBackground (alpha composited over its base). Measured WCAG 2.25-2.57 vs floor 4.5 (text) in 50/50 themes (10 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "low-emphasis (secondary/muted) text role, drawn through translucent overlay stack sideBar.background > list.inactiveSelectionBackground (alpha composited over its base). Measured WCAG 2.44-2.63 vs floor 4.5 (text) in 50/50 themes (10 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "inlineChatInput.placeholderForeground|inlineChatInput.background",
@@ -562,7 +562,7 @@
         "Caligo-CinderSplitComplementary",
         "Caligo-CinderTriadic"
       ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack panel.background > list.inactiveSelectionBackground (alpha composited over its base). Measured WCAG 2.55-3.03 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack panel.background > list.inactiveSelectionBackground (alpha composited over its base). Measured WCAG 2.84-3.42 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "list.highlightForeground|sideBar.background",
@@ -617,7 +617,7 @@
         "Caligo-CinderSplitComplementary",
         "Caligo-CinderTriadic"
       ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.inactiveSelectionBackground (alpha composited over its base). Measured WCAG 2.55-3.03 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.inactiveSelectionBackground (alpha composited over its base). Measured WCAG 2.84-3.42 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "modernActivityBar.activeForeground|activityBar.background>modernActivityBar.activeBackground",
