@@ -42,7 +42,7 @@
         "Caligo-CinderSplitComplementary",
         "Caligo-CinderTriadic"
       ],
-      "reason": "label text on a filled (accent or badge) background, drawn through translucent overlay stack editor.background > chat.slashCommandBackground (alpha composited over its base). Measured WCAG 3.53-4.16 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "label text on a filled (accent or badge) background, drawn through translucent overlay stack editor.background > chat.slashCommandBackground (alpha composited over its base). Measured WCAG 3.53-4.50 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "chat.slashCommandForeground|sideBar.background>chat.slashCommandBackground",
@@ -53,7 +53,7 @@
         "Caligo-CinderSplitComplementary",
         "Caligo-CinderTriadic"
       ],
-      "reason": "label text on a filled (accent or badge) background, drawn through translucent overlay stack sideBar.background > chat.slashCommandBackground (alpha composited over its base). Measured WCAG 3.45-4.11 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "label text on a filled (accent or badge) background, drawn through translucent overlay stack sideBar.background > chat.slashCommandBackground (alpha composited over its base). Measured WCAG 3.45-4.45 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "debugIcon.breakpointDisabledForeground|editor.background",
@@ -211,102 +211,14 @@
         "Caligo-AuroraNoir",
         "Caligo-AuroraNoirAnalogous",
         "Caligo-AuroraNoirMonochromatic",
-        "Caligo-AuroraNoirSplitComplementary",
-        "Caligo-AuroraNoirTriadic",
         "Caligo-DeepSable",
         "Caligo-DeepSableAnalogous",
         "Caligo-DeepSableMonochromatic",
-        "Caligo-DeepSableSplitComplementary",
-        "Caligo-DeepSableTriadic",
-        "Caligo-Eclipse",
-        "Caligo-EclipseAnalogous",
-        "Caligo-EclipseMonochromatic",
-        "Caligo-EclipseSplitComplementary",
-        "Caligo-EclipseTriadic",
-        "Caligo-GraphiteFlux",
-        "Caligo-GraphiteFluxAnalogous",
-        "Caligo-GraphiteFluxMonochromatic",
-        "Caligo-GraphiteFluxSplitComplementary",
-        "Caligo-GraphiteFluxTriadic",
         "Caligo-Mandarian",
-        "Caligo-MandarianAnalogous",
         "Caligo-MandarianMonochromatic",
-        "Caligo-MandarianSplitComplementary",
-        "Caligo-MandarianTriadic",
-        "Caligo-MidnightAtelier",
-        "Caligo-MidnightAtelierAnalogous",
-        "Caligo-MidnightAtelierMonochromatic",
-        "Caligo-MidnightAtelierSplitComplementary",
-        "Caligo-MidnightAtelierTriadic",
-        "Caligo-NebulaNight",
-        "Caligo-NebulaNightAnalogous",
-        "Caligo-NebulaNightMonochromatic",
-        "Caligo-NebulaNightSplitComplementary",
-        "Caligo-NebulaNightTriadic",
-        "Caligo-ObsidianGlow",
-        "Caligo-ObsidianGlowAnalogous",
-        "Caligo-ObsidianGlowMonochromatic",
-        "Caligo-ObsidianGlowSplitComplementary",
-        "Caligo-ObsidianGlowTriadic",
-        "Caligo-VoidEmber",
-        "Caligo-VoidEmberAnalogous",
-        "Caligo-VoidEmberMonochromatic",
-        "Caligo-VoidEmberSplitComplementary",
-        "Caligo-VoidEmberTriadic"
-      ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 2.99-3.42 vs floor 4.5 (text) in 45/50 themes (9 seeds incl. AuroraNoir, DeepSable, Eclipse). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
-      "pair": "editor.findMatchForeground|editor.background>editor.findMatchBackground",
-      "themes": "*",
-      "reason": "foreground/background pair, drawn through translucent overlay stack editor.background > editor.findMatchBackground (alpha composited over its base). Measured WCAG 1.65-3.77 vs floor 4.5 (text) in 50/50 themes (10 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
-      "pair": "editor.findMatchHighlightForeground|editor.background>editor.findMatchHighlightBackground",
-      "themes": ["Caligo-AuroraNoirMonochromatic"],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack editor.background > editor.findMatchHighlightBackground (alpha composited over its base). Measured WCAG 4.49-4.49 vs floor 4.5 (text) in 1/50 themes (AuroraNoir). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
-      "pair": "editor.foreground|editor.background>editor.findMatchBackground",
-      "themes": "*",
-      "reason": "foreground/background pair, drawn through translucent overlay stack editor.background > editor.findMatchBackground (alpha composited over its base). Measured WCAG 1.65-3.77 vs floor 4.5 (text) in 50/50 themes (10 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
-      "pair": "editor.foreground|editor.background>editor.findMatchHighlightBackground",
-      "themes": ["Caligo-AuroraNoirMonochromatic"],
-      "reason": "foreground/background pair, drawn through translucent overlay stack editor.background > editor.findMatchHighlightBackground (alpha composited over its base). Measured WCAG 4.49-4.49 vs floor 4.5 (text) in 1/50 themes (AuroraNoir). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
-      "pair": "editor.foreground|editor.background>editor.lineHighlightBackground>editor.selectionBackground",
-      "themes": [
-        "Caligo-AuroraNoir",
-        "Caligo-AuroraNoirAnalogous",
-        "Caligo-AuroraNoirMonochromatic",
-        "Caligo-AuroraNoirTriadic",
-        "Caligo-DeepSable",
-        "Caligo-DeepSableAnalogous",
-        "Caligo-DeepSableMonochromatic",
-        "Caligo-Eclipse",
-        "Caligo-EclipseAnalogous",
-        "Caligo-EclipseMonochromatic",
-        "Caligo-EclipseTriadic",
-        "Caligo-GraphiteFlux",
-        "Caligo-GraphiteFluxAnalogous",
-        "Caligo-GraphiteFluxMonochromatic",
-        "Caligo-Mandarian",
-        "Caligo-MandarianAnalogous",
-        "Caligo-MandarianMonochromatic",
-        "Caligo-MandarianSplitComplementary",
-        "Caligo-MandarianTriadic",
-        "Caligo-MidnightAtelierAnalogous",
-        "Caligo-MidnightAtelierSplitComplementary",
-        "Caligo-ObsidianGlow",
-        "Caligo-ObsidianGlowAnalogous",
-        "Caligo-ObsidianGlowMonochromatic",
-        "Caligo-ObsidianGlowSplitComplementary",
         "Caligo-ObsidianGlowTriadic"
       ],
-      "reason": "foreground/background pair, drawn through translucent overlay stack editor.background > editor.lineHighlightBackground > editor.selectionBackground (alpha composited over its base). Measured WCAG 4.04-4.48 vs floor 4.5 (text) in 26/50 themes (7 seeds incl. AuroraNoir, DeepSable, Eclipse). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 4.39-4.49 vs floor 4.5 (text) in 9/50 themes (AuroraNoir, DeepSable, Mandarian, ObsidianGlow). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "editor.placeholder.foreground|editor.background",
@@ -316,26 +228,13 @@
     {
       "pair": "editorBracketMatch.foreground|editor.background>editorBracketMatch.background",
       "themes": [
-        "Caligo-AuroraNoirAnalogous",
-        "Caligo-AuroraNoirTriadic",
         "Caligo-Cinder",
         "Caligo-CinderAnalogous",
         "Caligo-CinderMonochromatic",
         "Caligo-CinderSplitComplementary",
-        "Caligo-CinderTriadic",
-        "Caligo-DeepSable",
-        "Caligo-DeepSableMonochromatic",
-        "Caligo-DeepSableTriadic",
-        "Caligo-GraphiteFluxTriadic",
-        "Caligo-MandarianAnalogous",
-        "Caligo-MandarianMonochromatic",
-        "Caligo-MidnightAtelier",
-        "Caligo-MidnightAtelierMonochromatic",
-        "Caligo-ObsidianGlowSplitComplementary",
-        "Caligo-VoidEmber",
-        "Caligo-VoidEmberMonochromatic"
+        "Caligo-CinderTriadic"
       ],
-      "reason": "foreground/background pair, drawn through translucent overlay stack editor.background > editorBracketMatch.background (alpha composited over its base). Measured WCAG 2.16-4.45 vs floor 4.5 (text) in 18/50 themes (8 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "foreground/background pair, drawn through translucent overlay stack editor.background > editorBracketMatch.background (alpha composited over its base). Measured WCAG 2.16-4.38 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "editorCursor.background|editorCursor.foreground",
@@ -420,7 +319,7 @@
         "Caligo-CinderSplitComplementary",
         "Caligo-CinderTriadic"
       ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack editorSuggestWidget.background > editorSuggestWidget.selectedBackground (alpha composited over its base). Measured WCAG 3.42-4.09 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack editorSuggestWidget.background > editorSuggestWidget.selectedBackground (alpha composited over its base). Measured WCAG 3.43-4.36 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "editorSuggestWidget.highlightForeground|editorSuggestWidget.background",
@@ -436,7 +335,7 @@
     {
       "pair": "editorSuggestWidget.selectedIconForeground|editorSuggestWidget.background>editorSuggestWidget.selectedBackground",
       "themes": ["Caligo-Cinder", "Caligo-CinderAnalogous", "Caligo-CinderMonochromatic"],
-      "reason": "icon/glyph colour, drawn through translucent overlay stack editorSuggestWidget.background > editorSuggestWidget.selectedBackground (alpha composited over its base). Measured WCAG 2.61-2.65 vs floor 3 (ui) in 3/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "icon/glyph colour, drawn through translucent overlay stack editorSuggestWidget.background > editorSuggestWidget.selectedBackground (alpha composited over its base). Measured WCAG 2.61-2.85 vs floor 3 (ui) in 3/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "extensionBadge.remoteForeground|extensionBadge.remoteBackground",
@@ -484,7 +383,7 @@
     {
       "pair": "gauge.foreground|sideBar.background>gauge.background",
       "themes": ["Caligo-Cinder", "Caligo-CinderAnalogous", "Caligo-CinderMonochromatic"],
-      "reason": "bar fill (non-text) on its track, drawn through translucent overlay stack sideBar.background > gauge.background (alpha composited over its base). Measured WCAG 2.64-2.67 vs floor 3 (ui) in 3/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "bar fill (non-text) on its track, drawn through translucent overlay stack sideBar.background > gauge.background (alpha composited over its base). Measured WCAG 2.89-2.91 vs floor 3 (ui) in 3/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "git.blame.editorDecorationForeground|editor.background",
@@ -497,34 +396,6 @@
       "reason": "low-emphasis (secondary/muted) text role, drawn through translucent overlay stack editor.background > editor.lineHighlightBackground (alpha composited over its base). Measured WCAG 2.12-2.77 vs floor 4.5 (text) in 50/50 themes (10 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
-      "pair": "gitDecoration.addedResourceForeground|sideBar.background>list.activeSelectionBackground",
-      "themes": [
-        "Caligo-DeepSable",
-        "Caligo-DeepSableAnalogous",
-        "Caligo-DeepSableMonochromatic",
-        "Caligo-MandarianMonochromatic"
-      ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 4.46-4.49 vs floor 4.5 (text) in 4/50 themes (DeepSable, Mandarian). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
-      "pair": "gitDecoration.conflictingResourceForeground|sideBar.background>list.activeSelectionBackground",
-      "themes": [
-        "Caligo-AuroraNoir",
-        "Caligo-AuroraNoirAnalogous",
-        "Caligo-AuroraNoirMonochromatic"
-      ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 4.37-4.46 vs floor 4.5 (text) in 3/50 themes (AuroraNoir). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
-      "pair": "gitDecoration.deletedResourceForeground|sideBar.background>list.activeSelectionBackground",
-      "themes": [
-        "Caligo-AuroraNoir",
-        "Caligo-AuroraNoirAnalogous",
-        "Caligo-AuroraNoirMonochromatic"
-      ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 4.37-4.46 vs floor 4.5 (text) in 3/50 themes (AuroraNoir). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
       "pair": "gitDecoration.ignoredResourceForeground|sideBar.background",
       "themes": "*",
       "reason": "low-emphasis (secondary/muted) text role. Measured WCAG 2.57-2.66 vs floor 4.5 (text) in 50/50 themes (10 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
@@ -532,7 +403,7 @@
     {
       "pair": "gitDecoration.ignoredResourceForeground|sideBar.background>list.activeSelectionBackground",
       "themes": "*",
-      "reason": "low-emphasis (secondary/muted) text role, drawn through translucent overlay stack sideBar.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 1.86-2.39 vs floor 4.5 (text) in 50/50 themes (10 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "low-emphasis (secondary/muted) text role, drawn through translucent overlay stack sideBar.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 2.30-2.61 vs floor 4.5 (text) in 50/50 themes (10 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "gitDecoration.ignoredResourceForeground|sideBar.background>list.hoverBackground",
@@ -542,201 +413,7 @@
     {
       "pair": "gitDecoration.ignoredResourceForeground|sideBar.background>list.inactiveSelectionBackground",
       "themes": "*",
-      "reason": "low-emphasis (secondary/muted) text role, drawn through translucent overlay stack sideBar.background > list.inactiveSelectionBackground (alpha composited over its base). Measured WCAG 2.19-2.57 vs floor 4.5 (text) in 50/50 themes (10 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
-      "pair": "gitDecoration.modifiedResourceForeground|sideBar.background>list.activeSelectionBackground",
-      "themes": ["Caligo-AuroraNoir", "Caligo-AuroraNoirMonochromatic"],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 4.37-4.41 vs floor 4.5 (text) in 2/50 themes (AuroraNoir). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
-      "pair": "gitDecoration.renamedResourceForeground|sideBar.background>list.activeSelectionBackground",
-      "themes": [
-        "Caligo-AuroraNoir",
-        "Caligo-AuroraNoirAnalogous",
-        "Caligo-DeepSable",
-        "Caligo-DeepSableAnalogous",
-        "Caligo-Eclipse",
-        "Caligo-EclipseAnalogous",
-        "Caligo-EclipseMonochromatic",
-        "Caligo-EclipseTriadic",
-        "Caligo-GraphiteFlux",
-        "Caligo-GraphiteFluxAnalogous",
-        "Caligo-GraphiteFluxMonochromatic",
-        "Caligo-Mandarian",
-        "Caligo-MandarianTriadic",
-        "Caligo-MidnightAtelierAnalogous",
-        "Caligo-MidnightAtelierTriadic",
-        "Caligo-NebulaNightAnalogous",
-        "Caligo-ObsidianGlow",
-        "Caligo-ObsidianGlowSplitComplementary",
-        "Caligo-VoidEmberAnalogous"
-      ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 3.18-4.26 vs floor 4.5 (text) in 19/50 themes (9 seeds incl. AuroraNoir, DeepSable, Eclipse). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
-      "pair": "gitDecoration.renamedResourceForeground|sideBar.background>list.inactiveSelectionBackground",
-      "themes": [
-        "Caligo-DeepSable",
-        "Caligo-EclipseMonochromatic",
-        "Caligo-EclipseTriadic",
-        "Caligo-GraphiteFluxMonochromatic",
-        "Caligo-Mandarian",
-        "Caligo-MandarianTriadic",
-        "Caligo-MidnightAtelierAnalogous",
-        "Caligo-ObsidianGlow",
-        "Caligo-ObsidianGlowSplitComplementary",
-        "Caligo-VoidEmberAnalogous"
-      ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.inactiveSelectionBackground (alpha composited over its base). Measured WCAG 4.16-4.47 vs floor 4.5 (text) in 10/50 themes (7 seeds incl. DeepSable, Eclipse, GraphiteFlux). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
-      "pair": "gitDecoration.stageDeletedResourceForeground|sideBar.background>list.activeSelectionBackground",
-      "themes": [
-        "Caligo-AuroraNoir",
-        "Caligo-AuroraNoirAnalogous",
-        "Caligo-AuroraNoirMonochromatic",
-        "Caligo-AuroraNoirSplitComplementary",
-        "Caligo-AuroraNoirTriadic",
-        "Caligo-DeepSable",
-        "Caligo-DeepSableAnalogous",
-        "Caligo-DeepSableMonochromatic",
-        "Caligo-DeepSableSplitComplementary",
-        "Caligo-DeepSableTriadic",
-        "Caligo-Eclipse",
-        "Caligo-EclipseAnalogous",
-        "Caligo-EclipseMonochromatic",
-        "Caligo-EclipseSplitComplementary",
-        "Caligo-EclipseTriadic",
-        "Caligo-GraphiteFlux",
-        "Caligo-GraphiteFluxAnalogous",
-        "Caligo-GraphiteFluxMonochromatic",
-        "Caligo-GraphiteFluxSplitComplementary",
-        "Caligo-GraphiteFluxTriadic",
-        "Caligo-Mandarian",
-        "Caligo-MandarianAnalogous",
-        "Caligo-MandarianMonochromatic",
-        "Caligo-MandarianSplitComplementary",
-        "Caligo-MandarianTriadic",
-        "Caligo-MidnightAtelier",
-        "Caligo-MidnightAtelierAnalogous",
-        "Caligo-MidnightAtelierMonochromatic",
-        "Caligo-MidnightAtelierSplitComplementary",
-        "Caligo-MidnightAtelierTriadic",
-        "Caligo-NebulaNight",
-        "Caligo-NebulaNightAnalogous",
-        "Caligo-NebulaNightMonochromatic",
-        "Caligo-NebulaNightSplitComplementary",
-        "Caligo-ObsidianGlow",
-        "Caligo-ObsidianGlowAnalogous",
-        "Caligo-ObsidianGlowMonochromatic",
-        "Caligo-ObsidianGlowTriadic",
-        "Caligo-VoidEmber",
-        "Caligo-VoidEmberAnalogous",
-        "Caligo-VoidEmberMonochromatic",
-        "Caligo-VoidEmberSplitComplementary",
-        "Caligo-VoidEmberTriadic"
-      ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 3.29-4.43 vs floor 4.5 (text) in 43/50 themes (9 seeds incl. AuroraNoir, DeepSable, Eclipse). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
-      "pair": "gitDecoration.stageDeletedResourceForeground|sideBar.background>list.inactiveSelectionBackground",
-      "themes": [
-        "Caligo-AuroraNoir",
-        "Caligo-AuroraNoirAnalogous",
-        "Caligo-AuroraNoirMonochromatic",
-        "Caligo-AuroraNoirSplitComplementary",
-        "Caligo-AuroraNoirTriadic",
-        "Caligo-DeepSable",
-        "Caligo-DeepSableAnalogous",
-        "Caligo-DeepSableMonochromatic",
-        "Caligo-EclipseSplitComplementary",
-        "Caligo-EclipseTriadic",
-        "Caligo-GraphiteFlux",
-        "Caligo-GraphiteFluxAnalogous",
-        "Caligo-GraphiteFluxMonochromatic",
-        "Caligo-Mandarian",
-        "Caligo-MandarianMonochromatic",
-        "Caligo-MandarianSplitComplementary",
-        "Caligo-MandarianTriadic",
-        "Caligo-ObsidianGlow",
-        "Caligo-ObsidianGlowAnalogous",
-        "Caligo-ObsidianGlowMonochromatic",
-        "Caligo-ObsidianGlowTriadic"
-      ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.inactiveSelectionBackground (alpha composited over its base). Measured WCAG 4.19-4.50 vs floor 4.5 (text) in 21/50 themes (AuroraNoir, DeepSable, Eclipse, GraphiteFlux, Mandarian, ObsidianGlow). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
-      "pair": "gitDecoration.stageModifiedResourceForeground|sideBar.background>list.activeSelectionBackground",
-      "themes": [
-        "Caligo-DeepSable",
-        "Caligo-DeepSableAnalogous",
-        "Caligo-DeepSableMonochromatic",
-        "Caligo-MandarianMonochromatic"
-      ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 4.46-4.49 vs floor 4.5 (text) in 4/50 themes (DeepSable, Mandarian). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
-      "pair": "gitDecoration.submoduleResourceForeground|sideBar.background>list.activeSelectionBackground",
-      "themes": [
-        "Caligo-AuroraNoir",
-        "Caligo-AuroraNoirMonochromatic",
-        "Caligo-DeepSableAnalogous",
-        "Caligo-DeepSableMonochromatic",
-        "Caligo-DeepSableSplitComplementary",
-        "Caligo-DeepSableTriadic",
-        "Caligo-EclipseAnalogous",
-        "Caligo-GraphiteFlux",
-        "Caligo-GraphiteFluxAnalogous",
-        "Caligo-Mandarian",
-        "Caligo-MandarianAnalogous",
-        "Caligo-MandarianMonochromatic",
-        "Caligo-MandarianSplitComplementary",
-        "Caligo-MidnightAtelierMonochromatic",
-        "Caligo-MidnightAtelierSplitComplementary",
-        "Caligo-MidnightAtelierTriadic",
-        "Caligo-NebulaNightAnalogous",
-        "Caligo-NebulaNightMonochromatic",
-        "Caligo-NebulaNightSplitComplementary",
-        "Caligo-ObsidianGlowAnalogous",
-        "Caligo-ObsidianGlowMonochromatic",
-        "Caligo-ObsidianGlowSplitComplementary",
-        "Caligo-VoidEmberMonochromatic",
-        "Caligo-VoidEmberTriadic"
-      ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 3.12-4.42 vs floor 4.5 (text) in 24/50 themes (9 seeds incl. AuroraNoir, DeepSable, Eclipse). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
-      "pair": "gitDecoration.submoduleResourceForeground|sideBar.background>list.inactiveSelectionBackground",
-      "themes": [
-        "Caligo-AuroraNoir",
-        "Caligo-AuroraNoirMonochromatic",
-        "Caligo-DeepSableMonochromatic",
-        "Caligo-DeepSableSplitComplementary",
-        "Caligo-EclipseAnalogous",
-        "Caligo-GraphiteFluxAnalogous",
-        "Caligo-Mandarian",
-        "Caligo-MandarianAnalogous",
-        "Caligo-MandarianMonochromatic",
-        "Caligo-MandarianSplitComplementary",
-        "Caligo-MidnightAtelierMonochromatic",
-        "Caligo-MidnightAtelierTriadic",
-        "Caligo-ObsidianGlowAnalogous",
-        "Caligo-ObsidianGlowMonochromatic",
-        "Caligo-ObsidianGlowSplitComplementary",
-        "Caligo-VoidEmberMonochromatic"
-      ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.inactiveSelectionBackground (alpha composited over its base). Measured WCAG 4.12-4.46 vs floor 4.5 (text) in 16/50 themes (8 seeds incl. AuroraNoir, DeepSable, Eclipse). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
-      "pair": "gitDecoration.untrackedResourceForeground|sideBar.background>list.activeSelectionBackground",
-      "themes": [
-        "Caligo-DeepSable",
-        "Caligo-DeepSableAnalogous",
-        "Caligo-DeepSableMonochromatic",
-        "Caligo-MandarianMonochromatic"
-      ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 4.46-4.49 vs floor 4.5 (text) in 4/50 themes (DeepSable, Mandarian). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "low-emphasis (secondary/muted) text role, drawn through translucent overlay stack sideBar.background > list.inactiveSelectionBackground (alpha composited over its base). Measured WCAG 2.44-2.63 vs floor 4.5 (text) in 50/50 themes (10 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "inlineChatInput.placeholderForeground|inlineChatInput.background",
@@ -750,25 +427,13 @@
     },
     {
       "pair": "list.activeSelectionIconForeground|panel.background>list.activeSelectionBackground",
-      "themes": [
-        "Caligo-Cinder",
-        "Caligo-CinderAnalogous",
-        "Caligo-CinderMonochromatic",
-        "Caligo-CinderSplitComplementary",
-        "Caligo-CinderTriadic"
-      ],
-      "reason": "icon/glyph colour, drawn through translucent overlay stack panel.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 2.20-2.60 vs floor 3 (ui) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "themes": ["Caligo-Cinder", "Caligo-CinderAnalogous", "Caligo-CinderMonochromatic"],
+      "reason": "icon/glyph colour, drawn through translucent overlay stack panel.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 2.70-2.75 vs floor 3 (ui) in 3/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "list.activeSelectionIconForeground|sideBar.background>list.activeSelectionBackground",
-      "themes": [
-        "Caligo-Cinder",
-        "Caligo-CinderAnalogous",
-        "Caligo-CinderMonochromatic",
-        "Caligo-CinderSplitComplementary",
-        "Caligo-CinderTriadic"
-      ],
-      "reason": "icon/glyph colour, drawn through translucent overlay stack sideBar.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 2.20-2.60 vs floor 3 (ui) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "themes": ["Caligo-Cinder", "Caligo-CinderAnalogous", "Caligo-CinderMonochromatic"],
+      "reason": "icon/glyph colour, drawn through translucent overlay stack sideBar.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 2.70-2.75 vs floor 3 (ui) in 3/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "list.deemphasizedForeground|panel.background",
@@ -778,7 +443,7 @@
     {
       "pair": "list.deemphasizedForeground|panel.background>list.activeSelectionBackground",
       "themes": "*",
-      "reason": "low-emphasis (secondary/muted) text role, drawn through translucent overlay stack panel.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 2.20-3.06 vs floor 4.5 (text) in 50/50 themes (10 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "low-emphasis (secondary/muted) text role, drawn through translucent overlay stack panel.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 2.90-3.51 vs floor 4.5 (text) in 50/50 themes (10 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "list.deemphasizedForeground|panel.background>list.hoverBackground",
@@ -793,7 +458,7 @@
     {
       "pair": "list.deemphasizedForeground|sideBar.background>list.activeSelectionBackground",
       "themes": "*",
-      "reason": "low-emphasis (secondary/muted) text role, drawn through translucent overlay stack sideBar.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 2.20-3.06 vs floor 4.5 (text) in 50/50 themes (10 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "low-emphasis (secondary/muted) text role, drawn through translucent overlay stack sideBar.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 2.90-3.51 vs floor 4.5 (text) in 50/50 themes (10 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "list.deemphasizedForeground|sideBar.background>list.hoverBackground",
@@ -801,53 +466,15 @@
       "reason": "low-emphasis (secondary/muted) text role, drawn through translucent overlay stack sideBar.background > list.hoverBackground (alpha composited over its base). Measured WCAG 3.42-3.60 vs floor 4.5 (text) in 50/50 themes (10 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
-      "pair": "list.errorForeground|panel.background>list.activeSelectionBackground",
-      "themes": [
-        "Caligo-AuroraNoir",
-        "Caligo-AuroraNoirAnalogous",
-        "Caligo-AuroraNoirMonochromatic"
-      ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack panel.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 4.37-4.46 vs floor 4.5 (text) in 3/50 themes (AuroraNoir). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
-      "pair": "list.errorForeground|sideBar.background>list.activeSelectionBackground",
-      "themes": [
-        "Caligo-AuroraNoir",
-        "Caligo-AuroraNoirAnalogous",
-        "Caligo-AuroraNoirMonochromatic"
-      ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 4.37-4.46 vs floor 4.5 (text) in 3/50 themes (AuroraNoir). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
       "pair": "list.focusHighlightForeground|panel.background>list.activeSelectionBackground",
       "themes": [
-        "Caligo-AuroraNoirSplitComplementary",
-        "Caligo-AuroraNoirTriadic",
         "Caligo-Cinder",
         "Caligo-CinderAnalogous",
         "Caligo-CinderMonochromatic",
         "Caligo-CinderSplitComplementary",
-        "Caligo-CinderTriadic",
-        "Caligo-DeepSable",
-        "Caligo-DeepSableMonochromatic",
-        "Caligo-DeepSableSplitComplementary",
-        "Caligo-DeepSableTriadic",
-        "Caligo-GraphiteFluxSplitComplementary",
-        "Caligo-GraphiteFluxTriadic",
-        "Caligo-Mandarian",
-        "Caligo-MandarianAnalogous",
-        "Caligo-MandarianMonochromatic",
-        "Caligo-MidnightAtelier",
-        "Caligo-MidnightAtelierAnalogous",
-        "Caligo-MidnightAtelierMonochromatic",
-        "Caligo-ObsidianGlowSplitComplementary",
-        "Caligo-ObsidianGlowTriadic",
-        "Caligo-VoidEmber",
-        "Caligo-VoidEmberAnalogous",
-        "Caligo-VoidEmberMonochromatic",
-        "Caligo-VoidEmberTriadic"
+        "Caligo-CinderTriadic"
       ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack panel.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 2.88-4.48 vs floor 4.5 (text) in 25/50 themes (8 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack panel.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 3.54-4.26 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "list.focusHighlightForeground|panel.background>list.focusBackground",
@@ -858,38 +485,18 @@
         "Caligo-CinderSplitComplementary",
         "Caligo-CinderTriadic"
       ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack panel.background > list.focusBackground (alpha composited over its base). Measured WCAG 3.60-4.27 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack panel.background > list.focusBackground (alpha composited over its base). Measured WCAG 3.60-4.49 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "list.focusHighlightForeground|sideBar.background>list.activeSelectionBackground",
       "themes": [
-        "Caligo-AuroraNoirSplitComplementary",
-        "Caligo-AuroraNoirTriadic",
         "Caligo-Cinder",
         "Caligo-CinderAnalogous",
         "Caligo-CinderMonochromatic",
         "Caligo-CinderSplitComplementary",
-        "Caligo-CinderTriadic",
-        "Caligo-DeepSable",
-        "Caligo-DeepSableMonochromatic",
-        "Caligo-DeepSableSplitComplementary",
-        "Caligo-DeepSableTriadic",
-        "Caligo-GraphiteFluxSplitComplementary",
-        "Caligo-GraphiteFluxTriadic",
-        "Caligo-Mandarian",
-        "Caligo-MandarianAnalogous",
-        "Caligo-MandarianMonochromatic",
-        "Caligo-MidnightAtelier",
-        "Caligo-MidnightAtelierAnalogous",
-        "Caligo-MidnightAtelierMonochromatic",
-        "Caligo-ObsidianGlowSplitComplementary",
-        "Caligo-ObsidianGlowTriadic",
-        "Caligo-VoidEmber",
-        "Caligo-VoidEmberAnalogous",
-        "Caligo-VoidEmberMonochromatic",
-        "Caligo-VoidEmberTriadic"
+        "Caligo-CinderTriadic"
       ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 2.88-4.48 vs floor 4.5 (text) in 25/50 themes (8 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 3.54-4.26 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "list.focusHighlightForeground|sideBar.background>list.focusBackground",
@@ -900,7 +507,7 @@
         "Caligo-CinderSplitComplementary",
         "Caligo-CinderTriadic"
       ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.focusBackground (alpha composited over its base). Measured WCAG 3.60-4.27 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.focusBackground (alpha composited over its base). Measured WCAG 3.60-4.49 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "list.highlightForeground|panel.background",
@@ -916,54 +523,13 @@
     {
       "pair": "list.highlightForeground|panel.background>list.activeSelectionBackground",
       "themes": [
-        "Caligo-AuroraNoir",
-        "Caligo-AuroraNoirAnalogous",
-        "Caligo-AuroraNoirMonochromatic",
-        "Caligo-AuroraNoirSplitComplementary",
-        "Caligo-AuroraNoirTriadic",
         "Caligo-Cinder",
         "Caligo-CinderAnalogous",
         "Caligo-CinderMonochromatic",
         "Caligo-CinderSplitComplementary",
-        "Caligo-CinderTriadic",
-        "Caligo-DeepSable",
-        "Caligo-DeepSableAnalogous",
-        "Caligo-DeepSableMonochromatic",
-        "Caligo-DeepSableSplitComplementary",
-        "Caligo-DeepSableTriadic",
-        "Caligo-Eclipse",
-        "Caligo-EclipseSplitComplementary",
-        "Caligo-EclipseTriadic",
-        "Caligo-GraphiteFlux",
-        "Caligo-GraphiteFluxAnalogous",
-        "Caligo-GraphiteFluxMonochromatic",
-        "Caligo-GraphiteFluxSplitComplementary",
-        "Caligo-GraphiteFluxTriadic",
-        "Caligo-Mandarian",
-        "Caligo-MandarianAnalogous",
-        "Caligo-MandarianMonochromatic",
-        "Caligo-MandarianSplitComplementary",
-        "Caligo-MandarianTriadic",
-        "Caligo-MidnightAtelier",
-        "Caligo-MidnightAtelierAnalogous",
-        "Caligo-MidnightAtelierMonochromatic",
-        "Caligo-MidnightAtelierSplitComplementary",
-        "Caligo-MidnightAtelierTriadic",
-        "Caligo-NebulaNight",
-        "Caligo-NebulaNightAnalogous",
-        "Caligo-NebulaNightMonochromatic",
-        "Caligo-NebulaNightSplitComplementary",
-        "Caligo-NebulaNightTriadic",
-        "Caligo-ObsidianGlow",
-        "Caligo-ObsidianGlowSplitComplementary",
-        "Caligo-ObsidianGlowTriadic",
-        "Caligo-VoidEmber",
-        "Caligo-VoidEmberAnalogous",
-        "Caligo-VoidEmberMonochromatic",
-        "Caligo-VoidEmberSplitComplementary",
-        "Caligo-VoidEmberTriadic"
+        "Caligo-CinderTriadic"
       ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack panel.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 2.20-4.42 vs floor 4.5 (text) in 46/50 themes (10 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack panel.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 2.70-3.30 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "list.highlightForeground|panel.background>list.filterMatchBackground",
@@ -972,14 +538,9 @@
         "Caligo-CinderAnalogous",
         "Caligo-CinderMonochromatic",
         "Caligo-CinderSplitComplementary",
-        "Caligo-CinderTriadic",
-        "Caligo-DeepSable",
-        "Caligo-DeepSableSplitComplementary",
-        "Caligo-DeepSableTriadic",
-        "Caligo-GraphiteFluxSplitComplementary",
-        "Caligo-VoidEmber"
+        "Caligo-CinderTriadic"
       ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack panel.background > list.filterMatchBackground (alpha composited over its base). Measured WCAG 2.59-4.46 vs floor 4.5 (text) in 10/50 themes (Cinder, DeepSable, GraphiteFlux, VoidEmber). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack panel.background > list.filterMatchBackground (alpha composited over its base). Measured WCAG 2.59-3.12 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "list.highlightForeground|panel.background>list.hoverBackground",
@@ -995,20 +556,13 @@
     {
       "pair": "list.highlightForeground|panel.background>list.inactiveSelectionBackground",
       "themes": [
-        "Caligo-AuroraNoirSplitComplementary",
         "Caligo-Cinder",
         "Caligo-CinderAnalogous",
         "Caligo-CinderMonochromatic",
         "Caligo-CinderSplitComplementary",
-        "Caligo-CinderTriadic",
-        "Caligo-DeepSable",
-        "Caligo-DeepSableSplitComplementary",
-        "Caligo-DeepSableTriadic",
-        "Caligo-GraphiteFluxSplitComplementary",
-        "Caligo-GraphiteFluxTriadic",
-        "Caligo-VoidEmber"
+        "Caligo-CinderTriadic"
       ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack panel.background > list.inactiveSelectionBackground (alpha composited over its base). Measured WCAG 2.55-4.41 vs floor 4.5 (text) in 12/50 themes (AuroraNoir, Cinder, DeepSable, GraphiteFlux, VoidEmber). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack panel.background > list.inactiveSelectionBackground (alpha composited over its base). Measured WCAG 2.84-3.42 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "list.highlightForeground|sideBar.background",
@@ -1024,54 +578,13 @@
     {
       "pair": "list.highlightForeground|sideBar.background>list.activeSelectionBackground",
       "themes": [
-        "Caligo-AuroraNoir",
-        "Caligo-AuroraNoirAnalogous",
-        "Caligo-AuroraNoirMonochromatic",
-        "Caligo-AuroraNoirSplitComplementary",
-        "Caligo-AuroraNoirTriadic",
         "Caligo-Cinder",
         "Caligo-CinderAnalogous",
         "Caligo-CinderMonochromatic",
         "Caligo-CinderSplitComplementary",
-        "Caligo-CinderTriadic",
-        "Caligo-DeepSable",
-        "Caligo-DeepSableAnalogous",
-        "Caligo-DeepSableMonochromatic",
-        "Caligo-DeepSableSplitComplementary",
-        "Caligo-DeepSableTriadic",
-        "Caligo-Eclipse",
-        "Caligo-EclipseSplitComplementary",
-        "Caligo-EclipseTriadic",
-        "Caligo-GraphiteFlux",
-        "Caligo-GraphiteFluxAnalogous",
-        "Caligo-GraphiteFluxMonochromatic",
-        "Caligo-GraphiteFluxSplitComplementary",
-        "Caligo-GraphiteFluxTriadic",
-        "Caligo-Mandarian",
-        "Caligo-MandarianAnalogous",
-        "Caligo-MandarianMonochromatic",
-        "Caligo-MandarianSplitComplementary",
-        "Caligo-MandarianTriadic",
-        "Caligo-MidnightAtelier",
-        "Caligo-MidnightAtelierAnalogous",
-        "Caligo-MidnightAtelierMonochromatic",
-        "Caligo-MidnightAtelierSplitComplementary",
-        "Caligo-MidnightAtelierTriadic",
-        "Caligo-NebulaNight",
-        "Caligo-NebulaNightAnalogous",
-        "Caligo-NebulaNightMonochromatic",
-        "Caligo-NebulaNightSplitComplementary",
-        "Caligo-NebulaNightTriadic",
-        "Caligo-ObsidianGlow",
-        "Caligo-ObsidianGlowSplitComplementary",
-        "Caligo-ObsidianGlowTriadic",
-        "Caligo-VoidEmber",
-        "Caligo-VoidEmberAnalogous",
-        "Caligo-VoidEmberMonochromatic",
-        "Caligo-VoidEmberSplitComplementary",
-        "Caligo-VoidEmberTriadic"
+        "Caligo-CinderTriadic"
       ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 2.20-4.42 vs floor 4.5 (text) in 46/50 themes (10 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 2.70-3.30 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "list.highlightForeground|sideBar.background>list.filterMatchBackground",
@@ -1080,14 +593,9 @@
         "Caligo-CinderAnalogous",
         "Caligo-CinderMonochromatic",
         "Caligo-CinderSplitComplementary",
-        "Caligo-CinderTriadic",
-        "Caligo-DeepSable",
-        "Caligo-DeepSableSplitComplementary",
-        "Caligo-DeepSableTriadic",
-        "Caligo-GraphiteFluxSplitComplementary",
-        "Caligo-VoidEmber"
+        "Caligo-CinderTriadic"
       ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.filterMatchBackground (alpha composited over its base). Measured WCAG 2.59-4.46 vs floor 4.5 (text) in 10/50 themes (Cinder, DeepSable, GraphiteFlux, VoidEmber). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.filterMatchBackground (alpha composited over its base). Measured WCAG 2.59-3.12 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "list.highlightForeground|sideBar.background>list.hoverBackground",
@@ -1103,53 +611,18 @@
     {
       "pair": "list.highlightForeground|sideBar.background>list.inactiveSelectionBackground",
       "themes": [
-        "Caligo-AuroraNoirSplitComplementary",
         "Caligo-Cinder",
         "Caligo-CinderAnalogous",
         "Caligo-CinderMonochromatic",
         "Caligo-CinderSplitComplementary",
-        "Caligo-CinderTriadic",
-        "Caligo-DeepSable",
-        "Caligo-DeepSableSplitComplementary",
-        "Caligo-DeepSableTriadic",
-        "Caligo-GraphiteFluxSplitComplementary",
-        "Caligo-GraphiteFluxTriadic",
-        "Caligo-VoidEmber"
+        "Caligo-CinderTriadic"
       ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.inactiveSelectionBackground (alpha composited over its base). Measured WCAG 2.55-4.41 vs floor 4.5 (text) in 12/50 themes (AuroraNoir, Cinder, DeepSable, GraphiteFlux, VoidEmber). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
-      "pair": "list.invalidItemForeground|panel.background>list.activeSelectionBackground",
-      "themes": [
-        "Caligo-AuroraNoir",
-        "Caligo-AuroraNoirAnalogous",
-        "Caligo-AuroraNoirMonochromatic"
-      ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack panel.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 4.37-4.46 vs floor 4.5 (text) in 3/50 themes (AuroraNoir). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
-      "pair": "list.invalidItemForeground|sideBar.background>list.activeSelectionBackground",
-      "themes": [
-        "Caligo-AuroraNoir",
-        "Caligo-AuroraNoirAnalogous",
-        "Caligo-AuroraNoirMonochromatic"
-      ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 4.37-4.46 vs floor 4.5 (text) in 3/50 themes (AuroraNoir). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
-      "pair": "list.warningForeground|panel.background>list.activeSelectionBackground",
-      "themes": ["Caligo-AuroraNoir", "Caligo-AuroraNoirMonochromatic"],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack panel.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 4.37-4.41 vs floor 4.5 (text) in 2/50 themes (AuroraNoir). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
-      "pair": "list.warningForeground|sideBar.background>list.activeSelectionBackground",
-      "themes": ["Caligo-AuroraNoir", "Caligo-AuroraNoirMonochromatic"],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.activeSelectionBackground (alpha composited over its base). Measured WCAG 4.37-4.41 vs floor 4.5 (text) in 2/50 themes (AuroraNoir). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack sideBar.background > list.inactiveSelectionBackground (alpha composited over its base). Measured WCAG 2.84-3.42 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "modernActivityBar.activeForeground|activityBar.background>modernActivityBar.activeBackground",
       "themes": ["Caligo-Cinder", "Caligo-CinderAnalogous", "Caligo-CinderMonochromatic"],
-      "reason": "icon/glyph colour, drawn through translucent overlay stack activityBar.background > modernActivityBar.activeBackground (alpha composited over its base). Measured WCAG 2.68-2.72 vs floor 3 (ui) in 3/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "icon/glyph colour, drawn through translucent overlay stack activityBar.background > modernActivityBar.activeBackground (alpha composited over its base). Measured WCAG 2.91-2.92 vs floor 3 (ui) in 3/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "notificationLink.foreground|notifications.background",
@@ -1174,57 +647,6 @@
       "reason": "label text on a filled (accent or badge) background. Measured WCAG 3.09-3.62 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
-      "pair": "peekViewResult.lineForeground|peekViewResult.background>peekViewResult.matchHighlightBackground",
-      "themes": [
-        "Caligo-AuroraNoir",
-        "Caligo-AuroraNoirAnalogous",
-        "Caligo-AuroraNoirMonochromatic",
-        "Caligo-AuroraNoirSplitComplementary",
-        "Caligo-AuroraNoirTriadic",
-        "Caligo-DeepSable",
-        "Caligo-DeepSableAnalogous",
-        "Caligo-DeepSableMonochromatic",
-        "Caligo-DeepSableSplitComplementary",
-        "Caligo-DeepSableTriadic",
-        "Caligo-Eclipse",
-        "Caligo-EclipseAnalogous",
-        "Caligo-EclipseMonochromatic",
-        "Caligo-EclipseSplitComplementary",
-        "Caligo-EclipseTriadic",
-        "Caligo-GraphiteFlux",
-        "Caligo-GraphiteFluxAnalogous",
-        "Caligo-GraphiteFluxMonochromatic",
-        "Caligo-GraphiteFluxSplitComplementary",
-        "Caligo-GraphiteFluxTriadic",
-        "Caligo-Mandarian",
-        "Caligo-MandarianAnalogous",
-        "Caligo-MandarianMonochromatic",
-        "Caligo-MandarianSplitComplementary",
-        "Caligo-MandarianTriadic",
-        "Caligo-MidnightAtelier",
-        "Caligo-MidnightAtelierAnalogous",
-        "Caligo-MidnightAtelierMonochromatic",
-        "Caligo-MidnightAtelierSplitComplementary",
-        "Caligo-MidnightAtelierTriadic",
-        "Caligo-NebulaNight",
-        "Caligo-NebulaNightAnalogous",
-        "Caligo-NebulaNightMonochromatic",
-        "Caligo-NebulaNightSplitComplementary",
-        "Caligo-NebulaNightTriadic",
-        "Caligo-ObsidianGlow",
-        "Caligo-ObsidianGlowAnalogous",
-        "Caligo-ObsidianGlowMonochromatic",
-        "Caligo-ObsidianGlowSplitComplementary",
-        "Caligo-ObsidianGlowTriadic",
-        "Caligo-VoidEmber",
-        "Caligo-VoidEmberAnalogous",
-        "Caligo-VoidEmberMonochromatic",
-        "Caligo-VoidEmberSplitComplementary",
-        "Caligo-VoidEmberTriadic"
-      ],
-      "reason": "foreground/background pair, drawn through translucent overlay stack peekViewResult.background > peekViewResult.matchHighlightBackground (alpha composited over its base). Measured WCAG 3.86-4.43 vs floor 4.5 (text) in 45/50 themes (9 seeds incl. AuroraNoir, DeepSable, Eclipse). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
       "pair": "pickerGroup.foreground|quickInput.background",
       "themes": [
         "Caligo-Cinder",
@@ -1243,12 +665,12 @@
         "Caligo-CinderSplitComplementary",
         "Caligo-CinderTriadic"
       ],
-      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack quickInput.background > quickInputList.focusBackground (alpha composited over its base). Measured WCAG 3.42-4.09 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "accent/status coloured text on a neutral surface, drawn through translucent overlay stack quickInput.background > quickInputList.focusBackground (alpha composited over its base). Measured WCAG 3.43-4.36 vs floor 4.5 (text) in 5/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "quickInputList.focusIconForeground|quickInput.background>quickInputList.focusBackground",
       "themes": ["Caligo-Cinder", "Caligo-CinderAnalogous", "Caligo-CinderMonochromatic"],
-      "reason": "icon/glyph colour, drawn through translucent overlay stack quickInput.background > quickInputList.focusBackground (alpha composited over its base). Measured WCAG 2.61-2.65 vs floor 3 (ui) in 3/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
+      "reason": "icon/glyph colour, drawn through translucent overlay stack quickInput.background > quickInputList.focusBackground (alpha composited over its base). Measured WCAG 2.61-2.85 vs floor 3 (ui) in 3/50 themes (Cinder). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "statusBarItem.remoteForeground|statusBarItem.remoteBackground",
@@ -1280,62 +702,6 @@
       "pair": "terminal.ansiBrightBlack|terminal.background>terminal.selectionBackground",
       "themes": "*",
       "reason": "low-emphasis (secondary/muted) text role, drawn through translucent overlay stack terminal.background > terminal.selectionBackground (alpha composited over its base). Measured WCAG 2.26-3.03 vs floor 4.5 (text) in 50/50 themes (10 seeds incl. AuroraNoir, Cinder, DeepSable). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
-      "pair": "terminal.foreground|terminal.background>terminal.findMatchBackground",
-      "themes": ["Caligo-AuroraNoirMonochromatic"],
-      "reason": "foreground/background pair, drawn through translucent overlay stack terminal.background > terminal.findMatchBackground (alpha composited over its base). Measured WCAG 4.49-4.49 vs floor 4.5 (text) in 1/50 themes (AuroraNoir). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
-    },
-    {
-      "pair": "terminal.foreground|terminal.background>terminal.inactiveSelectionBackground",
-      "themes": [
-        "Caligo-AuroraNoir",
-        "Caligo-AuroraNoirAnalogous",
-        "Caligo-AuroraNoirMonochromatic",
-        "Caligo-AuroraNoirSplitComplementary",
-        "Caligo-AuroraNoirTriadic",
-        "Caligo-DeepSable",
-        "Caligo-DeepSableAnalogous",
-        "Caligo-DeepSableMonochromatic",
-        "Caligo-DeepSableSplitComplementary",
-        "Caligo-DeepSableTriadic",
-        "Caligo-Eclipse",
-        "Caligo-EclipseAnalogous",
-        "Caligo-EclipseMonochromatic",
-        "Caligo-EclipseSplitComplementary",
-        "Caligo-EclipseTriadic",
-        "Caligo-GraphiteFlux",
-        "Caligo-GraphiteFluxAnalogous",
-        "Caligo-GraphiteFluxMonochromatic",
-        "Caligo-GraphiteFluxSplitComplementary",
-        "Caligo-GraphiteFluxTriadic",
-        "Caligo-Mandarian",
-        "Caligo-MandarianAnalogous",
-        "Caligo-MandarianMonochromatic",
-        "Caligo-MandarianSplitComplementary",
-        "Caligo-MandarianTriadic",
-        "Caligo-MidnightAtelier",
-        "Caligo-MidnightAtelierAnalogous",
-        "Caligo-MidnightAtelierMonochromatic",
-        "Caligo-MidnightAtelierSplitComplementary",
-        "Caligo-MidnightAtelierTriadic",
-        "Caligo-NebulaNight",
-        "Caligo-NebulaNightAnalogous",
-        "Caligo-NebulaNightMonochromatic",
-        "Caligo-NebulaNightSplitComplementary",
-        "Caligo-NebulaNightTriadic",
-        "Caligo-ObsidianGlow",
-        "Caligo-ObsidianGlowAnalogous",
-        "Caligo-ObsidianGlowMonochromatic",
-        "Caligo-ObsidianGlowSplitComplementary",
-        "Caligo-ObsidianGlowTriadic",
-        "Caligo-VoidEmber",
-        "Caligo-VoidEmberAnalogous",
-        "Caligo-VoidEmberMonochromatic",
-        "Caligo-VoidEmberSplitComplementary",
-        "Caligo-VoidEmberTriadic"
-      ],
-      "reason": "foreground/background pair, drawn through translucent overlay stack terminal.background > terminal.inactiveSelectionBackground (alpha composited over its base). Measured WCAG 3.07-4.50 vs floor 4.5 (text) in 45/50 themes (9 seeds incl. AuroraNoir, DeepSable, Eclipse). Recorded as found, palette not retuned in the contrast-truth run; remove this entry when the pair passes."
     },
     {
       "pair": "terminal.initialHintForeground|terminal.background",

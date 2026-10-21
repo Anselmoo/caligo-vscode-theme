@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { clamp01, oklch, toHex, withAlpha } from "../color.js";
+import { clamp01, oklch, scaleAlpha, toHex, withAlpha } from "../color.js";
 
 describe("oklch", () => {
   it("should create OKLCH color object", () => {
@@ -108,5 +108,22 @@ describe("clamp01", () => {
     expect(clamp01(0)).toBe(0);
     expect(clamp01(0.5)).toBe(0.5);
     expect(clamp01(1)).toBe(1);
+  });
+});
+
+describe("scaleAlpha", () => {
+  it("multiplies an existing alpha instead of replacing it", () => {
+    // 0x48/255 ≈ 0.282; withAlpha(.., 0.6) would make this MORE opaque (0x99)
+    expect(scaleAlpha("#123456" + "48", 0.6)).toBe(withAlpha("#123456", (0x48 / 255) * 0.6));
+    expect(Number.parseInt(scaleAlpha("#12345648", 0.6).slice(7), 16)).toBeLessThan(0x48);
+  });
+
+  it("treats #RRGGBB as fully opaque", () => {
+    expect(scaleAlpha("#ABCDEF", 0.5)).toBe(withAlpha("#abcdef", 0.5));
+  });
+
+  it("rejects anything that is not #RRGGBB or #RRGGBBAA", () => {
+    expect(() => scaleAlpha("#fff", 0.5)).toThrow("scaleAlpha: expected #RRGGBB or #RRGGBBAA");
+    expect(() => scaleAlpha("red", 0.5)).toThrow("scaleAlpha: expected #RRGGBB or #RRGGBBAA");
   });
 });

@@ -52,6 +52,22 @@ export function withAlpha(hex: string, alpha: number): string {
   return `${rgb}${aa}`;
 }
 
+/**
+ * Multiply a color's existing alpha by `factor` (`#RRGGBB` counts as alpha 1).
+ *
+ * `withAlpha` replaces the alpha byte, so `withAlpha(selection, 0.6)` on a 0.28-alpha
+ * selection makes it MORE opaque. Use this when a weaker variant of a translucent color
+ * is meant.
+ */
+export function scaleAlpha(hex: string, factor: number): string {
+  const normalized = hex.trim().toLowerCase();
+  if (!/^#[0-9a-f]{6}([0-9a-f]{2})?$/.test(normalized)) {
+    throw new Error(`scaleAlpha: expected #RRGGBB or #RRGGBBAA, got '${hex}'`);
+  }
+  const alpha = normalized.length === 9 ? Number.parseInt(normalized.slice(7), 16) / 255 : 1;
+  return withAlpha(normalized.slice(0, 7), alpha * factor);
+}
+
 export function clamp01(n: number): number {
   return Math.max(0, Math.min(1, n));
 }
