@@ -1,27 +1,19 @@
-import { mount } from "@vue/test-utils";
-import { describe, expect, it, vi } from "vitest";
+import { flushPromises, mount } from "@vue/test-utils";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { computed, ref } from "vue";
 import ExportView from "../ExportView.vue";
 
-vi.mock("../../composables/useThemeAnalysis.js", () => ({
-  useThemeAnalysis: () => ({
-    oklchColors: computed(() => [
-      {
-        key: "accent",
-        hex: "#ffaa33",
-        l: 0.8,
-        c: 0.18,
-        h: 80,
-      },
-    ]),
-  }),
+const copyCurrent = vi.fn();
+const downloadCurrent = vi.fn();
+
+vi.mock("../../composables/useTheme.js", () => ({
+  useTheme: () => ({ currentTheme: computed(() => ({ displayName: "Eclipse Triadic" })) }),
 }));
 
 vi.mock("../../composables/useExport.js", () => {
   const selectedFormat = ref("json-flat");
   const currentResult = computed(() => ({
-    content:
-      '{\n  "caligo-bg-base": "#101010",\n  "caligo-fg-primary": "#f0f0f0",\n  "caligo-accent": "#ffaa33"\n}',
+    content: '{\n  "caligo-accent": "#ffaa33"\n}',
     filename: "caligo.json",
     format: "json-flat",
     mimeType: "application/json",
@@ -32,33 +24,46 @@ vi.mock("../../composables/useExport.js", () => {
       availableFormats: computed(() => ["json-flat"]),
       formatLabels: computed(() => ({ "json-flat": "JSON (Flat)" })),
       currentResult,
-      copyCurrent: vi.fn().mockResolvedValue(true),
-      downloadCurrent: vi.fn(),
+      copyCurrent,
+      downloadCurrent,
     }),
   };
 });
 
-describe("ExportView", () => {
-  it("renders semantic matrix swatches from exported content colors", () => {
-    const wrapper = mount(ExportView);
+afterEach(() => {
+  copyCurrent.mockReset();
+  downloadCurrent.mockReset();
+});
 
-    expect(wrapper.findAll(".semantic-matrix__swatch")).toHaveLength(3);
-    expect(wrapper.text()).toContain("Accent");
-    expect(wrapper.text()).toContain("Other");
-    expect(wrapper.text()).toContain("caligo-bg-base");
+describe("ExportView", () => {
+  it("names the theme being exported and the file it produces", () => {
+    const wrapper = mount(ExportView);
+    expect(wrapper.find("h1").exists()).toBe(true);
+    expect(wrapper.find("[data-export-theme]").text()).toBe("Eclipse Triadic");
+    expect(wrapper.text()).toContain("caligo.json, 3 lines");
   });
 
-  it("updates selected token details when a matrix swatch is chosen", async () => {
+  it("downloads the current theme and confirms it", async () => {
     const wrapper = mount(ExportView);
+    await wrapper.get('[data-export-action="download"]').trigger("click");
+    expect(downloadCurrent).toHaveBeenCalledOnce();
+    expect(wrapper.get('[role="status"]').text()).toBe("Downloaded caligo.json");
+  });
 
-    const swatches = wrapper.findAll(".semantic-matrix__swatch");
-    expect(swatches).toHaveLength(3);
+  it("copies the current theme and confirms it", async () => {
+    copyCurrent.mockResolvedValue(true);
+    const wrapper = mount(ExportView);
+    await wrapper.get('[data-export-action="copy"]').trigger("click");
+    await flushPromises();
+    expect(copyCurrent).toHaveBeenCalledOnce();
+    expect(wrapper.get('[role="status"]').text()).toBe("Copied to clipboard");
+  });
 
-    expect(wrapper.text()).toContain("caligo-bg-base");
-
-    await swatches[2].trigger("click");
-
-    expect(wrapper.text()).toContain("caligo-accent");
-    expect(wrapper.text()).toContain("#ffaa33");
+  it("says what to do when the browser blocks the clipboard", async () => {
+    copyCurrent.mockResolvedValue(false);
+    const wrapper = mount(ExportView);
+    await wrapper.get('[data-export-action="copy"]').trigger("click");
+    await flushPromises();
+    expect(wrapper.get('[role="status"]').text()).toContain("copy it by hand");
   });
 });

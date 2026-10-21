@@ -1,292 +1,189 @@
 <script setup lang="ts">
+/**
+ * One scene at the active platform: thumbnail first, then the facts and the
+ * two downloads. The preview is always the build-time WebP; the full SVG is only
+ * ever requested by the person who asks for it.
+ */
 import { computed, ref } from "vue";
 import { PLATFORM_SIZES, thumbnailSize } from "../../../wallpaper/types.js";
 import type { WallpaperManifestEntry } from "../../composables/useWallpapers";
 import { rasterizeSvgToPng, triggerDownload } from "../../utils/rasterize-svg.js";
 
-const props = defineProps<{
-  entry: WallpaperManifestEntry;
-  activePlatform: "monitor" | "tablet" | "mobile";
-  activeTextVariant: "text" | "no-text";
-  /**
-   * Resolves a variant to its manifest entry. Paths MUST come from the manifest:
-   * the on-disk folder for harmonyMode "none" is "balanced", so re-deriving a
-   * path from harmonyMode produces a 404 for every Balanced wallpaper.
-   */
-  resolve: (
-    seedId: string,
-    harmonyMode: string,
-    platform: "monitor" | "tablet" | "mobile",
-    textVariant: "text" | "no-text"
-  ) => WallpaperManifestEntry | null;
-}>();
+const props = defineProps<{ entry: WallpaperManifestEntry }>();
 
-const platforms = [
-  { id: "monitor", label: "Monitor", icon: "pi pi-desktop" },
-  { id: "tablet", label: "Tablet", icon: "pi pi-tablet" },
-  { id: "mobile", label: "Mobile", icon: "pi pi-mobile" },
-] as const;
-
-const textVariants = [
-  { id: "no-text", label: "No text" },
-  { id: "text", label: "With text" },
-] as const;
-
-// Local per-card state — independent of global filter
-const localPlatform = ref<"monitor" | "tablet" | "mobile">(props.activePlatform);
-const localTextVariant = ref<"text" | "no-text">(props.activeTextVariant);
-
-// Resolve the currently selected variant straight from the manifest.
-const activeVariant = computed(() =>
-  props.resolve(
-    props.entry.seedId,
-    props.entry.harmonyMode,
-    localPlatform.value,
-    localTextVariant.value
-  )
-);
-
-/**
- * The entry every asset URL is read from.
- *
- * Resolved once so preview and download can never disagree about which variant
- * they describe. Falling back field-by-field across entries would let a card
- * show one platform's thumbnail while offering another's download.
- */
-const displayedEntry = computed(() => activeVariant.value ?? props.entry);
-
-/** Full-resolution SVG — the download source, never the preview source. */
-const sourceSvgUrl = computed(() => displayedEntry.value.svgPath);
-
-/**
- * Preview source for the card image.
- *
- * Prefers the build-time WebP thumbnail (~30 KB) over the wallpaper SVG
- * (~455 KB, up to 8,700 nodes, 3840x2160 intrinsic). Falls back to the SVG of
- * *the same variant* when its thumbnail is missing — never to another
- * variant's thumbnail, which would silently show the wrong artwork.
- */
-const previewUrl = computed(() => displayedEntry.value.thumbPath ?? sourceSvgUrl.value);
-
-/** Intrinsic thumbnail box, so the grid reserves space before the image lands. */
-const previewSize = computed(() => thumbnailSize(localPlatform.value));
-
-const downloadState = ref<"idle" | "working" | "error">("idle");
-
-const downloadLabel = computed(() => {
-  if (downloadState.value === "working") return "Rendering PNG…";
-  if (downloadState.value === "error") return "Retry download";
-  return "Download PNG";
+const previewUrl = computed(() => (props.entry.thumbPath ? `./${props.entry.thumbPath}` : null));
+const svgUrl = computed(() => `./${props.entry.svgPath}`);
+const previewSize = computed(() => thumbnailSize(props.entry.platform));
+const baseName = computed(() => {
+  const { seedId, harmonyMode, platform, textVariant } = props.entry;
+  return `caligo-${seedId}-${harmonyMode}-${platform}${textVariant === "text" ? "-text" : ""}`;
 });
 
+const pngState = ref<"idle" | "working" | "error">("idle");
+
 /**
- * Rasterise the selected SVG to a full-resolution PNG in the browser.
- * PNGs are not deployed: the complete 4K set is ~2 GB, over the 1 GB
- * GitHub Pages limit, so we generate on demand instead.
+ * PNGs are not deployed (the 4K set is ~2 GB, over the Pages limit), so the
+ * browser renders one from the SVG when asked.
  */
 async function downloadPng() {
-  if (downloadState.value === "working") return;
-  downloadState.value = "working";
+  if (pngState.value === "working") return;
+  pngState.value = "working";
   try {
-    const { width, height } = PLATFORM_SIZES[localPlatform.value];
-    const blob = await rasterizeSvgToPng(sourceSvgUrl.value, width, height);
-    const textSuffix = localTextVariant.value === "text" ? "-text" : "";
-    triggerDownload(
-      blob,
-      `caligo-${props.entry.seedId}-${props.entry.harmonyMode}-${localPlatform.value}${textSuffix}.png`
-    );
-    downloadState.value = "idle";
+    const { width, height } = PLATFORM_SIZES[props.entry.platform];
+    const blob = await rasterizeSvgToPng(svgUrl.value, width, height);
+    triggerDownload(blob, `${baseName.value}.png`);
+    pngState.value = "idle";
   } catch (e) {
     console.error("Wallpaper PNG export failed", e);
-    downloadState.value = "error";
+    pngState.value = "error";
   }
 }
 
-// Silence biome: all vars below are used in the Vue template
-void platforms;
-void textVariants;
 void previewUrl;
+void svgUrl;
 void previewSize;
-void sourceSvgUrl;
-void displayedEntry;
-void activeVariant;
-void downloadLabel;
+void baseName;
 void downloadPng;
 </script>
 
 <template>
-  <article class="wallpaper-card">
-    <!-- Preview -->
-    <div class="preview-wrap">
+  <article class="scene-card" data-wallpaper-card>
+    <div class="scene-card__frame" :style="{ aspectRatio: `${previewSize.width} / ${previewSize.height}` }">
       <img
+        v-if="previewUrl"
+        class="scene-card__img"
         :src="previewUrl"
-        :alt="`${entry.displayName} wallpaper preview (${localPlatform})`"
-        class="preview-img"
+        :alt="`${entry.seedDisplayName}, ${entry.harmonyLabel}: ${entry.platform} wallpaper preview`"
         :width="previewSize.width"
         :height="previewSize.height"
         loading="lazy"
         decoding="async"
       />
+      <p v-else class="scene-card__missing">Preview not built yet</p>
     </div>
 
-    <!-- Meta -->
-    <div class="card-body">
-      <h3 class="card-title">{{ entry.seedDisplayName }}</h3>
-      <p class="card-topic">{{ entry.harmonyLabel }} · {{ entry.topic }}</p>
-
-      <!-- Platform tabs -->
-      <div class="toggle-row">
-        <button
-          v-for="p in platforms"
-          :key="p.id"
-          class="toggle-btn"
-          :class="{ active: localPlatform === p.id }"
-          @click="localPlatform = p.id"
-        ><i :class="p.icon" /> {{ p.label }}</button>
+    <div class="scene-card__body">
+      <div>
+        <h3 class="scene-card__title">{{ entry.seedDisplayName }}</h3>
+        <p class="scene-card__mode">{{ entry.harmonyLabel }}</p>
       </div>
-
-      <!-- Text variant tabs -->
-      <div class="toggle-row">
+      <div class="scene-card__actions">
+        <a class="scene-card__link" :href="svgUrl" :download="`${baseName}.svg`">
+          SVG<span class="visually-hidden"> of {{ entry.seedDisplayName }}, {{ entry.harmonyLabel }}</span>
+        </a>
         <button
-          v-for="v in textVariants"
-          :key="v.id"
-          class="toggle-btn"
-          :class="{ active: localTextVariant === v.id }"
-          @click="localTextVariant = v.id"
-        >{{ v.label }}</button>
+          type="button"
+          class="scene-card__link"
+          :disabled="pngState === 'working'"
+          @click="downloadPng"
+        >
+          {{ pngState === "working" ? "Rendering…" : "PNG"
+          }}<span class="visually-hidden"> of {{ entry.seedDisplayName }}, {{ entry.harmonyLabel }}</span>
+        </button>
       </div>
-
-      <!-- Download -->
-      <button
-        type="button"
-        class="download-btn"
-        :class="{ 'is-error': downloadState === 'error' }"
-        :disabled="downloadState === 'working'"
-        @click="downloadPng"
-      >
-        <i
-          :class="downloadState === 'working' ? 'pi pi-spinner pi-spin' : 'pi pi-download'"
-          aria-hidden="true"
-        />
-        {{ downloadLabel }}
-      </button>
-      <p v-if="downloadState === 'error'" class="download-error" role="alert">
-        Could not render the PNG. Please try again.
+      <p v-if="pngState === 'error'" class="scene-card__error" role="alert">
+        The PNG could not be rendered. Try again, or download the SVG.
       </p>
     </div>
   </article>
 </template>
 
 <style scoped>
-.wallpaper-card {
-  background: var(--bg1);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
+.scene-card {
   display: flex;
   flex-direction: column;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  gap: 12px;
+  min-width: 0;
 }
 
-.wallpaper-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-}
-
-.preview-wrap {
-  aspect-ratio: 16/9;
+.scene-card__frame {
+  display: grid;
+  place-items: center;
   overflow: hidden;
-  background: var(--bg0);
+  border-radius: 6px;
+  background: var(--bg1);
+  outline: 1px solid color-mix(in oklab, var(--fg0) 12%, transparent);
+  outline-offset: -1px;
 }
 
-.preview-img {
+.scene-card__img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
 }
 
-.card-body {
-  padding: var(--space-md);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-}
-
-.card-title {
-  font-size: var(--text-md);
-  font-weight: 600;
-  color: var(--fg0);
+.scene-card__missing {
   margin: 0;
-}
-
-.card-topic {
-  font-size: var(--text-sm);
-  color: var(--fg2);
-  margin: 0;
-}
-
-.toggle-row {
-  display: flex;
-  gap: var(--space-xs);
-  flex-wrap: wrap;
-}
-
-.toggle-btn {
-  padding: 2px 10px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-color);
-  background: transparent;
-  color: var(--fg2);
-  font-size: var(--text-xs);
-  cursor: pointer;
-  transition: background 0.1s, color 0.1s, border-color 0.1s;
-}
-
-.toggle-btn.active,
-.toggle-btn:hover {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--bg0);
-}
-
-.download-btn {
-  font-family: inherit;
-  cursor: pointer;
-  background: transparent;
-  width: 100%;
-  justify-content: center;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: var(--space-xs) var(--space-md);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--accent);
-  color: var(--accent);
-  font-size: var(--text-sm);
-  text-decoration: none;
+  padding: 0 16px;
+  color: var(--fg1);
+  font-size: var(--step--1);
   text-align: center;
-  transition: background 0.15s, color 0.15s;
 }
 
-.download-btn:hover:not(:disabled) {
-  background: var(--accent);
-  color: var(--bg0);
+.scene-card__body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 16px;
 }
 
-.download-btn:disabled {
-  opacity: 0.7;
-  cursor: progress;
-}
-
-.download-btn.is-error {
-  border-color: var(--color-error);
-  color: var(--color-error);
-}
-
-.download-error {
+.scene-card__title {
   margin: 0;
-  font-size: var(--text-xs);
-  color: var(--color-error);
+  color: var(--fg0);
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+.scene-card__mode {
+  margin: 2px 0 0;
+  color: var(--fg1);
+  font-size: var(--step--1);
+}
+
+.scene-card__actions {
+  display: flex;
+  gap: 16px;
+}
+
+.scene-card__link {
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: var(--fg0);
+  font: inherit;
+  font-size: var(--step--1);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.scene-card__link:hover {
+  text-decoration-thickness: 2px;
+}
+
+.scene-card__link:disabled {
+  cursor: progress;
+  color: var(--fg1);
+}
+
+.scene-card__error {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--error);
+  font-size: var(--step--1);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 </style>

@@ -33,6 +33,12 @@ export function useWallpapers() {
   const entries = ref<WallpaperManifestEntry[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
+  /**
+   * True when the manifest simply does not exist yet: a 404, or any answer that is
+   * not a manifest (the Vite dev server replies to unknown paths with its HTML page,
+   * status 200). Distinct from a network failure so the UI can say how to create it.
+   */
+  const missing = ref(false);
 
   const filter = ref<WallpaperFilter>({
     seedId: null,
@@ -104,10 +110,30 @@ export function useWallpapers() {
     if (entries.value.length > 0) return; // already loaded
     loading.value = true;
     error.value = null;
+    missing.value = false;
     try {
       const res = await fetch(MANIFEST_URL);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data: WallpapersManifest = await res.json();
+      if (!res.ok) {
+        missing.value = res.status === 404;
+        throw new Error(`HTTP ${res.status}`);
+      }
+      // A 200 with an HTML body is the SPA fallback, not a manifest.
+      const contentType = res.headers?.get("content-type") ?? "";
+      if (contentType && !/json/i.test(contentType)) {
+        missing.value = true;
+        throw new Error("Wallpaper manifest is not JSON");
+      }
+      let data: WallpapersManifest;
+      try {
+        data = await res.json();
+      } catch {
+        missing.value = true;
+        throw new Error("Wallpaper manifest is not valid JSON");
+      }
+      if (!data || !Array.isArray(data.entries) || data.entries.length === 0) {
+        missing.value = true;
+        throw new Error("Wallpaper manifest has no entries");
+      }
       entries.value = data.entries;
     } catch (e) {
       error.value = e instanceof Error ? e.message : String(e);
@@ -128,6 +154,7 @@ export function useWallpapers() {
     entries: readonly(entries),
     loading: readonly(loading),
     error: readonly(error),
+    missing: readonly(missing),
     filter,
     filteredEntries,
     findVariant,
