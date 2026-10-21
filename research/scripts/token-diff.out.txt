@@ -1,0 +1,26 @@
+themes=50 emitted-union=940
+main     raw=990 normalised=989 missing=65 extra=15
+1.142.0  raw=990 normalised=989 missing=65 extra=15
+1.116.0  raw=914 normalised=913 missing=12 extra=38
+1.108.1  raw=896 normalised=895 missing=3 extra=47
+1.109.0 total=900 +4 -0
+1.111.0 total=908 +8 -0
+1.114.0 total=914 +6 -0
+1.117.0 total=926 +20 -8
+1.118.0 total=929 +3 -0
+1.119.0 total=931 +2 -0
+1.120.0 total=934 +3 -0
+1.123.0 total=938 +4 -0
+1.127.0 total=940 +2 -0
+1.130.0 total=941 +1 -0
+1.131.0 total=944 +3 -0
+1.132.0 total=950 +6 -0
+1.134.0 total=973 +23 -0
+1.136.0 total=974 +5 -4
+1.137.0 total=975 +1 -0
+1.138.0 total=983 +8 -0
+1.139.0 total=986 +3 -0
+1.140.0 total=989 +3 -0
+1.141.0 total=990 +1 -0
+universe(known+registerColor+extensions)=1006 missing=68
+emitted but not in universe: ['aiCustomizationManagement.sashBorder']
