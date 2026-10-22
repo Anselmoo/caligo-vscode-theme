@@ -26,6 +26,9 @@ export function toContrastColor(color: unknown): Rgba {
 /** Smallest WCAG ratio for small text (AA). */
 export const AA_TEXT = 4.5;
 
+/** Smallest WCAG ratio for large text and UI components (AA). */
+export const AA_LARGE = 3;
+
 /** Keys that are plotted as inks; the rest of the core list are surfaces. */
 const SURFACE_KEYS = new Set(["bg0", "bg1", "bg2"]);
 
@@ -102,4 +105,26 @@ export function minLightnessFor(bg: string, ratio = AA_TEXT): number | null {
 /** Percent opacity as shown in the table, or null when fully opaque. */
 export function opacityPercent(alpha: number): number | null {
   return alpha < 0.995 ? Math.round(alpha * 100) : null;
+}
+
+export type LadderRung = ColourRow & {
+  /** WCAG ratio over bg0 as rendered (translucent inks already blended). */
+  ratio: number;
+  /** Reaches 4.5:1, enough for small text. */
+  passesAA: boolean;
+  /** Reaches 3:1, enough for large text and UI marks. */
+  passesLarge: boolean;
+};
+
+/** The inks ordered from highest contrast to lowest, with which bars each one clears. */
+export function contrastLadder(rows: ColourRow[]): LadderRung[] {
+  return rows
+    .filter((r): r is ColourRow & { contrast: number } => r.kind === "ink" && r.contrast !== null)
+    .map(r => ({
+      ...r,
+      ratio: r.contrast,
+      passesAA: r.contrast >= AA_TEXT,
+      passesLarge: r.contrast >= AA_LARGE,
+    }))
+    .sort((a, b) => b.ratio - a.ratio);
 }

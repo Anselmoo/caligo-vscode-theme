@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
 import type { ThemeIndexEntry } from "../../../types/theme.js";
 import {
+  AA_LARGE,
   AA_TEXT,
+  type ColourRow,
   colourRows,
+  contrastLadder,
   measureHex,
   minLightnessFor,
   opacityPercent,
@@ -72,5 +75,52 @@ describe("colour report", () => {
 
   it("returns no rows before a theme is loaded", () => {
     expect(colourRows(null)).toEqual([]);
+  });
+
+  describe("contrastLadder", () => {
+    const row = (key: string, kind: ColourRow["kind"], contrast: number | null): ColourRow => ({
+      key,
+      label: key,
+      hex: "#000000",
+      kind,
+      l: 0.5,
+      c: 0.1,
+      h: 0,
+      alpha: 1,
+      contrast,
+    });
+
+    it("lists inks only, highest contrast first", () => {
+      const ladder = contrastLadder([
+        row("bg0", "surface", null),
+        row("low", "ink", 3.2),
+        row("high", "ink", 9.1),
+        row("mid", "ink", 5.5),
+      ]);
+      expect(ladder.map(r => r.key)).toEqual(["high", "mid", "low"]);
+    });
+
+    it("flags the 4.5:1 and 3:1 bars as inclusive boundaries", () => {
+      const ladder = contrastLadder([
+        row("exactAA", "ink", AA_TEXT),
+        row("justUnderAA", "ink", AA_TEXT - 0.01),
+        row("exactLarge", "ink", AA_LARGE),
+        row("justUnderLarge", "ink", AA_LARGE - 0.01),
+      ]);
+      const by = Object.fromEntries(ladder.map(r => [r.key, r]));
+      expect(by.exactAA).toMatchObject({ passesAA: true, passesLarge: true });
+      expect(by.justUnderAA).toMatchObject({ passesAA: false, passesLarge: true });
+      expect(by.exactLarge).toMatchObject({ passesAA: false, passesLarge: true });
+      expect(by.justUnderLarge).toMatchObject({ passesAA: false, passesLarge: false });
+    });
+
+    it("uses the blended ratio for a translucent ink", () => {
+      const strings = contrastLadder(colourRows(theme())).find(r => r.key === "strings");
+      expect(strings?.ratio).toBeCloseTo(renderedContrast("#9090a2bf", BG0), 6);
+    });
+
+    it("is empty without rows", () => {
+      expect(contrastLadder([])).toEqual([]);
+    });
   });
 });

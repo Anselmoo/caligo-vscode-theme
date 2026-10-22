@@ -2,11 +2,13 @@
 /**
  * Themes: the whole family on the Theme Spectrum, then the active variant up close
  * (a live editor drawn from its colours and its palette), how to wear it in VS Code,
- * and its colours as tokens for your own project.
+ * and its colours as tokens for your own project. A real VS Code screenshot of the
+ * active variant sits top right and opens in place.
  */
 import { computed } from "vue";
 import ExportPanel from "../components/export/ExportPanel.vue";
 import VariantDetail from "../components/gallery/VariantDetail.vue";
+import ScreenshotPeek from "../components/theme/ScreenshotPeek.vue";
 import ThemeSpectrum from "../components/theme/ThemeSpectrum.vue";
 import WearIt from "../components/theme/WearIt.vue";
 import { useScreenshots } from "../composables/useScreenshots.js";
@@ -29,11 +31,18 @@ const screenshot = computed(() => {
 <template>
   <div class="themes">
     <header class="themes__head">
-      <h1 class="themes__title">Themes</h1>
-      <p class="themes__lede">
-        Ten palettes, each in five harmony modes. Pick one and this whole site wears it; below,
-        see it in an editor and take it home.
-      </p>
+      <div class="themes__intro">
+        <h1 class="themes__title">Themes</h1>
+        <p class="themes__lede">
+          Ten palettes, each in five harmony modes. Pick one and this whole site wears it; below,
+          see it in an editor and take it home.
+        </p>
+      </div>
+      <ScreenshotPeek
+        class="themes__peek"
+        :src="screenshot"
+        :label="currentTheme?.displayName ?? ''"
+      />
     </header>
 
     <p v-if="error" class="notice">
@@ -46,7 +55,7 @@ const screenshot = computed(() => {
       <ThemeSpectrum />
 
       <div v-if="currentTheme" class="themes__detail">
-        <VariantDetail :theme="currentTheme" :screenshot="screenshot" />
+        <VariantDetail :theme="currentTheme" />
         <div class="themes__take">
           <WearIt />
           <ExportPanel />
@@ -63,6 +72,17 @@ const screenshot = computed(() => {
   max-width: var(--page-max);
   margin: 0 auto;
   padding: clamp(40px, 8vh, 96px) var(--gutter) clamp(56px, 10vh, 120px);
+}
+
+.themes__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: clamp(20px, 4vw, 48px);
+}
+
+.themes__intro {
+  min-width: 0;
 }
 
 .themes__title {
@@ -103,6 +123,12 @@ const screenshot = computed(() => {
 .notice {
   margin: 0;
   color: var(--fg-muted);
+}
+
+@media (max-width: 720px) {
+  .themes__head {
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 960px) {
