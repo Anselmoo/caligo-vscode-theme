@@ -13,6 +13,7 @@ import { useTheme } from "../../composables/useTheme.js";
 import type { ThemeIndexEntry } from "../../types/theme.js";
 import { HARMONY_MEANINGS } from "../../utils/harmony-utils.js";
 import HarmonyGlyph from "./HarmonyGlyph.vue";
+import SeedGlyph from "./SeedGlyph.vue";
 
 const { themes, seeds, harmonies, currentThemeKey, currentTheme, setTheme } = useTheme();
 
@@ -43,6 +44,7 @@ function inks(t: ThemeIndexEntry): Record<string, string> {
     "--chip-bg": c.bg0,
     "--chip-edge": c.bg2,
     "--chip-glow": c.accent,
+    "--chip-fg": c.fg1,
     "--ink-1": c.accent,
     "--ink-2": c.keywords,
     "--ink-3": c.types,
@@ -130,7 +132,14 @@ function onPointerMove(event: PointerEvent) {
         <tbody>
           <tr v-for="(row, r) in rows" :key="row.seed.id">
             <th scope="row" class="grid__seed" :class="{ 'is-lit': hover?.row === r }">
-              {{ row.seed.label }}
+              <span class="grid__seed-in">
+                <SeedGlyph
+                  :seed="row.seed.id"
+                  :size="30"
+                  :style="{ '--glyph-accent': row.cells.find(Boolean)?.colors.accent }"
+                />
+                <span class="grid__seed-name">{{ row.seed.label }}</span>
+              </span>
             </th>
             <td v-for="(cell, c) in row.cells" :key="harmonies[c].id" class="grid__slot">
               <button
@@ -152,7 +161,24 @@ function onPointerMove(event: PointerEvent) {
                 @pointerenter="hover = { row: r, col: c }"
                 @click="apply(cell)"
               >
-                <span v-for="n in 6" :key="n" class="chip__ink" :style="{ background: `var(--ink-${n})` }" />
+                <span class="chip__code" aria-hidden="true">
+                  <span class="chip__line">
+                    <i class="chip__ink" :style="{ '--ink': 'var(--ink-2)', '--w': '34%' }" />
+                    <i class="chip__bar" :style="{ '--w': '46%' }" />
+                  </span>
+                  <span class="chip__line chip__line--in">
+                    <i class="chip__ink" :style="{ '--ink': 'var(--ink-4)', '--w': '38%' }" />
+                    <i class="chip__ink" :style="{ '--ink': 'var(--ink-5)', '--w': '46%' }" />
+                  </span>
+                  <span class="chip__line chip__line--in">
+                    <i class="chip__ink" :style="{ '--ink': 'var(--ink-3)', '--w': '30%' }" />
+                    <i class="chip__ink" :style="{ '--ink': 'var(--ink-6)', '--w': '22%' }" />
+                    <i class="chip__ink" :style="{ '--ink': 'var(--ink-1)', '--w': '16%' }" />
+                  </span>
+                  <span class="chip__line chip__line--tail">
+                    <i class="chip__bar" :style="{ '--w': '12%' }" />
+                  </span>
+                </span>
               </button>
             </td>
           </tr>
@@ -235,7 +261,7 @@ function onPointerMove(event: PointerEvent) {
 }
 
 .grid__corner {
-  width: clamp(88px, 18%, 190px);
+  width: clamp(96px, 21%, 214px);
 }
 
 .grid__col {
@@ -247,8 +273,15 @@ function onPointerMove(event: PointerEvent) {
   transition: color 160ms var(--ease-out);
 }
 
+.grid__col {
+  white-space: nowrap;
+}
+
 .grid__col :deep(.glyph) {
-  display: none;
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: -5px;
+  opacity: 0.8;
 }
 
 .grid__seed {
@@ -261,6 +294,26 @@ function onPointerMove(event: PointerEvent) {
   transition: color 160ms var(--ease-out);
 }
 
+.grid__seed-in {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.grid__seed-name {
+  min-width: 0;
+}
+
+.grid__seed :deep(.seed-glyph) {
+  opacity: 0.85;
+  transition: opacity 160ms var(--ease-out), scale 260ms var(--ease-out);
+}
+
+.grid__seed.is-lit :deep(.seed-glyph) {
+  opacity: 1;
+  scale: 1.12;
+}
+
 .grid__col.is-lit,
 .grid__seed.is-lit {
   color: var(--fg0);
@@ -270,36 +323,107 @@ function onPointerMove(event: PointerEvent) {
   padding: 0;
 }
 
+/* A chip is a small night of its own, and a few lines of code written in it: the
+   variant's background, the six inks as the tokens of a TypeScript snippet. */
 .chip {
   position: relative;
+  display: block;
+  width: 100%;
+  height: clamp(84px, 9vw, 112px);
+  padding: clamp(12px, 1.4vw, 18px) clamp(14px, 1.6vw, 20px);
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--chip-edge) 80%, var(--chip-glow) 12%);
+  border-radius: 16px;
+  /* The variant's own background stays the paint colour; the gradients only light it. */
+  background-color: var(--chip-bg);
+  background-image:
+    radial-gradient(120% 140% at 50% 140%, color-mix(in oklab, var(--chip-glow) 14%, transparent), transparent 62%),
+    linear-gradient(to bottom, color-mix(in oklab, var(--chip-bg) 90%, var(--chip-edge)), var(--chip-bg));
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--fg0) 9%, transparent),
+    0 8px 18px -14px oklch(from var(--bg0) calc(l * 0.2) c h);
+  text-align: left;
+  cursor: pointer;
+  isolation: isolate;
+  transition:
+    transform 220ms var(--ease-out),
+    box-shadow 260ms var(--ease-out),
+    border-color 200ms var(--ease-out);
+}
+
+/* A sheen that sweeps the chip on hover. */
+.chip::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, color-mix(in oklab, var(--fg0) 12%, transparent) 50%, transparent 65%);
+  translate: -120% 0;
+  transition: translate 700ms var(--ease-out);
+}
+
+.chip__code {
+  display: grid;
+  gap: clamp(6px, 0.8vw, 9px);
+  height: 100%;
+  align-content: center;
+}
+
+.chip__line {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: clamp(4px, 0.6vw, 7px);
-  width: 100%;
-  height: clamp(40px, 5vw, 54px);
-  padding: 0 8px;
-  border: 1px solid var(--chip-edge);
-  border-radius: 12px;
-  background: var(--chip-bg);
-  cursor: pointer;
-  transition:
-    transform 180ms var(--ease-out),
-    box-shadow 220ms var(--ease-out),
-    border-color 180ms var(--ease-out);
+  gap: clamp(5px, 0.6vw, 8px);
+}
+
+.chip__line--in {
+  padding-left: clamp(10px, 1.4vw, 18px);
+}
+
+.chip__line--tail {
+  opacity: 0.8;
+}
+
+/* A token: its width is its length in the line, its colour is the variant's ink. */
+.chip__ink,
+.chip__bar {
+  display: block;
+  flex: none;
+  width: var(--w);
+  height: clamp(5px, 0.6vw, 7px);
+  border-radius: 4px;
+  transform-origin: left;
+  transition: transform 360ms var(--ease-out);
 }
 
 .chip__ink {
-  width: clamp(7px, 0.9vw, 11px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  flex: none;
+  background-color: var(--ink);
+  box-shadow: 0 0 10px -3px var(--ink);
 }
 
-.chip:hover {
-  transform: translateY(-2px);
-  border-color: color-mix(in oklab, var(--chip-glow) 55%, var(--chip-edge));
-  box-shadow: 0 10px 24px -14px var(--chip-glow);
+/* Plain text and punctuation: the variant's body-text colour, a step quieter. */
+.chip__bar {
+  background-color: var(--chip-fg);
+  opacity: 0.5;
+}
+
+.chip:hover,
+.chip:focus-visible {
+  transform: translateY(-3px);
+  border-color: color-mix(in oklab, var(--chip-glow) 60%, var(--chip-edge));
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--fg0) 14%, transparent),
+    0 18px 32px -16px var(--chip-glow);
+}
+
+.chip:hover::after,
+.chip:focus-visible::after {
+  translate: 120% 0;
+}
+
+/* The tokens stretch out a little, line by line. */
+.chip:hover .chip__ink,
+.chip:focus-visible .chip__ink {
+  transform: scaleX(1.12);
 }
 
 .chip:focus-visible {
@@ -307,13 +431,14 @@ function onPointerMove(event: PointerEvent) {
   outline-offset: 3px;
 }
 
-/* The lit chip: ringed in the site's light, glowing in its own accent. */
+/* The lit chip: ringed in its own accent and glowing. */
 .chip[aria-pressed="true"] {
   border-color: var(--chip-glow);
   box-shadow:
-    0 0 0 2px color-mix(in oklab, var(--chip-glow) 70%, transparent),
-    0 0 28px -6px var(--chip-glow);
-  animation: lit 420ms var(--ease-out);
+    inset 0 1px 0 color-mix(in oklab, var(--fg0) 16%, transparent),
+    0 0 0 2px color-mix(in oklab, var(--chip-glow) 75%, transparent),
+    0 0 34px -4px var(--chip-glow);
+  animation: lit 460ms var(--ease-out);
 }
 
 @keyframes lit {
@@ -384,10 +509,6 @@ function onPointerMove(event: PointerEvent) {
     text-align: center;
   }
 
-  .grid__col :deep(.glyph) {
-    display: inline-block;
-  }
-
   .grid__seed {
     padding-right: 4px;
     font-size: 0.72rem;
@@ -396,24 +517,45 @@ function onPointerMove(event: PointerEvent) {
   }
 
   .chip {
-    display: grid;
-    grid-template-columns: repeat(3, auto);
-    align-content: center;
-    gap: 4px;
-    height: 46px;
-    padding: 0;
+    height: 70px;
+    padding: 10px;
+    border-radius: 12px;
   }
 
-  .chip__ink {
-    width: 7px;
+  .chip__code {
+    gap: 5px;
+  }
+
+  .chip__line--tail,
+  .chip::after {
+    display: none;
+  }
+
+  .chip__line--in {
+    padding-left: 8px;
+  }
+
+  .grid__seed-in {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .chip,
+  .chip::after,
+  .chip__ink,
+  .chip__bar,
+  .grid__seed :deep(.seed-glyph),
   .grid__col,
   .grid__seed {
     transition: none;
+  }
+
+  .chip:hover .chip__ink,
+  .chip:focus-visible .chip__ink {
+    transform: none;
   }
 
   .chip[aria-pressed="true"] {
