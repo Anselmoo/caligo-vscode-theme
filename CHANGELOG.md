@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-10-22
 ### Changed
 - **site**: redesign around the restored Theme Spectrum matrix, with fixes to manifest, export and hero data (#178)
 
