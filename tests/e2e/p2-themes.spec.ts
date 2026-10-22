@@ -159,6 +159,19 @@ test.describe("Theme Spectrum: every variant on one wall", { tag: "@themes" }, (
     }
   });
 
+  test("every palette row carries its own icon beside its name", async ({ page }) => {
+    const heads = spectrum(page).locator("tbody th[scope='row']");
+    await expect(heads).toHaveCount(manifest.seeds.length);
+    const icons = await heads.evaluateAll(els =>
+      els.map(el => el.querySelector("svg.seed-glyph path")?.getAttribute("d") ?? "")
+    );
+    expect(
+      icons.every(d => d.length > 0),
+      "each row has a drawn icon"
+    ).toBe(true);
+    expect(new Set(icons).size, "no two rows share an icon").toBe(manifest.seeds.length);
+  });
+
   test("marks exactly one chip as pressed on arrival: the default theme", async ({ page }) => {
     const pressed = spectrum(page).locator('button[data-chip][aria-pressed="true"]');
     await expect(pressed).toHaveCount(1);
