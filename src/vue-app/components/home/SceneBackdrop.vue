@@ -7,9 +7,11 @@
  *    two ridges as smooth cubic Béziers shaded along their own axis, a sparse star
  *    field). It paints with the first frame, costs no request, and follows every
  *    theme switch through CSS variables.
- * 2. The theme's generated wallpaper, when the wallpaper manifest lists one. It loads
- *    after first paint as a single <img> (rasterised once, never re-filtered) and
+ * 2. The theme's generated wallpaper as a WebP: the 1920 px hero rendition, else the
+ *    640 px thumbnail. Never the SVG (several MB). It loads after first paint and
  *    fades in over layer 1, so a missing or slow wallpaper never leaves a hole.
+ * A scrim of the page background sits behind the hero copy, so the text is read
+ * against --bg0, whatever the scene paints there.
  */
 import { computed, onMounted, ref, watch } from "vue";
 import { useTheme } from "../../composables/useTheme.js";
@@ -26,7 +28,8 @@ const sceneSrc = computed(() => {
   if (!theme) return null;
   const mode = theme.harmonyId === "balanced" ? "none" : theme.harmonyId;
   const entry = findVariant(theme.seedId, mode, "monitor", "no-text");
-  return entry ? `./${entry.svgPath}` : null;
+  const src = entry?.heroPath ?? entry?.thumbPath;
+  return src ? `./${src}` : null;
 });
 
 watch(sceneSrc, () => {
@@ -58,6 +61,7 @@ const stars = Array.from({ length: 70 }, (_, i) => {
 <template>
   <div class="scene" aria-hidden="true">
     <svg class="scene__night" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMax slice">
+      <title>Night sky in the active theme</title>
       <defs>
         <linearGradient id="scene-sky" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" class="sky-top" />
@@ -103,6 +107,7 @@ const stars = Array.from({ length: 70 }, (_, i) => {
       fetchpriority="low"
       @load="sceneLoaded = true"
     />
+    <div class="scene__scrim" />
     <div class="scene__fade" />
   </div>
 </template>
@@ -125,6 +130,7 @@ const stars = Array.from({ length: 70 }, (_, i) => {
 
 .scene__image {
   object-fit: cover;
+  scale: 1.06;
   object-position: center 70%;
   opacity: 0;
   transition: opacity 900ms var(--ease-out);
@@ -172,6 +178,47 @@ const stars = Array.from({ length: 70 }, (_, i) => {
   stop-color: oklch(from var(--bg0) calc(l * 0.6) c h);
 }
 
+/* The scene drifts up a little as the page scrolls past it (where supported). */
+@supports (animation-timeline: scroll()) {
+  .scene__image {
+    animation: drift linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 100vh;
+  }
+}
+
+@keyframes drift {
+  to {
+    translate: 0 -6%;
+  }
+}
+
+/* Copy side: the page background, fading into the scene. */
+.scene__scrim {
+  position: absolute;
+  inset: 0;
+  /* Measured: the lede must clear 4.5:1 over the brightest scene pixel behind it in
+     every theme (aurora and moonlight are the bright spots). */
+  background: linear-gradient(
+    100deg,
+    color-mix(in oklab, var(--bg0) 95%, transparent) 0%,
+    color-mix(in oklab, var(--bg0) 90%, transparent) 42%,
+    color-mix(in oklab, var(--bg0) 55%, transparent) 58%,
+    transparent 76%
+  );
+}
+
+@media (max-width: 960px) {
+  .scene__scrim {
+    background: linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--bg0) 90%, transparent) 0%,
+      color-mix(in oklab, var(--bg0) 70%, transparent) 55%,
+      transparent 100%
+    );
+  }
+}
+
 /* Blend the scene into the page below so the hero has no bottom edge. */
 .scene__fade {
   position: absolute;
@@ -183,6 +230,7 @@ const stars = Array.from({ length: 70 }, (_, i) => {
 @media (prefers-reduced-motion: reduce) {
   .scene__image {
     transition: none;
+    animation: none;
   }
 }
 </style>

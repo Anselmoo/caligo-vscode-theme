@@ -1,18 +1,26 @@
 <script setup lang="ts">
 /**
  * Controls for the wallpaper grid. Platform leads because it changes every
- * thumbnail's shape and the file you download; theme and mode only narrow the list.
+ * thumbnail's shape and the file you download. Scope shows the active palette's
+ * five scenes, or the whole family one switch away.
  */
 import { PLATFORM_SIZES } from "../../../wallpaper/types.js";
 import type { WallpaperFilter } from "../../composables/useWallpapers";
 
+export type WallpaperScope = "palette" | "all";
+
 const props = defineProps<{
   filter: WallpaperFilter;
-  seeds: Array<{ id: string; label: string }>;
-  modes: Array<{ id: string; label: string }>;
+  show: WallpaperScope;
+  /** Name of the active palette, e.g. "Deep Sable". */
+  paletteLabel: string;
+  total: number;
 }>();
 
-const emit = defineEmits<{ update: [patch: Partial<WallpaperFilter>] }>();
+const emit = defineEmits<{
+  update: [patch: Partial<WallpaperFilter>];
+  scope: [scope: WallpaperScope];
+}>();
 
 const platforms = [
   { id: "monitor", label: "Monitor" },
@@ -24,17 +32,13 @@ function resolution(): string {
   const { width, height } = PLATFORM_SIZES[props.filter.platform ?? "monitor"];
   return `${width} × ${height} px`;
 }
-
-function onSelect(key: "seedId" | "harmonyMode", event: Event) {
-  emit("update", { [key]: (event.target as HTMLSelectElement).value || null });
-}
-
 </script>
 
 <template>
   <div class="controls">
     <div class="controls__platform">
-      <div class="segmented" role="group" aria-label="Platform" data-platform-toggle>
+      <fieldset class="segmented" data-platform-toggle>
+        <legend class="visually-hidden">Device</legend>
         <button
           v-for="p in platforms"
           :key="p.id"
@@ -45,28 +49,30 @@ function onSelect(key: "seedId" | "harmonyMode", event: Event) {
         >
           {{ p.label }}
         </button>
-      </div>
+      </fieldset>
       <p class="controls__size">{{ resolution() }}</p>
     </div>
 
     <div class="controls__filters">
-      <div class="field">
-        <label class="field__label" for="wallpaper-theme">Theme</label>
-        <select
-          id="wallpaper-theme" class="field__select" :value="filter.seedId ?? ''" @change="onSelect('seedId', $event)">
-          <option value="">All themes</option>
-          <option v-for="s in seeds" :key="s.id" :value="s.id">{{ s.label }}</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label class="field__label" for="wallpaper-mode">Mode</label>
-        <select
-          id="wallpaper-mode" class="field__select" :value="filter.harmonyMode ?? ''" @change="onSelect('harmonyMode', $event)">
-          <option value="">All modes</option>
-          <option v-for="m in modes" :key="m.id" :value="m.id">{{ m.label }}</option>
-        </select>
-      </div>
+      <fieldset class="segmented" data-scope-toggle>
+        <legend class="visually-hidden">Show</legend>
+        <button
+          type="button"
+          class="segmented__btn"
+          :aria-pressed="show === 'palette'"
+          @click="emit('scope', 'palette')"
+        >
+          {{ paletteLabel }}
+        </button>
+        <button
+          type="button"
+          class="segmented__btn"
+          :aria-pressed="show === 'all'"
+          @click="emit('scope', 'all')"
+        >
+          All {{ total }}
+        </button>
+      </fieldset>
 
       <label class="check">
         <input
@@ -98,6 +104,9 @@ function onSelect(key: "seedId" | "harmonyMode", event: Event) {
 
 .segmented {
   display: inline-flex;
+  min-width: 0;
+  margin: 0;
+  border: 0;
   padding: 3px;
   border-radius: 10px;
   background: color-mix(in oklab, var(--fg0) 8%, var(--bg0));
@@ -141,28 +150,8 @@ function onSelect(key: "seedId" | "harmonyMode", event: Event) {
   gap: 16px 20px;
 }
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
 
-.field__label {
-  color: var(--fg1);
-  font-size: var(--step--1);
-}
 
-.field__select {
-  height: 40px;
-  min-width: 11rem;
-  padding: 0 12px;
-  border: 1px solid color-mix(in oklab, var(--fg0) 22%, transparent);
-  border-radius: 8px;
-  background: var(--bg1);
-  color: var(--fg0);
-  font: inherit;
-  font-size: var(--step-0);
-}
 
 .check {
   display: inline-flex;
@@ -191,13 +180,6 @@ function onSelect(key: "seedId" | "harmonyMode", event: Event) {
     min-width: 0;
   }
 
-  .field {
-    flex: 1 1 8rem;
-  }
 
-  .field__select {
-    width: 100%;
-    min-width: 0;
-  }
 }
 </style>

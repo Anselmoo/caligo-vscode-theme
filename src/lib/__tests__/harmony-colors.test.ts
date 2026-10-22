@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  deriveHarmonyAccentShift,
   deriveHarmonyDecorativeWheel,
+  deriveHarmonyIntentOffsets,
   deriveHarmonyPalette,
+  deriveHarmonySemanticHues,
   getHarmonyHues,
   HARMONY_MODES,
   HARMONY_OFFSETS,
@@ -267,5 +270,54 @@ describe("midpointHue", () => {
   it("handles wrap-around across 360 degrees", () => {
     expect(midpointHue(350, 10)).toBe(0);
     expect(midpointHue(10, 350)).toBe(0);
+  });
+});
+
+// Per-mode tables the palette engine reads. Each mode must give the UI its own
+// identity without breaking the relationships its name promises.
+describe("per-mode tables", () => {
+  const hueGap = (a: number, b: number) => {
+    const d = Math.abs(a - b) % 360;
+    return Math.min(d, 360 - d);
+  };
+
+  it("shifts the UI accent differently in every mode, and not at all in balanced", () => {
+    expect(deriveHarmonyAccentShift("none").hueOffset).toBe(0);
+    const offsets = HARMONY_MODES.map(m => deriveHarmonyAccentShift(m).hueOffset);
+    expect(new Set(offsets).size).toBe(HARMONY_MODES.length);
+    for (const mode of HARMONY_MODES) {
+      const { chromaMultiplier, lightnessAdjust } = deriveHarmonyAccentShift(mode);
+      expect(chromaMultiplier).toBeGreaterThanOrEqual(0.9);
+      expect(chromaMultiplier).toBeLessThanOrEqual(1.25);
+      expect(Math.abs(lightnessAdjust)).toBeLessThanOrEqual(0.05);
+    }
+  });
+
+  it("keeps analogous intents inside the ±30° band and split-complementary on its flanks", () => {
+    const analogous = Object.values(deriveHarmonyIntentOffsets(220, "analogous"));
+    for (const offset of analogous) expect(Math.abs(offset)).toBeLessThanOrEqual(30);
+
+    const split = deriveHarmonyIntentOffsets(220, "split-complementary");
+    expect([split.controlFlow, split.data, split.meta]).toEqual([150, 180, 210]);
+
+    for (const mode of HARMONY_MODES) {
+      const offsets = deriveHarmonyIntentOffsets(220, mode);
+      expect(offsets.declaration).toBe(0);
+      expect(new Set(Object.values(offsets)).size).toBe(Object.keys(offsets).length);
+    }
+  });
+
+  it("keeps the four semantic hues at least 20° apart in every mode", () => {
+    for (const mode of HARMONY_MODES) {
+      const hues = Object.values(deriveHarmonySemanticHues(mode));
+      for (let i = 0; i < hues.length; i++) {
+        for (let j = i + 1; j < hues.length; j++) {
+          expect(
+            hueGap(hues[i], hues[j]),
+            `${mode}: ${hues[i]} vs ${hues[j]}`
+          ).toBeGreaterThanOrEqual(20);
+        }
+      }
+    }
   });
 });

@@ -20,11 +20,11 @@
  */
 
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { dirname, join, relative, resolve } from "node:path";
+import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 import { matchesSeed, parseQuality, platformFromPath } from "../src/wallpaper/thumbs.js";
-import { THUMBNAIL_LONG_EDGE, thumbnailSize } from "../src/wallpaper/types.js";
+import { HERO_LONG_EDGE, THUMBNAIL_LONG_EDGE, thumbnailSize } from "../src/wallpaper/types.js";
 
 // ─── Paths ────────────────────────────────────────────────────────────────────
 
@@ -84,45 +84,75 @@ async function main() {
     for (const svgFile of svgs) {
       const platform = platformFromPath(svgFile);
       const { width, height } = thumbnailSize(platform);
+      // The monitor scene without caption also feeds the site hero: rasterise it
+      // once at hero size and downscale that canvas for the thumbnail.
+      const hero = svgFile.endsWith(`${sep}monitor.svg`)
+        ? thumbnailSize(platform, HERO_LONG_EDGE)
+        : null;
       const svgText = readFileSync(svgFile, "utf-8");
 
-      // Draw the SVG into a canvas at thumbnail size and let Chromium encode
-      // WebP. Doing it in-page avoids a second image dependency (Playwright
-      // itself screenshots only PNG/JPEG) and matches how browsers will
-      // rasterise the artwork for real users.
-      const dataUrl: string = await page.evaluate(
-        async ({ svg, w, h, q }) => {
+      // Draw the SVG into a canvas and let Chromium encode WebP. Doing it in-page
+      // avoids a second image dependency (Playwright itself screenshots only
+      // PNG/JPEG) and matches how browsers will rasterise the artwork for real users.
+      const urls: { thumb: string; hero: string | null } = await page.evaluate(
+        async ({ svg, w, h, hw, hh, q }) => {
           const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
           const url = URL.createObjectURL(blob);
+          // No named helpers in here: tsx wraps them in a __name() call that does
+          // not exist inside the page.
           try {
             const img = new Image();
             img.src = url;
             await img.decode();
-
-            const canvas = document.createElement("canvas");
-            canvas.width = w;
-            canvas.height = h;
-            const ctx = canvas.getContext("2d");
-            if (!ctx) throw new Error("Canvas 2D context unavailable");
-            ctx.drawImage(img, 0, 0, w, h);
-            return canvas.toDataURL("image/webp", q);
+            const sizes =
+              hw && hh
+                ? [
+                    [hw, hh],
+                    [w, h],
+                  ]
+                : [[w, h]];
+            const out: string[] = [];
+            let source: CanvasImageSource = img;
+            for (const [cw, ch] of sizes) {
+              const canvas = document.createElement("canvas");
+              canvas.width = cw;
+              canvas.height = ch;
+              const ctx = canvas.getContext("2d");
+              if (!ctx) throw new Error("Canvas 2D context unavailable");
+              ctx.imageSmoothingQuality = "high";
+              ctx.drawImage(source, 0, 0, cw, ch);
+              out.push(canvas.toDataURL("image/webp", q));
+              source = canvas;
+            }
+            return out.length === 2
+              ? { hero: out[0], thumb: out[1] }
+              : { hero: null, thumb: out[0] };
           } finally {
             URL.revokeObjectURL(url);
           }
         },
-        { svg: svgText, w: width, h: height, q: QUALITY }
+        {
+          svg: svgText,
+          w: width,
+          h: height,
+          hw: hero?.width ?? 0,
+          hh: hero?.height ?? 0,
+          q: QUALITY,
+        }
       );
 
-      if (!dataUrl.startsWith("data:image/webp")) {
-        throw new Error(`Chromium did not return WebP for ${relative(PROJECT_ROOT, svgFile)}`);
+      const outputs: Array<[string, string]> = [[svgFile.replace(/\.svg$/, ".webp"), urls.thumb]];
+      if (urls.hero) outputs.push([svgFile.replace(/\.svg$/, ".hero.webp"), urls.hero]);
+      for (const [outFile, dataUrl] of outputs) {
+        if (!dataUrl.startsWith("data:image/webp")) {
+          throw new Error(`Chromium did not return WebP for ${relative(PROJECT_ROOT, outFile)}`);
+        }
+        const buffer = Buffer.from(dataUrl.slice(dataUrl.indexOf(",") + 1), "base64");
+        writeFileSync(outFile, buffer);
+        bytes += statSync(outFile).size;
       }
 
-      const outFile = svgFile.replace(/\.svg$/, ".webp");
-      const buffer = Buffer.from(dataUrl.slice(dataUrl.indexOf(",") + 1), "base64");
-      writeFileSync(outFile, buffer);
-
       written++;
-      bytes += statSync(outFile).size;
 
       if (written % 50 === 0) console.log(`  … ${written}/${svgs.length}`);
     }

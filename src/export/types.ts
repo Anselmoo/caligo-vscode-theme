@@ -1,4 +1,4 @@
-import type { DerivedPalette } from "../core/palette.js";
+import type { ExportSource } from "./shared.js";
 
 export type ExportFormat =
   | "css-custom-properties"
@@ -28,5 +28,5 @@ export interface ExportFormatter {
   label: string;
   extension: string;
   mimeType: string;
-  generate(palette: DerivedPalette, options?: ExportOptions): ExportResult;
+  generate(source: ExportSource, options?: ExportOptions): ExportResult;
 }

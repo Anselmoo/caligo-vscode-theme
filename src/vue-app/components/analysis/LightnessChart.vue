@@ -4,7 +4,7 @@
  * neutral text colour needs to reach 4.5:1 over the background. Marks are labelled
  * directly; the full numbers live in the table beside it.
  */
-import { computed } from "vue";
+import { computed, useId } from "vue";
 import { AA_TEXT, type ColourRow } from "./colour-report.js";
 
 const props = defineProps<{
@@ -63,6 +63,8 @@ const labels = computed(() => {
   return entries;
 });
 
+const titleId = useId();
+
 const description = computed(
   () =>
     `Lightness against chroma for the colours of ${props.themeName}. ` +
@@ -74,7 +76,8 @@ const description = computed(
 </script>
 
 <template>
-  <svg class="chart" :viewBox="`0 0 ${W} ${H}`" role="img" :aria-label="description">
+  <svg class="chart" :viewBox="`0 0 ${W} ${H}`" role="img" :aria-labelledby="titleId">
+    <title :id="titleId">{{ description }}</title>
     <g class="chart__grid">
       <template v-for="tick in yTicks" :key="`y${tick}`">
         <line :x1="M.left" :x2="W - M.right" :y1="y(tick)" :y2="y(tick)" />

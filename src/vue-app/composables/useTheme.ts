@@ -6,6 +6,7 @@
 import { computed, type Ref, ref, watch } from "vue";
 import type { ThemeHarmony, ThemeIndex, ThemeIndexEntry } from "../types/theme.js";
 import { sortHarmonies } from "../utils/harmony-utils.js";
+import { initialThemeKey, storeTheme, writeThemeToAddress } from "../utils/theme-link.js";
 
 // Theme state
 const themeIndex: Ref<ThemeIndex | null> = ref(null);
@@ -60,8 +61,8 @@ export function useTheme() {
 
       themeIndex.value = data;
 
-      // Set default theme
-      currentThemeKey.value = data.defaultThemeKey;
+      // A shared link wins, then the visitor's last pick, then the manifest default.
+      currentThemeKey.value = initialThemeKey(data);
 
       // Apply theme colors to CSS variables
       applyTheme(currentThemeKey.value);
@@ -137,13 +138,10 @@ export function useTheme() {
     root.style.setProperty("--error", colors.error);
     root.style.setProperty("--color-error", colors.error);
 
-    // Semantic state colors derived from theme palette
-    // Warning: Use types/keywords color (typically yellow/orange in themes)
-    root.style.setProperty("--color-warning", colors.keywords);
-    // Success: Use strings/functions color (typically green/cyan in themes)
-    root.style.setProperty("--color-success", colors.strings);
-    // Info: Use accent color
-    root.style.setProperty("--color-info", colors.accent);
+    // Semantic state colors: the shipped theme's own editorWarning / added / editorInfo colours
+    root.style.setProperty("--color-warning", colors.warning);
+    root.style.setProperty("--color-success", colors.success);
+    root.style.setProperty("--color-info", colors.info);
 
     // RGB variants for rgba() usage
     root.style.setProperty("--bg0-rgb", hexToRgb(colors.bg0));
@@ -153,8 +151,8 @@ export function useTheme() {
     root.style.setProperty("--fg1-rgb", hexToRgb(colors.fg1));
     root.style.setProperty("--fg-muted-rgb", hexToRgb(colors.fgMuted));
     root.style.setProperty("--color-error-rgb", hexToRgb(colors.error));
-    root.style.setProperty("--color-warning-rgb", hexToRgb(colors.keywords));
-    root.style.setProperty("--color-success-rgb", hexToRgb(colors.strings));
+    root.style.setProperty("--color-warning-rgb", hexToRgb(colors.warning));
+    root.style.setProperty("--color-success-rgb", hexToRgb(colors.success));
 
     // Syntax highlighting colors
     root.style.setProperty("--syntax-keywords", colors.keywords);
@@ -222,8 +220,7 @@ export function useTheme() {
     root.style.setProperty("--vscode-window-minimize", colors.decorator);
     root.style.setProperty("--vscode-window-maximize", colors.functions);
 
-    // Store in localStorage
-    localStorage.setItem("caligo-site-theme", themeKey);
+    storeTheme(themeKey);
   };
 
   /**
@@ -234,6 +231,9 @@ export function useTheme() {
       console.warn(`Invalid theme key: ${themeKey}`);
       return;
     }
+    // An explicit pick names itself in the address, so the URL is always shareable.
+    writeThemeToAddress(themeIndex.value.themes[themeKey]);
+
     // Re-selecting the current theme re-applies it, without an animation.
     if (themeKey === currentThemeKey.value) {
       applyTheme(themeKey);
@@ -313,24 +313,6 @@ export function useTheme() {
   });
 
   /**
-   * Get themes grouped by seed
-   */
-  const themesBySeed = computed(() => {
-    if (!themeIndex.value) return {};
-
-    const grouped: Record<string, ThemeIndexEntry[]> = {};
-
-    for (const theme of themes.value) {
-      if (!grouped[theme.seedId]) {
-        grouped[theme.seedId] = [];
-      }
-      grouped[theme.seedId].push(theme);
-    }
-
-    return grouped;
-  });
-
-  /**
    * Watch for theme changes
    */
   watch(currentThemeKey, newKey => {
@@ -347,7 +329,6 @@ export function useTheme() {
     themes,
     harmonies,
     seeds,
-    themesBySeed,
     isLoading,
     error,
 

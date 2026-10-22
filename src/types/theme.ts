@@ -35,6 +35,12 @@ export interface ThemeColors {
   fgMuted: string;
   accent: string;
   error: string;
+  /** editorWarning.foreground of the shipped theme */
+  warning: string;
+  /** gitDecoration.addedResourceForeground of the shipped theme (testing.iconPassed, terminal.ansiGreen as fallbacks) */
+  success: string;
+  /** editorInfo.foreground of the shipped theme */
+  info: string;
   strings: string;
   types: string;
   functions: string;
@@ -80,6 +86,8 @@ export interface ThemeIndexEntry {
   harmonyId: ThemeHarmonyId;
   harmonyLabel: string;
   displayName: string;
+  /** The theme's name as VS Code lists it, e.g. "Caligo (Aurora Noir — Monochromatic · 2 weights)". */
+  vscodeLabel: string;
   colors: ThemeColors;
   core: ThemeCoreColor[];
   oklch: {

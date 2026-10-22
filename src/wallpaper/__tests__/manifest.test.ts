@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveThumbPath } from "../manifest.js";
+import { resolveHeroPath, resolveThumbPath } from "../manifest.js";
 
 describe("resolveThumbPath", () => {
   const always = () => true;
@@ -30,5 +30,23 @@ describe("resolveThumbPath", () => {
     expect(resolveThumbPath("wallpapers/v1.2/balanced/monitor.svg", always)).toBe(
       "wallpapers/v1.2/balanced/monitor.webp"
     );
+  });
+});
+
+describe("resolveHeroPath", () => {
+  const all = () => true;
+
+  it("names the hero rendition beside the monitor scene", () => {
+    expect(resolveHeroPath("wallpapers/DeepSable/balanced/monitor.svg", all)).toBe(
+      "wallpapers/DeepSable/balanced/monitor.hero.webp"
+    );
+  });
+
+  it("has none for captioned or non-monitor scenes, or when it was not rasterised", () => {
+    expect(resolveHeroPath("wallpapers/DeepSable/balanced/monitor-text.svg", all)).toBeUndefined();
+    expect(resolveHeroPath("wallpapers/DeepSable/balanced/mobile.svg", all)).toBeUndefined();
+    expect(
+      resolveHeroPath("wallpapers/DeepSable/balanced/monitor.svg", () => false)
+    ).toBeUndefined();
   });
 });

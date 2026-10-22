@@ -6,87 +6,22 @@
  * fallback (status 200), and a static host answers 404. Both must lead to a
  * plain-language empty state, never a raw JSON parse error.
  *
- * The populated grid is tested against a mocked manifest: it must show the
- * build-time thumbnails and never load a full wallpaper SVG.
+ * The populated grid is tested against a mocked manifest (support/wallpapers.ts): by
+ * default it shows the active theme's palette (a scope switch widens it to "All"),
+ * with the build-time thumbnails, and never loads a full wallpaper SVG.
  */
 
-import type { Page, Route } from "@playwright/test";
+import type { Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
-import { gotoApp } from "./support/app";
+import { applyThemeViaPalette, gotoApp, loadThemeManifest, themeByKey } from "./support/app";
+import { DEFAULT_SEED, MODES, OTHER_SEED, SEEDS, serveWallpapers } from "./support/wallpapers";
 
 const RAW_ERROR = /Unexpected token|SyntaxError|not valid JSON|HTTP \d{3}|Failed to fetch/i;
 
-/** 1x1 transparent PNG; browsers sniff the bytes, so it also serves .webp requests. */
-const PIXEL = Buffer.from(
-  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
-  "base64"
-);
-
-const SEEDS = [
-  { id: "AuroraNoir", name: "Aurora Noir" },
-  { id: "Eclipse", name: "Eclipse" },
-];
-const MODES = [
-  { id: "none", folder: "balanced", label: "Balanced", topic: "Balanced" },
-  { id: "triadic", folder: "triadic", label: "Triadic", topic: "Triadic" },
-];
-const PLATFORMS = ["monitor", "tablet", "mobile"] as const;
-const TEXT_VARIANTS = ["no-text", "text"] as const;
-
-type MockOptions = { dropThumbFor?: string };
-
-function mockManifest({ dropThumbFor }: MockOptions = {}) {
-  const entries = SEEDS.flatMap(seed =>
-    MODES.flatMap(mode =>
-      PLATFORMS.flatMap(platform =>
-        TEXT_VARIANTS.map(textVariant => {
-          const stem = `wallpapers/${seed.id}/${mode.folder}/${platform}${textVariant === "text" ? "-text" : ""}`;
-          const entry: Record<string, string> = {
-            seedId: seed.id,
-            seedDisplayName: seed.name,
-            harmonyMode: mode.id,
-            harmonyLabel: mode.label,
-            topic: mode.topic,
-            platform,
-            textVariant,
-            displayName: `${seed.name} · ${mode.topic}`,
-            svgPath: `${stem}.svg`,
-            pngPath: `${stem}.png`,
-            thumbPath: `${stem}.webp`,
-          };
-          if (dropThumbFor === `${seed.id}|${mode.id}`) delete entry.thumbPath;
-          return entry;
-        })
-      )
-    )
-  );
-  return { total: entries.length, entries };
-}
-
-/** Serve a mocked manifest and tiny wallpaper assets; returns every wallpaper asset URL requested. */
-async function serveWallpapers(page: Page, options: MockOptions = {}): Promise<string[]> {
-  const requested: string[] = [];
-  await page.route("**/wallpapers-manifest.json", route =>
-    route.fulfill({ json: mockManifest(options) })
-  );
-  // Match on the pathname only: Vite module URLs such as
-  // /src/vue-app/components/wallpapers/... must pass through untouched.
-  await page.route(
-    url => url.pathname.startsWith("/wallpapers/"),
-    (route: Route) => {
-      const url = route.request().url();
-      requested.push(url);
-      if (url.endsWith(".svg")) {
-        return route.fulfill({
-          contentType: "image/svg+xml",
-          body: '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/>',
-        });
-      }
-      return route.fulfill({ contentType: "image/png", body: PIXEL });
-    }
-  );
-  return requested;
-}
+const manifest = loadThemeManifest();
+const otherTheme = themeByKey(manifest, `Caligo-${OTHER_SEED.id}Triadic`);
+const SCENES_PER_PALETTE = MODES.length;
+const SCENES_IN_FAMILY = SEEDS.length * MODES.length;
 
 async function expectPlainEmptyState(page: Page) {
   const empty = page.locator("#main [data-wallpapers-empty]");
@@ -123,19 +58,21 @@ test.describe("Wallpapers page: no wallpapers built yet", { tag: "@wallpapers" }
 });
 
 test.describe("Wallpapers page: populated grid (mocked manifest)", { tag: "@wallpapers" }, () => {
-  test("shows one thumbnail card per scene and never loads a full SVG", async ({ page }) => {
+  test("shows the active palette's thumbnail cards and never loads a full SVG", async ({
+    page,
+  }) => {
     const requested = await serveWallpapers(page);
     await gotoApp(page, "/#/wallpapers");
 
     const cards = page.locator("#main [data-wallpaper-card]");
-    await expect(cards).toHaveCount(SEEDS.length * MODES.length);
+    await expect(cards).toHaveCount(SCENES_PER_PALETTE);
 
     const sources = await cards
       .locator("img")
       .evaluateAll(imgs =>
         imgs.map(img => (img as HTMLImageElement).currentSrc || (img as HTMLImageElement).src)
       );
-    expect(sources.length).toBeGreaterThanOrEqual(SEEDS.length * MODES.length);
+    expect(sources.length).toBeGreaterThanOrEqual(SCENES_PER_PALETTE);
     for (const src of sources) expect(src, "grid images are thumbnails").toMatch(/\.webp$/);
 
     await page.waitForLoadState("networkidle");
@@ -145,9 +82,61 @@ test.describe("Wallpapers page: populated grid (mocked manifest)", { tag: "@wall
     ).toEqual([]);
 
     for (const card of await cards.all()) {
-      const fullFile = card.locator('a[href$=".svg"], a[href$=".png"]');
-      await expect(fullFile.first(), "each card links to the full-size file").toBeAttached();
+      const fullFile = card.locator('a[href$=".svg"]');
+      await expect(fullFile.first(), "each card links to the full-size SVG").toBeAttached();
+      await expect(card.getByRole("button", { name: /^PNG/ })).toBeVisible();
     }
+  });
+
+  test("shows only the active palette by default; All shows every scene", async ({ page }) => {
+    await serveWallpapers(page);
+    await gotoApp(page, "/#/wallpapers");
+
+    const cards = page.locator("#main [data-wallpaper-card]");
+    const scope = page.locator("#main [data-scope-toggle]");
+    const palette = scope.getByRole("button", { name: DEFAULT_SEED.name, exact: true });
+    const all = scope.getByRole("button", { name: `All ${SCENES_IN_FAMILY}`, exact: true });
+    await expect(scope.getByRole("button")).toHaveCount(2);
+
+    await expect(palette, "the active palette is the default scope").toHaveAttribute(
+      "aria-pressed",
+      "true"
+    );
+    await expect(all).toHaveAttribute("aria-pressed", "false");
+    await expect(cards).toHaveCount(SCENES_PER_PALETTE);
+    for (const card of await cards.all()) await expect(card).toContainText(DEFAULT_SEED.name);
+    await expect(page.locator("#main")).toContainText(`${SCENES_PER_PALETTE} scenes for Monitor`);
+
+    await all.click();
+    await expect(all).toHaveAttribute("aria-pressed", "true");
+    await expect(palette).toHaveAttribute("aria-pressed", "false");
+    await expect(cards).toHaveCount(SCENES_IN_FAMILY);
+    await expect(page.locator("#main")).toContainText(`${SCENES_IN_FAMILY} scenes for Monitor`);
+    for (const seed of SEEDS) {
+      await expect(cards.filter({ hasText: seed.name })).toHaveCount(MODES.length);
+    }
+
+    await palette.click();
+    await expect(cards).toHaveCount(SCENES_PER_PALETTE);
+  });
+
+  test("changing the theme changes the palette shown", async ({ page }) => {
+    await serveWallpapers(page);
+    await gotoApp(page, "/#/wallpapers");
+
+    const cards = page.locator("#main [data-wallpaper-card]");
+    await expect(cards).toHaveCount(SCENES_PER_PALETTE);
+    await expect(cards.first()).toContainText(DEFAULT_SEED.name);
+
+    await applyThemeViaPalette(page, `${otherTheme.seedLabel} ${otherTheme.harmonyLabel}`);
+
+    const scope = page.locator("#main [data-scope-toggle]");
+    await expect(
+      scope.getByRole("button", { name: otherTheme.seedLabel, exact: true })
+    ).toHaveAttribute("aria-pressed", "true");
+    await expect(cards).toHaveCount(SCENES_PER_PALETTE);
+    for (const card of await cards.all()) await expect(card).toContainText(OTHER_SEED.name);
+    await expect(page.locator("#main")).not.toContainText(DEFAULT_SEED.name);
   });
 
   test("platform is the main toggle and switches every card", async ({ page }) => {
@@ -166,6 +155,7 @@ test.describe("Wallpapers page: populated grid (mocked manifest)", { tag: "@wall
     await expect(monitor).toHaveAttribute("aria-pressed", "false");
 
     const images = page.locator("#main [data-wallpaper-card] img");
+    await expect(images).toHaveCount(SCENES_PER_PALETTE);
     await expect
       .poll(() =>
         images.evaluateAll(imgs => imgs.map(img => (img as HTMLImageElement).getAttribute("src")))
@@ -180,27 +170,39 @@ test.describe("Wallpapers page: populated grid (mocked manifest)", { tag: "@wall
     expect(requested.filter(url => url.endsWith(".svg"))).toEqual([]);
   });
 
-  test("filters by theme and by mode", async ({ page }) => {
-    await serveWallpapers(page);
+  test("shows a placeholder, not the full SVG, when a thumbnail is missing", async ({ page }) => {
+    const requested = await serveWallpapers(page, {
+      dropThumbFor: `${DEFAULT_SEED.id}|triadic`,
+    });
     await gotoApp(page, "/#/wallpapers");
 
     const cards = page.locator("#main [data-wallpaper-card]");
-    await expect(cards).toHaveCount(4);
+    await expect(cards).toHaveCount(SCENES_PER_PALETTE);
+    const missing = cards.filter({ hasText: "Triadic" });
+    await expect(missing).toHaveCount(1);
+    await expect(missing).toContainText("Preview not built yet");
+    await expect(missing.locator("img")).toHaveCount(0);
+    await expect(
+      cards.filter({ hasText: "Balanced" }).locator("img"),
+      "the other scene keeps its thumbnail"
+    ).toHaveCount(1);
 
-    await page.locator("#main").getByLabel("Theme", { exact: true }).selectOption("Eclipse");
-    await expect(cards).toHaveCount(2);
-    for (const card of await cards.all()) await expect(card).toContainText("Eclipse");
-
-    await page.locator("#main").getByLabel("Mode", { exact: true }).selectOption("triadic");
-    await expect(cards).toHaveCount(1);
-    await expect(cards.first()).toContainText("Triadic");
+    await page.waitForLoadState("networkidle");
+    expect(requested.filter(url => url.endsWith(".svg"))).toEqual([]);
   });
 
-  test("shows a placeholder, not the full SVG, when a thumbnail is missing", async ({ page }) => {
-    const requested = await serveWallpapers(page, { dropThumbFor: "Eclipse|triadic" });
+  test("shows a placeholder under All too, for a scene of another palette", async ({ page }) => {
+    const requested = await serveWallpapers(page, { dropThumbFor: `${OTHER_SEED.id}|triadic` });
     await gotoApp(page, "/#/wallpapers");
 
-    await expect(page.locator("#main [data-wallpaper-card]")).toHaveCount(4);
+    await page
+      .locator("#main [data-scope-toggle]")
+      .getByRole("button", { name: `All ${SCENES_IN_FAMILY}`, exact: true })
+      .click();
+    const cards = page.locator("#main [data-wallpaper-card]");
+    await expect(cards).toHaveCount(SCENES_IN_FAMILY);
+    await expect(cards.filter({ hasText: "Preview not built yet" })).toHaveCount(1);
+
     await page.waitForLoadState("networkidle");
     expect(requested.filter(url => url.endsWith(".svg"))).toEqual([]);
   });

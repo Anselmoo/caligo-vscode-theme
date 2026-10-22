@@ -74,10 +74,10 @@ describe("router/index", () => {
       "home",
       "themes",
       "science",
-      "export",
       "wallpapers",
       undefined, // /gallery → /themes redirect
       undefined, // /analysis → /science redirect
+      undefined, // /export → /themes#export redirect
       "not-found",
     ]);
   });
@@ -89,7 +89,7 @@ describe("router/index", () => {
       .filter((component): component is () => Promise<unknown> => typeof component === "function");
 
     const loaded = await Promise.all(lazyComponents.map(component => component()));
-    expect(loaded).toHaveLength(6);
+    expect(loaded).toHaveLength(5);
   });
 
   it("uses saved scroll position and defaults to top when absent", () => {
@@ -98,6 +98,10 @@ describe("router/index", () => {
 
     expect(state.capturedConfig?.scrollBehavior({}, {}, savedPosition)).toEqual(savedPosition);
     expect(state.capturedConfig?.scrollBehavior({}, {}, null)).toEqual({ top: 0 });
+    expect(state.capturedConfig?.scrollBehavior({ hash: "#export" }, {}, null)).toEqual({
+      el: "#export",
+      top: 72,
+    });
   });
 
   it("updates title and meta description in the global beforeEach guard", () => {

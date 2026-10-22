@@ -26,11 +26,13 @@ interface OklchColor {
 }
 
 type TokenColor = {
+  name?: string;
   scope?: string | string[];
   settings?: { foreground?: string };
 };
 
 type ThemeJson = {
+  name?: string;
   colors?: Record<string, string>;
   tokenColors?: TokenColor[];
   _oklchDebug?: Record<string, unknown>;
@@ -63,6 +65,22 @@ function firstTokenMatching(tokenColors: TokenColor[], matcher: (scope: string) 
 }
 
 /**
+ * The rule that names `scope` exactly, else the first rule a looser matcher accepts.
+ * Prefix matching alone picks whichever rule comes first: the Comments rule lists
+ * `string.comment`, so `^string` used to return the comment colour as Strings.
+ */
+function tokenForRole(
+  tokenColors: TokenColor[],
+  scope: string,
+  fallback: (scope: string) => boolean
+) {
+  return (
+    tokenColors.find(t => normalizeScopes(t).includes(scope)) ??
+    firstTokenMatching(tokenColors, fallback)
+  );
+}
+
+/**
  * Extract a stable set of “core” theme colors from VS Code theme JSON.
  *
  * Note: We intentionally avoid mapping bg2 to sidebar/panel because many themes
@@ -78,6 +96,9 @@ export function extractManifestColors(themeContent: ThemeJson): {
   fgMuted: string;
   accent: string;
   error: string;
+  warning: string;
+  success: string;
+  info: string;
   strings: string;
   types: string;
   functions: string;
@@ -129,24 +150,49 @@ export function extractManifestColors(themeContent: ThemeJson): {
     "#7dd3fc"
   );
   const error = pickColor(colors, ["editorError.foreground"], "#f87171");
-
-  // Token extraction (avoid accidental collisions, e.g. Keywords includes storage.type)
-  const stringToken = firstTokenMatching(
-    tokenColors,
-    s => /^(string)(\.|$)/.test(s) || s.includes("punctuation.definition.string")
+  // Semantic states, read from the same workbench keys VS Code paints them with.
+  // success has no editor key: "added" (git) is the closest "positive" state every theme ships,
+  // then the test-passed icon, then the terminal green.
+  const warning = pickColor(
+    colors,
+    ["editorWarning.foreground", "list.warningForeground", "terminal.ansiYellow"],
+    "#fbbf24"
   );
-  const typeToken = firstTokenMatching(
+  const success = pickColor(
+    colors,
+    ["gitDecoration.addedResourceForeground", "testing.iconPassed", "terminal.ansiGreen"],
+    "#4ade80"
+  );
+  const info = pickColor(
+    colors,
+    ["editorInfo.foreground", "notificationsInfoIcon.foreground", "terminal.ansiBlue"],
+    "#60a5fa"
+  );
+
+  // Token extraction: exact scope first, then a prefix match that cannot collide
+  // (Keywords includes storage.type; Comments includes string.comment).
+  const stringToken = tokenForRole(
     tokenColors,
+    "string",
+    s =>
+      (/^string(\.|$)/.test(s) && !s.startsWith("string.comment")) ||
+      s.includes("punctuation.definition.string")
+  );
+  const typeToken = tokenForRole(
+    tokenColors,
+    "entity.name.type",
     s =>
       /^(entity\.name\.(type|class|struct|enum|interface))(\.|$)/.test(s) ||
       /^(support\.type)(\.|$)/.test(s)
   );
-  const functionToken = firstTokenMatching(
+  const functionToken = tokenForRole(
     tokenColors,
+    "entity.name.function",
     s => /^(entity\.name\.function)(\.|$)/.test(s) || /^(support\.function)(\.|$)/.test(s)
   );
-  const keywordToken = firstTokenMatching(
+  const keywordToken = tokenForRole(
     tokenColors,
+    "keyword",
     s => /^(keyword)(\.|$)/.test(s) || /^(storage\.(type|modifier))(\.|$)/.test(s)
   );
   const decoratorToken = firstTokenMatching(tokenColors, s => s.includes("decorator"));
@@ -166,6 +212,9 @@ export function extractManifestColors(themeContent: ThemeJson): {
     fgMuted,
     accent,
     error,
+    warning,
+    success,
+    info,
     strings,
     types,
     functions,
@@ -265,6 +314,7 @@ function generateThemesManifest() {
       harmonyId: string;
       harmonyLabel: string;
       displayName: string;
+      vscodeLabel: string;
       colors: Record<string, string>;
       core: Array<{
         key: string;
@@ -298,6 +348,9 @@ function generateThemesManifest() {
         fgMuted,
         accent,
         error,
+        warning,
+        success,
+        info,
         strings,
         types,
         functions,
@@ -329,6 +382,8 @@ function generateThemesManifest() {
           .map(w => w.charAt(0).toUpperCase() + w.slice(1))
           .join(" "),
         displayName: formatDisplayName(themeName),
+        // The name VS Code lists under Preferences: Color Theme.
+        vscodeLabel: themeContent.name ?? formatDisplayName(themeName),
         colors: {
           bg0,
           bg1,
@@ -338,6 +393,9 @@ function generateThemesManifest() {
           fgMuted,
           accent,
           error,
+          warning,
+          success,
+          info,
           strings,
           types,
           functions,

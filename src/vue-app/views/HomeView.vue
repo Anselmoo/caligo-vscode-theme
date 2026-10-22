@@ -4,10 +4,11 @@ import { RouterLink } from "vue-router";
 import { renderedContrast } from "../components/analysis/colour-report.js";
 import EditorPreview from "../components/home/EditorPreview.vue";
 import SceneBackdrop from "../components/home/SceneBackdrop.vue";
-import ThemeHorizon from "../components/home/ThemeHorizon.vue";
+import ThemeSpectrum from "../components/theme/ThemeSpectrum.vue";
+import WearIt from "../components/theme/WearIt.vue";
 import { useTheme } from "../composables/useTheme.js";
 
-const { themes, harmonies, currentTheme, setTheme } = useTheme();
+const { themes, seeds, harmonies, currentTheme } = useTheme();
 
 const MARKETPLACE_URL =
   "https://marketplace.visualstudio.com/items?itemName=AnselmHahn.caligo-vscode-theme";
@@ -17,33 +18,11 @@ const textContrast = computed(() => {
   return c ? renderedContrast(c.fg0, c.bg0).toFixed(1) : "–";
 });
 
-/** The current seed in all five harmony modes, as clickable mini palettes. */
-const modes = computed(() => {
-  const seed = currentTheme.value?.seedId;
-  return harmonies.value
-    .map(h => themes.value.find(t => t.seedId === seed && t.harmonyId === h.id))
-    .filter(t => t !== undefined)
-    .map(t => ({
-      key: t.key,
-      label: t.harmonyLabel,
-      current: t.key === currentTheme.value?.key,
-      inks: [
-        t.colors.keywords,
-        t.colors.types,
-        t.colors.functions,
-        t.colors.strings,
-        t.colors.decorator,
-      ],
-      bg: t.colors.bg0,
-    }));
-});
-
 const bgOklch = computed(() => {
   const bg = currentTheme.value?.oklch.bg;
   if (!bg) return null;
   return { l: bg.l.toFixed(2), c: bg.c.toFixed(3), h: Math.round(bg.h) };
 });
-
 </script>
 
 <template>
@@ -61,11 +40,17 @@ const bgOklch = computed(() => {
             <a class="btn-primary" :href="MARKETPLACE_URL" rel="noopener" target="_blank">
               Install from Marketplace
             </a>
-            <RouterLink class="btn-quiet" to="/themes">Browse all themes</RouterLink>
+            <RouterLink class="btn-quiet" :to="{ path: '/', hash: '#spectrum' }">Choose your night</RouterLink>
           </div>
         </div>
         <EditorPreview class="hero__editor" />
-        <ThemeHorizon class="hero__horizon" />
+      </div>
+    </section>
+
+    <section id="spectrum" class="choose" aria-label="Choose a theme">
+      <div class="choose__inner">
+        <ThemeSpectrum />
+        <WearIt />
       </div>
     </section>
 
@@ -81,25 +66,13 @@ const bgOklch = computed(() => {
         </article>
 
         <article class="fact">
-          <div class="fact__modes" role="group" aria-label="Harmony modes of this theme">
-            <button
-              v-for="mode in modes"
-              :key="mode.key"
-              type="button"
-              class="mode-swatch"
-              :class="{ 'is-current': mode.current }"
-              :aria-pressed="mode.current"
-              :aria-label="`${mode.label} mode`"
-              :style="{ background: mode.bg }"
-              @click="setTheme(mode.key)"
-            >
-              <span v-for="(ink, i) in mode.inks" :key="i" :style="{ background: ink }" />
-            </button>
-          </div>
-          <h2 class="fact__title">One palette, five moods</h2>
+          <p class="fact__figure">
+            {{ seeds.length }}<span class="fact__unit">×</span>{{ harmonies.length }}
+          </p>
+          <h2 class="fact__title">One family, {{ themes.length }} nights</h2>
           <p class="fact__body">
-            Each theme comes in balanced, analogous, monochromatic, split-complementary and
-            triadic harmony. Pick the one that suits the hour.
+            Ten palettes, each lit five ways. Same ink roles everywhere, so switching never
+            means relearning where to look.
           </p>
         </article>
 
@@ -122,7 +95,7 @@ const bgOklch = computed(() => {
 <style scoped>
 .hero {
   position: relative;
-  min-height: min(calc(100svh - 56px), 900px);
+  min-height: min(calc(100svh - 56px), 820px);
   display: flex;
   isolation: isolate;
 }
@@ -208,11 +181,19 @@ const bgOklch = computed(() => {
   align-self: center;
 }
 
-.hero__horizon {
-  grid-column: 1 / -1;
+.choose {
+  scroll-margin-top: 72px;
 }
 
-/* Facts: three measured statements, set as a quiet row rather than cards. */
+.choose__inner {
+  display: grid;
+  gap: clamp(28px, 4vw, 44px);
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: clamp(8px, 2vh, 24px) var(--gutter) 0;
+}
+
+/* Facts: three measured statements on one ruled line, not cards. */
 .facts__inner {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -225,6 +206,8 @@ const bgOklch = computed(() => {
 .fact {
   display: flex;
   flex-direction: column;
+  padding-top: 20px;
+  border-top: 1px solid color-mix(in oklab, var(--fg0) 12%, transparent);
 }
 
 .fact__figure {
@@ -276,34 +259,6 @@ const bgOklch = computed(() => {
 
 .fact__body a:hover {
   text-decoration-color: var(--fg0);
-}
-
-.fact__modes {
-  display: flex;
-  gap: 8px;
-  min-height: 3.6rem;
-  margin-bottom: 18px;
-  align-items: flex-start;
-}
-
-.mode-swatch {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  width: 30px;
-  padding: 6px;
-  border: 1px solid color-mix(in oklab, var(--fg0) 14%, transparent);
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.mode-swatch span {
-  height: 5px;
-  border-radius: 2px;
-}
-
-.mode-swatch.is-current {
-  border-color: var(--fg0);
 }
 
 @media (max-width: 960px) {

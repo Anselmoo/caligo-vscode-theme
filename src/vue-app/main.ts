@@ -15,7 +15,6 @@ import "./styles/semantic-tokens.css"; // Derived color tokens (hover, borders, 
 import "./styles/typography.css"; // Consistent heading/text hierarchy
 import "./styles/color-utilities.css"; // Utility classes
 import "./styles/globals.css";
-import "primeicons/primeicons.css";
 import "@fontsource-variable/martian-mono/wdth.css";
 import "@fontsource-variable/hanken-grotesk";
 

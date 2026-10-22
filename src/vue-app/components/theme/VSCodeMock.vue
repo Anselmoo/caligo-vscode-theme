@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useTheme } from "../../composables/useTheme.js";
+import SiteIcon from "../common/SiteIcon.vue";
 
 const { currentTheme } = useTheme();
 
@@ -20,7 +21,7 @@ const themeDisplayName = computed(() => currentTheme.value?.displayName || "Deep
         <div class="vscode-mock__dot vscode-mock__dot--maximize" />
       </div>
       <div class="vscode-mock__tab">
-        <i class="vscode-mock__file-icon pi pi-file" aria-hidden="true"></i>
+        <SiteIcon name="file" class="vscode-mock__file-icon" :size="13" />
         <span class="vscode-mock__tab-name">caligo.ts</span>
       </div>
     </div>
@@ -30,15 +31,15 @@ const themeDisplayName = computed(() => currentTheme.value?.displayName || "Deep
       <!-- Sidebar file explorer -->
       <div class="vscode-mock__sidebar">
         <div class="vscode-mock__file">
-          <i class="vscode-mock__file-icon pi pi-file" aria-hidden="true"></i>
+          <SiteIcon name="file" class="vscode-mock__file-icon" :size="13" />
           <span class="vscode-mock__file-name">README.md</span>
         </div>
         <div class="vscode-mock__file active">
-          <i class="vscode-mock__file-icon pi pi-file" aria-hidden="true"></i>
+          <SiteIcon name="file" class="vscode-mock__file-icon" :size="13" />
           <span class="vscode-mock__file-name">caligo.ts</span>
         </div>
         <div class="vscode-mock__file">
-          <i class="vscode-mock__file-icon pi pi-file" aria-hidden="true"></i>
+          <SiteIcon name="file" class="vscode-mock__file-icon" :size="13" />
           <span class="vscode-mock__file-name">theme.json</span>
         </div>
       </div>
@@ -184,13 +185,17 @@ const themeDisplayName = computed(() => currentTheme.value?.displayName || "Deep
   overflow-x: auto;
 }
 
+/* Wraps instead of scrolling: the mock is a picture, so nothing in it should be a
+   scroll area a keyboard cannot reach. */
 .sample-code {
-  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-family: var(--font-mono);
   font-size: var(--text-sm);
   line-height: 1.6;
   color: var(--vscode-editor-fg, var(--fg0));
   margin: 0;
-  white-space: pre;
+  overflow: visible;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 /* Syntax highlighting tokens */

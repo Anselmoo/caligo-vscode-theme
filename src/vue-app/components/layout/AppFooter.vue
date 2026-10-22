@@ -1,30 +1,49 @@
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
+import SiteIcon from "../common/SiteIcon.vue";
 
 const REPO = "https://github.com/Anselmoo/caligo-vscode-theme";
 const MARKETPLACE =
   "https://marketplace.visualstudio.com/items?itemName=AnselmHahn.caligo-vscode-theme";
 const year = new Date().getFullYear();
 
+const external = [
+  { href: MARKETPLACE, label: "Marketplace", icon: "marketplace" },
+  { href: REPO, label: "GitHub", icon: "github" },
+  { href: `${REPO}/blob/main/CONTRIBUTING.md`, label: "Contributing", icon: "contribute" },
+  { href: `${REPO}/blob/main/LICENSE`, label: "License", icon: "license" },
+] as const;
 </script>
 
 <template>
   <footer class="footer">
     <div class="footer__inner">
-      <p class="footer__note">Caligo is open source under the MIT license. Copyright {{ year }} Anselm Hahn.</p>
+      <div class="footer__about">
+        <p class="footer__slogan">
+          Built with <SiteIcon name="heart" class="footer__heart" :size="15" /><span
+            class="visually-hidden"
+            >love</span
+          >
+          for developers who code after dark
+          <SiteIcon name="moon" class="footer__moon" :size="14" />
+        </p>
+        <p class="footer__note">© {{ year }} Anselm Hahn. Open source under the MIT license.</p>
+      </div>
       <nav class="footer__nav" aria-label="Footer">
         <RouterLink class="footer__link" to="/themes">Themes</RouterLink>
-        <a class="footer__link" :href="MARKETPLACE" target="_blank" rel="noopener noreferrer"
-          >Marketplace</a
-        >
-        <a class="footer__link" :href="REPO" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <RouterLink class="footer__link" to="/wallpapers">Wallpapers</RouterLink>
+        <RouterLink class="footer__link" to="/science">Science</RouterLink>
         <a
-          class="footer__link"
-          :href="`${REPO}/blob/main/LICENSE`"
+          v-for="link in external"
+          :key="link.label"
+          class="footer__link footer__link--ext"
+          :href="link.href"
           target="_blank"
           rel="noopener noreferrer"
-          >License</a
         >
+          <SiteIcon :name="link.icon" :size="16" />
+          {{ link.label }}
+        </a>
       </nav>
     </div>
   </footer>
@@ -41,42 +60,68 @@ const year = new Date().getFullYear();
 .footer__inner {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 12px 40px;
+  gap: 20px 40px;
   max-width: var(--page-max);
   margin: 0 auto;
-  padding: 28px var(--gutter);
+  padding: 36px var(--gutter) 40px;
+}
+
+.footer__about {
+  display: grid;
+  gap: 6px;
+}
+
+.footer__slogan {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 6px;
+  margin: 0;
+  color: var(--fg1);
+  font-size: var(--step-0);
+}
+
+.footer__heart {
+  color: var(--accent);
+}
+
+.footer__moon {
+  color: var(--syntax-functions);
 }
 
 .footer__note {
-  max-width: var(--measure);
   margin: 0;
   color: var(--fg-muted);
   font-size: var(--step--1);
-  line-height: 1.5;
 }
 
 .footer__nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 20px;
+  align-items: center;
+  gap: 6px 22px;
 }
 
 .footer__link {
-  padding: 4px 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 32px;
   color: var(--fg-muted);
   font-size: var(--step--1);
-  text-decoration: underline;
-  text-decoration-color: color-mix(in oklab, var(--fg-muted) 45%, transparent);
-  text-underline-offset: 4px;
+  text-decoration: none;
   /* Colour changes with the theme go through a View Transition; a global colour
      transition on links would tween from the pre-theme default on first paint. */
   transition: none;
 }
 
 .footer__link:hover {
-  color: var(--fg-muted);
-  text-decoration-color: currentColor;
+  color: var(--fg0);
+}
+
+.footer__link--ext :deep(.icon) {
+  color: var(--fg1);
 }
 </style>

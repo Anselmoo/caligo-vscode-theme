@@ -3,6 +3,7 @@ import { computed } from "vue";
 import { RouterLink } from "vue-router";
 import { useCommandPalette } from "../../composables/useCommandPalette.js";
 import { useTheme } from "../../composables/useTheme.js";
+import SiteIcon from "../common/SiteIcon.vue";
 
 const { open } = useCommandPalette();
 const { currentTheme } = useTheme();
@@ -35,6 +36,22 @@ const modeName = computed(() => currentTheme.value?.harmonyLabel ?? "");
       </ul>
 
       <div class="nav-actions">
+        <a
+          class="nav-icon"
+          href="https://marketplace.visualstudio.com/items?itemName=AnselmHahn.caligo-vscode-theme"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <SiteIcon name="marketplace" label="Caligo on the VS Code Marketplace" />
+        </a>
+        <a
+          class="nav-icon"
+          href="https://github.com/Anselmoo/caligo-vscode-theme"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <SiteIcon name="github" label="Caligo on GitHub" />
+        </a>
         <button
           type="button"
           class="theme-chip"
@@ -111,10 +128,34 @@ const modeName = computed(() => currentTheme.value?.harmonyLabel ?? "");
 }
 
 .nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   margin-left: auto;
 }
 
+.nav-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  color: var(--fg-muted);
+}
+
+.nav-icon:hover {
+  color: var(--fg0);
+  background: color-mix(in oklab, var(--fg0) 8%, transparent);
+}
+
+.nav-icon:focus-visible {
+  outline: 2px solid var(--fg0);
+  outline-offset: 1px;
+}
+
 .theme-chip {
+  margin-left: 6px;
+  white-space: nowrap;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -167,6 +208,12 @@ const modeName = computed(() => currentTheme.value?.harmonyLabel ?? "");
 
   .nav-link {
     padding: 6px 7px;
+  }
+}
+
+@media (max-width: 520px) {
+  .nav-icon {
+    display: none;
   }
 }
 

@@ -12,7 +12,6 @@ const Stub = defineComponent({ render: () => h("div") });
 vi.mock("../../views/HomeView.vue", () => ({ default: Stub }));
 vi.mock("../../views/GalleryView.vue", () => ({ default: Stub }));
 vi.mock("../../views/AnalysisView.vue", () => ({ default: Stub }));
-vi.mock("../../views/ExportView.vue", () => ({ default: Stub }));
 vi.mock("../../views/WallpapersView.vue", () => ({ default: Stub }));
 vi.mock("../../views/NotFoundView.vue", () => ({ default: Stub }));
 
@@ -116,10 +115,10 @@ describe("router view transitions", () => {
     const { updates } = installViewTransition();
     const removeGuard = router.afterEach(() => {});
     const failing = router.beforeResolve(to => {
-      if (to.path === "/export") throw new Error("guard failed");
+      if (to.path === "/wallpapers") throw new Error("guard failed");
     });
 
-    await expect(router.push("/export")).rejects.toThrow("guard failed");
+    await expect(router.push("/wallpapers")).rejects.toThrow("guard failed");
 
     await expect(Promise.all(updates)).resolves.toBeDefined();
     failing();

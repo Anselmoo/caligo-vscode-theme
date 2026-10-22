@@ -5,5 +5,6 @@ export { EXPORT_FORMATTERS, getFormatter } from "./formatter-registry.js";
 export { jsonFlatFormatter } from "./json-flat.js";
 export { jsonGroupedFormatter } from "./json-grouped.js";
 export { scssVariablesFormatter } from "./scss-variables.js";
+export { type ExportSource, sourceFromTheme } from "./shared.js";
 export { tailwindConfigFormatter } from "./tailwind-config.js";
 export type { ExportFormat, ExportFormatter, ExportOptions, ExportResult } from "./types.js";

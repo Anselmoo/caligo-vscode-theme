@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { computed } from "vue";
+/**
+ * The exported file, highlighted. It never scrolls inside itself (a scroll area
+ * with no tab stop is unreachable by keyboard in some browsers): long files show
+ * their first lines under a fade, and a native button reveals the rest. The full
+ * text is always in the DOM, so screen readers and find-in-page see all of it.
+ */
+import { computed, ref, useId, watch } from "vue";
 
 const props = defineProps<{
   content: string;
@@ -11,6 +17,17 @@ const props = defineProps<{
 const JSON_EXPORT_FORMATS = new Set(["design-tokens-w3c", "json-flat", "json-grouped"]);
 
 const lines = computed(() => props.content.split("\n"));
+
+const COLLAPSED_LINES = 14;
+const codeId = useId();
+const expanded = ref(false);
+const canExpand = computed(() => lines.value.length > COLLAPSED_LINES);
+watch(
+  () => props.exportFormat,
+  () => {
+    expanded.value = false;
+  }
+);
 const shouldTokenizeJson = computed(() => {
   if (props.isJson) return true;
   if (props.exportFormat && JSON_EXPORT_FORMATS.has(props.exportFormat)) return true;
@@ -140,12 +157,12 @@ function tokenizeStructuredLine(line: string): Array<{ type: string; value: stri
 </script>
 
 <template>
-  <pre
-    class="export-preview"
-    role="region"
-    aria-label="Export preview"
-    tabindex="0"
-  ><code><span
+  <section class="export-preview" aria-label="Export preview">
+    <pre
+      :id="codeId"
+      class="export-preview__code"
+      :class="{ 'is-collapsed': canExpand && !expanded }"
+    ><code><span
     v-for="(lineTokens, index) in tokenizedLines"
     :key="`${index}-${lines[index]}`"
     class="export-preview__line"
@@ -156,6 +173,17 @@ function tokenizeStructuredLine(line: string): Array<{ type: string; value: stri
     :class="`export-preview__token export-preview__token--${token.type}`"
   >{{ token.value }}</span>
 </span></code></pre>
+    <button
+      v-if="canExpand"
+      type="button"
+      class="export-preview__more"
+      :aria-expanded="expanded"
+      :aria-controls="codeId"
+      @click="expanded = !expanded"
+    >
+      {{ expanded ? "Show fewer lines" : `Show all ${lines.length} lines` }}
+    </button>
+  </section>
 </template>
 
 <!--
@@ -165,10 +193,7 @@ function tokenizeStructuredLine(line: string): Array<{ type: string; value: stri
 -->
 <style scoped>
 .export-preview {
-  max-height: min(60vh, 520px);
   margin: 0;
-  padding: 18px 20px;
-  overflow: auto;
   border: 1px solid color-mix(in oklab, var(--fg0) 12%, transparent);
   border-radius: var(--radius-md);
   background: var(--bg1);
@@ -177,6 +202,50 @@ function tokenizeStructuredLine(line: string): Array<{ type: string; value: stri
   font-size: 0.8rem;
   line-height: 1.7;
   tab-size: 2;
+  /* Clips the code block's corners to the rounded border. */
+  overflow: hidden;
+}
+
+/* The global `pre` style paints its own block, so it is reset to sit flush inside
+   the frame. Long lines wrap; the block never scrolls on its own. */
+.export-preview__code {
+  margin: 0;
+  padding: 18px 20px;
+  border-radius: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  overflow: visible;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.export-preview__code.is-collapsed {
+  max-height: calc(14 * 1.7em + 18px);
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, black 70%, transparent);
+}
+
+.export-preview__more {
+  display: block;
+  width: 100%;
+  min-height: 40px;
+  border: 0;
+  border-top: 1px solid color-mix(in oklab, var(--fg0) 10%, transparent);
+  background: color-mix(in oklab, var(--bg2) 60%, var(--bg1));
+  color: var(--fg1);
+  font: inherit;
+  font-family: var(--font-sans);
+  cursor: pointer;
+}
+
+.export-preview__more:hover {
+  color: var(--fg0);
+}
+
+.export-preview__more:focus-visible {
+  outline: 2px solid var(--fg0);
+  outline-offset: -2px;
 }
 
 /* The global `code` style tints text and adds a chip background; reset it here. */

@@ -1,5 +1,4 @@
-import type { DerivedPalette } from "../core/palette.js";
-import { buildTokenGroups, getPrefix, toSrgbComponents } from "./shared.js";
+import { getPrefix, toSrgbComponents } from "./shared.js";
 import type { ExportFormatter } from "./types.js";
 
 function toTokenValue(hex: string) {
@@ -15,12 +14,12 @@ export const designTokensFormatter: ExportFormatter = {
   label: "W3C Design Tokens",
   extension: "json",
   mimeType: "application/json",
-  generate(palette: DerivedPalette, options) {
+  generate(source, options) {
     const prefix = getPrefix(options);
-    const groups = buildTokenGroups(palette);
+    const groups = source.groups;
     const tokens = {
       [prefix]: {
-        $description: `Caligo — ${palette.seed.displayName} (${palette.mode}) palette`,
+        $description: `Caligo — ${source.title} palette`,
         background: {
           $type: "color",
           ...Object.fromEntries(

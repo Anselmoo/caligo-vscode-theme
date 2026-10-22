@@ -1,18 +1,8 @@
 import { computed, ref } from "vue";
-import { derivePalette } from "../../core/palette.js";
 import { EXPORT_FORMATTERS, getFormatter } from "../../export/formatter-registry.js";
+import { sourceFromTheme } from "../../export/shared.js";
 import type { ExportFormat, ExportResult } from "../../export/types.js";
-import type { HarmonyMode } from "../../types/harmony.js";
 import { useTheme } from "./useTheme.js";
-
-function toHarmonyMode(harmonyId: string): HarmonyMode {
-  if (harmonyId === "balanced") return "none";
-  if (harmonyId === "analogous") return "analogous";
-  if (harmonyId === "monochromatic") return "monochromatic";
-  if (harmonyId === "triadic") return "triadic";
-  if (harmonyId === "split-complementary") return "split-complementary";
-  return "none";
-}
 
 export function useExport() {
   const { currentTheme } = useTheme();
@@ -32,25 +22,8 @@ export function useExport() {
   const currentResult = computed<ExportResult | null>(() => {
     if (!currentTheme.value) return null;
 
-    const palette = derivePalette(
-      {
-        id: currentTheme.value.seedId,
-        displayName: currentTheme.value.seedLabel,
-        background: {
-          mode: "oklch",
-          ...currentTheme.value.oklch.bg,
-        },
-        accent: {
-          mode: "oklch",
-          ...currentTheme.value.oklch.accent,
-        },
-        harmony: toHarmonyMode(currentTheme.value.harmonyId),
-      },
-      "Balanced"
-    );
-
     const formatter = getFormatter(selectedFormat.value);
-    return formatter.generate(palette);
+    return formatter.generate(sourceFromTheme(currentTheme.value));
   });
 
   async function copyCurrent(): Promise<boolean> {

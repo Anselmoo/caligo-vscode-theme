@@ -182,6 +182,16 @@ const lines = computed<Token[][]>(() => [
   white-space: pre;
 }
 
+/* Phones: wrap long lines under their own text instead of cutting them off. */
+@media (max-width: 520px) {
+  .editor__line {
+    padding-left: 3.2em;
+    text-indent: -3.2em;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+}
+
 .editor__gutter {
   display: inline-block;
   width: 3.2em;
