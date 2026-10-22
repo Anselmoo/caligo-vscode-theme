@@ -2,7 +2,7 @@
 /**
  * The selected variant: a live editor mock-up drawn from its colours (instant, and it
  * relights with every pick), a line on what it is, and the core palette with exact
- * values. A real VS Code screenshot is offered as a link only when CI generated one.
+ * values. The real VS Code screenshot lives in the page header (ScreenshotPeek).
  */
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
@@ -12,10 +12,7 @@ import VSCodeMock from "../theme/VSCodeMock.vue";
 
 const props = defineProps<{
   theme: ThemeIndexEntry;
-  /** Resolved URL of this variant's VS Code screenshot, or null when none exists. */
-  screenshot: string | null;
 }>();
-
 
 const textContrast = computed(() => {
   const { fg0, bg0 } = props.theme.colors;
@@ -44,9 +41,6 @@ const textContrast = computed(() => {
     </ul>
 
     <p class="detail__links">
-      <a v-if="screenshot" :href="screenshot" target="_blank" rel="noopener">
-        Open a real VS Code screenshot
-      </a>
       <RouterLink to="/science">See how the colours are measured</RouterLink>
     </p>
   </section>

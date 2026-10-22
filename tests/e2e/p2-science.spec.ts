@@ -110,6 +110,71 @@ test.describe("Science page: one report for the current theme", { tag: "@science
   });
 });
 
+test.describe("Science page: the contrast ladder", { tag: "@science" }, () => {
+  const SURFACES = new Set(["bg0", "bg1", "bg2"]);
+  const inkKeys = (theme: ThemeEntry) =>
+    theme.core.map(c => c.key).filter(key => !SURFACES.has(key));
+  const ladder = (page: Page) => page.locator('#main [data-science-view="contrast"]');
+
+  test.beforeEach(async ({ page }) => {
+    await openScience(page);
+  });
+
+  test("is the third view, beside the lightness and OKLCH views", async ({ page }) => {
+    await expect(ladder(page)).toBeVisible();
+    await expect(ladder(page).getByRole("heading", { level: 2 })).toBeVisible();
+    await expect(page.locator("#main [data-science-view]")).toHaveCount(3);
+  });
+
+  test("draws one bar per ink and none for the surfaces", async ({ page }) => {
+    const rows = ladder(page).locator("[data-ladder-row]");
+    await expect(rows).toHaveCount(inkKeys(defaultTheme).length);
+    for (const key of inkKeys(defaultTheme)) {
+      await expect(ladder(page).locator(`[data-ladder-row="${key}"]`), key).toHaveCount(1);
+    }
+    for (const key of SURFACES) {
+      await expect(ladder(page).locator(`[data-ladder-row="${key}"]`), key).toHaveCount(0);
+    }
+  });
+
+  test("each bar's ratio is the WCAG contrast of that ink over the background", async ({
+    page,
+  }) => {
+    const { bg0 } = defaultTheme.colors;
+    for (const key of inkKeys(defaultTheme)) {
+      const hex = defaultTheme.colors[key as keyof ThemeEntry["colors"]];
+      const expected = renderedContrast(hex, bg0);
+      const value = ladder(page).locator(`[data-ladder-row="${key}"] [data-ratio]`);
+      const ratio = Number(await value.getAttribute("data-ratio"));
+      expect(Math.abs(ratio - expected), `${key}: ${ratio} vs ${expected}`).toBeLessThanOrEqual(
+        0.05
+      );
+      await expect(value).toContainText(expected.toFixed(1));
+    }
+  });
+
+  test("lists the inks from clearest to faintest", async ({ page }) => {
+    const ratios = (
+      await ladder(page)
+        .locator("[data-ladder-row] [data-ratio]")
+        .evaluateAll(els => els.map(el => Number(el.getAttribute("data-ratio"))))
+    ).map(Number);
+    expect(ratios).toEqual([...ratios].sort((a, b) => b - a));
+  });
+
+  test("says in words which inks miss 4.5:1, and follows theme changes", async ({ page }) => {
+    // Cinder's accent is the one ink in the family that misses 4.5:1 (3.1:1).
+    const cinder = themeByKey(manifest, "Caligo-Cinder");
+    await applyThemeViaPalette(page, "cinder balanced");
+    await expectThemeApplied(page, cinder);
+    const accent = ladder(page).locator('[data-ladder-row="accent"] [data-ratio]');
+    await expect(accent).toContainText("below");
+    await expect(ladder(page).locator("[data-contrast-summary]")).toContainText(
+      /6 of 7 inks reach 4\.5:1/
+    );
+  });
+});
+
 test.describe("Science page: OKLCH comes from the hex, not the manifest", {
   tag: "@science",
 }, () => {

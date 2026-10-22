@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import ColourTable from "../components/analysis/ColourTable.vue";
+import ContrastLadder from "../components/analysis/ContrastLadder.vue";
 import {
+  AA_LARGE,
   AA_TEXT,
   colourRows,
+  contrastLadder,
   minLightnessFor,
   opacityPercent,
 } from "../components/analysis/colour-report.js";
@@ -29,6 +32,19 @@ const weakInks = computed(() =>
     .filter(r => r.contrast !== null && r.contrast < AA_TEXT)
     .map(r => ({ key: r.key, label: r.label, ratio: (r.contrast ?? 0).toFixed(1) }))
 );
+
+const ladder = computed(() => contrastLadder(rows.value));
+const ladderSummary = computed(() => {
+  const all = ladder.value;
+  if (all.length === 0) return null;
+  const weakest = all[all.length - 1];
+  return {
+    total: all.length,
+    aa: all.filter(r => r.passesAA).length,
+    large: all.filter(r => r.passesLarge).length,
+    weakest: { label: weakest.label.toLowerCase(), ratio: weakest.ratio.toFixed(1) },
+  };
+});
 
 const translucentInks = computed(() =>
   inks.value
@@ -125,6 +141,31 @@ const references = [
         </div>
         <div class="view__body">
           <ColourTable :rows="rows" :theme-name="themeName" />
+        </div>
+      </section>
+
+      <section
+        v-if="ladderSummary"
+        class="view view--flip"
+        data-science-view="contrast"
+        aria-labelledby="contrast-title"
+      >
+        <div class="view__head">
+          <h2 id="contrast-title" class="view__title">How far each ink clears the bar</h2>
+          <p class="prose">
+            WCAG asks for {{ AA_TEXT }}:1 for small text and {{ AA_LARGE }}:1 for large text and
+            interface marks. Each bar is one ink's ratio over the primary background.
+          </p>
+        </div>
+        <div class="view__chart">
+          <ContrastLadder :rows="rows" :theme-name="themeName" />
+        </div>
+        <div class="view__body">
+          <p class="prose" data-contrast-summary>
+            {{ ladderSummary.aa }} of {{ ladderSummary.total }} inks reach {{ AA_TEXT }}:1 and
+            {{ ladderSummary.large }} reach {{ AA_LARGE }}:1. The faintest is
+            {{ ladderSummary.weakest.label }} at {{ ladderSummary.weakest.ratio }}:1.
+          </p>
         </div>
       </section>
     </template>
@@ -279,8 +320,16 @@ const references = [
   font-size: var(--step--1);
 }
 
+.view--flip {
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  grid-template-areas:
+    "head chart"
+    "body chart";
+}
+
 @media (max-width: 960px) {
-  .view {
+  .view,
+  .view--flip {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
       "head"
