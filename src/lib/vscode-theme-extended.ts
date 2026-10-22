@@ -14,8 +14,21 @@
  *  - `myWidget.*` — a documentation example, not a real VS Code color.
  */
 
-import { scaleAlpha, withAlpha } from "./color.js";
+import { converter } from "culori";
+import { oklch, scaleAlpha, toHex, withAlpha } from "./color.js";
 import type { DerivedPalette } from "./palette.js";
+
+const toOklch = converter("oklch") as (c: string) => { l: number; c?: number; h?: number };
+
+/**
+ * The same color with its chroma multiplied, lightness and hue kept (toHex maps the chroma back into
+ * sRGB), at the given alpha. A changed diff word is marked by saturation, not by lightness: a
+ * lighter tint would lift the surface toward the code painted on it.
+ */
+function deepen(hex: string, chromaFactor: number, alpha: number, lift = 0): string {
+  const o = toOklch(hex.slice(0, 7));
+  return withAlpha(toHex(oklch(o.l + lift, (o.c ?? 0) * chromaFactor, o.h ?? 0)), alpha);
+}
 
 export function buildExtendedColors(p: DerivedPalette): Record<string, string> {
   const s = p.semantic;
@@ -36,6 +49,18 @@ export function buildExtendedColors(p: DerivedPalette): Record<string, string> {
   const addedLine = withAlpha(s.success, 0.1);
   const removedBg = withAlpha(s.error, 0.16);
   const removedLine = withAlpha(s.error, 0.1);
+  /**
+   * Diff editor lines start from the dark status tint (errorBg / successBg: background lightness
+   * + 0.08, low chroma) and are marked by saturation rather than lightness, so code painted on them
+   * keeps its contrast: the changed line at chroma x3, L + 0.02, 0.45 alpha; the changed word at
+   * chroma x4.5, L + 0.06, 0.6 alpha (no border box). The small lifts keep both visible where the
+   * status hue is close to the background hue (green on teal themes, red on red themes). The diff
+   * gutter uses the word tint: a clear change marker that still leaves line numbers at ~3:1.
+   */
+  const diffRemovedLine = deepen(s.errorBg, 3, 0.45, 0.02);
+  const diffRemovedWord = deepen(s.errorBg, 4.5, 0.6, 0.06);
+  const diffAddedLine = deepen(s.successBg, 3, 0.45, 0.02);
+  const diffAddedWord = deepen(s.successBg, 4.5, 0.6, 0.06);
 
   return {
     // ── Activity Bar ────────────────────────────────────────────────────────
@@ -299,20 +324,22 @@ export function buildExtendedColors(p: DerivedPalette): Record<string, string> {
     // ── Diff / merge ──────────────────────────────────────────────────────
     "diffEditor.border": p.border,
     "diffEditor.diagonalFill": withAlpha(p.border, 0.5),
-    "diffEditor.insertedTextBackground": addedBg,
-    "diffEditor.insertedLineBackground": addedLine,
-    "diffEditor.insertedTextBorder": transparent,
-    "diffEditor.removedTextBackground": removedBg,
-    "diffEditor.removedLineBackground": removedLine,
-    "diffEditor.removedTextBorder": transparent,
+    "diffEditor.insertedTextBackground": diffAddedWord,
+    "diffEditor.insertedLineBackground": diffAddedLine,
+    // A faint outline marks the changed word without sitting under its text (no contrast cost);
+    // at 0.3 alpha it reads as a hairline, not the solid box the semantic border used to draw.
+    "diffEditor.insertedTextBorder": withAlpha(s.success, 0.3),
+    "diffEditor.removedTextBackground": diffRemovedWord,
+    "diffEditor.removedLineBackground": diffRemovedLine,
+    "diffEditor.removedTextBorder": withAlpha(s.error, 0.3),
     "diffEditor.unchangedRegionBackground": p.bg1,
     "diffEditor.unchangedRegionForeground": p.fgMuted,
     "diffEditor.unchangedCodeBackground": withAlpha(p.fg0, 0.02),
     "diffEditor.unchangedRegionShadow": shadow,
     "diffEditor.move.border": withAlpha(p.huePurple, 0.6),
     "diffEditor.moveActive.border": p.huePurple,
-    "diffEditorGutter.insertedLineBackground": withAlpha(s.success, 0.22),
-    "diffEditorGutter.removedLineBackground": withAlpha(s.error, 0.22),
+    "diffEditorGutter.insertedLineBackground": diffAddedWord,
+    "diffEditorGutter.removedLineBackground": diffRemovedWord,
     "diffEditorOverview.insertedForeground": withAlpha(s.success, 0.6),
     "diffEditorOverview.removedForeground": withAlpha(s.error, 0.6),
     "merge.border": p.border,

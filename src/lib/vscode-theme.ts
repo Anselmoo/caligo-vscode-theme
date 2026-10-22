@@ -1,5 +1,6 @@
 import { scaleAlpha, withAlpha } from "./color.js";
 import { pickReadableForeground } from "./contrast.js";
+import { codeInks } from "./contrast-pairs.js";
 import { deriveIntentSemanticTokenColors } from "./intent-layers.js";
 import { fitOverlaysToReaders } from "./overlay-fit.js";
 import type { DerivedPalette } from "./palette.js";
@@ -56,7 +57,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
 
     "editor.background": p.bg0,
     "editor.foreground": p.fg0,
-    "editorLineNumber.foreground": withAlpha(p.fgMuted, 0.55),
+    "editorLineNumber.foreground": withAlpha(p.fgMuted, 0.63),
     "editorLineNumber.activeForeground": withAlpha(p.fg0, 0.8),
     "editorCursor.foreground": p.accentSoft,
 
@@ -459,7 +460,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
       name: "Comments",
       scope: ["comment", "punctuation.definition.comment", "string.comment"],
       settings: {
-        foreground: withAlpha(p.fgMuted, 0.75),
+        foreground: withAlpha(p.fgMuted, 0.9),
         fontStyle: "italic",
       },
     },
@@ -502,7 +503,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
         "punctuation.definition.string.end",
         "punctuation.definition.string",
       ],
-      settings: { foreground: withAlpha(syntax.strings, 0.85) },
+      settings: { foreground: withAlpha(syntax.strings, 0.92) },
     },
     {
       name: "String Interpolation",
@@ -526,7 +527,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     {
       name: "Docstrings",
       scope: ["string.quoted.docstring.multi", "string.quoted.docstring"],
-      settings: { foreground: withAlpha(p.fgMuted, 0.75) },
+      settings: { foreground: withAlpha(p.fgMuted, 0.9) },
     },
     {
       name: "Regex",
@@ -997,7 +998,12 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
   for (const [key, value] of Object.entries(buildInheritedColors(p, settled))) {
     if (!(key in settled)) settled[key] = value;
   }
-  const fitted = fitOverlaysToReaders(settled);
+  const semanticTokenColors = p.intent
+    ? deriveIntentSemanticTokenColors(p.intent, p.fgMuted)
+    : deriveSemanticTokenColors(p);
+  // Code is painted in token colors, so they read the diff, merge and inline-chat overlays too.
+  const inks = codeInks({ tokenColors, semanticTokenColors }).map(ink => ink.fg);
+  const fitted = fitOverlaysToReaders(settled, inks);
   // An inactive selection is its active twin at lower alpha. Re-derive it from the
   // fitted active tint, or a darkened active selection reads weaker than the inactive.
   for (const [active, inactive] of [
@@ -1017,9 +1023,7 @@ export function buildVscodeThemeJson(p: DerivedPalette): VscodeThemeJson {
     colors: fitted,
     tokenColors,
     semanticHighlighting: true,
-    semanticTokenColors: p.intent
-      ? deriveIntentSemanticTokenColors(p.intent, p.fgMuted)
-      : deriveSemanticTokenColors(p),
+    semanticTokenColors,
     _oklchDebug,
   };
 }

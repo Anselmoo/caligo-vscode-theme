@@ -87,7 +87,16 @@ const PAIR_GROUPS: ReadonlyArray<
     ["editor.background>editor.findMatchHighlightBackground"],
   ],
   ["editor.foldPlaceholderForeground", "text", ["editor.background>editor.foldBackground"]],
-  ["editorLineNumber.foreground", "text", ["editor.background", "editorGutter.background"]],
+  [
+    "editorLineNumber.foreground",
+    "text",
+    [
+      "editor.background",
+      "editorGutter.background",
+      "editor.background>diffEditorGutter.removedLineBackground",
+      "editor.background>diffEditorGutter.insertedLineBackground",
+    ],
+  ],
   [
     "editorLineNumber.activeForeground",
     "text",
@@ -1452,6 +1461,58 @@ function expandGroups(): ContrastPair[] {
 /** Every gated pair. Ids (see `pairId`) are unique. */
 export const CONTRAST_PAIRS: readonly ContrastPair[] = expandGroups();
 
+/**
+ * Editor stacks that code is painted on, `base...>overlay` in `colors` keys, bottom -> top.
+ *
+ * The registry above scores `editor.foreground` on a few of them, but code is mostly painted in
+ * token colors (tokenColors / semanticTokenColors): a constant or keyword on a removed line, a
+ * comment inside a merge conflict. Every distinct code ink of a theme is gated over each stack
+ * here (see `codeInks`), and the overlay fit treats those inks as readers of the top layer.
+ */
+export const CODE_STACKS: readonly string[] = [
+  "editor.background>diffEditor.removedLineBackground",
+  "editor.background>diffEditor.removedLineBackground>diffEditor.removedTextBackground",
+  "editor.background>diffEditor.insertedLineBackground",
+  "editor.background>diffEditor.insertedLineBackground>diffEditor.insertedTextBackground",
+  "editor.background>merge.currentContentBackground",
+  "editor.background>merge.incomingContentBackground",
+  "editor.background>merge.commonContentBackground",
+  "editor.background>mergeEditor.conflictingLines.background",
+  "editor.background>mergeEditor.change.background",
+  "editor.background>inlineChatDiff.removed",
+  "editor.background>inlineChatDiff.inserted",
+  // Selection and occurrence highlights: code under them keeps its token colors. (Find matches are
+  // not listed: the themes set editor.findMatchForeground / findMatchHighlightForeground, which
+  // replace the token colors of matched text; the registry pairs above gate those.
+  // editor.selectionForeground applies to high-contrast themes only, so selected code is still
+  // painted in token colors.)
+  "editor.background>editor.lineHighlightBackground>editor.selectionBackground",
+  "editor.background>diffEditor.removedLineBackground>editor.selectionBackground",
+  "editor.background>diffEditor.insertedLineBackground>editor.selectionBackground",
+  "editor.background>editor.selectionHighlightBackground",
+  "editor.background>editor.wordHighlightBackground",
+  "editor.background>editor.wordHighlightStrongBackground",
+];
+
+/**
+ * Distinct code inks of a theme: every tokenColors and semanticTokenColors foreground, deduplicated
+ * by hex (the first label that uses a hex names it). `editor.foreground` is not included; the
+ * registry pairs above cover it.
+ */
+export function codeInks(theme: ThemeJson): Array<{ label: string; fg: string }> {
+  const seen = new Map<string, string>();
+  for (const rule of theme.tokenColors ?? []) {
+    const fg = rule.settings?.foreground;
+    if (fg && !seen.has(fg))
+      seen.set(fg, `token:${rule.name ?? [rule.scope ?? ""].flat().join(",")}`);
+  }
+  for (const [selector, value] of Object.entries(theme.semanticTokenColors ?? {})) {
+    const fg = typeof value === "string" ? value : value?.foreground;
+    if (fg && !seen.has(fg)) seen.set(fg, `semantic:${selector}`);
+  }
+  return [...seen].map(([fg, label]) => ({ label, fg }));
+}
+
 const baseKeys = (base: ContrastPair["base"]): string[] =>
   base === undefined ? [] : ([] as string[]).concat(base);
 
@@ -1549,6 +1610,17 @@ export function evaluateThemeContrast(theme: ThemeJson): PairResult[] {
     if (!fg) continue;
     const id = `semantic:${selector}|${EDITOR_BG}`;
     push(score(id, "text", fg, [editorBg(id)]));
+  }
+
+  // Code inks over the code stacks. An ink that already fails on the bare editor background is
+  // scored there (above) and not again on every stack: its own color is the problem.
+  for (const ink of codeInks(theme)) {
+    if (wcagContrastRatio(ink.fg, editorBg(ink.label)) < WCAG_MIN.text) continue;
+    for (const stack of CODE_STACKS) {
+      const id = `code:${ink.label}|${stack}`;
+      const layers = stack.split(">").map(k => requireColor(colors, k, id));
+      push(score(id, "text", ink.fg, layers));
+    }
   }
 
   return results;
