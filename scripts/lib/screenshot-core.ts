@@ -338,6 +338,7 @@ export async function stopApp(app: ElectronApplication) {
   }
 }
 
+import { slugifyForFilename } from "./screenshot-filename";
 import { tryCloseSidebarOnce } from "./theme-utils";
 
 export async function captureThemeInOpenApp(params: {
@@ -889,14 +890,4 @@ export function writeReportAtomic(report: ScreenshotReport, targetPath: string) 
   const tmp = `${targetPath}.${Date.now()}.tmp`;
   fs.writeFileSync(tmp, JSON.stringify(report, null, 2), "utf-8");
   fs.renameSync(tmp, targetPath);
-}
-
-function slugifyForFilename(input: string): string {
-  return input
-    .toLowerCase()
-    .replace(/\s+/g, " ")
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/(^-|-$)/g, "");
 }

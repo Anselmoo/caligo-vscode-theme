@@ -826,12 +826,36 @@ jobs:
             echo "❌ @anselmoo/caligo-theme-data publish failed for ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           fi
 
+  # GitHub Pages is one global slot. A tag build may only take it when the
+  # tagged commit is still main's head; otherwise it would overwrite a newer
+  # site (2026-10-21: re-pushing the old v0.7.0 tag redeployed September code).
+  pages-freshness:
+    name: Release - Pages freshness check
+    if: ${{ needs.release-gate.outputs.ready == 'true' }}
+    needs: release-gate
+    runs-on: ubuntu-latest
+    outputs:
+      current: ${{ steps.check.outputs.current }}
+    steps:
+      - name: Compare tagged commit with main's head
+        id: check
+        env:
+          REPO_URL: https://github.com/${{ github.repository }}.git
+        run: |
+          MAIN_SHA="$(git ls-remote "$REPO_URL" refs/heads/main | cut -f1)"
+          if [ -n "$MAIN_SHA" ] && [ "$MAIN_SHA" = "$GITHUB_SHA" ]; then
+            echo "current=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "current=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Skipping Pages deploy: ${GITHUB_REF_NAME} (${GITHUB_SHA}) is not main's head (${MAIN_SHA:-unknown}); the main pipeline owns the site."
+          fi
+
   # Keep Pages independent from package/image publishing:
   # release-pages must run from release-gate even if release-ghcr or release-github-packages fails.
   release-pages:
     name: Release - Deploy Pages
-    if: ${{ needs.release-gate.outputs.ready == 'true' }}
-    needs: [release-gate, build-sbom, build-wallpapers]
+    if: ${{ needs.release-gate.outputs.ready == 'true' && needs.pages-freshness.outputs.current == 'true' }}
+    needs: [release-gate, pages-freshness, build-sbom, build-wallpapers]
     runs-on: ubuntu-latest
     concurrency:
       group: pages
