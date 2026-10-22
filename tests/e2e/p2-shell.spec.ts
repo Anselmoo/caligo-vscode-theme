@@ -305,6 +305,29 @@ test.describe("Footer", { tag: "@science" }, () => {
   });
 });
 
+// Hash routing: an in-page link written as href="#x" would navigate to a route
+// called "x" and land on the 404 page. These links must stay on their page.
+test.describe("In-page links under hash routing", { tag: "@shell" }, () => {
+  test("Choose your night scrolls to the Spectrum on Home", async ({ page }) => {
+    await gotoApp(page, "/");
+    await page.getByRole("link", { name: "Choose your night" }).click();
+    await expect(page).toHaveURL(/#\/#spectrum$/);
+    await expect(page.getByRole("heading", { name: "Page not found" })).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "Theme Spectrum" })).toBeInViewport();
+  });
+
+  test("the skip link moves focus to the content without leaving the page", async ({ page }) => {
+    await gotoApp(page, "/#/science");
+    await page.keyboard.press("Tab");
+    const skip = page.getByRole("link", { name: "Skip to content" });
+    await expect(skip).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/#\/science$/);
+    await expect(page.locator("#main")).toBeFocused();
+    await expect(page.getByRole("heading", { name: "Page not found" })).toHaveCount(0);
+  });
+});
+
 test.describe("404 page", { tag: "@science" }, () => {
   test("offers a way home", async ({ page }) => {
     await gotoApp(page, "/#/no-such-page");

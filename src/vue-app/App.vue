@@ -15,13 +15,24 @@ onBeforeMount(async () => {
 
 useCommandPaletteShortcut();
 
+/**
+ * Skip link: with hash routing, following href="#main" would navigate to a route
+ * called "main" (a 404). Move focus to the content instead; the href stays for
+ * semantics and for no-JS fallbacks.
+ */
+function skipToMain() {
+  const main = document.getElementById("main");
+  main?.focus();
+  main?.scrollIntoView();
+}
+
 // Some TS configurations (and editor diagnostics) don't account for template usage
 // when reporting noUnusedLocals in <script setup>.
 </script>
 
 <template>
   <div id="caligo-app">
-    <a class="skip-link" href="#main">Skip to content</a>
+    <a class="skip-link" href="#main" @click.prevent="skipToMain">Skip to content</a>
     <AppNav />
     <!-- Page changes animate through View Transitions (router/index.ts), so the
          router view swaps instantly here instead of running an out-in fade. -->

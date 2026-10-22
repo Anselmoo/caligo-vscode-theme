@@ -40,7 +40,7 @@ const bgOklch = computed(() => {
             <a class="btn-primary" :href="MARKETPLACE_URL" rel="noopener" target="_blank">
               Install from Marketplace
             </a>
-            <a class="btn-quiet" href="#spectrum">Choose your night</a>
+            <RouterLink class="btn-quiet" :to="{ path: '/', hash: '#spectrum' }">Choose your night</RouterLink>
           </div>
         </div>
         <EditorPreview class="hero__editor" />
