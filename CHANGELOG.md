@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-10-22
+### Changed
+- **site**: redesign around the restored Theme Spectrum matrix, with fixes to manifest, export and hero data (#178)
+
+### Fixed
+- **contrast**: readable code in diff, merge and selection states — syntax colours are now scored on stacked diff layers and the diff overlays are fitted to the text drawn on them (#179)
+- **pages**: tag builds no longer redeploy the site with stale wallpapers, and the Monochromatic screenshots are found again (#177)
+
 ## [0.8.0] - 2026-10-21
 ### Added
 - **colors**: emit the 63 VS Code workbench colors the themes were missing (Agents window, chat incl. voice glow, modern UI shell, `tab.divider`, `statusBar.inactiveBackground`, ...) and gate coverage against a fixture pinned to VS Code 1.142.0 (#174)
