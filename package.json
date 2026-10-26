@@ -133,7 +133,7 @@
     "@vscode/test-electron": "^2.5.2",
     "@vscode/vsce": "^3.9.2",
     "@vue/test-utils": "^2.5.1",
-    "axe-core": "^4.11.4",
+    "axe-core": "^4.14.0",
     "commit-and-tag-version": "^9.6.0",
     "d3-shape": "^3.2.0",
     "happy-dom": "^20.9.0",
